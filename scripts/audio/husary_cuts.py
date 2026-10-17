@@ -387,7 +387,7 @@ def write_review(rows: list[dict]) -> None:
         "<code>status: bad</code>, хорошую — <code>status: ok</code>.</p>"
         f"<table><tr><th>Текст</th><th>Звук</th><th>Аяты</th><th>Статус</th></tr>{items}</table>"
     )
-    (OUT / "review.html").write_text(page, "utf-8")
+    (OUT / "review.html").write_text(page + "\n", "utf-8")
 
 
 if __name__ == "__main__":

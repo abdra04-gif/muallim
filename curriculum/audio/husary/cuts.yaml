@@ -1,0 +1,1319 @@
+# Нарезки «как правильно» из учебного чтения Хусари (EveryAyah, SRC-042), ADR-0032.
+# Генерирует scripts/audio/husary_cuts.py. status: unchecked → человек слушает
+# review.html и ставит ok или bad (bad бот не даёт). start/end — секунды в файле аята.
+- text: أَ إِ أُ
+  file: ef11b3186209d65c.ogg
+  status: unchecked
+  parts:
+  - token: أَ
+    aya: '101:1'
+    start: 0.12
+    end: 0.5
+    pause_before: 4.23
+    check: model
+  - token: إِ
+    aya: '70:22'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.21
+    check: alignment
+  - token: أُ
+    aya: '20:31'
+    start: 0.16
+    end: 0.5
+    pause_before: 4.28
+    check: alignment
+- text: أَ
+  file: efe4842c24be1f98.ogg
+  status: unchecked
+  parts:
+  - token: أَ
+    aya: '101:1'
+    start: 0.12
+    end: 0.5
+    pause_before: 4.23
+    check: model
+- text: إِ
+  file: 66b95b115f4c199f.ogg
+  status: unchecked
+  parts:
+  - token: إِ
+    aya: '70:22'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.21
+    check: alignment
+- text: أُ
+  file: 1a73536b5f7ff9e3.ogg
+  status: unchecked
+  parts:
+  - token: أُ
+    aya: '20:31'
+    start: 0.16
+    end: 0.5
+    pause_before: 4.28
+    check: alignment
+- text: رَ
+  file: 191edc4446efe37a.ogg
+  status: unchecked
+  parts:
+  - token: رَ
+    aya: 7:122
+    start: 0.2
+    end: 0.5
+    pause_before: 4.32
+    check: model
+- text: رِ
+  file: 490c376a4c347d73.ogg
+  status: unchecked
+  parts:
+  - token: رِ
+    aya: '50:11'
+    start: 0.28
+    end: 0.66
+    pause_before: 4.4
+    check: alignment
+- text: رُ
+  file: e2a40595258c38d4.ogg
+  status: unchecked
+  parts:
+  - token: رُ
+    aya: '15:2'
+    start: 0.36
+    end: 0.7
+    pause_before: 4.48
+    check: alignment
+- text: رَ رِ رُ
+  file: 0d4b144c229b782f.ogg
+  status: unchecked
+  parts:
+  - token: رَ
+    aya: 7:122
+    start: 0.2
+    end: 0.5
+    pause_before: 4.32
+    check: model
+  - token: رِ
+    aya: '50:11'
+    start: 0.28
+    end: 0.66
+    pause_before: 4.4
+    check: alignment
+  - token: رُ
+    aya: '15:2'
+    start: 0.36
+    end: 0.7
+    pause_before: 4.48
+    check: alignment
+- text: زَ
+  file: e019f1bbc603bf35.ogg
+  status: unchecked
+  parts:
+  - token: زَ
+    aya: '64:7'
+    start: 0.12
+    end: 0.42
+    pause_before: 4.24
+    check: model
+- text: زِ
+  file: 59c2d7febfef8288.ogg
+  status: unchecked
+  parts:
+  - token: زِ
+    aya: '73:4'
+    start: 0.32
+    end: 0.7
+    pause_before: 0.28
+    check: model
+- text: زُ
+  file: 98f3b177f9ee4251.ogg
+  status: unchecked
+  parts:
+  - token: زُ
+    aya: 2:212
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: alignment
+- text: زَ زِ زُ
+  file: 3e4e017831617787.ogg
+  status: unchecked
+  parts:
+  - token: زَ
+    aya: '64:7'
+    start: 0.12
+    end: 0.42
+    pause_before: 4.24
+    check: model
+  - token: زِ
+    aya: '73:4'
+    start: 0.32
+    end: 0.7
+    pause_before: 0.28
+    check: model
+  - token: زُ
+    aya: 2:212
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: alignment
+- text: مَ
+  file: 377f54ce9e8f13cf.ogg
+  status: unchecked
+  parts:
+  - token: مَ
+    aya: '101:2'
+    start: 0.28
+    end: 0.7
+    pause_before: 4.41
+    check: model
+- text: مِ
+  file: e43a63ddfbaa2066.ogg
+  status: unchecked
+  parts:
+  - token: مِ
+    aya: '113:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.26
+    check: alignment
+- text: مُ
+  file: a41bdb0b77a02b67.ogg
+  status: unchecked
+  parts:
+  - token: مُ
+    aya: 55:64
+    start: 0.44
+    end: 0.82
+    pause_before: 4.56
+    check: model
+- text: مَ مِ مُ
+  file: 1ba15accaa9b6cb9.ogg
+  status: unchecked
+  parts:
+  - token: مَ
+    aya: '101:2'
+    start: 0.28
+    end: 0.7
+    pause_before: 4.41
+    check: model
+  - token: مِ
+    aya: '113:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.26
+    check: alignment
+  - token: مُ
+    aya: 55:64
+    start: 0.44
+    end: 0.82
+    pause_before: 4.56
+    check: model
+- text: تَ
+  file: 6670f319d7b5bf94.ogg
+  status: unchecked
+  parts:
+  - token: تَ
+    aya: '80:41'
+    start: 0.24
+    end: 0.66
+    pause_before: 4.36
+    check: model
+- text: تِ
+  file: ecbc66cf6b8f43fb.ogg
+  status: unchecked
+  parts:
+  - token: تِ
+    aya: '53:22'
+    start: 0.28
+    end: 0.66
+    pause_before: 4.4
+    check: model
+- text: تُ
+  file: 7d3d35190d09ad3d.ogg
+  status: unchecked
+  parts:
+  - token: تُ
+    aya: '88:5'
+    start: 0.24
+    end: 0.66
+    pause_before: 4.36
+    check: model
+- text: تَ تِ تُ
+  file: 2dc92f32b5d5e82c.ogg
+  status: unchecked
+  parts:
+  - token: تَ
+    aya: '80:41'
+    start: 0.24
+    end: 0.66
+    pause_before: 4.36
+    check: model
+  - token: تِ
+    aya: '53:22'
+    start: 0.28
+    end: 0.66
+    pause_before: 4.4
+    check: model
+  - token: تُ
+    aya: '88:5'
+    start: 0.24
+    end: 0.66
+    pause_before: 4.36
+    check: model
+- text: نَ
+  file: 40c8cf0fb4f3cdb9.ogg
+  status: unchecked
+  parts:
+  - token: نَ
+    aya: '74:36'
+    start: 0.2
+    end: 0.62
+    pause_before: 4.32
+    check: model
+- text: نِ
+  file: 5405ba18fcb9d075.ogg
+  status: unchecked
+  parts:
+  - token: نِ
+    aya: '73:3'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.2
+    check: model
+- text: نُ
+  file: 35548ef661b29d87.ogg
+  status: unchecked
+  parts:
+  - token: نُ
+    aya: '41:32'
+    start: 0.04
+    end: 0.38
+    pause_before: 4.16
+    check: model
+- text: نَ نِ نُ
+  file: c753bcc56db4b5f6.ogg
+  status: unchecked
+  parts:
+  - token: نَ
+    aya: '74:36'
+    start: 0.2
+    end: 0.62
+    pause_before: 4.32
+    check: model
+  - token: نِ
+    aya: '73:3'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.2
+    check: model
+  - token: نُ
+    aya: '41:32'
+    start: 0.04
+    end: 0.38
+    pause_before: 4.16
+    check: model
+- text: يَ
+  file: 7ff1508cbd3dbab2.ogg
+  status: unchecked
+  parts:
+  - token: يَ
+    aya: '20:28'
+    start: 0.24
+    end: 0.58
+    pause_before: 4.35
+    check: model
+- text: يُ
+  file: eff307e019d68e1b.ogg
+  status: unchecked
+  parts:
+  - token: يُ
+    aya: '51:9'
+    start: 0.16
+    end: 0.54
+    pause_before: 4.28
+    check: model
+- text: بَ
+  file: d431deab7158b3e2.ogg
+  status: unchecked
+  parts:
+  - token: بَ
+    aya: 56:67
+    start: 0.28
+    end: 0.62
+    pause_before: 4.4
+    check: model
+- text: بِ
+  file: 3d7326a9ba8c6708.ogg
+  status: unchecked
+  parts:
+  - token: بِ
+    aya: '80:15'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: model
+- text: بُ
+  file: db369760ad6bcaa3.ogg
+  status: unchecked
+  parts:
+  - token: بُ
+    aya: '76:25'
+    start: 2.85
+    end: 3.19
+    pause_before: 0.24
+    check: model
+- text: بَ بِ بُ
+  file: 06b4b3179e5fdbb6.ogg
+  status: unchecked
+  parts:
+  - token: بَ
+    aya: 56:67
+    start: 0.28
+    end: 0.62
+    pause_before: 4.4
+    check: model
+  - token: بِ
+    aya: '80:15'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: model
+  - token: بُ
+    aya: '76:25'
+    start: 2.85
+    end: 3.19
+    pause_before: 0.24
+    check: model
+- text: كَ
+  file: 1b8031bb340366de.ogg
+  status: unchecked
+  parts:
+  - token: كَ
+    aya: '74:32'
+    start: 0.16
+    end: 0.5
+    pause_before: 4.28
+    check: model
+- text: كِ
+  file: d51eedf08198252a.ogg
+  status: unchecked
+  parts:
+  - token: كِ
+    aya: '80:16'
+    start: 0.04
+    end: 0.38
+    pause_before: 4.16
+    check: model
+- text: كُ
+  file: 6f94d563d6efb591.ogg
+  status: unchecked
+  parts:
+  - token: كُ
+    aya: '55:26'
+    start: 0.2
+    end: 0.62
+    pause_before: 4.32
+    check: model
+- text: كَ كِ كُ
+  file: 748ccac6a6ad6fed.ogg
+  status: unchecked
+  parts:
+  - token: كَ
+    aya: '74:32'
+    start: 0.16
+    end: 0.5
+    pause_before: 4.28
+    check: model
+  - token: كِ
+    aya: '80:16'
+    start: 0.04
+    end: 0.38
+    pause_before: 4.16
+    check: model
+  - token: كُ
+    aya: '55:26'
+    start: 0.2
+    end: 0.62
+    pause_before: 4.32
+    check: model
+- text: لَ
+  file: c4e931ac03054ca2.ogg
+  status: unchecked
+  parts:
+  - token: لَ
+    aya: '112:3'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: model
+- text: لِ
+  file: dbb8df58f45a146e.ogg
+  status: unchecked
+  parts:
+  - token: لِ
+    aya: '77:13'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.19
+    check: model
+- text: لُ
+  file: 4fa06a5ae43d9d9b.ogg
+  status: unchecked
+  parts:
+  - token: لُ
+    aya: 5:78
+    start: 0.0
+    end: 0.3
+    pause_before: 4.12
+    check: model
+- text: لَ لِ لُ
+  file: 3cfce22ee93c3a0a.ogg
+  status: unchecked
+  parts:
+  - token: لَ
+    aya: '112:3'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: model
+  - token: لِ
+    aya: '77:13'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.19
+    check: model
+  - token: لُ
+    aya: 5:78
+    start: 0.0
+    end: 0.3
+    pause_before: 4.12
+    check: model
+- text: وَ
+  file: f847ca2b3640a636.ogg
+  status: unchecked
+  parts:
+  - token: وَ
+    aya: '103:1'
+    start: 0.08
+    end: 0.5
+    pause_before: 4.2
+    check: model
+- text: وُ
+  file: 37fbe8908d4704ff.ogg
+  status: unchecked
+  parts:
+  - token: وُ
+    aya: '88:2'
+    start: 0.08
+    end: 0.5
+    pause_before: 4.2
+    check: alignment
+- text: أَوْ رَوْ نَوْ لَوْ
+  file: aad705a29713bd31.ogg
+  status: unchecked
+  parts:
+  - token: أَوْ
+    aya: '75:34'
+    start: 0.12
+    end: 0.82
+    pause_before: 4.24
+    check: model
+  - token: رَوْ
+    aya: '30:15'
+    start: 8.36
+    end: 8.94
+    pause_before: 0.24
+    check: model
+  - token: نَوْ
+    aya: '78:9'
+    start: 1.96
+    end: 2.66
+    pause_before: 0.32
+    check: model
+  - token: لَوْ
+    aya: 37:168
+    start: 0.16
+    end: 0.74
+    pause_before: 4.28
+    check: model
+- text: هَ
+  file: f27e4b76e352c6a9.ogg
+  status: unchecked
+  parts:
+  - token: هَ
+    aya: '69:29'
+    start: 0.24
+    end: 0.62
+    pause_before: 4.36
+    check: alignment
+- text: هِ
+  file: 368693483e2b2dd2.ogg
+  status: unchecked
+  parts:
+  - token: هِ
+    aya: '97:5'
+    start: 1.76
+    end: 2.18
+    pause_before: 0.28
+    check: model
+- text: هُ
+  file: e5003bc21b088f94.ogg
+  status: unchecked
+  parts:
+  - token: هُ
+    aya: '27:2'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: alignment
+- text: هَ هِ هُ
+  file: 5162e11bb0058d1f.ogg
+  status: unchecked
+  parts:
+  - token: هَ
+    aya: '69:29'
+    start: 0.24
+    end: 0.62
+    pause_before: 4.36
+    check: alignment
+  - token: هِ
+    aya: '97:5'
+    start: 1.76
+    end: 2.18
+    pause_before: 0.28
+    check: model
+  - token: هُ
+    aya: '27:2'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: alignment
+- text: مِنْهُ مِنْهُمْ إِلَيْهِ إِلَيْهِمْ أَمْهِلْهُمْ
+  file: 8931e76053b6da7e.ogg
+  status: unchecked
+  parts:
+  - token: مِنْهُ
+    aya: '69:45'
+    start: 2.0
+    end: 2.94
+    pause_before: 0.24
+    check: model
+  - token: مِنْهُمْ
+    aya: 15:79
+    start: 3.16
+    end: 4.58
+    pause_before: 0.36
+    check: model
+  - token: إِلَيْهِ
+    aya: '41:47'
+    start: 0.16
+    end: 1.02
+    pause_before: 4.28
+    check: alignment
+  - token: إِلَيْهِمْ
+    aya: '51:27'
+    start: 2.84
+    end: 4.57
+    pause_before: 0.68
+    check: model
+  - token: أَمْهِلْهُمْ
+    aya: '86:17'
+    start: 3.81
+    end: 5.87
+    pause_before: 0.2
+    check: model
+- text: فَ
+  file: 974f76d02d4f4333.ogg
+  status: unchecked
+  parts:
+  - token: فَ
+    aya: '90:13'
+    start: 0.4
+    end: 0.78
+    pause_before: 4.53
+    check: model
+- text: فِ
+  file: c7f392deef0ab65b.ogg
+  status: unchecked
+  parts:
+  - token: فِ
+    aya: '85:18'
+    start: 0.16
+    end: 0.54
+    pause_before: 4.28
+    check: alignment
+- text: فُ
+  file: a0b184720b4eb913.ogg
+  status: unchecked
+  parts:
+  - token: فُ
+    aya: '82:3'
+    start: 2.41
+    end: 2.79
+    pause_before: 0.2
+    check: model
+- text: فَ فِ فُ
+  file: 3321db4b20f006c0.ogg
+  status: unchecked
+  parts:
+  - token: فَ
+    aya: '90:13'
+    start: 0.4
+    end: 0.78
+    pause_before: 4.53
+    check: model
+  - token: فِ
+    aya: '85:18'
+    start: 0.16
+    end: 0.54
+    pause_before: 4.28
+    check: alignment
+  - token: فُ
+    aya: '82:3'
+    start: 2.41
+    end: 2.79
+    pause_before: 0.2
+    check: model
+- text: قَ
+  file: b8ad739dba9474f8.ogg
+  status: unchecked
+  parts:
+  - token: قَ
+    aya: '23:1'
+    start: 0.4
+    end: 0.74
+    pause_before: 4.52
+    check: model
+- text: قِ
+  file: a38e1b277b93dfd0.ogg
+  status: unchecked
+  parts:
+  - token: قِ
+    aya: '70:36'
+    start: 3.68
+    end: 4.02
+    pause_before: 0.24
+    check: model
+- text: قُ
+  file: 7084c042fd094136.ogg
+  status: unchecked
+  parts:
+  - token: قُ
+    aya: '74:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: alignment
+- text: قَ قِ قُ
+  file: 42d125c53914490f.ogg
+  status: unchecked
+  parts:
+  - token: قَ
+    aya: '23:1'
+    start: 0.4
+    end: 0.74
+    pause_before: 4.52
+    check: model
+  - token: قِ
+    aya: '70:36'
+    start: 3.68
+    end: 4.02
+    pause_before: 0.24
+    check: model
+  - token: قُ
+    aya: '74:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: alignment
+- text: شَ
+  file: 9a490665a1446b32.ogg
+  status: unchecked
+  parts:
+  - token: شَ
+    aya: '3:18'
+    start: 0.04
+    end: 0.38
+    pause_before: 4.16
+    check: alignment
+- text: شُ
+  file: 0b4e83084e058443.ogg
+  status: unchecked
+  parts:
+  - token: شُ
+    aya: '36:55'
+    start: 5.67
+    end: 6.05
+    pause_before: 0.28
+    check: model
+- text: سَ
+  file: 7fe1ea7b0a6cbba5.ogg
+  status: unchecked
+  parts:
+  - token: سَ
+    aya: '74:26'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.2
+    check: model
+- text: سِ
+  file: 48428bcc7b05bd1a.ogg
+  status: unchecked
+  parts:
+  - token: سِ
+    aya: '56:28'
+    start: 1.2
+    end: 1.58
+    pause_before: 0.28
+    check: model
+- text: سُ
+  file: f48613ace178a2f0.ogg
+  status: unchecked
+  parts:
+  - token: سُ
+    aya: 37:159
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+- text: سَ سِ سُ
+  file: e088a312772f5aba.ogg
+  status: unchecked
+  parts:
+  - token: سَ
+    aya: '74:26'
+    start: 0.08
+    end: 0.42
+    pause_before: 4.2
+    check: model
+  - token: سِ
+    aya: '56:28'
+    start: 1.2
+    end: 1.58
+    pause_before: 0.28
+    check: model
+  - token: سُ
+    aya: 37:159
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+- text: ثَ
+  file: 2d4d7a7700214e3e.ogg
+  status: unchecked
+  parts:
+  - token: ثَ
+    aya: 6:143
+    start: 0.04
+    end: 0.34
+    pause_before: 4.16
+    check: alignment
+- text: ثُ
+  file: a18d3e5412060fc4.ogg
+  status: unchecked
+  parts:
+  - token: ثُ
+    aya: '74:21'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.25
+    check: alignment
+- text: صَ
+  file: 3aac02d5cb70c76a.ogg
+  status: unchecked
+  parts:
+  - token: صَ
+    aya: '96:10'
+    start: 2.28
+    end: 2.66
+    pause_before: 0.32
+    check: model
+- text: صِ
+  file: b7321073af3fc318.ogg
+  status: unchecked
+  parts:
+  - token: صِ
+    aya: 2:138
+    start: 0.56
+    end: 0.9
+    pause_before: 4.68
+    check: model
+- text: صُ
+  file: 7811e9fc81ce6d85.ogg
+  status: unchecked
+  parts:
+  - token: صُ
+    aya: '87:19'
+    start: 0.04
+    end: 0.42
+    pause_before: 4.16
+    check: alignment
+- text: صَ صِ صُ
+  file: cd1c78d6ba200396.ogg
+  status: unchecked
+  parts:
+  - token: صَ
+    aya: '96:10'
+    start: 2.28
+    end: 2.66
+    pause_before: 0.32
+    check: model
+  - token: صِ
+    aya: 2:138
+    start: 0.56
+    end: 0.9
+    pause_before: 4.68
+    check: model
+  - token: صُ
+    aya: '87:19'
+    start: 0.04
+    end: 0.42
+    pause_before: 4.16
+    check: alignment
+- text: طَ
+  file: 539b0d0da80ca077.ogg
+  status: unchecked
+  parts:
+  - token: طَ
+    aya: '44:44'
+    start: 0.28
+    end: 0.62
+    pause_before: 4.4
+    check: alignment
+- text: جَ
+  file: 9759387956be414d.ogg
+  status: unchecked
+  parts:
+  - token: جَ
+    aya: '78:26'
+    start: 0.04
+    end: 0.42
+    pause_before: 4.16
+    check: model
+- text: جِ
+  file: 2c87e1b89f3d28b4.ogg
+  status: unchecked
+  parts:
+  - token: جِ
+    aya: '25:52'
+    start: 6.29
+    end: 6.68
+    pause_before: 0.28
+    check: model
+- text: جُ
+  file: 43abf3ef536e5cc8.ogg
+  status: unchecked
+  parts:
+  - token: جُ
+    aya: '38:11'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: model
+- text: جَ جِ جُ
+  file: 88a2d17000323151.ogg
+  status: unchecked
+  parts:
+  - token: جَ
+    aya: '78:26'
+    start: 0.04
+    end: 0.42
+    pause_before: 4.16
+    check: model
+  - token: جِ
+    aya: '25:52'
+    start: 6.29
+    end: 6.68
+    pause_before: 0.28
+    check: model
+  - token: جُ
+    aya: '38:11'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: model
+- text: خَ
+  file: 314d20965b73b358.ogg
+  status: unchecked
+  parts:
+  - token: خَ
+    aya: '55:3'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: model
+- text: خِ
+  file: b1c4627eafac45aa.ogg
+  status: unchecked
+  parts:
+  - token: خِ
+    aya: '83:26'
+    start: 0.08
+    end: 0.5
+    pause_before: 4.2
+    check: alignment
+- text: خُ
+  file: 7997846d7f7be906.ogg
+  status: unchecked
+  parts:
+  - token: خُ
+    aya: '69:30'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: alignment
+- text: خَ خِ خُ
+  file: 94e9761bcf99f160.ogg
+  status: unchecked
+  parts:
+  - token: خَ
+    aya: '55:3'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: model
+  - token: خِ
+    aya: '83:26'
+    start: 0.08
+    end: 0.5
+    pause_before: 4.2
+    check: alignment
+  - token: خُ
+    aya: '69:30'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: alignment
+- text: حَ
+  file: 5f387e8e0b747b5a.ogg
+  status: unchecked
+  parts:
+  - token: حَ
+    aya: '102:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: model
+- text: حِ
+  file: 3aa0f2c8cc8fd1eb.ogg
+  status: unchecked
+  parts:
+  - token: حِ
+    aya: '54:5'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: alignment
+- text: حُ
+  file: 4e8278d76cee3ed2.ogg
+  status: unchecked
+  parts:
+  - token: حُ
+    aya: '5:3'
+    start: 0.16
+    end: 0.46
+    pause_before: 4.28
+    check: model
+- text: حَ حِ حُ
+  file: 628ad1aad561157b.ogg
+  status: unchecked
+  parts:
+  - token: حَ
+    aya: '102:2'
+    start: 0.12
+    end: 0.54
+    pause_before: 4.24
+    check: model
+  - token: حِ
+    aya: '54:5'
+    start: 0.2
+    end: 0.58
+    pause_before: 4.32
+    check: alignment
+  - token: حُ
+    aya: '5:3'
+    start: 0.16
+    end: 0.46
+    pause_before: 4.28
+    check: model
+- text: غَ
+  file: 9d91cae0a678020c.ogg
+  status: unchecked
+  parts:
+  - token: غَ
+    aya: '41:32'
+    start: 2.04
+    end: 2.46
+    pause_before: 0.24
+    check: model
+- text: غُ
+  file: 60611110b8a9da65.ogg
+  status: unchecked
+  parts:
+  - token: غُ
+    aya: '30:2'
+    start: 0.12
+    end: 0.42
+    pause_before: 4.23
+    check: alignment
+- text: عَ
+  file: 40fa11ec92fde59b.ogg
+  status: unchecked
+  parts:
+  - token: عَ
+    aya: '80:1'
+    start: 0.16
+    end: 0.58
+    pause_before: 4.28
+    check: model
+- text: عِ
+  file: 4eb203273eb4fe6e.ogg
+  status: unchecked
+  parts:
+  - token: عِ
+    aya: '53:14'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: alignment
+- text: عُ
+  file: 9ff8c5a57f210170.ogg
+  status: unchecked
+  parts:
+  - token: عُ
+    aya: '77:6'
+    start: 0.24
+    end: 0.7
+    pause_before: 4.36
+    check: alignment
+- text: عَ عِ عُ
+  file: 2c21ef327b185533.ogg
+  status: unchecked
+  parts:
+  - token: عَ
+    aya: '80:1'
+    start: 0.16
+    end: 0.58
+    pause_before: 4.28
+    check: model
+  - token: عِ
+    aya: '53:14'
+    start: 0.08
+    end: 0.46
+    pause_before: 4.2
+    check: alignment
+  - token: عُ
+    aya: '77:6'
+    start: 0.24
+    end: 0.7
+    pause_before: 4.36
+    check: alignment
+- text: دَ
+  file: a3d77da278049104.ogg
+  status: unchecked
+  parts:
+  - token: دَ
+    aya: 4:96
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+- text: دِ
+  file: 9f6c1f31ca0e49cb.ogg
+  status: unchecked
+  parts:
+  - token: دِ
+    aya: '16:5'
+    start: 9.98
+    end: 10.28
+    pause_before: 0.24
+    check: model
+- text: دُ
+  file: d9b353b6b8e87eb2.ogg
+  status: unchecked
+  parts:
+  - token: دُ
+    aya: '37:9'
+    start: 0.12
+    end: 0.42
+    pause_before: 4.24
+    check: model
+- text: دَ دِ دُ
+  file: e266ae4b2188ff46.ogg
+  status: unchecked
+  parts:
+  - token: دَ
+    aya: 4:96
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+  - token: دِ
+    aya: '16:5'
+    start: 9.98
+    end: 10.28
+    pause_before: 0.24
+    check: model
+  - token: دُ
+    aya: '37:9'
+    start: 0.12
+    end: 0.42
+    pause_before: 4.24
+    check: model
+- text: ضَ
+  file: 56659341981041af.ogg
+  status: unchecked
+  parts:
+  - token: ضَ
+    aya: '39:29'
+    start: 0.24
+    end: 0.62
+    pause_before: 4.36
+    check: model
+- text: ضِ
+  file: dde84cf8d15f82d8.ogg
+  status: unchecked
+  parts:
+  - token: ضِ
+    aya: 19:82
+    start: 14.01
+    end: 14.35
+    pause_before: 4.09
+    check: model
+- text: ضُ
+  file: 2d1269710a38a299.ogg
+  status: unchecked
+  parts:
+  - token: ضُ
+    aya: 3:112
+    start: 0.0
+    end: 0.3
+    pause_before: 4.12
+    check: model
+- text: ضَ ضِ ضُ
+  file: 983bdd5f3f0a3ba4.ogg
+  status: unchecked
+  parts:
+  - token: ضَ
+    aya: '39:29'
+    start: 0.24
+    end: 0.62
+    pause_before: 4.36
+    check: model
+  - token: ضِ
+    aya: 19:82
+    start: 14.01
+    end: 14.35
+    pause_before: 4.09
+    check: model
+  - token: ضُ
+    aya: 3:112
+    start: 0.0
+    end: 0.3
+    pause_before: 4.12
+    check: model
+- text: ذَ
+  file: f08e596e779d715a.ogg
+  status: unchecked
+  parts:
+  - token: ذَ
+    aya: '55:48'
+    start: 0.64
+    end: 0.98
+    pause_before: 4.76
+    check: model
+- text: ذِ
+  file: 06d0f2d25de329a4.ogg
+  status: unchecked
+  parts:
+  - token: ذِ
+    aya: 26:209
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+- text: ذُ
+  file: cff38b65d931ec7c.ogg
+  status: unchecked
+  parts:
+  - token: ذُ
+    aya: '85:15'
+    start: 0.16
+    end: 0.58
+    pause_before: 4.28
+    check: model
+- text: ذَ ذِ ذُ
+  file: 9f7e9d161e0739ac.ogg
+  status: unchecked
+  parts:
+  - token: ذَ
+    aya: '55:48'
+    start: 0.64
+    end: 0.98
+    pause_before: 4.76
+    check: model
+  - token: ذِ
+    aya: 26:209
+    start: 0.2
+    end: 0.54
+    pause_before: 4.32
+    check: model
+  - token: ذُ
+    aya: '85:15'
+    start: 0.16
+    end: 0.58
+    pause_before: 4.28
+    check: model
+- text: ظَ
+  file: e8bbe8e8085b29ca.ogg
+  status: unchecked
+  parts:
+  - token: ظَ
+    aya: '30:41'
+    start: 0.24
+    end: 0.58
+    pause_before: 4.36
+    check: alignment
+- text: ظِ
+  file: ae1f0fd0dfcbf012.ogg
+  status: unchecked
+  parts:
+  - token: ظِ
+    aya: '16:48'
+    start: 17.26
+    end: 17.68
+    pause_before: 0.28
+    check: model
+- text: ظُ
+  file: 3030375cb473d373.ogg
+  status: unchecked
+  parts:
+  - token: ظُ
+    aya: '39:16'
+    start: 3.71
+    end: 4.05
+    pause_before: 0.32
+    check: model
+- text: ظَ ظِ ظُ
+  file: 26d5cb16de326205.ogg
+  status: unchecked
+  parts:
+  - token: ظَ
+    aya: '30:41'
+    start: 0.24
+    end: 0.58
+    pause_before: 4.36
+    check: alignment
+  - token: ظِ
+    aya: '16:48'
+    start: 17.26
+    end: 17.68
+    pause_before: 0.28
+    check: model
+  - token: ظُ
+    aya: '39:16'
+    start: 3.71
+    end: 4.05
+    pause_before: 0.32
+    check: model
