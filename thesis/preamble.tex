@@ -1,0 +1,35 @@
+% Преамбула: шрифты (латиница, кириллица, арабский с огласовками), поля, библиография.
+\usepackage{etoolbox}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{\mainlang}
+\ifdefstring{\mainlang}{english}{\setotherlanguages{russian,arabic}}{\setotherlanguages{english,arabic}}
+
+% Times New Roman есть в macOS; на другой машине — Liberation Serif или Tempora.
+\setmainfont{Times New Roman}
+\newfontfamily\cyrillicfont{Times New Roman}
+% Арабский — тот же шрифт, что рисует карточки бота (ADR-0024): огласовки и шадда не теряются.
+\newfontfamily\arabicfont[Script=Arabic,Path=../src/muallim/presentation/telegram/assets/fonts/,
+  Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,Scale=1.25]{ScheherazadeNew}
+% \ar{…} — арабская вставка в строке; источник строки — в тексте рядом ([SRC-NNN]).
+\newcommand{\ar}[1]{\textarabic{#1}}
+
+\usepackage[left=3cm,right=1.5cm,top=2cm,bottom=2cm]{geometry} % [утвердить] по требованиям вуза
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{indentfirst}
+
+\usepackage{graphicx}
+\graphicspath{{../docs/architecture/diagrams/}{../docs/design/screens/}{figures/}}
+\usepackage{booktabs,tabularx,longtable}
+\usepackage{caption}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
+
+% Библиография — тот же sources.bib, что у всего проекта (ключи SRC-NNN).
+\ifdefstring{\mainlang}{english}
+  {\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}}
+  {\usepackage[backend=biber,style=gost-numeric,sorting=none]{biblatex}}
+\addbibresource{../docs/research/sources.bib}
+
+% ID рисунков и таблиц из docs/thesis/figures.md: \label{fig:R-01}, \label{tab:T-01}.

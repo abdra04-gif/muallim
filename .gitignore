@@ -31,3 +31,6 @@ dist/
 # Книга (скан издания, «все права защищены») — только локально, для исследования; см. book/README.md
 book/*.pdf
 book/pages/
+
+# Сборка LaTeX
+thesis/build/

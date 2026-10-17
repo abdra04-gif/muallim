@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: trace husary-cuts design help setup check lint test cov run run-stub db-up db-down db-shell backup restore migrate migration report errors diagrams audit
+.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-up db-down db-shell backup restore migrate migration report errors diagrams audit
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -66,6 +66,12 @@ errors: ## Каталог ошибок: make errors a="--letter ص --lesson L18"
 
 report: ## Отчёт по данным исследования
 	uv run muallim-research report
+
+thesis: ## Диссертация LaTeX → thesis/build/main.pdf
+	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build main.tex
+
+thesis-check: ## Проверка вёрстки: арабский, кириллица, ссылки, рисунки → thesis/build/check.pdf
+	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build check.tex
 
 trace: ## Трассировка: требования ↔ тесты сейчас, исследование, отпечаток версии → docs/requirements/verification-status.md
 	uv run python scripts/trace.py $(a)

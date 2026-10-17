@@ -39,7 +39,7 @@
 | `pedagogy-reviewer` | проверка учебного контента и методики | ничего (только предложения) |
 | `thesis-scribe` | CHANGELOG, ADR, журнал, материалы диплома | `docs/`, `CHANGELOG.md` |
 | `asr-evaluator` | протокол оценки модели, метрики RQ-1/RQ-2 с ДИ, сопоставимость с IqraEval (ADR-0033) | `analytics/`, `docs/research/`; код — спецификацией для `/feature` |
-| `thesis-writer` | черновики глав из материалов репозитория | `docs/thesis/chapters/` |
+| `thesis-writer` | черновики глав из материалов репозитория | `thesis/chapters/*.tex` (ADR-0037) |
 | `citation-verifier` | сверка источников с первоисточниками, ГОСТ Р 7.0.5 | ничего (только отчёт) |
 | `thesis-opponent` | чтение главы как оппонент на защите | ничего (только отчёт) |
 | `solution-architect` | 2–3 варианта устройства до кода, черновик ADR (ADR-0034) | `docs/adr/` (черновик «Предложено») |

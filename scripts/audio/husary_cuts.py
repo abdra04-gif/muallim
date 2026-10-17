@@ -170,30 +170,46 @@ class Cut:
     )
 
 
-_spikes: dict[tuple[int, int, bool], tuple[np.ndarray, list[tuple[str, int, int]], float]] = {}
+WINDOW = 5.0  # слово в середине аята: декодируем ±5 с вокруг него, а не минуту записи целиком
+Heard = tuple[np.ndarray, list[tuple[str, int, int]], float]
+_spikes: dict[tuple[int, int, float], Heard] = {}
 
 
-def heard_in(model: Model, c: Candidate) -> tuple[np.ndarray, list[tuple[str, int, int]], float]:
-    """Звук аята (или его начала) и услышанные фонемы со временем — один раз на аят."""
-    key = (c.sura, c.aya, c.ayah_start)
+def heard_in(model: Model, c: Candidate, ref: str) -> tuple[Heard, str, int, float]:
+    """Звук окна аята, услышанные в нём фонемы со временем; кусок эталона и позиция цели в нём.
+
+    Модель на длинной записи работает очень долго (внимание по всей записи), поэтому для слова
+    из середины аята оцениваем его время по доле фонем и берём окно вокруг.
+    """
+    path = download(c.sura, c.aya)
+    if c.ayah_start:
+        lo, hi = 0.0, HEAD
+    else:
+        full = decode_file(path)
+        dur = len(full) / SR
+        t = c.offset / len(ref) * dur
+        lo, hi = max(0.0, t - WINDOW), min(dur, t + WINDOW)
+    key = (c.sura, c.aya, round(lo, 1))
     if key not in _spikes:
-        path = download(c.sura, c.aya)
-        wave = decode_file(path, 0.0, HEAD) if c.ayah_start else decode_file(path)
+        wave = decode_file(path, lo, hi)
         _spikes[key] = (wave, *model.spikes(wave))
-    return _spikes[key]
+    heard = _spikes[key]
+    n = len(heard[1])
+    if c.ayah_start:  # услышано только начало аята — и сравниваем с началом
+        return heard, ref[: n + 4], c.offset, lo
+    a = max(0, c.offset - n)  # эталон с запасом: окно точно внутри
+    return heard, ref[a : c.offset + n], c.offset - a, lo
 
 
 def try_cut(model: Model, target: str, c: Candidate, ref: str) -> Cut | None:
-    wave, sp, frame = heard_in(model, c)
+    (wave, sp, frame), ref, offset, lo = heard_in(model, c, ref)
     heard = "".join(ch for ch, _, _ in sp)
-    if c.ayah_start:  # услышано только начало аята — и сравниваем с началом
-        ref = ref[: len(heard) + 4]
     # сопоставить эталон аята с услышанным: позиция цели в эталоне -> позиция в услышанном
     sm = difflib.SequenceMatcher(None, ref, heard, autojunk=False)
     j = None
     for a, b, size in sm.get_matching_blocks():
-        if a <= c.offset and c.offset + len(target) < a + size:  # цель и следующий звук внутри
-            j = b + (c.offset - a)
+        if a <= offset and offset + len(target) < a + size:  # цель и следующий звук внутри
+            j = b + (offset - a)
             break
     if j is None or heard[j : j + len(target)] != target:
         return None
@@ -209,13 +225,13 @@ def try_cut(model: Model, target: str, c: Candidate, ref: str) -> Cut | None:
             continue
         piece = wave[int(start * SR) : int(end * SR)]
         if model.text(_padded(_faded(piece))) == target:  # проверка тем же «ухом»
-            return Cut("", c.sura, c.aya, start, end, pause, _faded(piece))
+            return Cut("", c.sura, c.aya, lo + start, lo + end, pause, _faded(piece))
     if c.ayah_start and nxt[1] - sp[j + len(target) - 1][2] >= 2:
         # Короткое «ءِ», «ءُ» модель отдельно не слышит (нужен контекст), а в аяте услышала точно
         # и до следующего звука есть зазор: берём по разметке, человек проверит на слух.
         end = nxt[1] * frame - 0.02
         piece = wave[int(start * SR) : int(end * SR)]
-        return Cut("", c.sura, c.aya, start, end, pause, _faded(piece), "alignment")
+        return Cut("", c.sura, c.aya, lo + start, lo + end, pause, _faded(piece), "alignment")
     return None
 
 

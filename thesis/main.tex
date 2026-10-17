@@ -1,0 +1,33 @@
+% Магистерская диссертация — точка входа. Сборка: make thesis (→ thesis/build/main.pdf).
+% Требования Университета Иннополис к оформлению и языку ещё не подтверждены — thesis/README.md.
+\documentclass[a4paper,12pt,oneside]{report}
+
+% Язык основного текста: english или russian. Меняется в одном месте.
+\newcommand{\mainlang}{english}
+
+\input{preamble}
+\input{meta}
+
+\begin{document}
+\input{titlepage}
+
+\begin{abstract}
+\input{chapters/00-abstract}
+\end{abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\input{chapters/01-introduction}
+\input{chapters/02-literature-review}
+\input{chapters/03-methodology}
+\input{chapters/04-implementation}
+\input{chapters/05-evaluation}
+\input{chapters/06-conclusion}
+
+\printbibliography[heading=bibintoc]
+
+\appendix
+\input{chapters/a-traceability}
+\end{document}

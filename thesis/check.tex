@@ -1,0 +1,20 @@
+% Проверка вёрстки (make thesis-check): арабский с огласовками, кириллица, ссылка на источник, рисунок.
+\documentclass[a4paper,12pt]{report}
+\newcommand{\mainlang}{english}
+\input{preamble}
+\begin{document}
+Latin text with a citation~\cite{SRC-004}.
+
+\textrussian{Кириллица: проверка чтения по книге «Муаллим ас-Сани»~\cite{SRC-040}.}
+
+% Строка книги — карточка L001-03, с.~10, стр.~1 (SRC-040), текст из curriculum/course.ru.yaml.
+\ar{بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{02-layers.png}
+  \caption{Layers (R-02)}\label{fig:R-02}
+\end{figure}
+
+\printbibliography
+\end{document}
