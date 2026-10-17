@@ -1,0 +1,11 @@
+.env
+.env.*
+.git
+.venv
+data
+docs
+tests
+analytics/reports
+.claude
+**/__pycache__
+book

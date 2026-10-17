@@ -1,0 +1,17 @@
+%% Цикл разработки с ИИ-агентами (agent harness loop), ADR-0012.
+flowchart TB
+    task["📝 Задача от человека<br/>+ требование FR/NFR"] --> spec["Уточнение: один вопрос с вариантами"]
+    spec --> phT["scripts/phase tests"]
+    phT --> tw["🤖 tdd-test-writer<br/>пишет падающие тесты"]
+    tw --> human1{"👤 Человек<br/>принимает тесты?"}
+    human1 -- нет --> tw
+    human1 -- да --> phI["scripts/phase impl<br/>тесты заморожены хуком"]
+    phI --> impl["🤖 implementer<br/>код до зелёного"]
+    impl --> gates{"Хуки и проверки:<br/>pytest · ruff · mypy · lint-imports"}
+    gates -- "красно (Stop-хук)" --> impl
+    gates -- зелено --> arch["🤖 architecture-guardian<br/>ревью по ADR"]
+    arch -- замечания --> impl
+    arch --> sec["🤖 security-auditor"]
+    sec --> scribe["🤖 thesis-scribe<br/>CHANGELOG, ADR, материалы диплома"]
+    scribe --> phO["scripts/phase off"]
+    phO --> human2{"👤 Человек:<br/>проверка в Telegram, коммит"}

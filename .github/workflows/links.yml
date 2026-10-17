@@ -1,0 +1,29 @@
+name: Внешние ссылки
+
+# Внутренние ссылки и пути проверяет pytest (tests/architecture/test_docs.py) — локально и в CI.
+# Здесь — только внешние URL (источники, стандарты, законы): раз в неделю и вручную.
+# Не блокирует работу: чужой сайт может лежать не по нашей вине; результат — в сводке запуска.
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # понедельник, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --scheme https --scheme http
+            --accept 200,206,403,429
+            --exclude-path .venv
+            --exclude-path docs/journal/prompts
+            './**/*.md'
+          fail: false
+          jobSummary: true

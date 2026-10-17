@@ -1,0 +1,28 @@
+%% Что происходит, когда ученик присылает голосовое.
+sequenceDiagram
+    autonumber
+    actor L as Ученик
+    participant H as handlers.on_voice
+    participant UC as AssessRecitation
+    participant R as MuaalemRecognizer
+    participant D as domain.assess_best
+    participant S as AudioStore
+    participant DB as PostgreSQL
+
+    L->>H: голосовое (OGG/Opus)
+    H->>UC: execute(learner, audio)
+    UC->>R: recognize(audio, текст карточки)
+    R->>R: ffmpeg → 16 кГц, фонетизация эталона (васл/вакф)
+    R-->>UC: heard, references, model_version
+    UC->>D: сравнить с каждым эталоном
+    D-->>UC: лучший эталон, все кандидаты, ошибки
+    alt есть согласие на исследование
+        UC->>S: save(audio) → sha256
+    end
+    UC->>DB: attempt + след решения + detected_errors + событие (одна транзакция)
+    UC-->>H: результат, объяснения на языке ученика, транскрипция
+    H-->>L: вердикт, ошибки, «Услышано», № попытки, кнопки «Ещё раз / Дальше / 🔊 / 🚩»
+    opt ученик нажал «🚩 Бот ошибся»
+        L->>H: причина
+        H->>DB: learner_reports → первым в очередь разметки
+    end

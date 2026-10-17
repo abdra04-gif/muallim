@@ -1,0 +1,8 @@
+#!/bin/sh
+# TDD-фаза для агента (ADR-0011): tests (пишем падающие тесты) → impl (код, тесты заморожены) → off.
+f="$(dirname "$0")/../.agent-phase"
+case "${1:-}" in
+  tests|impl|off) echo "$1" > "$f"; echo "phase: $1" ;;
+  "") cat "$f" 2>/dev/null || echo off ;;
+  *) echo "usage: scripts/phase [tests|impl|off]" >&2; exit 1 ;;
+esac

@@ -1,0 +1,85 @@
+%% Схема БД (подробно — docs/data/data-dictionary.md).
+erDiagram
+    learners ||--o{ consents : "журнал согласий"
+    learners ||--o{ attempts : "читает"
+    learners |o--o{ interaction_events : "действия"
+    attempts ||--o{ detected_errors : "найдено моделью"
+    attempts ||--o{ annotations : "размечено человеком"
+    detected_errors |o--o{ annotations : "метка ошибки"
+    attempts ||--o{ learner_reports : "«бот ошибся»"
+    learners ||--o{ learner_reports : "оспаривает"
+    curriculum_items |o--o{ attempts : "строка книги (item_id + curriculum_version)"
+
+    learners {
+        uuid id PK
+        bigint telegram_user_id UK "персональные данные"
+        string pseudonym UK "для выгрузок"
+        string current_item_id
+        bool research_consent
+        string feedback_language
+    }
+    consents {
+        int id PK
+        uuid learner_id FK
+        string kind
+        bool granted
+        string text_version
+    }
+    attempts {
+        uuid id PK
+        uuid learner_id FK
+        string item_id "L18-02"
+        string curriculum_version
+        string model_version
+        text reference_phonemes
+        text heard_phonemes
+        smallint score
+        string verdict
+        string audio_sha256 "null без согласия"
+        string reference_variant "wasl / waqf"
+        json candidates "все эталоны и баллы"
+        json model_output "сырые данные модели"
+        json policy "пороги"
+        string app_version "версия кода"
+        string feedback_language
+    }
+    curriculum_items {
+        string curriculum_version PK
+        string item_id PK
+        string lesson_id
+        string text "арабский текст строки"
+        string note "«Обратите внимание»"
+        smallint page "страница книги"
+        smallint line "строка на странице"
+        bool verified
+    }
+    learner_reports {
+        int id PK
+        uuid attempt_id FK
+        uuid learner_id FK
+        string reason
+    }
+    detected_errors {
+        int id PK
+        uuid attempt_id FK
+        string kind
+        smallint position
+        string expected
+        string heard
+        text message "что увидел ученик"
+    }
+    annotations {
+        int id PK
+        uuid attempt_id FK
+        int detected_error_id FK
+        string annotator
+        string label
+        text corrected_phonemes
+        string guide_version
+    }
+    interaction_events {
+        int id PK
+        uuid learner_id FK "SET NULL при удалении"
+        string event
+        json payload
+    }

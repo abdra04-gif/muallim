@@ -1,0 +1,21 @@
+# ЧЕРНОВИК, предложенный ИИ-агентом 2026-10-17. Включает человек (enabled: true) после
+# проверки носителем языка и преподавателем (OQ-11, ADR-0017).
+language:
+  code: kk
+  title: Қазақша
+  enabled: false
+  status: черновик агента
+where: " {n}-буында"
+tip: "\n   \U0001F4A1 {tip}"
+joiner: " + "
+messages:
+  letter_substitution: "\U0001F524 Әріп{where}: {expected} болуы керек, ал {heard} естілді."
+  vowel_substitution: "\U0001F508 Харакат{where}: {expected_vowel} болуы керек, ал {heard_vowel} естілді."
+  sound_substitution: "⚠️ Дыбыс{where}: {expected} болуы керек, ал {heard} естілді."
+  fragment_substitution: "⚠️ Бөлік{where}: {expected_seq} болуы керек, ал {heard_seq} естілді."
+  madd_too_short: "〰️ Дауысты дыбыс{where} жеткілікті созылмады: {expected_vowel} керек."
+  vowel_missing: "\U0001F507 {expected_vowel}{where} естілмеді. Дауысты дыбысты анық айт."
+  shadda_missing: "✌️ {expected}{where} қосарланбады (ташдид). Дыбысты сәл ұзағырақ ұста."
+  sound_missing: "\U0001F507 {expected} дыбысы{where} түсіп қалды."
+  madd_too_long: "〰️ Дауысты дыбыс{where} тым ұзақ созылды: мұнда қысқа дыбыс, маддсыз."
+  extra_sound: "➕ Артық дыбыс{where}: {heard_seq}."

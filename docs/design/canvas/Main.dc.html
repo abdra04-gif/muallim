@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Обзор макетов бота</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;family=Noto+Serif:wght@600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7a5b12}a:hover{color:#4e3a0b}
+</style>
+</helmet>
+<div style="width: 1280px; height: 640px; box-sizing: border-box; padding: 56px 64px; background: #FBF7EC; color: #221E1C; font-family: 'Noto Sans', sans-serif; display: flex; flex-direction: column; gap: 28px; border: 4px solid #C8A44D">
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <div style="font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a5b12; font-weight: 600">Telegram-бот · пробная версия интерфейса · v0.5</div>
+    <h1 style="margin: 0; font-family: 'Noto Serif', serif; font-size: 44px; font-weight: 600">Муаллим сани — макеты экранов</h1>
+    <p style="margin: 0; font-size: 18px; color: #4a4440; max-width: 900px">Картинки на телефонах — настоящие экраны, нарисованные кодом бота (make design). Порядок уроков и строки — как в книге Максуди, издание 2010 г.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+    <div style="background: #FFFFFF; border: 1px solid #E5D9B8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="font-weight: 700; font-size: 17px">1. Главная</div><div style="font-size: 14px; color: #4a4440">Карта букв, серия дней, «Продолжить с места»</div></div>
+    <div style="background: #FFFFFF; border: 1px solid #E5D9B8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="font-weight: 700; font-size: 17px">2. Урок</div><div style="font-size: 14px; color: #4a4440">Строка книги крупно, буква урока красным, как в книге</div></div>
+    <div style="background: #FFFFFF; border: 1px solid #E5D9B8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="font-weight: 700; font-size: 17px">3. Послушать</div><div style="font-size: 14px; color: #4a4440">🔊 эталон, записанный учителем прямо в боте</div></div>
+    <div style="background: #FFFFFF; border: 1px solid #E5D9B8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="font-weight: 700; font-size: 17px">4. Прочитать</div><div style="font-size: 14px; color: #4a4440">Голосовое → ошибки подсвечены в тексте</div></div>
+    <div style="background: #FFFFFF; border: 1px solid #E5D9B8; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="font-weight: 700; font-size: 17px">5. Дальше</div><div style="font-size: 14px; color: #4a4440">Все строки засчитаны → 🎉 урок пройден, следующий урок</div></div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px">
+      <div style="font-weight: 700; font-size: 17px">Правила интерфейса</div>
+      <div>• Одно окно: кнопки меняют экран на месте — чат не уезжает вниз</div>
+      <div>• 🏠 Главная — на каждом экране; «▶️ Дальше» переходит в следующий урок</div>
+      <div>• Урок 1 — весь алфавит, как на с. 10 книги; дальше буквы по одной</div>
+      <div>• Строка засчитана от 80%; урок пройден, когда засчитаны все строки</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px">
+      <div style="font-weight: 700; font-size: 17px">Цвета</div>
+      <div style="display: flex; gap: 10px; align-items: center"><div style="width: 22px; height: 22px; border-radius: 6px; background: #C82828"></div>буква урока / текущая буква</div>
+      <div style="display: flex; gap: 10px; align-items: center"><div style="width: 22px; height: 22px; border-radius: 6px; background: #FFD6D6; border: 1px solid #C82828"></div>ошибка в чтении</div>
+      <div style="display: flex; gap: 10px; align-items: center"><div style="width: 22px; height: 22px; border-radius: 6px; background: #2E7D32"></div>урок пройден</div>
+      <div style="display: flex; gap: 10px; align-items: center"><div style="width: 22px; height: 22px; border-radius: 6px; background: #E6A000"></div>урок начат</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+# Оглавление рабочего издания (SRC-040, book/README.md) и уроки бота по каждому разделу.
+# Страницы — по нумерации книги (PDF = страница + 1). Генерируется scripts/book/build.py.
+edition: SRC-040
+sections:
+- title: Введение
+  page: 5
+  sections: []
+  lessons: []
+- title: Предисловие
+  page: 6
+  sections: []
+  lessons: []
+- title: Арабский алфавит
+  page: 10
+  sections: [start, alphabet, letter]
+  lessons: [L001, L002, L003, L004, L005, L006, L007, L008, L009, L010, L011, L012, L013, L014, L015, L016, L017, L018, L019,
+    L020, L021, L022, L023, L024, L025, L026, L027, L028, L029, L030]
+- title: Буквы «мадд»
+  page: 25
+  sections: [madd]
+  lessons: [L031, L032, L033]
+- title: Упражнения
+  page: 27
+  sections: [exercises]
+  lessons: [L034, L035, L036, L037]
+- title: Буквы с «ташдидом» (удвоением)
+  page: 30
+  sections: [tashdid]
+  lessons: [L038, L039, L040, L041]
+- title: Буквы с «танвином»
+  page: 32
+  sections: [tanwin]
+  lessons: [L042, L043]
+- title: Встреча «танвина» с «ташдидом»
+  page: 34
+  sections: [tanwin_tashdid]
+  lessons: [L044]
+- title: Виды написания буквы «хэмзэ»
+  page: 35
+  sections: [hamza, wasla, ta_marbuta]
+  lessons: [L045, L046, L047, L048]
+- title: Положение двух соседних букв, над первой из которых имеется «сукун»
+  page: 38
+  sections: [sukun]
+  lessons: [L049, L050, L051, L052]
+- title: Присоединение к словам определённого артикля
+  page: 41
+  sections: [article]
+  lessons: [L053]
+- title: Буква م с «сукуном»
+  page: 43
+  sections: [mim]
+  lessons: [L054, L055]
+- title: ن с «сукуном» и «танвин»
+  page: 45
+  sections: [noon_izhar, noon_idgham, noon_ikhfa, iqlab]
+  lessons: [L056, L057, L058, L059, L060, L061, L062, L063, L064, L065, L066, L067, L068, L069]
+- title: «Калькаля»
+  page: 54
+  sections: [qalqala]
+  lessons: [L070]
+- title: Маленькие буквы, встречающиеся в Коране
+  page: 55
+  sections: [small]
+  lessons: [L071, L072, L073]
+- title: Положение ي, которой предшествует «фатха»
+  page: 57
+  sections: [ya_alif]
+  lessons: [L074]
+- title: Положение و с маленьким ا
+  page: 57
+  sections: [waw_alif]
+  lessons: [L075]
+- title: Буквы, которые не читаются
+  page: 58
+  sections: [silent]
+  lessons: [L076, L077, L078, L079, L080, L081, L082, L083]
+- title: Огласовка «кясрой» буквы ن с «сукуном»
+  page: 62
+  sections: [noon_kasra]
+  lessons: [L084, L085]
+- title: Остановка и её знаки
+  page: 63
+  sections: [waqf]
+  lessons: [L086, L087, L088]
+- title: «Сакт»
+  page: 65
+  sections: [sakt]
+  lessons: [L089]
+- title: Виды «мадд». Удлинение гласного звука
+  page: 67
+  sections: [madd_types]
+  lessons: [L090, L091, L092, L093]
+- title: Раздельные буквы, приходящие в начале сур
+  page: 70
+  sections: [muqattaat]
+  lessons: [L094, L095]
+- title: Чёрный кружок в Коране; порядковые знаки
+  page: 73
+  sections: [signs]
+  lessons: [L096]
+- title: Суры для чтения
+  page: 75
+  sections: [sura]
+  lessons: [L097, L098, L099, L100, L101, L102, L103, L104, L105, L106, L107, L108, L109, L110, L111, L112, L113, L114, L115,
+    L116, L117, L118, L119, L120, L121, L122, L123, L124, L125]
+- title: Оглавление
+  page: 86
+  sections: []
+  lessons: []

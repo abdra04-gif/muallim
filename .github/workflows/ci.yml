@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-retries 10
+    env:
+      # Включает tests/integration/test_postgres.py (миграции и отчёты на настоящем PostgreSQL)
+      TEST_POSTGRES_URL: postgresql+asyncpg://test:test@localhost:5432/test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: astral-sh/setup-uv@v6
+      # Без extra `ml`: модель для тестов не нужна (ADR-0006)
+      - run: sudo apt-get update && sudo apt-get install -y libfribidi0  # арабский текст на картинках (ADR-0024)
+      - run: uv sync --frozen --python 3.12
+      - name: Стиль
+        run: uv run ruff format --check . && uv run ruff check .
+      - name: Типы
+        run: uv run mypy
+      - name: Архитектура
+        run: uv run lint-imports
+      - name: Тесты и покрытие
+        run: uv run pytest -q --cov --cov-report=term-missing:skip-covered
+      - name: Уязвимости зависимостей
+        run: uv run pip-audit --skip-editable

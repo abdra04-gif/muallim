@@ -1,0 +1,62 @@
+# Матрица трассировки
+
+Требование → где реализовано → чем проверено. Пути проверяются тестом
+`tests/architecture/test_docs.py`: если файл переименовали, тест упадёт и матрицу придётся обновить.
+
+**Проверка:** ✅ автотест проверяет требование · 🟡 частично (часть — вручную или ждёт данных пилота) ·
+❌ не проверяется (нужен тест — срочно). Строка без автотеста не может быть ✅ (это тоже проверяет тест).
+
+| ID | Реализация | Тесты | Документы | Проверка |
+|---|---|---|---|---|
+| FR-01 | `curriculum/course.ru.yaml`, `book/contents.yaml`, `src/muallim/infrastructure/curriculum/yaml_loader.py`, `src/muallim/presentation/telegram/views.py` | `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py`, `tests/architecture/test_book.py` | ADR-0013, ADR-0022, `docs/pedagogy/book-structure.md`, `book/README.md` | ✅ |
+| FR-02 | `src/muallim/application/use_cases/cards.py`, `src/muallim/presentation/telegram/keyboards.py` | `tests/unit/test_use_cases.py`, `tests/unit/test_curriculum_model.py` | ADR-0005 | ✅ |
+| FR-03 | `src/muallim/presentation/telegram/handlers.py`, `src/muallim/infrastructure/audio/ffmpeg.py` | `tests/integration/test_bot_flow.py` (приём голосового, слишком короткое); декодирование OGG — ручная проверка в Telegram | — | 🟡 |
+| FR-04 | `src/muallim/domain/assessment.py`, `src/muallim/infrastructure/asr/muaalem.py` | `tests/unit/test_assessment.py`, `tests/unit/test_policy.py` | ADR-0006, ADR-0007 | ✅ |
+| FR-05 | `src/muallim/application/feedback.py`, `curriculum/lexicon.ru.yaml` | `tests/unit/test_feedback.py` | ADR-0014 | ✅ |
+| FR-06 | `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/db/repositories/attempts.py` | `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0004, `docs/data/data-dictionary.md` | ✅ |
+| FR-07 | `src/muallim/application/use_cases/progress.py` | `tests/unit/test_use_cases.py` | — | ✅ |
+| FR-08 | `src/muallim/application/use_cases/learners.py` | `tests/unit/test_use_cases.py` | ADR-0010 | ✅ |
+| FR-09 | `src/muallim/application/use_cases/learners.py`, `src/muallim/application/use_cases/recitation.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_bot_flow.py` | ADR-0010, `docs/security/privacy.md` | ✅ |
+| FR-10 | `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0010 | ✅ |
+| FR-11 | `analytics/sql/`, `src/muallim/research/reports.py` | `tests/integration/test_research.py` | `docs/data/reports.md` | ✅ |
+| FR-12 | `src/muallim/infrastructure/db/repositories/events.py` | `tests/unit/test_use_cases.py` | `docs/data/data-dictionary.md` | ✅ |
+| FR-13 | `src/muallim/research/annotation.py` | `tests/integration/test_research.py` | `docs/data/annotation-guide.md` | ✅ |
+| FR-14 | `src/muallim/research/dataset.py` | `tests/integration/test_research.py` | `docs/data/data-lifecycle.md` | ✅ |
+| FR-20 | `src/muallim/application/use_cases/reference.py`, `src/muallim/infrastructure/audio/reference_library.py`, `curriculum/audio/` | `tests/unit/test_use_cases.py`, `tests/integration/test_reference_audio.py` | ADR-0018 | ✅ |
+| FR-21 | `src/muallim/application/transcription.py`, `curriculum/lexicon.ru.yaml` | `tests/unit/test_transcription.py` | `docs/pedagogy/methodology.md` (M-09, M-10) | ✅ |
+| FR-22 | `src/muallim/application/feedback.py`, `curriculum/feedback.ru.yaml`, `src/muallim/application/use_cases/learners.py` | `tests/unit/test_feedback_languages.py`, `tests/unit/test_use_cases.py` | ADR-0017 | ✅ |
+| FR-23 | `src/muallim/application/use_cases/reports.py`, `src/muallim/research/annotation.py`, `analytics/sql/07_learner_disputes.sql` | `tests/unit/test_use_cases.py`, `tests/integration/test_research.py`, `tests/integration/test_bot_flow.py` | ADR-0020 | ✅ |
+| FR-24 | `src/muallim/domain/attempt.py`, `src/muallim/infrastructure/db/repositories/attempts.py`, `migrations/versions/0002_decision_trace_reports_language.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py` | ADR-0019 | ✅ |
+| FR-25 | `src/muallim/presentation/telegram/views.py`, `src/muallim/presentation/telegram/handlers.py` | `tests/unit/test_use_cases.py` | — | ✅ |
+| FR-26 | `src/muallim/application/use_cases/curriculum.py`, `src/muallim/infrastructure/db/repositories/curriculum.py`, `src/muallim/bootstrap/main.py`, `migrations/versions/0003_curriculum_items_and_views.py` | `tests/integration/test_data_tools.py`, `tests/integration/test_di.py` | ADR-0023 | ✅ |
+| FR-27 | `src/muallim/infrastructure/db/views.py`, `src/muallim/research/errors.py`, `src/muallim/bootstrap/research_cli.py` | `tests/integration/test_data_tools.py`, `tests/architecture/test_migrations.py` | ADR-0023, `docs/data/browsing.md` | ✅ |
+| FR-28 | `analytics/sql/08_book_lines.sql`, `analytics/sql/09_minimal_pairs.sql`, `analytics/sql/10_errors_by_letter.sql` | `tests/integration/test_data_tools.py`, `tests/integration/test_postgres.py` | ADR-0023 | ✅ |
+| FR-29 | `Makefile` | — (проверено вручную 2026-10-17: `make backup`) | ADR-0023, `docs/data/browsing.md` | 🟡 |
+| FR-30 | `src/muallim/application/use_cases/reference.py`, `src/muallim/infrastructure/audio/reference_library.py`, `src/muallim/presentation/telegram/handlers.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_reference_audio.py`, `tests/unit/test_screens.py` | ADR-0024 | ✅ |
+| FR-31 | `src/muallim/application/use_cases/progress.py`, `src/muallim/application/use_cases/recitation.py`, `src/muallim/presentation/telegram/screens.py` | `tests/unit/test_use_cases.py`, `tests/unit/test_screens.py` | ADR-0024 | ✅ |
+| FR-32 | `src/muallim/presentation/telegram/handlers.py`, `src/muallim/presentation/telegram/screens.py`, `src/muallim/domain/curriculum.py` | `tests/unit/test_screens.py`, `tests/unit/test_curriculum_model.py` | ADR-0024, `docs/design/README.md` | ✅ |
+| FR-33 | `src/muallim/presentation/telegram/render.py` | `tests/unit/test_render.py` | ADR-0024 | ✅ |
+| FR-34 | `curriculum/course.ru.yaml` | `tests/unit/test_curriculum_content.py` | ADR-0024, ADR-0022 | ✅ |
+| FR-35 | `src/muallim/application/use_cases/progress.py`, `src/muallim/infrastructure/db/repositories/attempts.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py` | ADR-0024 | ✅ |
+| FR-36 | `scripts/book/build.py`, `scripts/book/letters.py`, `scripts/book/rules.py`, `scripts/book/quran.py`, `curriculum/course.ru.yaml`, `book/contents.yaml` | `tests/unit/test_curriculum_content.py` | ADR-0025 | ✅ |
+| FR-37 | `scripts/book/texts.py`, `src/muallim/presentation/telegram/screens.py` | `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py` | ADR-0025, M-13 | ✅ |
+| FR-38 | `src/muallim/presentation/telegram/render.py`, `src/muallim/presentation/telegram/texts.py` | `tests/unit/test_screens.py`, `tests/unit/test_render.py` | ADR-0025 | ✅ |
+| FR-39 | `src/muallim/domain/quiz.py`, `src/muallim/application/use_cases/quiz.py` | `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ADR-0025 | ✅ |
+| FR-40 | `src/muallim/infrastructure/audio/reference_library.py`, `src/muallim/infrastructure/audio/http.py` | `tests/integration/test_reference_audio.py` | ADR-0025 | ✅ |
+| FR-41 | `scripts/book/build.py` | `tests/unit/test_curriculum_content.py` | ADR-0025 | ✅ |
+| FR-42 | `src/muallim/infrastructure/asr/muaalem.py`, `src/muallim/bootstrap/config.py` | `tests/integration/test_di.py` | ADR-0025 | ✅ |
+| FR-43 | `src/muallim/domain/phonetics.py`, `src/muallim/application/transcription.py`, `src/muallim/application/feedback.py`, `src/muallim/application/use_cases/reading.py`, `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/asr/reading.py`, `src/muallim/presentation/telegram/screens.py`, `src/muallim/presentation/telegram/handlers.py`, `curriculum/feedback.ru.yaml`, `curriculum/lexicon.ru.yaml` | `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_feedback.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_use_cases.py`, `tests/integration/test_reading_guide.py` | ADR-0029, `docs/pedagogy/methodology.md` (M-09, M-10, M-16) | ✅ |
+| NFR-TR-01 | `curriculum/course.ru.yaml` | `tests/unit/test_curriculum_content.py` | `docs/research/sources.md` | ✅ |
+| NFR-TR-02 | `docs/adr/README.md` | `tests/architecture/test_docs.py` | ADR-0001 | ✅ |
+| NFR-TR-03 | `src/muallim/infrastructure/audio/file_store.py` | `tests/integration/test_audio_store.py` | — | ✅ |
+| NFR-TR-04 | `.claude/hooks/log_prompt.py` | `tests/architecture/test_hooks.py` | `docs/journal/README.md` | ✅ |
+| NFR-REL-02 | `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/audio/ffmpeg.py`, `src/muallim/research/metrics.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py` | `docs/requirements/quality-scenarios.md` (QAS-04) | ✅ |
+| NFR-ACC-01 | `src/muallim/research/metrics.py`, `src/muallim/bootstrap/research_cli.py` | `tests/unit/test_metrics.py`, `tests/integration/test_metrics_report.py` | ADR-0026, `docs/research/metrics-gqm.md` | 🟡 |
+| NFR-SEC-01 | `.claude/hooks/guard.py`, `.gitignore` | `tests/architecture/test_hooks.py` | `docs/security/threat-model.md` | ✅ |
+| NFR-SEC-02 | `src/muallim/research/dataset.py` | `tests/integration/test_research.py` | `docs/security/privacy.md` | ✅ |
+| NFR-SEC-03 | `src/muallim/infrastructure/audio/file_store.py` | `tests/integration/test_audio_store.py` | `docs/security/threat-model.md` | ✅ |
+| NFR-SEC-04 | `src/muallim/infrastructure/db/tables.py` | `tests/integration/test_sql_repositories.py` | ADR-0010 | ✅ |
+| NFR-MNT-01 | `pyproject.toml` | `tests/architecture/test_layers.py` | ADR-0002 | ✅ |
+| NFR-MNT-03 | `migrations/versions/0001_initial_schema.py` | `tests/architecture/test_migrations.py` | ADR-0004 | ✅ |
+| NFR-SEC-07 | `src/muallim/bootstrap/logs.py`, `docker-compose.yml` | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ADR-0027 | ✅ |
+| NFR-TR-05 | `.github/workflows/links.yml` | `tests/architecture/test_docs.py` | ADR-0028 | 🟡 |

@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "Если используете этот проект в работе, пожалуйста, сошлитесь на него."
+title: "Muallim: ИИ-тренажёр чтения по учебнику «Аль-Муаллим ас-Сани»"
+type: software
+authors:
+  - family-names: "Исмаилов"
+    email: "abdraoper@gmail.com"
+version: 0.1.0
+date-released: "2026-10-17"
+keywords:
+  - pronunciation assessment
+  - Quranic recitation
+  - Arabic literacy
+  - Telegram bot
+  - AI agents

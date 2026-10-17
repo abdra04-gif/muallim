@@ -1,0 +1,33 @@
+# Секреты
+.env
+.env.*
+!.env.example
+
+# Данные учеников и выгрузки — никогда в git
+data/
+*.sqlite3
+*.db
+*.dump
+
+# Отчёты могут содержать псевдонимы; коммитить осознанно (git add -f)
+analytics/reports/*.md
+
+# Служебное
+.agent-phase
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+.DS_Store
+.idea/
+.vscode/
+
+# Книга (скан издания, «все права защищены») — только локально, для исследования; см. book/README.md
+book/*.pdf
+book/pages/

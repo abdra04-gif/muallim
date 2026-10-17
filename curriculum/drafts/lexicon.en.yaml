@@ -1,0 +1,187 @@
+# ЧЕРНОВИК, предложенный ИИ-агентом 2026-10-17. Включает человек (enabled: true) после
+# проверки носителем языка и преподавателем (OQ-11, ADR-0017).
+consonants:
+  ء:
+    name: Hamza
+    translit: ʼ
+  ب:
+    name: Ba
+    translit: b
+  ت:
+    name: Ta
+    translit: t
+  ث:
+    name: Tha
+    translit: th
+  ج:
+    name: Jim
+    translit: j
+  ح:
+    name: Ḥa
+    translit: ḥ
+  خ:
+    name: Kha
+    translit: kh
+  د:
+    name: Dal
+    translit: d
+  ذ:
+    name: Dhal
+    translit: dh
+  ر:
+    name: Ra
+    translit: r
+  ز:
+    name: Zay
+    translit: z
+  س:
+    name: Sin
+    translit: s
+  ش:
+    name: Shin
+    translit: sh
+  ص:
+    name: Ṣad
+    translit: ṣ
+  ض:
+    name: Ḍad
+    translit: ḍ
+  ط:
+    name: Ṭa
+    translit: ṭ
+  ظ:
+    name: Ẓa
+    translit: ẓ
+  ع:
+    name: ʿAyn
+    translit: ʿ
+  غ:
+    name: Ghayn
+    translit: gh
+  ف:
+    name: Fa
+    translit: f
+  ق:
+    name: Qaf
+    translit: q
+  ك:
+    name: Kaf
+    translit: k
+  ل:
+    name: Lam
+    translit: l
+  م:
+    name: Mim
+    translit: m
+  ن:
+    name: Nun
+    translit: n
+  ه:
+    name: Ha
+    translit: h
+  و:
+    name: Waw
+    translit: w
+  ي:
+    name: Ya
+    translit: y
+vowels:
+  َ: fatha (short «a»)
+  ِ: kasra (short «i»)
+  ُ: damma (short «u»)
+  ا: madd — long «aa»
+  ۦ: madd — long «ii»
+  ۥ: madd — long «uu»
+  ڇ: qalqala — a light «bounce» of the sound
+letter_tips:
+  ء: A short «a» with a light catch in the throat, like «a» after a pause.
+  ب: A plain «b».
+  ت: "A light «t»: tip of the tongue at the upper teeth."
+  ث: Between the teeth, like «th» in «think».
+  ج: A smooth «j» as in «jam».
+  ح: "A deep «h» from the middle of the throat: tighten the throat and breathe out strongly, without rasping."
+  خ: A rasping «kh» from the back of the palate, like German «ch» in «Bach». Heavy letter.
+  د: A plain «d».
+  ذ: Voiced, between the teeth, like «th» in «this».
+  ر: A rolled «r». With fatha it is heavy.
+  ز: A plain «z».
+  س: A plain light «s».
+  ش: «sh».
+  ص: "A heavy «s»: back of the tongue raised, lips slightly rounded."
+  ض: "A heavy «d»: side of the tongue pressed against the molars."
+  ط: "A heavy «t»: the whole tongue pressed to the palate."
+  ظ: "A heavy «th» as in «this»: tongue between the teeth, lips rounded."
+  ع: "From the middle of the throat: tighten the throat and say «a» with tension."
+  غ: A voiced gargled «gh», like French «r». Heavy letter.
+  ف: A plain «f».
+  ق: A deep «q» with the back of the tongue at the soft palate. Do not confuse with plain «k» (ك).
+  ك: A plain light «k».
+  ل: A light «l».
+  م: A plain «m».
+  ن: A plain «n».
+  و: Rounded lips, like English «w».
+  ه: A light breath, like «h» in «hello».
+  ي: Like «y» in «yes».
+pair_tips:
+- pair: حه
+  tip: ح — from the middle of the throat, strong and tense; ه — a light breath from deep in the chest.
+- pair: حخ
+  tip: ح — a clean breath without rasping; خ — rasping, like gargling.
+- pair: ءع
+  tip: ع — throat tightened and the sound is held; ء — a short catch, like a pause before «a».
+- pair: سص
+  tip: ص — heavy (back of the tongue raised); س — light.
+- pair: دض
+  tip: ض — heavy, side of the tongue against the molars; د — plain «d».
+- pair: تط
+  tip: ط — heavy, tongue pressed to the palate; ت — light «t».
+- pair: ذظ
+  tip: ظ — heavy, between the teeth; ذ — light, like «th» in «this».
+- pair: ذز
+  tip: ذ — tongue between the teeth («th»); ز — plain «z», tongue behind the teeth.
+- pair: زظ
+  tip: ظ — tongue between the teeth and lips rounded; ز — plain «z».
+- pair: ثس
+  tip: ث — tongue between the teeth («th» in «think»); س — plain «s».
+- pair: قك
+  tip: ق — deep, with the back of the tongue; ك — plain «k», further forward.
+- pair: خغ
+  tip: غ — voiced gargled «gh»; خ — voiceless rasping «kh».
+- pair: رغ
+  tip: غ — from the throat (like French «r»); ر — with the tip of the tongue.
+transcription:
+  ء: ʼ
+  ب: b
+  ت: t
+  ث: th
+  ج: j
+  ح: ḥ
+  خ: kh
+  د: d
+  ذ: dh
+  ر: r
+  ز: z
+  س: s
+  ش: sh
+  ص: ṣ
+  ض: ḍ
+  ط: ṭ
+  ظ: ẓ
+  ع: ʿ
+  غ: gh
+  ف: f
+  ق: q
+  ك: k
+  ل: l
+  م: m
+  ن: n
+  ه: h
+  و: w
+  ي: y
+  َ: a
+  ِ: i
+  ُ: u
+  ا: a
+  ۦ: i
+  ۥ: u
+  ڇ: ""

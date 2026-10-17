@@ -1,0 +1,26 @@
+%% Контекст системы (C4, уровень 1): кто и что взаимодействует с ботом.
+flowchart LR
+    learner(["👤 Ученик<br/>(Telegram)"])
+    researcher(["🎓 Исследователь"])
+    annotator(["🎧 Разметчик<br/>(преподаватель)"])
+
+    subgraph system["Muallim — тренажёр чтения"]
+        bot["🤖 Telegram-бот<br/><i>Python, aiogram</i>"]
+        research["📊 muallim-research<br/><i>CLI: отчёты, разметка, датасет</i>"]
+    end
+
+    tg["Telegram Bot API"]
+    db[("PostgreSQL<br/>попытки, ошибки, разметка")]
+    audio[("Аудио-хранилище<br/>только с согласия")]
+    model["🧠 Quran Muaalem<br/><i>распознавание фонем</i>"]
+    book[/"📖 Аль-Муаллим ас-Сани<br/>curriculum/*.yaml"/]
+
+    learner -- "голосовые, кнопки" --> tg --> bot
+    bot -- "оценка + объяснение ошибок" --> tg
+    bot --> model
+    bot --> db
+    bot --> audio
+    book --> bot
+    researcher --> research --> db
+    research -- "CSV очереди" --> annotator
+    annotator -- "метки" --> research

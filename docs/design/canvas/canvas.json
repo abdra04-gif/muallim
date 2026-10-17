@@ -1,0 +1,31 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-17T09:30:00Z"},
+  "title": "Муаллим бот — макеты",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1280, "h": 640, "title": "Обзор: путь ученика и правила интерфейса"},
+    "Home.dc.html": {"x": 0, "y": 1000, "w": 390, "h": 844, "title": "1 · Главная"},
+    "Lessons.dc.html": {"x": 470, "y": 1000, "w": 390, "h": 844, "title": "2 · Уроки"},
+    "Alphabet.dc.html": {"x": 940, "y": 1000, "w": 390, "h": 844, "title": "3 · Урок 1: алфавит (с. 10)"},
+    "Letter.dc.html": {"x": 1410, "y": 1000, "w": 390, "h": 844, "title": "4 · Буква урока"},
+    "Line.dc.html": {"x": 1880, "y": 1000, "w": 390, "h": 844, "title": "5 · Строка книги"},
+    "ResultErrors.dc.html": {"x": 0, "y": 2264, "w": 390, "h": 844, "title": "6 · Результат с ошибками"},
+    "ResultDone.dc.html": {"x": 470, "y": 2264, "w": 390, "h": 844, "title": "7 · Урок пройден"},
+    "Progress.dc.html": {"x": 940, "y": 2264, "w": 390, "h": 844, "title": "8 · Прогресс"},
+    "Help.dc.html": {"x": 1410, "y": 2264, "w": 390, "h": 844, "title": "9 · Как заниматься"},
+    "Teacher.dc.html": {"x": 1880, "y": 2264, "w": 390, "h": 844, "title": "10 · Режим учителя"},
+    "Pairs.dc.html": {"x": 2350, "y": 2264, "w": 390, "h": 844, "title": "11 · Пары «Обратите внимание»"}
+  },
+  "order": [
+    "Main.dc.html", "Home.dc.html", "Lessons.dc.html", "Alphabet.dc.html", "Letter.dc.html",
+    "Line.dc.html", "ResultErrors.dc.html", "ResultDone.dc.html", "Progress.dc.html",
+    "Help.dc.html", "Teacher.dc.html", "Pairs.dc.html"
+  ],
+  "notes": {
+    "row1": {"x": 0, "y": 740, "text": "Путь ученика: главная → уроки → карточка → голосовое", "kind": "title1", "maxW": 2270},
+    "row2": {"x": 0, "y": 2004, "text": "После голосового и служебные экраны", "kind": "title1", "maxW": 2740}
+  },
+  "designSystems": []
+}

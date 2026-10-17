@@ -1,0 +1,194 @@
+"""DI-контейнер (dishka): какой порт какой реализацией закрывается. Единственное место «склейки»."""
+
+import subprocess
+from collections.abc import AsyncIterator
+
+from dishka import AsyncContainer, Provider, Scope, make_async_container, provide, provide_all
+from dishka.integrations.aiogram import AiogramProvider
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+
+from muallim import __version__
+from muallim.application.feedback import FeedbackCatalog
+from muallim.application.ports.reading import ReadingGuide
+from muallim.application.ports.recognition import PronunciationRecognizer
+from muallim.application.ports.repositories import (
+    AttemptRepository,
+    CurriculumSnapshots,
+    LearnerRepository,
+    UnitOfWork,
+)
+from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
+from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
+from muallim.application.use_cases.cards import OpenItem
+from muallim.application.use_cases.curriculum import PublishCurriculum
+from muallim.application.use_cases.learners import (
+    DeleteMyData,
+    EnsureLearner,
+    SetFeedbackLanguage,
+    SetResearchConsent,
+)
+from muallim.application.use_cases.progress import GetProgress
+from muallim.application.use_cases.quiz import PracticeQuiz
+from muallim.application.use_cases.reading import HowToRead
+from muallim.application.use_cases.recitation import AssessRecitation
+from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
+from muallim.application.use_cases.reports import ReportMistake
+from muallim.bootstrap.config import PROJECT_ROOT, Settings
+from muallim.domain.curriculum import Curriculum
+from muallim.domain.policy import GradingPolicy
+from muallim.infrastructure.asr.stub import StubRecognizer
+from muallim.infrastructure.audio.file_store import FileAudioStore
+from muallim.infrastructure.audio.http import fetch
+from muallim.infrastructure.audio.reference_library import (
+    CombinedReferenceAudio,
+    FileReferenceAudio,
+    HusaryCuts,
+    RecitationCache,
+)
+from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
+from muallim.infrastructure.db.engine import create_engine, create_session_factory
+from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
+from muallim.infrastructure.db.repositories.curriculum import SqlCurriculumSnapshots
+from muallim.infrastructure.db.repositories.events import SqlEventLog
+from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
+from muallim.infrastructure.db.uow import SqlUnitOfWork
+from muallim.infrastructure.system import RandomIdGenerator, SystemClock
+from muallim.presentation.telegram.learner import LearnerProvider
+
+
+class AppProvider(Provider):
+    """Объекты на всё время работы бота."""
+
+    scope = Scope.APP
+
+    def __init__(self, settings: Settings) -> None:
+        super().__init__()
+        self.settings = settings
+
+    @provide
+    def settings_(self) -> Settings:
+        return self.settings
+
+    @provide
+    def curriculum(self) -> Curriculum:
+        d = self.settings.curriculum_dir
+        return load_curriculum(d / "course.ru.yaml", d / "lexicon.ru.yaml")
+
+    @provide
+    def policy(self) -> GradingPolicy:
+        return GradingPolicy(self.settings.pass_threshold, self.settings.excellent_threshold)
+
+    @provide
+    def feedback_catalog(self) -> FeedbackCatalog:
+        return load_feedback_catalog(self.settings.curriculum_dir)
+
+    @provide
+    def reference_audio(self, curriculum: Curriculum) -> ReferenceAudioLibrary:
+        ayat = {i.id: i.quran for les in curriculum.lessons for i in les.items if i.quran}
+        texts = {i.id: i.text for les in curriculum.lessons for i in les.items if not i.quran}
+        return CombinedReferenceAudio(
+            FileReferenceAudio(self.settings.reference_audio_dir),
+            RecitationCache(self.settings.recitations_dir, fetch, self.settings.reciter),
+            ayat,
+            HusaryCuts.load(self.settings.reference_audio_dir / "husary"),
+            texts,
+        )
+
+    @provide
+    def build_info(self) -> BuildInfo:
+        return BuildInfo(self.settings.app_version or detect_version())
+
+    @provide
+    def recognizer(self) -> PronunciationRecognizer:
+        if self.settings.asr_backend == "stub":
+            return StubRecognizer()
+        from muallim.infrastructure.asr.muaalem import MuaalemRecognizer  # noqa: PLC0415
+
+        recognizer = MuaalemRecognizer(device=self.settings.asr_device)
+        recognizer.load()
+        return recognizer
+
+    @provide
+    def reading_guide(self) -> ReadingGuide:
+        from muallim.infrastructure.asr.reading import QuranReadingGuide  # noqa: PLC0415
+
+        return QuranReadingGuide()
+
+    @provide
+    def audio_store(self) -> AudioStore:
+        return FileAudioStore(self.settings.audio_dir)
+
+    @provide
+    async def engine(self) -> AsyncIterator[AsyncEngine]:
+        engine = create_engine(self.settings.database_url.get_secret_value())
+        yield engine
+        await engine.dispose()
+
+    @provide
+    def session_factory(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+        return create_session_factory(engine)
+
+    clock = provide(SystemClock, provides=Clock)
+    ids = provide(RandomIdGenerator, provides=IdGenerator)
+
+
+class RequestProvider(Provider):
+    """Объекты на один апдейт: одна сессия БД и одна транзакция на запрос."""
+
+    scope = Scope.REQUEST
+
+    @provide
+    async def session(
+        self, factory: async_sessionmaker[AsyncSession]
+    ) -> AsyncIterator[AsyncSession]:
+        async with factory() as session:
+            yield session
+
+    uow = provide(SqlUnitOfWork, provides=UnitOfWork)
+    learners = provide(SqlLearnerRepository, provides=LearnerRepository)
+    attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
+    events = provide(SqlEventLog, provides=EventLog)
+    snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
+
+    @provide
+    def record_reference(
+        self,
+        library: ReferenceAudioLibrary,
+        settings: Settings,
+        uow: UnitOfWork,
+        events: EventLog,
+    ) -> RecordReference:
+        return RecordReference(library, settings.teachers, uow, events)
+
+    use_cases = provide_all(
+        EnsureLearner,
+        SetResearchConsent,
+        SetFeedbackLanguage,
+        DeleteMyData,
+        OpenItem,
+        AssessRecitation,
+        HowToRead,
+        GetProgress,
+        GetReferenceAudio,
+        ReportMistake,
+        PublishCurriculum,
+        PracticeQuiz,
+    )
+
+
+def detect_version() -> str:
+    """«0.2.0+a1b2c3d» — версия пакета и git-коммит; «-dirty», если есть незакоммиченные правки."""
+    try:
+        sha = subprocess.run(
+            ["git", "describe", "--always", "--dirty", "--exclude", "*"],  # noqa: S607
+            cwd=PROJECT_ROOT, capture_output=True, text=True, check=True, timeout=5,
+        ).stdout.strip()  # fmt: skip
+    except (OSError, subprocess.SubprocessError):
+        return __version__
+    return f"{__version__}+{sha}" if sha else __version__
+
+
+def create_container(settings: Settings) -> AsyncContainer:
+    return make_async_container(
+        AppProvider(settings), RequestProvider(), AiogramProvider(), LearnerProvider()
+    )

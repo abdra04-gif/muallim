@@ -1,0 +1,54 @@
+# Шаблоны объяснений ошибок. МЕНЯЕТ ТОЛЬКО ЧЕЛОВЕК (ADR-0017).
+# Поля: {where} {expected} {heard} {expected_vowel} {heard_vowel} {expected_seq} {heard_seq};
+# в how — ещё {tip} (подсказка из lexicon.ru.yaml: пара букв, буква или гласный).
+# Формулировки для новичка (FR-43) утверждены автором 2026-10-17; сверить с преподавателем (TD-FN-30).
+language:
+  code: ru
+  title: Русский
+  enabled: true
+  status: "эталон: для новичка — что не так, в каком слоге и как сказать (FR-43)"
+where: " в слоге «{syllable}»"
+tip: "\n   \U0001F4A1 {tip}"
+joiner: " + "
+how_line: "\n\U0001F444 Как сказать: {how}"
+# Строка не дочитана (FR-43). ЧЕРНОВИК агента 2026-10-18 — утвердить автору.
+unread: "\U0001F4D6 Не дочитано: ты остановился на «{last}». Дальше: «{rest}»."
+unread_how: "Читай строку до конца, без остановок — даже если не уверен в слоге. Лучше с ошибкой, чем не дочитать."
+# Коротко (ADR-0031): место «как надо → как у тебя» и полфразы подсказки; «как сказать» (how) —
+# под «👄 Подробнее». Поля short: {expected_tr} {heard_tr} — звук транскрипцией.
+# ЧЕРНОВИК агента 2026-10-18 — утвердить автору.
+line: "«{expected}» → у тебя «{heard}»"
+line_missing: "«{expected}» → у тебя пропущено"
+short:
+  letter_substitution: "Нужен звук «{expected_tr}», а не «{heard_tr}»."
+  vowel_substitution: "Нужно «{expected_tr}», а не «{heard_tr}» — смотри на огласовку."
+  sound_substitution: "Нужен «{expected_tr}», а не «{heard_tr}»."
+  fragment_substitution: "Прочитай это место медленно, по буквам."
+  madd_too_short: "Тяни гласный дольше — на два счёта."
+  vowel_missing: "Не проглатывай гласный «{expected_tr}»."
+  shadda_missing: "«{expected_tr}» звучит дважды — ташдид."
+  sound_missing: "Пропущен звук «{expected_tr}»."
+  madd_too_long: "Здесь коротко — без растяжки."
+  extra_sound: "Лишний звук «{heard_tr}» — читай только написанное."
+messages:
+  letter_substitution: "\U0001F524 Буква{where}: нужна {expected}, а прозвучала {heard}."
+  vowel_substitution: "\U0001F508 Гласный{where}: нужна {expected_vowel}, а прозвучала {heard_vowel}."
+  sound_substitution: "⚠️ Звук{where}: нужен {expected}, а прозвучал {heard}."
+  fragment_substitution: "⚠️ Прочитано иначе{where}: нужно {expected_seq}, а прозвучало {heard_seq}."
+  madd_too_short: "〰️ Гласный не дотянут{where}: нужен {expected_vowel}."
+  vowel_missing: "\U0001F507 Не прозвучал гласный{where}: нужна {expected_vowel}."
+  shadda_missing: "✌️ Нет удвоения (ташдида){where}: буква {expected} должна звучать дважды."
+  sound_missing: "\U0001F507 Пропущен звук{where}: {expected}."
+  madd_too_long: "〰️ Гласный растянут{where}: здесь короткий звук, без мадда."
+  extra_sound: "➕ Лишний звук{where}: {heard_seq}."
+how:
+  letter_substitution: "{tip}"
+  vowel_substitution: "{tip} Посмотри на знак над или под буквой — он и есть гласный."
+  sound_substitution: "{tip} Прочитай этот слог отдельно, медленно, справа налево."
+  fragment_substitution: "{tip} Прочитай этот слог отдельно, медленно, по буквам справа налево — и только потом всю строку."
+  madd_too_short: "{tip} Буква мадда (ا, و или ي без огласовки) удлиняет гласный перед ней."
+  vowel_missing: "{tip} Не проглатывай гласный: он звучит после каждой буквы с огласовкой."
+  shadda_missing: "Ташдид (ّ) — согласный звучит дважды: задержи его, как «сс» в слове «касса»."
+  sound_missing: "{tip} Читай медленно, по одной букве справа налево — каждый звук должен прозвучать."
+  madd_too_long: "Здесь нет буквы мадда — скажи гласный быстро, на один счёт."
+  extra_sound: "Читай только то, что написано. Если над буквой сукун (ْ), после неё гласного нет — остановись."

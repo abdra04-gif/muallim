@@ -1,0 +1,5 @@
+Muallim — тренажёр чтения по учебнику «Аль-Муаллим ас-Сани»
+Copyright (c) 2026 Исмаилов
+
+Распознавание произношения использует пакеты quran-muaalem и quran-transcript
+(https://github.com/obadx/quran-muaalem) — см. docs/research/sources.md, SRC-002, SRC-003.

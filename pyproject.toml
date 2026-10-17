@@ -1,0 +1,150 @@
+[project]
+name = "muallim"
+version = "0.6.0"
+description = "Telegram-тренажёр чтения по учебнику «Аль-Муаллим ас-Сани» с автоматической проверкой произношения"
+readme = "README.md"
+authors = [{ name = "Исмаилов", email = "abdraoper@gmail.com" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "aiogram~=3.20",
+    "alembic~=1.14",
+    "asyncpg~=0.30",
+    "dishka>=1.8",
+    "pillow>=11",
+    "pydantic~=2.10",
+    "pydantic-settings~=2.9",
+    "pyyaml~=6.0",
+    "sqlalchemy[asyncio]~=2.0",
+]
+
+[project.optional-dependencies]
+# Тяжёлые зависимости распознавания (~2 ГБ). Тестам и CI не нужны — см. ADR-0006.
+ml = [
+    "numpy>=1.26",
+    "quran-muaalem>=0.2.2",
+    "torch>=2.4",
+    "transformers>=4.55,<5",
+]
+
+[project.scripts]
+muallim = "muallim.bootstrap.main:run"
+muallim-research = "muallim.bootstrap.research_cli:main"
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.20",
+    "import-linter>=2.1",
+    "mypy>=1.14",
+    "pip-audit>=2.7",
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+    "types-pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.8,<0.14"]
+build-backend = "uv_build"
+
+# ---------- тесты ----------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: тесты с реальной БД (SQLite в памяти)",
+    "architecture: проверка слоёв и правил проекта",
+    "postgres: тесты на настоящем PostgreSQL (нужен TEST_POSTGRES_URL)",
+]
+addopts = "-ra --strict-markers"
+
+[tool.coverage.run]
+source = ["muallim"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "\\.\\.\\."]
+omit = [
+    "src/muallim/bootstrap/*",
+    "src/muallim/infrastructure/asr/muaalem.py",
+    "src/muallim/infrastructure/audio/ffmpeg.py",
+    "src/muallim/presentation/telegram/*",
+]
+
+# ---------- стиль и типы ----------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "S", "DTZ", "T20", "SIM", "RUF", "PL"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # кириллица и арабский в строках — это норма проекта
+    "PLR0913",                      # use case'ы принимают много портов через DI
+    "PLR2004",                      # пороги вынесены в domain/policy.py
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "S311"]
+"scripts/**" = ["T201", "S603", "S607"]
+"src/muallim/bootstrap/research_cli.py" = ["T201"]
+"src/muallim/presentation/telegram/handlers.py" = ["PLR0917"]  # aiogram/dishka внедряют зависимости параметрами
+".claude/hooks/**" = ["T201", "S603", "S607"]
+"migrations/**" = ["E501"]
+"scripts/render_mockups.py" = ["T201", "E501"]  # встроенные CSS и HTML страницы макетов
+"scripts/book/**" = ["T201", "E501", "E402", "PLW2901", "PLR0912", "PLR0915", "C901"]  # данные расшифровки книги и сборка программы
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["muallim"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["quran_muaalem.*", "quran_transcript.*", "torch.*", "numpy.*"]
+ignore_missing_imports = true
+
+# ---------- архитектура: правила слоёв (ADR-0002) ----------
+[tool.importlinter]
+root_package = "muallim"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Слои: bootstrap → research → presentation | infrastructure → application → domain"
+type = "layers"
+layers = [
+    "muallim.bootstrap",
+    "muallim.research",
+    "muallim.presentation | muallim.infrastructure",
+    "muallim.application",
+    "muallim.domain",
+]
+
+[[tool.importlinter.contracts]]
+name = "Домен чистый: без фреймворков и ввода-вывода"
+type = "forbidden"
+source_modules = ["muallim.domain"]
+forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "pydantic", "yaml", "alembic", "asyncpg", "PIL"]
+
+[[tool.importlinter.contracts]]
+name = "Application не знает о Telegram, БД и модели"
+type = "forbidden"
+source_modules = ["muallim.application"]
+forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "alembic", "asyncpg", "quran_muaalem", "torch", "PIL"]
+
+[[tool.importlinter.contracts]]
+name = "Presentation и infrastructure не зависят друг от друга"
+type = "independence"
+modules = ["muallim.presentation", "muallim.infrastructure"]
+
+[[tool.importlinter.contracts]]
+name = "Исследовательские инструменты не зависят от Telegram"
+type = "forbidden"
+source_modules = ["muallim.research"]
+forbidden_modules = ["muallim.presentation", "aiogram"]

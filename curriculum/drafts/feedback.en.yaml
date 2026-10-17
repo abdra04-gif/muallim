@@ -1,0 +1,21 @@
+# ЧЕРНОВИК, предложенный ИИ-агентом 2026-10-17. Включает человек (enabled: true) после
+# проверки носителем языка и преподавателем (OQ-11, ADR-0017).
+language:
+  code: en
+  title: English
+  enabled: false
+  status: черновик агента
+where: " in syllable {n}"
+tip: "\n   \U0001F4A1 {tip}"
+joiner: " + "
+messages:
+  letter_substitution: "\U0001F524 Letter{where}: should be {expected}, but you said {heard}."
+  vowel_substitution: "\U0001F508 Vowel{where}: should be {expected_vowel}, but you said {heard_vowel}."
+  sound_substitution: "⚠️ Sound{where}: should be {expected}, but you said {heard}."
+  fragment_substitution: "⚠️ Fragment{where}: should be {expected_seq}, but you said {heard_seq}."
+  madd_too_short: "〰️ Vowel too short{where}: it should be {expected_vowel}."
+  vowel_missing: "\U0001F507 {expected_vowel} was not pronounced{where}. Say the vowel clearly."
+  shadda_missing: "✌️ Missing doubling (shadda) of {expected}{where}. Hold the sound a little longer."
+  sound_missing: "\U0001F507 Missing sound {expected}{where}."
+  madd_too_long: "〰️ Vowel stretched too long{where}: this is a short vowel, no madd."
+  extra_sound: "➕ Extra sound{where}: {heard_seq}."

@@ -1,0 +1,25 @@
+%% Смысловые области (bounded contexts, DDD) поверх слоёв. Стрелка = «передаёт данные».
+%% У каждой области свой язык: «строка книги» в Обучении — это «эталон» в Оценке и «попытка» в Исследовании.
+flowchart LR
+    subgraph learning["📖 Обучение по книге"]
+        L["уроки · строки · правила · знаки<br/>прогресс · закрепление<br/><i>domain/curriculum, quiz<br/>use_cases/cards, progress, quiz</i>"]
+    end
+    subgraph reference["🔊 Эталоны"]
+        R["записи учителя · чтение Хусари<br/><i>use_cases/reference<br/>audio/reference_library</i>"]
+    end
+    subgraph assessment["🎙 Оценка чтения"]
+        A["распознавание · сравнение фонем<br/>вердикт · объяснение ошибки<br/><i>domain/assessment, policy, phonetics<br/>application/feedback, transcription<br/>asr/muaalem, stub</i>"]
+    end
+    subgraph identity["👤 Ученик и согласие"]
+        I["псевдоним · Telegram ID отдельно<br/>согласие · удаление<br/><i>domain/learner<br/>use_cases/learners</i>"]
+    end
+    subgraph research["🔬 Исследование"]
+        S["попытки со следом решения · жалобы<br/>разметка · отчёты · датасет<br/><i>domain/attempt, report<br/>use_cases/recitation, reports<br/>research/*</i>"]
+    end
+
+    L -- "текст строки = эталон" --> A
+    R -- "образец звука" --> L
+    A -- "результат = попытка" --> S
+    I -- "кто и с каким согласием" --> S
+    I -- "текущая строка" --> L
+    S -. "жалобы и разметка → калибровка (TD-FN-02)" .-> A
