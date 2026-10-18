@@ -121,10 +121,31 @@
 | `comment` | text | |
 | `guide_version` | varchar(16) | версия руководства по разметке |
 | `created_at` | timestamptz | |
+| `source` | varchar(16), null | откуда метка: `excel` (пакет `tasks.csv`) или `telegram` (кнопки в боте, FR-17); `null` — метки до миграции 0005 (все из Excel) |
+| `seconds_spent` | int, null | секунд от показа записи до ответа — только Telegram; при исправлении фонем — до отправки исправления |
 
 Строки не изменяются и не удаляются при исправлении: исправленная метка — новая строка, в
 метриках и датасете берётся **последняя метка каждого разметчика** на попытку (история
 сохраняется). Удаляются вместе с попыткой (CASCADE) и при отзыве согласия на запись голоса.
+
+## `annotators` — разметчики по приглашению и отозванные (FR-17, ADR-0041)
+| Поле | Тип | Описание |
+|---|---|---|
+| `code` | varchar(64), PK | код разметчика (A1, A2…), не имя |
+| `telegram_user_id` | bigint, unique, null | привязан приглашением; **персональные данные** — только для проверки доступа, в выгрузки не попадает |
+| `created_at` | timestamptz | |
+| `revoked_at` | timestamptz, null | доступ закрыт (`muallim-research annotator-revoke`); действует и на разметчиков из `ANNOTATOR_IDS` |
+
+Разметчики из `ANNOTATOR_IDS` (настройки) здесь не хранятся, пока их не отзовут.
+
+## `annotator_invites` — приглашения в разметку (FR-17, ADR-0041)
+| Поле | Тип | Описание |
+|---|---|---|
+| `id` | int, PK | |
+| `code_digest` | varchar(64), unique | SHA-256 кода приглашения (без регистра, дефисов и пробелов); **сам код не хранится** |
+| `annotator` | varchar(64) | для какого кода разметчика |
+| `created_at`, `expires_at` | timestamptz | действует сутки |
+| `used_at` | timestamptz, null | погашено при входе (один раз); неиспользованные удаляются при отзыве |
 
 ## `learner_reports` — жалобы «бот ошибся» (ADR-0020)
 | Поле | Тип | Описание |
@@ -140,7 +161,7 @@
 |---|---|---|
 | `id` | int, PK | |
 | `learner_id` | UUID → learners, SET NULL | после удаления ученика событие остаётся обезличенным |
-| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_answered`, `feedback_language_set`, `learner_deleted` |
+| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_answered`, `feedback_language_set`, `learner_deleted`; разметка (FR-17, `learner_id` — сам разметчик): `annotation_shown`, `annotation_submitted` (payload: `annotator`, `attempt_id`, `status`), `annotator_invite_redeemed`, `annotator_invite_failed` (для ограничения подбора кода) |
 | `payload` | JSON | только ID карточек, баллы, флаги; **никогда** — текст сообщений |
 | `created_at` | timestamptz | |
 

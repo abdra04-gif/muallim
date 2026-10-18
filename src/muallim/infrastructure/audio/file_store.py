@@ -28,6 +28,10 @@ class FileAudioStore(AudioStore):
     async def delete(self, sha256: str) -> None:
         self.path_for(sha256).unlink(missing_ok=True)
 
+    async def read(self, sha256: str) -> bytes | None:
+        path = self.path_for(sha256)
+        return await asyncio.to_thread(path.read_bytes) if path.is_file() else None
+
     @staticmethod
     def _write(path: Path, audio: bytes) -> None:
         path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)

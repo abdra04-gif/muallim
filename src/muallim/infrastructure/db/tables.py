@@ -187,6 +187,30 @@ annotations = Table(
     Column("comment", Text, nullable=False, default=""),
     Column("guide_version", String(16), nullable=False),  # версия docs/data/annotation-guide.md
     Column("created_at", UtcDateTime(), nullable=False),
+    Column("source", String(16)),  # excel | telegram (FR-17); NULL — до миграции 0005
+    Column("seconds_spent", Integer),  # от показа записи до ответа; только Telegram
+)
+
+# Разметчики по приглашению и отозванные (FR-17). Разметчики из ANNOTATOR_IDS живут в настройках;
+# строка появляется, когда их отзывают. Имени нет — только код (A1…), Telegram ID — отдельно.
+annotators = Table(
+    "annotators",
+    metadata,
+    Column("code", String(64), primary_key=True),
+    Column("telegram_user_id", BigInteger, unique=True),  # привязан приглашением; NULL — нет
+    Column("created_at", UtcDateTime(), nullable=False),
+    Column("revoked_at", UtcDateTime()),  # NULL — доступ открыт
+)
+
+annotator_invites = Table(
+    "annotator_invites",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("code_digest", String(64), nullable=False, unique=True),  # SHA-256 кода, не сам код
+    Column("annotator", String(64), nullable=False),
+    Column("created_at", UtcDateTime(), nullable=False),
+    Column("expires_at", UtcDateTime(), nullable=False),
+    Column("used_at", UtcDateTime()),  # одноразовое: после входа — время
 )
 
 learner_reports = Table(

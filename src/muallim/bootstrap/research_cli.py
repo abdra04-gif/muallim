@@ -6,6 +6,9 @@
                                  пакет разметчика: data/annotation/A1_<дата>/ (tasks.csv + audio/)
   annotation-import FILE --annotator A1
                                  загрузить размеченный tasks.csv (docs/data/annotation-guide.md)
+  annotator-invite A2            приглашение в разметку в Telegram: код на сутки, один вход
+  annotator-revoke A2            закрыть доступ сразу (и по приглашению, и из ANNOTATOR_IDS)
+  annotators                     разметчики по приглашению и отозванные
   dataset-export                 manifest.jsonl + truth.csv/predictions.csv (Iqra'Eval) + аудио
                                  в data/exports/<дата>/
   verify [--delete-orphans]      сверка БД и файлов записей: потери, лишние, повреждённые
@@ -21,11 +24,20 @@ from pathlib import Path
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.application.ports.system import Clock
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.system import SystemClock
-from muallim.research import annotation, dataset, errors, integrity, metrics, reports
+from muallim.research import (
+    annotation,
+    annotators,
+    dataset,
+    errors,
+    integrity,
+    metrics,
+    reports,
+)
 
 
 async def _run(args: argparse.Namespace) -> str:
@@ -44,19 +56,8 @@ async def _run(args: argparse.Namespace) -> str:
             out.write_text(f"{sql}\n{gqm}", encoding="utf-8")
             return f"Отчёт: {out}"
         async with create_session_factory(engine)() as session:
-            if args.command == "annotation-export":
-                out = PROJECT_ROOT / "data" / "annotation" / f"{args.annotator}_{stamp}"
-                count = await annotation.export_package(
-                    session, settings.audio_dir, out, args.annotator, args.limit
-                )
-                return f"Разметчику {args.annotator}: {count} попыток → {out}"
-            if args.command == "annotation-import":
-                r = await annotation.import_package(session, args.file, args.annotator, clock)
-                return (
-                    f"Загружено меток: {r.imported}; без изменений: {r.unchanged}; "
-                    f"пустых строк: {r.skipped_empty}; пропущено (ученик удалил данные или "
-                    f"отозвал согласие): {r.skipped_gone}"
-                )
+            if args.command.startswith("annotat"):
+                return await _annotation(session, args, settings, clock, stamp)
             if args.command == "verify":
                 copies = [PROJECT_ROOT / "data" / "annotation", PROJECT_ROOT / "data" / "exports"]
                 report = await integrity.check(session, settings.audio_dir, copies)
@@ -86,6 +87,40 @@ async def _run(args: argparse.Namespace) -> str:
     finally:
         await engine.dispose()
     raise SystemExit(f"Неизвестная команда {args.command}")
+
+
+async def _annotation(
+    session: AsyncSession, args: argparse.Namespace, settings: Settings, clock: Clock, stamp: str
+) -> str:
+    if args.command == "annotation-export":
+        out = PROJECT_ROOT / "data" / "annotation" / f"{args.annotator}_{stamp}"
+        count = await annotation.export_package(
+            session, settings.audio_dir, out, args.annotator, args.limit
+        )
+        return f"Разметчику {args.annotator}: {count} попыток → {out}"
+    if args.command == "annotation-import":
+        r = await annotation.import_package(session, args.file, args.annotator, clock)
+        return (
+            f"Загружено меток: {r.imported}; без изменений: {r.unchanged}; "
+            f"пустых строк: {r.skipped_empty}; пропущено (ученик удалил данные или "
+            f"отозвал согласие): {r.skipped_gone}"
+        )
+    if args.command == "annotator-invite":
+        code = await annotators.create_invite(session, args.annotator, clock)
+        return (
+            f"Приглашение для {args.annotator}: {code}\n"
+            f"Передайте лично (не в общий чат). Разметчик пишет боту: /annotate {code}\n"
+            "Действует сутки и один раз."
+        )
+    if args.command == "annotator-revoke":
+        await annotators.revoke(session, args.annotator, clock)
+        return f"Доступ {args.annotator} закрыт. Если код есть в ANNOTATOR_IDS — уберите и там."
+    rows = await annotators.list_annotators(session)
+    return reports.to_markdown_table(
+        ("код", "вошёл по приглашению", "доступ"),
+        [(r.code, "да" if r.telegram_bound else "нет", "закрыт" if r.revoked else "открыт")
+         for r in rows],
+    )  # fmt: skip
 
 
 async def _errors(
@@ -123,6 +158,9 @@ def main() -> None:
     imp = sub.add_parser("annotation-import")
     imp.add_argument("file", type=Path)
     imp.add_argument("--annotator", required=True)
+    for name in ("annotator-invite", "annotator-revoke"):
+        sub.add_parser(name).add_argument("annotator", help="код разметчика, например A2")
+    sub.add_parser("annotators")
     sub.add_parser("dataset-export")
     ver = sub.add_parser("verify", help="сверка БД и файлов записей")
     ver.add_argument(
@@ -147,5 +185,5 @@ def main() -> None:
     err.add_argument("--limit", type=int, default=500)
     try:
         print(asyncio.run(_run(parser.parse_args())))
-    except annotation.AnnotationError as error:
+    except (annotation.AnnotationError, ValueError) as error:
         raise SystemExit(f"Ошибка: {error}") from None

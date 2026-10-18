@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from muallim.application.ports.recognition import Recognition, RecognitionError
+from muallim.domain.annotation import AnnotationTask, Label
 from muallim.domain.assessment import Assessment
 from muallim.domain.attempt import Attempt
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
@@ -147,6 +148,9 @@ class InMemoryAudio:
         self.journal.append(f"delete:{sha256}")
         self.files.pop(sha256, None)
 
+    async def read(self, sha256: str) -> bytes | None:
+        return self.files.get(sha256)
+
 
 @dataclass
 class ScriptedRecognizer:
@@ -214,3 +218,59 @@ class ScriptedReadingGuide:
 
     def phonemes(self, text: str) -> str | None:
         return None if self.fail else text.replace(" ", "")
+
+
+@dataclass
+class InMemoryAnnotators:
+    """Разметчики по приглашению: digest → (код, срок, использован ли); привязки Telegram ID."""
+
+    invites: dict[str, tuple[str, datetime, bool]] = field(default_factory=dict)
+    bound: dict[int, str] = field(default_factory=dict)
+    revoked: set[str] = field(default_factory=set)
+    failures: dict[UUID, list[datetime]] = field(default_factory=dict)
+
+    async def bound_code(self, telegram_user_id: int) -> str | None:
+        return self.bound.get(telegram_user_id)
+
+    async def is_revoked(self, code: str) -> bool:
+        return code in self.revoked
+
+    async def redeem(self, digest: str, telegram_user_id: int, now: datetime) -> str | None:
+        found = self.invites.get(digest)
+        if found is None or found[2] or found[1] <= now:
+            return None
+        code, expires, _ = found
+        self.invites[digest] = (code, expires, True)
+        self.bound[telegram_user_id] = code
+        self.revoked.discard(code)
+        return code
+
+    async def failed_redeems(self, learner_id: UUID, since: datetime) -> int:
+        return sum(1 for at in self.failures.get(learner_id, []) if at >= since)
+
+    async def add_failed_redeem(self, learner_id: UUID, at: datetime) -> None:
+        self.failures.setdefault(learner_id, []).append(at)
+
+
+@dataclass
+class InMemoryAnnotationTasks:
+    """Очередь разметки: задачи по порядку; метки копятся списком."""
+
+    tasks: list[AnnotationTask] = field(default_factory=list)
+    labels: list[Label] = field(default_factory=list)
+
+    def _open(self, annotator: str) -> list[AnnotationTask]:
+        done = {label.attempt_id for label in self.labels if label.annotator == annotator}
+        return [t for t in self.tasks if t.attempt_id not in done]
+
+    async def next_for(self, annotator: str, exclude: frozenset[UUID]) -> AnnotationTask | None:
+        return next((t for t in self._open(annotator) if t.attempt_id not in exclude), None)
+
+    async def get(self, attempt_id: UUID) -> AnnotationTask | None:
+        return next((t for t in self.tasks if t.attempt_id == attempt_id), None)
+
+    async def remaining(self, annotator: str) -> int:
+        return len(self._open(annotator))
+
+    async def add(self, label: Label) -> None:
+        self.labels.append(label)

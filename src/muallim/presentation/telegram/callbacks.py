@@ -87,3 +87,11 @@ class Dispute(CallbackData, prefix="dispute"):
 class DisputeReason(CallbackData, prefix="dreason"):
     attempt: str
     reason: str
+
+
+class AnnotateAct(CallbackData, prefix="ann"):
+    """Разметчик (FR-17): ok — бот прав, fix — исправить, bad — плохая запись, off — читал не то,
+    skip — пропустить, stop — закончить, cancel — отменить исправление, ref — эталон."""
+
+    a: str  # UUID.hex попытки — 32 символа
+    act: str

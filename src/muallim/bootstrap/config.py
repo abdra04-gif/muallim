@@ -6,6 +6,8 @@ from typing import Literal
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from muallim.domain.annotation import valid_annotator_code
+
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -30,6 +32,24 @@ class Settings(BaseSettings):
     # Telegram ID учителей через запятую: им доступна кнопка «🎙 Записать эталон» (ADR-0024)
     teacher_ids: str = ""
 
+    # Разметчики в Telegram (FR-17): «код:Telegram ID» через запятую, например «A1:123,A2:456».
+    # Отдельно от учителей. Второй путь — приглашение: muallim-research annotator-invite A2
+    annotator_ids: str = ""
+
     @property
     def teachers(self) -> frozenset[int]:
         return frozenset(int(x) for x in self.teacher_ids.replace(" ", "").split(",") if x)
+
+    @property
+    def annotators(self) -> dict[int, str]:
+        found: dict[int, str] = {}
+        for pair in self.annotator_ids.replace(" ", "").split(","):
+            if not pair:
+                continue
+            code, _, tg = pair.partition(":")
+            if not valid_annotator_code(code) or not tg.isdigit() or int(tg) in found:
+                raise ValueError(
+                    f"ANNOTATOR_IDS: «{pair}» — нужно «код:Telegram ID» (латиница, без повторов)"
+                )
+            found[int(tg)] = code
+        return found

@@ -9,6 +9,9 @@ class AudioStore(Protocol):
 
     async def delete(self, sha256: str) -> None: ...
 
+    async def read(self, sha256: str) -> bytes | None:
+        """Запись по SHA-256 (для разметчика); None — файла нет."""
+
 
 class ReferenceAudioLibrary(Protocol):
     """Эталонные записи «как правильно» по id карточки (ADR-0018)."""

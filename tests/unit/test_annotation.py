@@ -1,0 +1,249 @@
+"""Разметка в Telegram (FR-17): правила меток, доступ разметчика, приглашения, очередь.
+
+Сценарии — на тестовых портах (tests/fakes.py), без Telegram и БД.
+"""
+
+from datetime import timedelta
+from uuid import UUID
+
+import pytest
+
+from muallim.application.use_cases.annotation import (
+    AnnotatorAccess,
+    NextAnnotation,
+    NotAnnotator,
+    RedeemInvite,
+    RedeemResult,
+    SubmitAnnotation,
+)
+from muallim.domain.annotation import (
+    INVITE_TTL,
+    MAX_INVITE_FAILURES,
+    AnnotationSource,
+    AnnotationStatus,
+    AnnotationTask,
+    LabelError,
+    check_label,
+    check_phonemes,
+    clean_phonemes,
+    invite_digest,
+    valid_annotator_code,
+)
+from muallim.domain.learner import Learner
+from tests.fakes import (
+    FixedClock,
+    InMemoryAnnotationTasks,
+    InMemoryAnnotators,
+    InMemoryAudio,
+    ListEventLog,
+    SpyUoW,
+)
+
+ANNOTATOR_TG, STRANGER_TG = 900, 901
+
+
+# ---------- правила (домен) ----------
+def test_clean_phonemes_drops_spaces_and_invisible_marks() -> None:
+    assert clean_phonemes(" \u200fسَ بَ\u200e ") == "سَبَ"
+
+
+@pytest.mark.parametrize(
+    ("text", "hint"),
+    [
+        ("", "пустое"),
+        ("أَ", "хамза пишется одним знаком «ء»"),
+        ("بّ", "удвоение"),
+        ("sa", "не фонема"),
+    ],
+)
+def test_check_phonemes_explains_what_is_wrong(text: str, hint: str) -> None:
+    with pytest.raises(LabelError, match=hint):
+        check_phonemes(text)
+
+
+def test_check_phonemes_accepts_phonetic_alphabet() -> None:
+    check_phonemes("صَبَرَ")
+
+
+def test_agree_must_keep_bot_phonemes_and_fix_must_change_them() -> None:
+    check_label(AnnotationStatus.AGREE, "سَ", bot_heard="سَ")
+    check_label(AnnotationStatus.FIX, "صَ", bot_heard="سَ")
+    with pytest.raises(LabelError, match="agree"):
+        check_label(AnnotationStatus.AGREE, "صَ", bot_heard="سَ")
+    with pytest.raises(LabelError, match="ничего не исправлено"):
+        check_label(AnnotationStatus.FIX, "سَ", bot_heard="سَ")
+
+
+@pytest.mark.parametrize(
+    ("code", "ok"), [("A1", True), ("t-2_b", True), ("", False), ("А1", False)]
+)
+def test_annotator_code_is_latin(code: str, ok: bool) -> None:  # «А» — кириллица
+    assert valid_annotator_code(code) is ok
+
+
+def test_invite_digest_ignores_case_dashes_and_spaces() -> None:
+    assert invite_digest(" kq7m-29fx ") == invite_digest("KQ7M29FX")
+    assert invite_digest("KQ7M29FX") != "KQ7M29FX"  # в БД — отпечаток, не сам код
+    assert len(invite_digest("KQ7M29FX")) == 64
+
+
+# ---------- сценарии ----------
+def _learner(tg: int) -> Learner:
+    return Learner(UUID(int=tg), tg, f"L-{tg}", "ru", FixedClock().now())
+
+
+def _task(n: int, heard: str = "سَ", sha: str | None = None) -> AnnotationTask:
+    return AnnotationTask(
+        attempt_id=UUID(int=n), item_id="L005-03", item_text="صَ", page=15, line=3,
+        bot_passed=False, bot_errors=(("ص", "س"),), reference_phonemes="صَ", bot_heard=heard,
+        learner_says=None, audio_sha256=sha or f"{n:064x}",
+    )  # fmt: skip
+
+
+class World:
+    """Разметчик A1 задан в настройках; очередь из двух записей с файлами."""
+
+    def __init__(self) -> None:
+        self.clock = FixedClock()
+        self.directory = InMemoryAnnotators()
+        self.tasks = InMemoryAnnotationTasks([_task(1), _task(2)])
+        self.audio = InMemoryAudio({t.audio_sha256: b"ogg" + bytes([i]) for i, t in
+                                    enumerate(self.tasks.tasks)})  # fmt: skip
+        self.events, self.uow = ListEventLog(), SpyUoW()
+        self.access = AnnotatorAccess(self.directory, {ANNOTATOR_TG: "A1"})
+
+    def next(self) -> NextAnnotation:
+        return NextAnnotation(self.access, self.tasks, self.audio, self.events, self.uow)
+
+    def submit(self) -> SubmitAnnotation:
+        return SubmitAnnotation(self.access, self.tasks, self.uow, self.events, self.clock)
+
+    def redeem(self) -> RedeemInvite:
+        return RedeemInvite(self.directory, self.uow, self.events, self.clock)
+
+
+async def test_access_from_settings_list_and_from_invite() -> None:
+    w = World()
+    assert await w.access.code_for(ANNOTATOR_TG) == "A1"
+    assert await w.access.code_for(STRANGER_TG) is None
+    w.directory.bound[STRANGER_TG] = "A2"
+    assert await w.access.code_for(STRANGER_TG) == "A2"
+
+
+async def test_revoked_code_closes_access_even_from_settings() -> None:
+    w = World()
+    w.directory.revoked.add("A1")
+    assert await w.access.code_for(ANNOTATOR_TG) is None
+
+
+async def test_invite_grants_access_once_and_expires() -> None:
+    w = World()
+    expires = w.clock.current + INVITE_TTL
+    w.directory.invites[invite_digest("KQ7M29FX")] = ("A2", expires, False)
+    learner = _learner(STRANGER_TG)
+
+    assert await w.redeem().execute(learner, "kq7m-29fx") == (RedeemResult.GRANTED, "A2")
+    assert await w.access.code_for(STRANGER_TG) == "A2"
+    other = _learner(902)  # тот же код второй раз не сработает
+    assert await w.redeem().execute(other, "KQ7M29FX") == (RedeemResult.INVALID, None)
+    assert ("annotator_invite_redeemed", learner.id, {"annotator": "A2"}) in w.events.events
+
+    w.directory.invites[invite_digest("OLD1OLD1")] = ("A3", w.clock.current, False)
+    w.clock.current += timedelta(seconds=5)
+    assert await w.redeem().execute(other, "OLD1OLD1") == (RedeemResult.INVALID, None)
+
+
+async def test_guessing_invites_is_locked_after_several_failures() -> None:
+    w = World()
+    w.directory.invites[invite_digest("GOODCODE")] = ("A2", w.clock.current + INVITE_TTL, False)
+    learner = _learner(STRANGER_TG)
+    for _ in range(MAX_INVITE_FAILURES):
+        assert (await w.redeem().execute(learner, "WRONG"))[0] is RedeemResult.INVALID
+    # даже верный код не принимается, пока не пройдёт час
+    assert await w.redeem().execute(learner, "GOODCODE") == (RedeemResult.LOCKED, None)
+    assert await w.access.code_for(STRANGER_TG) is None
+
+
+async def test_stranger_gets_no_task_and_cannot_label() -> None:
+    w = World()
+    with pytest.raises(NotAnnotator):
+        await w.next().execute(_learner(STRANGER_TG))
+    with pytest.raises(NotAnnotator):
+        await w.submit().execute(_learner(STRANGER_TG), UUID(int=1), AnnotationStatus.AGREE)
+    assert w.tasks.labels == []
+
+
+async def test_next_task_comes_with_recording_and_count_left() -> None:
+    w = World()
+    shown = await w.next().execute(_learner(ANNOTATOR_TG))
+    assert shown is not None
+    assert shown.task.attempt_id == UUID(int=1) and shown.audio == b"ogg\x00"
+    assert shown.annotator == "A1" and shown.remaining == 2
+    # пропущенную запись в этот раз не показываем снова
+    skipped = await w.next().execute(_learner(ANNOTATOR_TG), exclude=frozenset({UUID(int=1)}))
+    assert skipped is not None and skipped.task.attempt_id == UUID(int=2)
+
+
+async def test_task_without_recording_file_is_skipped() -> None:
+    w = World()
+    del w.audio.files[w.tasks.tasks[0].audio_sha256]
+    shown = await w.next().execute(_learner(ANNOTATOR_TG))
+    assert shown is not None and shown.task.attempt_id == UUID(int=2)
+
+
+async def test_queue_is_empty_when_everything_is_labelled() -> None:
+    w = World()
+    for n in (1, 2):
+        await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=n), AnnotationStatus.AGREE)
+    assert await w.next().execute(_learner(ANNOTATOR_TG)) is None
+
+
+async def test_agree_saves_bot_phonemes_with_source_and_time() -> None:
+    w = World()
+    saved = await w.submit().execute(
+        _learner(ANNOTATOR_TG), UUID(int=1), AnnotationStatus.AGREE, seconds_spent=7
+    )
+    assert saved
+    (label,) = w.tasks.labels
+    assert (label.annotator, label.status, label.actual) == ("A1", AnnotationStatus.AGREE, "سَ")
+    assert label.source is AnnotationSource.TELEGRAM and label.seconds_spent == 7
+    assert w.uow.commits == 1
+    assert w.events.events[-1][0] == "annotation_submitted"
+
+
+async def test_fix_is_checked_like_the_excel_package() -> None:
+    w = World()
+    submit, me = w.submit(), _learner(ANNOTATOR_TG)
+    with pytest.raises(LabelError, match="хамза"):
+        await submit.execute(me, UUID(int=1), AnnotationStatus.FIX, actual="أَ")
+    with pytest.raises(LabelError, match="ничего не исправлено"):
+        await submit.execute(me, UUID(int=1), AnnotationStatus.FIX, actual="سَ")
+    assert w.tasks.labels == []
+    assert await submit.execute(me, UUID(int=1), AnnotationStatus.FIX, actual=" صَ\u200f")
+    assert w.tasks.labels[-1].actual == "صَ"
+
+
+async def test_unusable_audio_has_no_phonemes() -> None:
+    w = World()
+    await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=1), AnnotationStatus.AUDIO_UNUSABLE)
+    assert w.tasks.labels[-1].actual is None
+
+
+async def test_label_for_deleted_attempt_is_not_saved() -> None:
+    w = World()
+    gone = await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=99), AnnotationStatus.AGREE)
+    assert gone is False and w.tasks.labels == []
+
+
+# ---------- настройки ----------
+def test_annotators_from_settings() -> None:
+    from pydantic import SecretStr  # noqa: PLC0415
+
+    from muallim.bootstrap.config import Settings  # noqa: PLC0415
+
+    settings = Settings(bot_token=SecretStr("0:t"), annotator_ids=" A1:900, A2 : 901 ,")
+    assert settings.annotators == {900: "A1", 901: "A2"}
+    assert Settings(bot_token=SecretStr("0:t"), _env_file=None).annotators == {}  # не из .env
+    for bad in ("A1", "A1:x", "А1:900", "A1:900,A2:900"):  # без ID, не число, кириллица, дубль
+        with pytest.raises(ValueError, match="ANNOTATOR_IDS"):
+            _ = Settings(bot_token=SecretStr("0:t"), annotator_ids=bad).annotators

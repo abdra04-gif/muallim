@@ -4,7 +4,7 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
@@ -16,6 +16,7 @@ from muallim.bootstrap.config import Settings
 from muallim.bootstrap.di import create_container
 from muallim.bootstrap.logs import configure_logging
 from muallim.presentation.telegram import texts
+from muallim.presentation.telegram.annotation import router as annotator_router
 from muallim.presentation.telegram.handlers import router
 
 COMMANDS = [
@@ -28,6 +29,11 @@ COMMANDS = [
     BotCommand(command="privacy", description="Мои данные и согласие"),
     BotCommand(command="me", description="Мой ID"),
 ]
+
+
+def routers() -> tuple[Router, ...]:
+    """Порядок важен: разметчик раньше ученика — у ученика последний обработчик ловит всё."""
+    return annotator_router, router
 
 
 async def main() -> None:
@@ -49,7 +55,7 @@ async def main() -> None:
     await bot.set_my_short_description(texts.BOT_SHORT_DESCRIPTION)
 
     dp = Dispatcher()
-    dp.include_router(router)
+    dp.include_routers(*routers())
     setup_dishka(container=container, router=dp, auto_inject=True)
     try:
         await dp.start_polling(bot)

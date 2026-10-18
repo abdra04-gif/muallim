@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import SecretStr
 
+from muallim.application.use_cases.annotation import NextAnnotation, RedeemInvite, SubmitAnnotation
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.application.use_cases.learners import DeleteMyData, EnsureLearner, SetResearchConsent
@@ -34,7 +35,8 @@ async def test_container_resolves_every_use_case(tmp_path: Path) -> None:
         async with container() as request:
             for uc in (
                 EnsureLearner, SetResearchConsent, DeleteMyData, OpenItem, GetProgress,
-                AssessRecitation, PublishCurriculum, PracticeQuiz,
+                AssessRecitation, PublishCurriculum, PracticeQuiz, NextAnnotation, RedeemInvite,
+                SubmitAnnotation,
             ):  # fmt: skip
                 assert isinstance(await request.get(uc), uc)
             published = await (await request.get(PublishCurriculum)).execute()

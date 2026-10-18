@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from muallim import __version__
 from muallim.application.feedback import FeedbackCatalog
+from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
 from muallim.application.ports.reading import ReadingGuide
 from muallim.application.ports.recognition import PronunciationRecognizer
 from muallim.application.ports.repositories import (
@@ -20,6 +21,12 @@ from muallim.application.ports.repositories import (
 )
 from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
+from muallim.application.use_cases.annotation import (
+    AnnotatorAccess,
+    NextAnnotation,
+    RedeemInvite,
+    SubmitAnnotation,
+)
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.application.use_cases.learners import (
@@ -49,6 +56,10 @@ from muallim.infrastructure.audio.reference_library import (
 )
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
+from muallim.infrastructure.db.repositories.annotation import (
+    SqlAnnotationTasks,
+    SqlAnnotatorDirectory,
+)
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
 from muallim.infrastructure.db.repositories.curriculum import SqlCurriculumSnapshots
 from muallim.infrastructure.db.repositories.events import SqlEventLog
@@ -155,6 +166,14 @@ class RequestProvider(Provider):
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
     events = provide(SqlEventLog, provides=EventLog)
     snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
+    annotator_directory = provide(SqlAnnotatorDirectory, provides=AnnotatorDirectory)
+    annotation_tasks = provide(SqlAnnotationTasks, provides=AnnotationTasks)
+
+    @provide
+    def annotator_access(
+        self, directory: AnnotatorDirectory, settings: Settings
+    ) -> AnnotatorAccess:
+        return AnnotatorAccess(directory, settings.annotators)
 
     @provide
     def record_reference(
@@ -180,6 +199,9 @@ class RequestProvider(Provider):
         ReportMistake,
         PublishCurriculum,
         PracticeQuiz,
+        RedeemInvite,
+        NextAnnotation,
+        SubmitAnnotation,
     )
 
 

@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-18T02:06:58+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-18T02:45:04+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `7d4e156cb0541607` | 75 |
+| код | `7a0c7a60c193b7bb` | 82 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
-| SQL-отчёты | `e48f975a8cc23f52` | 11 |
-| миграции | `d83a9fe5cd87809b` | 4 |
+| SQL-отчёты | `7c18cdaca9f68bc8` | 11 |
+| миграции | `212120caf4d62d83` | 5 |
 | зависимости | `af8a1c870e87abfe` | 1 |
 | предрегистрация | `d919a6ff575c0fce` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **52 из 53**.
+Проверено зелёными тестами: **53 из 54**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -33,6 +33,7 @@
 | FR-12 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-13 | `tests/integration/test_research.py` | ✅ |
 | FR-14 | `tests/integration/test_research.py` | ✅ |
+| FR-17 | `tests/integration/test_annotator_bot.py`, `tests/integration/test_annotators_sql.py`, `tests/unit/test_annotation.py` | ✅ |
 | FR-20 | `tests/integration/test_reference_audio.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-21 | `tests/unit/test_transcription.py` | ✅ |
 | FR-22 | `tests/unit/test_feedback_languages.py`, `tests/unit/test_use_cases.py` | ✅ |

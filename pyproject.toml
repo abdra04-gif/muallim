@@ -94,6 +94,7 @@ ignore = [
 "scripts/**" = ["T201", "S603", "S607"]
 "src/muallim/bootstrap/research_cli.py" = ["T201"]
 "src/muallim/presentation/telegram/handlers.py" = ["PLR0917"]  # aiogram/dishka внедряют зависимости параметрами
+"src/muallim/presentation/telegram/annotation.py" = ["PLR0917"]  # то же
 ".claude/hooks/**" = ["T201", "S603", "S607"]
 "migrations/**" = ["E501"]
 "scripts/render_mockups.py" = ["T201", "E501"]  # встроенные CSS и HTML страницы макетов
