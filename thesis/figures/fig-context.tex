@@ -1,0 +1,26 @@
+% Контекст системы (C4, уровень 1). Источник смысла: docs/architecture/diagrams/01-context.mmd.
+\begin{tikzpicture}[node distance=6mm and 9mm]
+  \node[human,text width=2.6cm] (learner) {\LANG{Learner}{Ученик}\\[-1pt]{\scriptsize\LANG{Russian-speaking beginner}{русскоязычный новичок}}};
+  \node[box,right=of learner,text width=2.2cm] (tg) {Telegram\\Bot API};
+  \node[hot,right=of tg,text width=3.0cm] (bot) {\LANG{Tutor bot}{Бот-тренажёр}\\[-1pt]{\scriptsize Python 3.12, aiogram 3}};
+  \node[box,above=of bot,text width=3.0cm] (book) {\LANG{Curriculum}{Программа}\\[-1pt]{\scriptsize\LANG{125 lessons, book order}{125 уроков в порядке книги}}};
+  \node[box,right=of bot,text width=2.6cm] (model) {Quran Muaalem\\[-1pt]{\scriptsize\LANG{phoneme recogniser}{распознавание фонем}}};
+  \node[store,below=of bot,text width=2.9cm,minimum height=1.1cm] (db) {PostgreSQL\\[-1pt]{\scriptsize\LANG{attempts, errors, labels}{попытки, ошибки, метки}}};
+  \node[store,right=of db,text width=2.4cm,minimum height=1.1cm] (audio) {\LANG{Audio store}{Записи}\\[-1pt]{\scriptsize\LANG{consent only}{только с согласия}}};
+  \node[box,left=of db,text width=2.9cm] (cli) {muallim-research\\[-1pt]{\scriptsize\LANG{reports, labels, dataset}{отчёты, разметка, датасет}}};
+  \node[human,below=of cli,text width=2.6cm] (res) {\LANG{Researcher}{Исследователь}};
+  \node[human,below=of db,text width=2.9cm] (ann) {\LANG{Annotators}{Разметчики}\\[-1pt]{\scriptsize\LANG{two teachers}{два преподавателя}}};
+
+  \draw[arr] (learner) -- node[lab,below]{\LANG{voice, taps}{голос, кнопки}} (tg);
+  \draw[arr] (tg) -- (bot);
+  \draw[arr] (book) -- (bot);
+  \draw[arr] (bot) -- (model);
+  \draw[arr] (bot) -- (db);
+  \draw[arr] (bot.south east) -- (audio.north west);
+  \draw[arr] (res) -- (cli);
+  \draw[arr] (cli) -- (db);
+  \draw[arr,<->] (ann) -- node[lab,left,pos=0.3]{\LANG{labels}{метки}} (db);
+  \begin{scope}[on background layer]
+    \node[group,fit=(bot)(book)(db)(audio)(cli)(model),label={[lab,anchor=south east]north east:\LANG{system boundary}{граница системы}}] {};
+  \end{scope}
+\end{tikzpicture}

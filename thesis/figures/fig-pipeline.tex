@@ -1,0 +1,29 @@
+% Конвейер оценки одной попытки: от голосового до объяснения и записи для исследования.
+% Код: application/use_cases/recitation.py, infrastructure/asr/muaalem.py, domain/assessment.py,
+% domain/policy.py, application/feedback.py (ADR-0007, ADR-0014, ADR-0019).
+\begin{tikzpicture}[node distance=5mm and 7mm]
+  \node[goldbox,text width=2.7cm] (voice) {\LANG{Voice message}{Голосовое}\\[-1pt]{\scriptsize OGG/Opus, $\le$60\,s}};
+  \node[box,right=of voice,text width=2.6cm] (ff) {ffmpeg\\[-1pt]{\scriptsize\LANG{16 kHz mono}{16 кГц, моно}}};
+  \node[hot,right=of ff,text width=3.0cm] (asr) {Quran Muaalem\\[-1pt]{\scriptsize\LANG{phonemes + 10 \emph{sifat}}{фонемы + 10 сифат}}};
+
+  \node[goldbox,below=11mm of voice,text width=2.7cm] (card) {\LANG{Book line}{Строка книги}\\[-1pt]{\scriptsize\LANG{page + line, SRC-040}{страница + строка, SRC-040}}};
+  \node[box,right=of card,text width=2.6cm] (phon) {\LANG{Phonetiser}{Фонетизатор}\\[-1pt]{\scriptsize\LANG{\emph{wasl} and \emph{waqf}}{васл и вакф}}};
+  \node[box,right=of phon,text width=3.0cm] (align) {\LANG{Alignment}{Выравнивание}\\[-1pt]{\scriptsize\LANG{per reference variant}{с каждым эталоном}}};
+
+  \node[box,right=of asr,text width=2.9cm,yshift=-8mm] (err) {\LANG{Typed errors}{Типизированные ошибки}\\[-1pt]{\scriptsize\LANG{10 kinds, syllable}{10 типов, слог}}};
+  \node[box,below=5mm of err,text width=2.9cm] (pol) {\LANG{Grading policy}{Политика оценки}\\[-1pt]{\scriptsize\LANG{score, verdict}{балл, вердикт}}};
+  \node[human,below=5mm of pol,text width=2.9cm] (fb) {\LANG{Feedback in Russian}{Объяснение по-русски}\\[-1pt]{\scriptsize\LANG{what / how / next}{что / как / что дальше}}};
+
+  \node[store,below=9mm of align,text width=3.1cm,minimum height=1.2cm] (db) {\LANG{Attempt record}{Запись попытки}\\[-1pt]{\scriptsize\LANG{full decision trace}{полный след решения}}};
+
+  \draw[arr] (voice) -- (ff);
+  \draw[arr] (ff) -- (asr);
+  \draw[arr] (card) -- (phon);
+  \draw[arr] (phon) -- (align);
+  \draw[arr] (asr.south) -- node[lab,right]{\LANG{heard}{услышано}} (align.north);
+  \draw[arr] (align.east) -- ++(4mm,0) |- (err.west);
+  \draw[arr] (err) -- (pol);
+  \draw[arr] (pol) -- (fb);
+  \draw[darr] (align) -- (db);
+  \node[lab,below=1mm of db] {\LANG{audio kept only with consent (SHA-256)}{аудио — только с согласия (SHA-256)}};
+\end{tikzpicture}

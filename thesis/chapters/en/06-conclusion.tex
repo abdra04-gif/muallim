@@ -1,0 +1,67 @@
+% Chapter 6. Answers to RQs (after the pilot), contributions, doctoral directions (docs/roadmap.md, stage 2).
+\chapter{Conclusion}\label{ch:concl}
+
+\section{Summary}
+
+The thesis set out to design a reading tutor that follows \emph{Muallim al-Sani} and to measure how far an
+open phoneme-level model can act as the listening teacher for Russian-speaking beginners. The literature
+review showed that the primer's sound-based, incremental method fits automatic feedback, that explicit and
+segment-level feedback is the condition under which pronunciation training works best, and that the best open
+model for Qur'anic Arabic has never been measured on primer-level reading by second-language beginners. It
+also showed that AI coding agents tend to game their own tests and that written rules decay, while checks
+enforced by the environment help.
+
+The tutor built in response turns the whole book into 125 lessons and 800 cards traceable to page and line;
+assesses each voice message at phoneme level with a full decision trace; explains errors in Russian in a
+short format grounded in feedback research; and stores consented, pseudonymised data ready for teacher
+annotation and evaluation. The harness that produced it enforces frozen tests, protected human zones, layer
+contracts and green checks, and keeps journals that make the development auditable.
+
+\section{Answers to the research questions}
+
+\paragraph{RQ-1} \pending{answer after the pilot}.
+\paragraph{RQ-2} \pending{answer after the pilot}.
+\paragraph{RQ-3} \pending{answer after the pilot}.
+\paragraph{RQ-4} The evidence collected so far shows that the harness blocked or exposed the classic failure
+modes of agent development --- test gaming, architecture erosion, leakage of secrets --- and that several
+failures passed every automatic check and were caught only by a second-level review or by the human.
+\pending{quantitative answer at the end of the project}.
+
+\section{Contributions}
+
+\begin{enumerate}
+  \item A teacher-referenced evaluation protocol for an open Qur'anic phoneme model on primer-level reading by
+    beginners, with preregistered hypotheses and standard MDD metrics.
+  \item A digital curriculum of \emph{Muallim al-Sani} in the book's order, with every line traceable to a
+    concrete edition, and a mapping of Maksudi's principles to tutor features.
+  \item An open-architecture tutor whose verdicts are reproducible and contestable.
+  \item A documented harness for building research software with AI agents, with incidents that show its
+    value and its blind spots.
+\end{enumerate}
+
+\section{Future work}
+
+The master's thesis is planned as the first stage of doctoral research. The data model already keeps what
+later studies need: stable learner, card and attempt identifiers; versions of code, curriculum, model and
+annotation guide in every record; raw model outputs; disputes; and the learner's first language. Six
+directions follow.
+\begin{enumerate}
+  \item \textbf{A model for second-language beginners.} Fine-tune on consented beginners' speech and measure
+    whether false rejections fall.
+  \item \textbf{Calibration and a ``not sure'' outcome.} Use per-phoneme confidence to choose thresholds that
+    make false alarms rare and misses safe, and send uncertain attempts to a teacher.
+  \item \textbf{Adaptive learning.} Model each learner's knowledge of letters and schedule spaced review;
+    add listening exercises, which the supervisor's course shows to fit the same order.
+  \item \textbf{Tajwid rules.} Extend checking to \emph{ikhfa}, \emph{idgham}, \emph{madd} and \emph{qalqala},
+    where the model is weakest.
+  \item \textbf{Longitudinal and cross-language studies.} Compare learning with the tutor, with a teacher and
+    mixed; compare Russian, Kazakh, Uzbek and Tatar speakers.
+  \item \textbf{An open benchmark.} Publish a dataset of beginners' primer-level reading, with consent for
+    publication, as a benchmark the field currently lacks.
+\end{enumerate}
+
+\section{Closing remark}
+
+Maksudi wrote a book for learners who had a teacher. This thesis does not try to remove the teacher; it tries
+to give learners a careful listener for the hours when the teacher is not there, and to be honest about how
+careful that listener is.

@@ -1,0 +1,26 @@
+% Обвязка ИИ-агента (agent harness): направляющие, датчики, человек (ADR-0011, ADR-0012, ADR-0034, ADR-0039).
+% Рамка guides/sensors — SRC-029.
+\begin{tikzpicture}[node distance=5mm and 8mm]
+  \node[goldbox,text width=3.3cm,xshift=-4mm] (guides) {\textbf{\LANG{Guides}{Направляющие}}\\[-1pt]{\scriptsize CLAUDE.md, ADR, \LANG{skills, requirements}{скиллы, требования}}};
+  \node[hot,right=of guides,text width=3.0cm] (agent) {\textbf{\LANG{Coding agent}{ИИ-агент}}\\[-1pt]{\scriptsize\LANG{reason $\to$ act $\to$ observe}{рассуждение $\to$ действие $\to$ наблюдение}}};
+  \node[box,right=of agent,text width=3.6cm] (pre) {\textbf{PreToolUse}\\[-1pt]{\scriptsize guard, human\_zones, dep\_check, git\_guard}};
+  \node[box,below=of pre,text width=3.6cm] (act) {\LANG{Edit / run}{Правка / команда}\\[-1pt]{\scriptsize\LANG{tests frozen in \texttt{impl}}{тесты заморожены в \texttt{impl}}}};
+  \node[box,below=of act,text width=3.6cm] (stop) {\textbf{Stop gate}\\[-1pt]{\scriptsize import-linter, mypy --strict, pytest}};
+  \node[box,left=13mm of stop,text width=3.0cm] (rev) {\LANG{Reviewer subagents}{Субагенты-ревьюеры}\\[-1pt]{\scriptsize\LANG{code, architecture, direction}{код, архитектура, направление}}};
+  \node[human,left=15mm of rev,text width=3.3cm] (human) {\textbf{\LANG{Human}{Человек}}\\[-1pt]{\scriptsize\LANG{accepts tests, content, commits}{принимает тесты, контент, коммиты}}};
+  \node[store,below=8mm of rev,text width=4.2cm,minimum height=1cm] (log) {\LANG{Journals}{Журналы}\\[-1pt]{\scriptsize\LANG{prompts, hook blocks, sessions}{запросы, блокировки, сессии}}};
+
+  \draw[arr] (guides) -- (agent);
+  \draw[arr] (agent) -- (pre);
+  \draw[arr] (pre) -- node[lab,right]{\LANG{allowed}{разрешено}} (act);
+  \draw[arr,draw=lesson] (pre.north) -- ++(0,5mm) -| node[lab,text=lesson,above,pos=0.25]{\LANG{blocked, with reason}{блок с причиной}} (agent.north);
+  \draw[arr] (act) -- (stop);
+  \draw[arr,draw=lesson] (stop.east) -- ++(5mm,0) |- node[lab,text=lesson,right,pos=0.25]{\LANG{red: keep working}{красно: продолжать}} (act.east);
+  \draw[arr] (stop) -- node[lab,above]{\LANG{green}{зелено}} (rev);
+  \draw[arr] (rev) -- node[lab,above]{\LANG{STOP $\to$ ask}{СТОП $\to$ вопрос}} (human);
+  \draw[arr] (human) -- (guides);
+  \draw[darr] (stop.south) |- (log.east);
+  \draw[darr] (rev) -- (log);
+  \node[lab,above=1mm of guides] {\LANG{feed-forward}{до действия}};
+  \node[lab,above=7mm of pre] {\LANG{feedback (sensors)}{после действия (датчики)}};
+\end{tikzpicture}

@@ -1,0 +1,35 @@
+% План работ: октябрь 2026 — июнь 2027 (roadmap, этап 1). Месяц = 2 слота (половины месяца).
+\begin{ganttchart}[
+    hgrid,vgrid={*1{draw=black!8}},
+    x unit=0.68cm,y unit chart=0.52cm,y unit title=0.55cm,
+    title/.append style={fill=accent!10,draw=accent!40},
+    title label font=\sffamily\scriptsize,
+    bar/.append style={fill=accent!70,draw=accent},
+    bar height=0.55,
+    group/.append style={fill=gold,draw=gold},
+    group height=0.25,
+    milestone/.append style={fill=lesson,draw=lesson},
+    bar label font=\sffamily\footnotesize,
+    group label font=\sffamily\footnotesize\bfseries,
+    milestone label font=\sffamily\footnotesize\itshape,
+  ]{1}{18}
+  \gantttitle{\LANG{Oct}{Окт}}{2}\gantttitle{\LANG{Nov}{Ноя}}{2}\gantttitle{\LANG{Dec}{Дек}}{2}
+  \gantttitle{\LANG{Jan}{Янв}}{2}\gantttitle{\LANG{Feb}{Фев}}{2}\gantttitle{\LANG{Mar}{Мар}}{2}
+  \gantttitle{\LANG{Apr}{Апр}}{2}\gantttitle{\LANG{May}{Май}}{2}\gantttitle{\LANG{Jun}{Июн}}{2}\\
+  \ganttgroup{\LANG{Preparation}{Подготовка}}{1}{6}\\
+  \ganttbar{\LANG{Proposal, preregistration freeze}{Предложение, заморозка предрегистрации}}{1}{3}\\
+  \ganttbar{\LANG{Ethics, consent, legal debt (T1)}{Этика, согласие, правовой долг (T1)}}{2}{5}\\
+  \ganttbar{\LANG{Book proofreading, reference audio}{Сверка книги, эталонные записи}}{1}{5}\\
+  \ganttbar{\LANG{Annotators, pilot readiness}{Разметчики, готовность пилота}}{4}{6}\\
+  \ganttgroup{\LANG{Data collection}{Сбор данных}}{7}{12}\\
+  \ganttbar{\LANG{Pilot, 20--40 learners, 6 weeks}{Пилот, 20--40 учеников, 6 недель}}{7}{9}\\
+  \ganttbar{\LANG{Delayed post-test (RQ-3)}{Отложенный тест (RQ-3)}}{10}{10}\\
+  \ganttbar{\LANG{Double annotation (RQ-1)}{Двойная разметка (RQ-1)}}{8}{12}\\
+  \ganttbar{\LANG{Agent-harness telemetry (RQ-4)}{Журналы обвязки агента (RQ-4)}}{1}{12}\\
+  \ganttgroup{\LANG{Analysis and writing}{Анализ и текст}}{11}{18}\\
+  \ganttbar{\LANG{Analysis RQ-1--RQ-4}{Анализ RQ-1--RQ-4}}{11}{14}\\
+  \ganttbar{\LANG{Chapters 4--6, abstract}{Главы 4--6, аннотация}}{12}{16}\\
+  \ganttmilestone{\LANG{Pre-defence}{Предзащита}}{16}\\
+  \ganttbar{\LANG{Revision, plagiarism check}{Доработка, проверка заимствований}}{16}{17}\\
+  \ganttmilestone{\LANG{Defence}{Защита}}{18}
+\end{ganttchart}

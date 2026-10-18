@@ -1,0 +1,303 @@
+% Chapter 2. Material: docs/pedagogy/, docs/research/literature-review.md, docs/research/linters-hooks-agents.md,
+% reports/ (SRC-038). Table T-09 (docs/thesis/figures.md).
+\chapter{Literature Review}\label{ch:review}
+
+This chapter reviews five areas that the tutor has to respect: the primer and its method
+(Section~\ref{sec:lr-primer}), the learners and their difficulties (Section~\ref{sec:lr-learners}),
+research on computer-assisted pronunciation training (Section~\ref{sec:lr-capt}), automatic assessment of
+Qur'anic recitation (Section~\ref{sec:lr-mdd}) and software engineering with AI coding agents
+(Section~\ref{sec:lr-agents}). Section~\ref{sec:lr-related} compares existing tools, and
+Section~\ref{sec:lr-gap} summarises the gap. The review is narrative and scoping; searches were run in
+October 2026, and every source carries a reliability grade in the project registry \cite{SRC-038}.
+
+\section{The primer and its method}\label{sec:lr-primer}
+
+\subsection{Maksudi and the two primers}
+
+Ahmad Hadi Maksudi (1868--1941), a Kazan teacher of Arabic and a Jadid educator, wrote two primers that
+are frequently confused. \emph{Mögallim äwwäl} (``The First Teacher'', 1892) taught Tatar literacy in
+Arabic script and went through more than thirty editions before 1918 \cite{SRC-015,SRC-019}.
+\emph{Muallim al-Sani} (``The Second Teacher'') continued it, leading from the letters to correct reading
+of the Qur'an with the basics of \emph{tajwid}. It is usually dated to the mid-1890s, but no primary
+bibliographic source confirming the first edition was found \cite{SRC-018}. Modern texts go back to the
+Kazan edition of 1917, which also underlies a Russian-language adaptation for Russian speakers
+\cite{SRC-024}. In 2014 the Muslim board of Kazakhstan launched a programme to distribute the book to
+mosques and madrasas \cite{SRC-020}. The thesis uses the 2010 Almetyevsk edition published under the
+Muslim board of Tatarstan, which follows the orthography of the Medina mushaf \cite{SRC-040}.
+
+\subsection{The sound method}
+
+Tatar schools of the period distinguished three methods of teaching literacy \cite{SRC-017}: the
+letter-naming method (\emph{usul-i harfiya}), in which pupils first learned the names of letters; the
+syllabic method (\emph{usul-i maddiya}); and the sound method (\emph{usul-i sautiya}) of the reformers,
+in which a letter is learned as a sound and syllables are assembled consciously. The transition to the
+sound method is credited with cutting the time needed to learn to read ``from several years to one school
+year'' \cite{SRC-016}. Damirov notes that the reformer Z.~Rasulev justified the method by the tradition
+of \emph{tajwid} rather than by European pedagogy \cite{SRC-016} --- an argument that matters for a
+religious audience, because it presents the sound method as internal to the Islamic tradition.
+
+Fakhrutdinova and Ibragimov describe Maksudi's contribution as the rejection of letter-name memorisation,
+a phonetic orientation towards articulation and sound, and gradual, meaningful progression; his fifteen
+didactic principles of 1906 fall into four groups: gradualness and continuity; individualisation and
+activity; visual support and apperception; practice and continuous control of understanding
+\cite{SRC-015}. Table~\ref{tab:lr-principles} shows how each group translates into a requirement for a
+digital tutor; the same table guided the interface decisions in Chapter~\ref{ch:impl}.
+
+\begin{table}[ht]
+\centering\small
+\caption{Maksudi's principles \cite{SRC-015} and their translation into tutor features.}
+\label{tab:lr-principles}
+\begin{tabularx}{\linewidth}{@{}P{4.3cm}L@{}}
+\toprule
+Principle & Tutor feature \\
+\midrule
+Gradualness and continuity & Lessons in the book's order; a line counts as learned when read correctly;
+lessons of at most a dozen lines. \\
+Individualisation and activity & Own pace and history; weak lines repeated; unlimited retries. \\
+Visual support and apperception & Reference audio before reading; the lesson's letter in red as in the
+book; hints that link new sounds to familiar ones. \\
+Practice and continuous control & Each attempt checked at once; each error explained; immediate retry. \\
+Humane treatment & No penalties or rankings; a streak of days as encouragement. \\
+Sound before name & A card teaches a sound with its vowel sign; the letter name is reference only. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Structure of the book and the lesson cycle}
+
+The book does not follow the alphabet. Two independent descriptions and the 2010 edition agree that it
+introduces letters in groups, starting with the hamza and \ar{ر ز م}, letters of simple, mostly non-joining
+shape from which syllables such as \ar{زَرَ} and \ar{مَرَ} can be formed immediately
+\cite{SRC-021,SRC-040}. After the letters come long vowels, \emph{shadda} and \emph{tanwin}; the hamza,
+the article and \emph{sukun}; the rules of \emph{mim} and \emph{nun}; peculiarities of Qur'anic spelling;
+pausing and the long vowels of recitation; and finally short suras. Each group of letters ends with ``pay
+attention'' lines that contrast similar sounds.
+
+Video courses and mosque classes based on the book share one lesson cycle: listen to the model, repeat it
+(each line three times in one course), read independently, receive correction, and move on only after an
+error-free reading \cite{SRC-021,SRC-022}. This is the digital form of \emph{talaqqi}, the oral transmission
+in which the teacher reads, the learner repeats and the teacher corrects at once \cite{SRC-058}. The
+Indonesian Iqro method makes the teacher's role explicit: once the letters are known, the teacher no longer
+explains but signals where the error is, and the learner corrects it \cite{SRC-057}. Teachers also advise
+against relying on transliteration, because ``sound cannot be conveyed on paper'' \cite{SRC-021,SRC-022},
+and weekly oral checks by a teacher remain the norm after a course \cite{SRC-039}. Controlled trials of
+primer methods for Qur'anic reading --- \emph{Muallim al-Sani}, \emph{Qaida Nuraniyya} or Iqro --- were not
+found \cite{SRC-038}.
+
+\section{The learners}\label{sec:lr-learners}
+
+The target learners are Russian-speaking adults in Russia and Kazakhstan who learn Arabic reading from
+zero. No peer-reviewed study of their reading errors exists. Methodological sources for Russian speakers
+list the expected difficulties: pharyngeal \ar{ح} and \ar{ع}; uvular \ar{ق}, pronounced as [k]; confusion of
+\ar{غ} and \ar{خ}; interdental \ar{ث}, \ar{ذ}, \ar{ظ}; emphatic \ar{ص}, \ar{ض}, \ar{ط}, \ar{ظ} without
+emphasis; shortened long vowels; undoubled \emph{shadda}; and \ar{ر} softened before front vowels
+\cite{SRC-023}. Studies of other first languages agree that pharyngeal, alveolar-dental and interdental
+sounds are hardest for non-Arabs \cite{SRC-034}, and Indonesian learners make most errors on \ar{ع} and
+\ar{ض} \cite{SRC-035}. The book's own minimal pairs --- \ar{ق}/\ar{ك}, \ar{ث}/\ar{س}, \ar{ص}/\ar{س},
+\ar{ط}/\ar{ت}, \ar{ح}/\ar{خ}, \ar{ع}/\ar{غ}, \ar{ض}/\ar{د}, \ar{ذ}/\ar{ز} --- target the same contrasts
+\cite{SRC-040}.
+
+Phonology suggests one difference between the two groups: Kazakh has uvular [q] and [\ipa{ʁ}], so \ar{ق}
+and \ar{غ} may be easier for Kazakh speakers than for Russian speakers. This is a hypothesis (H2.1), not a
+finding. A practical transcription for Russian speakers also needs care: common Arabic--Russian practical
+transcription loses the difference between \ar{ص} and \ar{س}, while the scholarly system marks emphatic
+and pharyngeal consonants with a dot below and interdentals with a line below \cite{SRC-051}.
+
+\section{Computer-assisted pronunciation training}\label{sec:lr-capt}
+
+\subsection{Effectiveness}
+
+Ngo, Chen and Lai's meta-analysis of automatic speech recognition in English pronunciation teaching found
+a medium overall effect ($g=0.69$). Effects were larger for segmental than for suprasegmental features
+and larger for explicit corrective feedback than for implicit feedback such as a plain transcript
+\cite{SRC-025}. Pronunciation instruction in general has a large effect \cite{SRC-105}, so automatic
+feedback is best seen as a way to deliver more instruction rather than better instruction. Amrate and
+Tsai's systematic review of computer-assisted pronunciation training adds that recognisers misjudge
+accented and children's speech and produce false alarms on intelligible pronunciation, and it recommends
+supervised use in which a teacher or partner can overrule the system \cite{SRC-026}.
+
+Perceptual training matters as well. High-variability phonetic training, in which learners hear a contrast
+from many speakers, has a medium-to-large and lasting effect on perception \cite{SRC-044} and a smaller
+but real transfer to production \cite{SRC-045}. For retention, distributed practice is among the most
+robust effects in learning research \cite{SRC-107}. A tutor that only checks production therefore leaves
+room for listening exercises and spaced review, which the project records as future features.
+
+\subsection{Designing feedback}
+
+Lyster and Ranta found that recasts --- the teacher simply says the correct form --- rarely lead to
+learner self-correction, while prompts that locate the error and invite another try do so more often
+\cite{SRC-053}. Neri, Cucchiarini and Strik argue that pronunciation feedback should target a few
+important errors rather than all of them, and their later work showed that automatic feedback improves
+precisely the errors it addresses \cite{SRC-054}. Shute's review of formative feedback recommends
+specific, simple feedback in manageable units, with detail available on demand \cite{SRC-055}. Hattie and
+Timperley identify feed-forward --- ``what to do next'' --- as the most powerful component and find praise
+of the person largely ineffective \cite{SRC-056}. Qur'anic pedagogy orders errors in a similar way:
+clear errors that change a letter or a vowel (\emph{lahn jali}) are corrected before hidden ones such as
+length or nasalisation (\emph{lahn khafi}) \cite{SRC-052}.
+
+These findings converge on a feedback unit with three parts: \emph{what} went wrong and where, \emph{how}
+to say it, and \emph{what to do next}, shown for a small number of errors at a time, clear errors first.
+Commercial Qur'an applications add a fourth element, highlighting the error in the text itself
+\cite{SRC-046}.
+
+\subsection{Messaging platforms as a medium}
+
+Telegram is the everyday messenger of the target audience and supports voice messages natively. A
+four-week study found that a Telegram channel improved the English pronunciation of Iranian learners
+\cite{SRC-092}, but no controlled study of a Telegram bot with automatic pronunciation checking was found.
+The platform's terms permit collecting data for machine learning only with explicit, active and revocable
+consent \cite{SRC-033}; its rate limits and file limits also constrain the design \cite{SRC-060}.
+
+\section{Automatic assessment of Qur'anic recitation}\label{sec:lr-mdd}
+
+\subsection{Task and metrics}
+
+Mispronunciation detection and diagnosis (MDD) compares a learner's phonemes with the canonical phonemes
+of the text. The standard protocol, used for L2-ARCTIC \cite{SRC-063} and adopted by the Qur'anic
+benchmarks \cite{SRC-064,SRC-066}, aligns three sequences --- canonical, annotated and recognised ---
+and labels each canonical phoneme as a true acceptance (TA), true rejection (TR, a real error detected), false
+acceptance (FA, a missed error) or false rejection (FR, a false alarm). Precision, recall and F1 follow:
+\begin{equation}
+  P = \frac{TR}{TR+FR},\qquad R = \frac{TR}{TR+FA},\qquad F_1 = \frac{2PR}{P+R}.
+\end{equation}
+Diagnosis accuracy additionally checks whether the recognised substitute matches the annotated one. For a
+tutor the two error types have different costs: a missed error slows learning; a false alarm on correct
+reading undermines trust.
+
+\subsection{Benchmarks}
+
+QuranMB.v1, presented at Interspeech 2025, was the first open benchmark for Arabic mispronunciation
+detection on Qur'anic material; its baselines achieved high recall but very low precision
+\cite{SRC-004}. The Iqra'Eval shared task at ArabicNLP 2025 gave the field a common evaluation, with
+systems around F1 0.40--0.44 \cite{SRC-043}. In IQRA 2026 at Interspeech, on QuranMB.v2, nineteen teams
+took part; the best system reached a phoneme-level F1 of 0.72 against a baseline of 0.44
+\cite{SRC-031,SRC-086}. The strongest systems are CTC phoneme recognisers on self-supervised encoders.
+The organisers note that the data contain no second-language learners and name their collection as a
+priority \cite{SRC-031}.
+
+\subsection{Quran Muaalem}
+
+Abdelfattah, Khalil and Abbas built Quran Muaalem around a largely automatic data pipeline: 848 hours and
+about 286 thousand utterances from 22 expert reciters, labelled in a dedicated Quran Phonetic Script that
+encodes both phonemes and articulatory attributes (\emph{sifat}) \cite{SRC-002}. A Wav2Vec2-BERT encoder
+feeds eleven CTC heads: phonemes and ten attributes such as whispering versus voicing, emphasis versus
+lightness, and \emph{qalqala}. The model, code and data are public \cite{SRC-003}; the package exposes
+per-phoneme probabilities and attribute probabilities that a tutor can use for confidence-aware decisions
+\cite{SRC-062}.
+
+The reported results reveal a domain gap. On the authors' expert test set the phoneme error rate is
+0.54\,\% (0.21\,\% averaged over all levels). On qdat\_bench, 159 recordings with real errors, it rises to
+5.78\,\%, the average tajwid F1 is 0.758, and \emph{ikhfa} reaches only 0.453 because it is acoustically
+close to a clear \emph{nun} \cite{SRC-002}. The authors note that the training data contain only male
+expert reciters and only the Hafs reading, and that qdat\_bench was annotated by one person on one verse.
+For a primer two more limitations follow: the phonetiser is designed for Qur'anic text, so isolated
+syllables need canonical phoneme strings, and slow, syllable-by-syllable reading by beginners lies outside
+the training distribution.
+
+\subsection{Learner data and neighbouring work}
+
+The closest public dataset of non-Arab learners contains about seven thousand crowdsourced recitations from
+speakers in more than eleven countries, collected at Innopolis University \cite{SRC-032}; it has no
+Russian or Kazakh speakers. Work from the same group is the nearest neighbour of this thesis. One study
+lets coding agents improve a memorisation checker built on transcripts of a Telegram bot, freezes the data
+and the evaluator with SHA-256 hashes, and formulates rules against leakage and metric gaming
+\cite{SRC-067,SRC-069}. Another proposes a taxonomy of recitation events that separates uncorrected mistakes
+from self-corrections and benign events such as repetitions \cite{SRC-068}. Both check \emph{what} was
+recited --- which verses, with omissions or insertions --- on transcripts without vowel signs, and leave
+vowels and tajwid out of scope. A primer tutor must check \emph{how} each syllable was pronounced. The
+taxonomy and the evaluation rules are nevertheless adopted in this thesis: self-corrections are labelled
+separately, and the evaluator is protected from the coding agent.
+
+\section{Related systems}\label{sec:lr-related}
+
+Table~\ref{tab:T-09} compares existing tools with the tutor of this thesis along the dimensions that matter
+for primer-level beginners.
+
+\begin{table}[ht]
+\centering\small
+\caption{Related systems (T-09). ``Check'' means automatic checking of the learner's voice.}
+\label{tab:T-09}
+\begin{tabularx}{\linewidth}{@{}P{3.3cm}P{2.0cm}P{2.0cm}L@{}}
+\toprule
+System & Level & Check & Notes \\
+\midrule
+Tarteel \cite{SRC-046} & verses & words & Memorisation; mistakes highlighted in the text; no letter-level
+check. \\
+Muallimi Soniy app \cite{SRC-006} & primer & --- & Order of rules from the book; Uzbek audience. \\
+muallimi\_soniy platform \cite{SRC-005} & primer & --- & Open web version of one edition. \\
+``thani'' course \cite{SRC-070} & primer & --- & Same letter order; trains listening (dictations). \\
+Recite Quran bot \cite{SRC-071,SRC-067} & verses & transcript & Memorisation check via speech
+recognition, without vowel signs. \\
+\textbf{This thesis} & primer & phonemes & Book order with page and line; phoneme-level errors explained
+in Russian; full decision trace; teacher annotation. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+No tool in Russian, Kazakh or Uzbek that checks primer-level reading by voice was found. Several new
+applications advertise AI checking of the \emph{Qaida} level, but their claims come from store pages and
+have not been evaluated independently \cite{SRC-038}.
+
+\section{Software engineering with AI coding agents}\label{sec:lr-agents}
+
+\subsection{Agents and harnesses}
+
+A coding agent alternates reasoning, tool use and observation \cite{SRC-108}. SWE-agent showed that the
+agent--computer interface shapes performance: a linter that rejects syntactically invalid edits at the
+moment of editing raised the share of solved repository tasks \cite{SRC-109}. Practitioners call the
+infrastructure around the loop a \emph{harness}. Böckeler's framework separates \emph{guides}, which steer
+the agent before it acts (instructions, skills), from \emph{sensors}, which check the result (tests,
+linters, reviewers), and distinguishes deterministic computational controls from probabilistic
+inferential ones; harnesses work best for maintainability and architectural fitness and worst for
+behaviour \cite{SRC-029}. Anthropic's engineering notes recommend external progress files, one feature per
+session, end-to-end verification and an explicit ban on editing or deleting tests \cite{SRC-028}.
+LLM assistance in architecture design follows the same pattern: it produces reasonable decisions but
+covers architectural drivers only partially and needs human control \cite{SRC-050}. An exploratory study
+of 2\,853 repositories found that context files dominate current practice, while hooks, skills and
+sub-agents remain rare \cite{SRC-073}. No peer-reviewed definition of ``harness engineering'' exists yet,
+and the practitioner sources are used here for concepts, not for numbers.
+
+\subsection{Evidence}
+
+\paragraph{Agents game evaluations} In ImpossibleBench the specification contradicts the tests, so a
+passing solution means the agent exploited the tests; frontier models did so frequently, and for Claude
+models most such attempts modified the tests themselves. Read-only tests blocked this behaviour
+\cite{SRC-027}. Reward hacking learned on coding tasks during training can generalise into broader misaligned
+behaviour, including sabotage when the model later works as a coding agent \cite{SRC-082}.
+
+\paragraph{Written rules are weak} Repository-level context files such as \texttt{AGENTS.md} did not
+improve task success, sometimes reduced it, and raised cost by about a fifth \cite{SRC-074}; another study
+found shorter run times and fewer tokens with unchanged success \cite{SRC-075}; an ablation with two agents
+and 288 runs found no effect on correctness \cite{SRC-077}. A factorial study of 1\,650 Claude Code
+sessions found that adherence did not depend on the structure of the instruction file but declined as a
+session went on \cite{SRC-076}.
+
+\paragraph{Mechanical feedback helps} Feeding static-analysis findings back to the model reduced the share
+of code with security issues from over 40\,\% to 13\,\% within ten iterations \cite{SRC-078}. Agents can
+derive properties and write property-based tests that find real bugs \cite{SRC-080,SRC-081}, and
+mutation-guided test generation at Meta produced tests that engineers accepted in most cases
+\cite{SRC-079}.
+
+\paragraph{Perception is not measurement} In a randomised study experienced open-source developers took
+19\,\% longer with AI tools while believing they had been faster \cite{SRC-030}. Agents that simulate
+students diverge systematically from real students \cite{SRC-083,SRC-084,SRC-085}, so they can support but
+not replace a pilot.
+
+Together these findings motivate the principle applied in this thesis: rules that matter should become
+checks enforced by the environment, and every enforcement should leave a trace that can be measured.
+
+\section{Summary and research gap}\label{sec:lr-gap}
+
+The method of \emph{Muallim al-Sani} --- sound-based, incremental, built on immediate correction --- fits
+automatic feedback well, and the conditions under which pronunciation feedback works best are exactly the
+conditions of a primer. An open phoneme-level model exists. What is missing is evidence on four points:
+\begin{enumerate}
+  \item how accurately such a model judges primer-level reading by second-language beginners, compared with
+    teachers, and how often it rejects correct reading (RQ-1);
+  \item which errors Russian-speaking beginners make, once model errors are separated from learner errors
+    (RQ-2);
+  \item whether explanations in the learner's language improve learning at the level of Arabic letters
+    (RQ-3);
+  \item how a guarded AI-agent harness behaves over a whole research project (RQ-4).
+\end{enumerate}
+The next chapter describes how the thesis collects this evidence.

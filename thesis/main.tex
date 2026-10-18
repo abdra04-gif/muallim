@@ -1,33 +1,36 @@
-% Магистерская диссертация — точка входа. Сборка: make thesis (→ thesis/build/main.pdf).
-% Требования Университета Иннополис к оформлению и языку ещё не подтверждены — thesis/README.md.
+% Master's thesis, English version — entry point. Build: make thesis (→ thesis/build/main.pdf).
+% Russian version: main-ru.tex (same structure, chapters/ru/). Innopolis formatting rules are not yet
+% confirmed — see thesis/README.md.
 \documentclass[a4paper,12pt,oneside]{report}
 
-% Язык основного текста: english или russian. Меняется в одном месте.
 \newcommand{\mainlang}{english}
+\newcommand{\docstyle}{thesis}
 
 \input{preamble}
 \input{meta}
+\hypersetup{pdftitle={\thesisShortEn},pdfauthor={\thesisAuthorEn}}
 
 \begin{document}
 \input{titlepage}
 
-\begin{abstract}
-\input{chapters/00-abstract}
-\end{abstract}
+\pagenumbering{roman}
+\input{chapters/en/00-abstract}
 
 \tableofcontents
 \listoffigures
 \listoftables
 
-\input{chapters/01-introduction}
-\input{chapters/02-literature-review}
-\input{chapters/03-methodology}
-\input{chapters/04-implementation}
-\input{chapters/05-evaluation}
-\input{chapters/06-conclusion}
+\cleardoublepage
+\pagenumbering{arabic}
+\input{chapters/en/01-introduction}
+\input{chapters/en/02-literature-review}
+\input{chapters/en/03-methodology}
+\input{chapters/en/04-implementation}
+\input{chapters/en/05-evaluation}
+\input{chapters/en/06-conclusion}
 
-\printbibliography[heading=bibintoc]
+\printbibliography[heading=bibintoc,title={Bibliography cited}]
 
 \appendix
-\input{chapters/a-traceability}
+\input{chapters/en/a-traceability}
 \end{document}

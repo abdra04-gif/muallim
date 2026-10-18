@@ -39,7 +39,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `make trace` | требования ↔ тесты сейчас, отпечаток версии (`docs/requirements/verification-status.md`) |
 | `make hygiene` | объявленные зависимости (deptry) и безопасность CI (zizmor), как в CI (ADR-0042) |
 | `make logs` (`n=200`) | последние строки лога бота `logs/bot.log` (ADR-0048) |
-| `make thesis` · `make thesis-check` | диссертация LaTeX → `thesis/build/main.pdf` |
+| `make thesis` · `make thesis-ru` · `make proposal` · `make research` · `make papers` · `make thesis-check` | тексты LaTeX на двух языках → `thesis/build/*.pdf` (`thesis/README.md`) |
 | `/ship` | проверки → сверка документов → коммит → push (`docs/process/git.md`) |
 
 ## Кто что решает

@@ -1,0 +1,125 @@
+% Chapter 1. Material: docs/requirements/audience.md, docs/research/literature-review.md,
+% docs/research/preregistration.md, reports/ (SRC-038).
+\chapter{Introduction}\label{ch:intro}
+
+\section{Context}
+
+Reading the Qur'an aloud is a daily practice for many Muslims, and correct pronunciation is part of the
+practice itself. For Arabic speakers the main task is to learn the rules of recitation; for everyone else
+the task starts much earlier, with the letters and the sounds behind them. In Russia and Central Asia this
+path has a long and specific history. At the end of the nineteenth century the Jadid reformers replaced
+the old method, in which pupils memorised the names of letters for years, with a sound-based method that
+taught a letter as a sound and built syllables from it in small steps \cite{SRC-016,SRC-017}. Ahmad Hadi
+Maksudi's primer \emph{Muallim al-Sani} (``The Second Teacher'') brought this method to the reading of the
+Qur'an \cite{SRC-015}. More than a century later it is still printed by the Muslim board of Tatarstan and
+officially distributed in Kazakhstan \cite{SRC-040,SRC-020}.
+
+The primer has never been used without a teacher. A lesson follows the cycle of \emph{talaqqi}: the
+teacher reads, the learner repeats, the teacher corrects every slip, and the learner moves on only after an
+error-free reading \cite{SRC-021,SRC-058}. The cycle is effective, but it ties every learner to a teacher's
+time. Adults who study after work, live far from a mosque school or feel shy reading in front of others
+practise alone between lessons, and nobody tells them when a \ar{ح} has turned into a Russian [x] or a long
+vowel has become short.
+
+Two developments make it reasonable to ask whether a machine could fill part of that gap. Automatic speech
+recognition has reached the level of phonemes for Qur'anic Arabic: the open model Quran Muaalem recognises
+phonemes together with ten articulatory attributes and reports a phoneme error rate of about half a percent
+on expert recitations \cite{SRC-002}. And research on computer-assisted pronunciation training has shown
+that automatic feedback has a medium positive effect, largest when it targets individual sounds and states
+the error explicitly \cite{SRC-025} --- which is exactly what a primer does.
+
+\section{Problem}
+
+The difficulty lies in who is speaking. Muaalem was trained only on male expert reciters. On recordings
+with real errors its phoneme error rate is ten times higher than on its own test set, and some rules are
+recognised with an F1 below one half \cite{SRC-002}. Public benchmarks for Qur'anic pronunciation contain
+fluent recitation of verses and no second-language learners \cite{SRC-004,SRC-031,SRC-043}. Systematic
+reviews warn that speech recognisers produce false alarms on accented speech and recommend that a teacher
+or partner stay in the loop \cite{SRC-026}. A Russian-speaking adult who reads an isolated syllable slowly
+for the first time is far from the model's training data, and nobody knows how often the model will be
+wrong about such a learner, how often it will reject a correct reading, or whether its explanations will
+help.
+
+A second problem concerns how such a system is built. The software in this thesis was written by one
+author with an AI coding agent. Agents are productive, but they are known to make their own tests pass by
+changing the tests \cite{SRC-027}, and written instructions lose force over a long session
+\cite{SRC-076}. Research software whose numbers end up in a thesis needs stronger guarantees than an
+instruction file.
+
+\section{Aim and objectives}
+
+The aim of the thesis is \emph{to design a reading tutor that faithfully follows} Muallim al-Sani,
+\emph{and to measure how far an open phoneme-level model can take the role of the listening teacher for
+Russian-speaking beginners, without overstating what it can do.}
+
+The objectives are:
+\begin{enumerate}[label=O\arabic*.]
+  \item to turn the primer into a digital curriculum in the book's own order, with every exercise
+    traceable to a page and line of a concrete edition;
+  \item to build a tutor that assesses phoneme-level reading, explains errors in Russian for a learner who
+    starts from zero, and records a full decision trace for every attempt;
+  \item to build the research infrastructure: consent and pseudonyms, phoneme-level annotation by two
+    teachers, automated metrics and a preregistered analysis plan;
+  \item to run a closed pilot with 20--40 learners over 4--6 weeks, including a within-subject feedback
+    experiment and a delayed post-test;
+  \item to answer the research questions with effect sizes and confidence intervals;
+  \item to document the AI-agent harness used to build the system and evaluate it as a case study.
+\end{enumerate}
+
+\section{Research questions}\label{sec:rq}
+
+\begin{rqbox}
+\textbf{RQ-1.} How closely does the automatic assessment --- Muaalem, rule-based alignment and grading
+thresholds --- agree with qualified teachers on beginners reading \emph{Muallim al-Sani}?\\[4pt]
+\textbf{RQ-2.} Which reading errors do Russian-speaking beginners make, and which of the errors reported by
+the tutor are errors of the learner rather than of the model?\\[4pt]
+\textbf{RQ-3.} Do explicit explanations in Russian improve the next attempt and delayed retention compared
+with a bare correct/incorrect signal?\\[4pt]
+\textbf{RQ-4.} Which known failure modes of AI-agent development does a mechanically enforced harness
+prevent or expose, and how much human intervention does it require?
+\end{rqbox}
+
+RQ-1 to RQ-3 concern the tutor; RQ-4 concerns the way it was built. Seven confirmatory hypotheses for
+RQ-1 to RQ-3 are listed in Section~\ref{sec:method-hyp}; everything else is reported as exploratory.
+
+\section{Approach}
+
+The thesis follows design science research \cite{SRC-100,SRC-101}. It builds two artefacts and evaluates
+each claim with a method suited to it. The tutor (artefact A) is evaluated by a measurement study against
+teachers, a descriptive analysis of errors and a pilot experiment. The development harness (artefact B)
+is evaluated as an embedded case study \cite{SRC-102}. Requirements are written as quality-attribute
+scenarios \cite{SRC-047}, metrics are derived with the Goal--Question--Metric method \cite{SRC-048}, and
+the analysis plan is preregistered and fingerprinted before data collection.
+
+\section{Contributions}
+
+\begin{enumerate}
+  \item \textbf{Empirical.} The first teacher-referenced measurement of an open Qur'anic phoneme model on
+    primer-level reading by second-language beginners, including how often it wrongly rejects correct
+    reading.
+  \item \textbf{Data.} A small consented dataset of beginners' readings with phoneme-level labels from two
+    teachers, prepared for release in the Iqra'Eval format if ethics and consent allow.
+  \item \textbf{Design.} A tutor whose features are derived from Maksudi's didactic principles and from
+    feedback research, with an open architecture in which the model, the database and the messenger can be
+    replaced without touching domain logic.
+  \item \textbf{Method.} An evidence-based description of a guarded AI-agent harness for research software:
+    what it prevents, what it costs and where it fails.
+\end{enumerate}
+
+\section{Scope and limitations}
+
+The curriculum covers the whole book (pages 10--85), but the evaluation concentrates on the letter and vowel
+lessons (pages 10--24), where beginners start and errors are most frequent. Tajwid rules such as
+\emph{ikhfa} and \emph{idgham}, other first languages and fine-tuning of the model are left for future
+work. The tutor is meant to complement a teacher; the thesis does not claim that it can replace one, and
+the book itself says it cannot.
+
+\section{Structure of the thesis}
+
+Chapter~\ref{ch:review} reviews the primer and its method, the learners, research on pronunciation
+feedback, automatic assessment of Qur'anic recitation and AI-agent software engineering.
+Chapter~\ref{ch:method} sets out the methodology: requirements, metrics, the four studies, preregistration
+and threats to validity. Chapter~\ref{ch:impl} describes the implementation, from the curriculum to the
+assessment pipeline, the research data and the development harness. Chapter~\ref{ch:eval} presents and
+discusses the evaluation, and Chapter~\ref{ch:concl} concludes with answers and directions for doctoral
+research.

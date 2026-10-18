@@ -1,0 +1,36 @@
+% Магистерская диссертация, русская версия — точка входа. Сборка: make thesis-ru (→ thesis/build/main-ru.pdf).
+% Английская версия — main.tex (та же структура, chapters/en/). Требования Иннополиса к оформлению
+% не подтверждены — thesis/README.md.
+\documentclass[a4paper,12pt,oneside]{report}
+
+\newcommand{\mainlang}{russian}
+\newcommand{\docstyle}{thesis}
+
+\input{preamble}
+\input{meta}
+\hypersetup{pdftitle={\thesisShortRu},pdfauthor={\thesisAuthorRu}}
+
+\begin{document}
+\input{titlepage}
+
+\pagenumbering{roman}
+\input{chapters/ru/00-abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+\input{chapters/ru/01-introduction}
+\input{chapters/ru/02-literature-review}
+\input{chapters/ru/03-methodology}
+\input{chapters/ru/04-implementation}
+\input{chapters/ru/05-evaluation}
+\input{chapters/ru/06-conclusion}
+
+\printbibliography[heading=bibintoc,title={Список использованных источников}]
+
+\appendix
+\input{chapters/ru/a-traceability}
+\end{document}

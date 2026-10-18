@@ -1,0 +1,311 @@
+% Chapter 3. Material: docs/requirements/quality-scenarios.md, docs/research/metrics-gqm.md,
+% docs/research/preregistration.md, docs/data/annotation-guide.md, docs/data/reports.md,
+% docs/architecture/design-iterations.md, docs/risks.md. Figure R-06 → fig-harness (Ch. 4).
+\chapter{Methodology}\label{ch:method}
+
+This chapter explains how the thesis produces and evaluates its artefacts. Section~\ref{sec:method-dsr}
+introduces the research paradigm. Sections~\ref{sec:method-req}--\ref{sec:method-gqm} describe how
+requirements, architecture and metrics were derived. Sections~\ref{sec:method-hyp}--\ref{sec:method-s4}
+present the four studies, and Sections~\ref{sec:method-prov}--\ref{sec:method-validity} cover
+preregistration, ethics and threats to validity.
+
+\section{Research paradigm}\label{sec:method-dsr}
+
+The thesis follows design science research, which produces knowledge by building an artefact that
+addresses a real problem and evaluating it rigorously \cite{SRC-100}. Wieringa separates two kinds of
+work inside such a project: \emph{design problems}, which ask how to change the world (``build a tutor
+that \ldots''), and \emph{knowledge questions}, which ask what is true about it (``how often does the model
+reject correct reading?'') \cite{SRC-101}. The research questions of this thesis are knowledge questions;
+the objectives O1--O3 and O6 are design problems that make them answerable. Table~\ref{tab:hevner} shows
+how the thesis addresses Hevner's seven guidelines.
+
+\begin{table}[ht]
+\centering\small
+\caption{Hevner's design science guidelines \cite{SRC-100} applied to this thesis.}
+\label{tab:hevner}
+\begin{tabularx}{\linewidth}{@{}P{3.6cm}L@{}}
+\toprule
+Guideline & In this thesis \\
+\midrule
+Design as an artefact & Artefact A, the reading tutor; artefact B, the development harness. \\
+Problem relevance & Beginners practise alone; teachers' time does not scale; no tool checks primer-level
+reading in the learners' language. \\
+Design evaluation & Measurement against two teachers (RQ-1), error analysis (RQ-2), pilot experiment
+(RQ-3), case study (RQ-4). \\
+Research contributions & Evaluation on an unstudied population and material; dataset; method. \\
+Research rigour & Preregistration; standard MDD metrics; agreement statistics with confidence intervals;
+case-study protocol \cite{SRC-102}; Empirical Standards as checklist \cite{SRC-103}. \\
+Design as a search process & 50 recorded decisions with rejected alternatives; seven design iterations. \\
+Communication & Thesis, dataset card, open architecture, and a doctoral roadmap. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Requirements}\label{sec:method-req}
+
+\subsection{The audience as the main constraint}
+
+One constraint was stated first and checked against every later decision: the learners are
+Russian-speaking adults who learn to read Arabic from zero. Seven rules follow from it: explain every sign
+in Russian before it is needed; follow the book's order in small steps; let the learner hear before
+reading; explain errors through familiar sounds and show them in the text; consolidate with short
+questions; never punish; and treat the Qur'anic text with respect, using the exact text of the Medina
+mushaf and starting with \emph{isti'adha} and \emph{basmala}.
+
+\subsection{Functional requirements and user stories}
+
+Requirements were collected from the author's requests, the prototype, the book and the literature, and
+written with stable identifiers and MoSCoW priorities. The current specification has 47 functional
+requirements, grouped as follows: curriculum from the book (FR-01, FR-16, FR-36--FR-41), assessment and
+feedback (FR-03--FR-05, FR-20--FR-22, FR-43), learner experience (FR-02, FR-07, FR-31--FR-35), research
+data (FR-06, FR-11--FR-14, FR-17, FR-24, FR-26--FR-29), privacy (FR-08--FR-10, FR-44) and
+later interface additions (FR-45--FR-47). User stories
+describe the same requirements from the viewpoints of learner, teacher and researcher. A traceability matrix
+links each requirement to code and tests; an automated report shows which requirements are covered by
+passing tests (59 of 60 at the time of writing).
+
+\subsection{Quality attribute scenarios}
+
+Non-functional requirements were rewritten as six-part quality attribute scenarios --- source, stimulus,
+environment, artefact, response and response measure --- following Bass, Clements and Kazman
+\cite{SRC-047}. Scenarios were prioritised in a utility tree by importance and technical risk.
+Table~\ref{tab:qas} lists them.
+
+\begin{table}[ht]
+\centering\small
+\caption{Quality attribute scenarios (QAS-01--QAS-11).}
+\label{tab:qas}
+\begin{tabularx}{\linewidth}{@{}lP{2.6cm}L@{}}
+\toprule
+ID & Attribute & Scenario and measure \\
+\midrule
+QAS-01 & Accuracy & The verdict agrees with a teacher: precision, recall, F1; $\kappa$ bot--teacher vs.\
+teacher--teacher. \\
+QAS-02 & Accuracy & Correct reference reading is accepted: share of failed verdicts on reference audio
+$\le$5\,\% (to approve). \\
+QAS-03 & Performance & Response to a voice message: 90\,\% of attempts processed in $\le$10\,s. \\
+QAS-04 & Reliability & A model failure does not break the lesson; 100\,\% of failures logged and
+answered. \\
+QAS-05 & Reliability & Position in the book survives a restart: no lost positions. \\
+QAS-06 & Input robustness & Too short, silent or over-long recordings are not graded. \\
+QAS-07 & Usability & At least four of five beginners reach a passed line in their first session without
+help (to approve). \\
+QAS-08 & Privacy & No audio without consent; deletion leaves no rows or files. \\
+QAS-09 & Reproducibility & Every attempt can be recomputed: versions, thresholds and hash stored. \\
+QAS-10 & Modifiability & A new recogniser is added without touching the domain. \\
+QAS-11 & Process integrity & The agent cannot weaken tests during implementation. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Architecture design method}\label{sec:method-add}
+
+The architecture was derived with a lightweight form of Attribute-Driven Design \cite{SRC-047}: each
+iteration takes one goal and a few drivers (scenarios, requirements, constraints), records decisions as
+architecture decision records (ADRs) \cite{SRC-010}, and closes with a test that confirms the decision.
+For a single author full iteration documents would be bureaucracy, so an iteration is one line in a table
+and the details live in the ADRs, including rejected options. Seven iterations were completed: replaceable
+model, database and messenger; research data with personal data kept apart; trustworthy and contestable
+assessment; curriculum strictly from the book; an interface usable without a teacher; agent development
+that cannot be gamed; and diagnostics without leaking personal data. Chapter~\ref{ch:impl} describes the
+results.
+
+\section{Measurement framework}\label{sec:method-gqm}
+
+Metrics were derived with the Goal--Question--Metric method \cite{SRC-048}: a goal is stated in a fixed
+template (analyse \emph{object} for the purpose of \emph{purpose} with respect to \emph{quality focus} from
+the viewpoint of \emph{stakeholder} in the context of \emph{context}), refined into questions, and only then
+into metrics and data. A metric without a goal is not collected. Six goals were defined: G1 agreement with
+teachers (RQ-1), G2 beginners' errors (RQ-2), G3 effect of explanations (RQ-3), G4 engagement and the
+beginner's path, G5 system quality, and G6 development with AI agents (RQ-4).
+
+For the pilot, one \emph{main metric} and one \emph{counter-metric} were chosen. The main metric is the
+number of book lines passed by learners for the first time in a week: it grows only when learners move
+through the book. Because it can be inflated by lowering the pass threshold, the counter-metric is the
+share of falsely accepted attempts, attempts passed by the tutor but not by the teacher's transcription.
+
+\section{Hypotheses}\label{sec:method-hyp}
+
+Table~\ref{tab:hyp} lists the confirmatory hypotheses. They are recorded in the preregistration
+(Section~\ref{sec:method-prov}); every other analysis is labelled exploratory and its findings are offered
+as hypotheses for future work.
+
+\begin{table}[ht]
+\centering\small
+\caption{Confirmatory hypotheses (preregistration v0.2).}
+\label{tab:hyp}
+\begin{tabularx}{\linewidth}{@{}llL@{}}
+\toprule
+ID & RQ & Hypothesis \\
+\midrule
+H1.1 & RQ-1 & Precision and recall of error detection on beginners are lower than reported on the model's
+training domain. \\
+H1.2 & RQ-1 & False rejections (FRR) are more frequent than false acceptances (FAR). \\
+H1.3 & RQ-1 & $\kappa$ between tutor and teacher is lower than $\kappa$ between teachers. \\
+H2.1 & RQ-2 & Errors on \ar{ق} and \ar{غ} are less frequent among Kazakh speakers than among Russian
+speakers (tested only if both groups are present). \\
+H2.2 & RQ-2 & Russian speakers make more errors in emphasis than in place of articulation. \\
+H3.1 & RQ-3 & The score gain on the next attempt is larger after a full explanation than after a
+correct/incorrect signal. \\
+H3.2 & RQ-3 & The difference in H3.1 persists on a delayed test after 1--2 weeks. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Participants and materials}\label{sec:method-participants}
+
+The pilot is closed: learners are invited through teachers and the author's acquaintances, and the target is
+20--40 adult learners over 4--6 weeks. Participation in research requires a separate consent; a short entry
+questionnaire, asked only of consenting learners, records age (18+), first language and prior experience of
+reading Arabic. Learners who do not consent can still use the tutor; their attempts are graded but no audio
+is kept and they are excluded from the analysis. The materials are the cards of the letter and vowel lessons
+(pages 10--24 of the book) and, for exploratory analysis, later lessons that learners reach. The unit of
+analysis is an attempt; learners are clusters, because attempts by one learner are not independent.
+
+Exclusions are fixed in advance: attempts graded by the development stub; recordings labelled unusable or
+off-task by an annotator (counted separately); and attempts before the preregistration freeze.
+
+\section{Study 1: agreement with teachers (RQ-1)}\label{sec:method-s1}
+
+\paragraph{Annotation} Two teachers who read confidently with tajwid annotate every attempt. Each sees the
+line of the book, the recording, the canonical phonemes, the phonemes the tutor heard and the errors it
+reported. If the tutor heard correctly, the annotator marks \emph{agree}; otherwise \emph{fix} and enters the
+phonemes that were actually pronounced. Two further marks are possible: \emph{audio unusable} and
+\emph{off task}. A separate flag marks a \emph{self-correction}, when the learner made an error and immediately
+re-read correctly in the same message; following the taxonomy of Al Mdfaa et al.\ \cite{SRC-068}, these
+attempts are reported in their own block and excluded from the main RQ-1 figures. Annotation can be done in
+Telegram or in a spreadsheet package; both write to the same table with the annotator code and the version
+of the annotation guide. Annotators see the tutor's answer; this speeds up work but may bias them towards
+agreement, which is treated as a threat to validity.
+
+\paragraph{Phoneme-level metrics} For each attempt the canonical, annotated and recognised phoneme sequences
+are aligned, and each canonical phoneme is classified as TA, TR, FA or FR (Section~\ref{sec:lr-mdd}).
+Precision, recall, F1 and diagnosis accuracy are computed over all phonemes, by error type and by letter
+\cite{SRC-064}.
+
+\paragraph{Verdict-level metrics} The teacher's verdict is obtained by applying the same grading policy to
+the teacher's transcription, with the thresholds stored in the attempt. FAR is the share of attempts the
+tutor passed although the teacher's transcription fails; FRR is the share it failed although the
+transcription passes. Agreement is measured with Cohen's $\kappa$ \cite{SRC-104},
+\begin{equation}
+  \kappa = \frac{p_o - p_e}{1 - p_e},
+\end{equation}
+where $p_o$ is observed and $p_e$ chance agreement, computed between the tutor and each teacher and between
+the two teachers. The teacher--teacher value is the ceiling against which the tutor is judged (H1.3).
+Agreement between annotators on individual phonemes is measured with Krippendorff's $\alpha$ for nominal
+data, which handles missing labels and any number of coders \cite{SRC-065}.
+
+\paragraph{Uncertainty} 95\,\% confidence intervals are obtained by a cluster bootstrap that resamples
+learners with replacement. Comparisons with published benchmarks are qualitative only, because the data
+differ.
+
+\section{Study 2: beginners' errors (RQ-2)}\label{sec:method-s2}
+
+Error frequencies by type, confusion matrices ``expected $\to$ heard'' and difficulty by book line and by
+the book's minimal pairs are computed twice: over all errors reported by the tutor and over errors
+confirmed by annotators (true rejections). The difference between the two shows how much of an apparent
+learner profile is produced by the model. To avoid conclusions driven by one active learner, every
+frequency is reported with the number of learners who contribute to it. H2.1 is tested with a mixed
+logistic model, with first language as a fixed effect and learner as a random effect, if both groups are
+large enough; otherwise it is reported descriptively. H2.2 uses the attribute (\emph{sifat}) outputs of the
+model and is reported descriptively with intervals.
+
+\section{Study 3: effect of explanations (RQ-3)}\label{sec:method-s3}
+
+\paragraph{Design} With 20--40 learners, two independent groups would be underpowered: a medium effect
+($d\approx0.6$) would need about 45 learners per group at $\alpha=0.05$ and 80\,\% power. The study
+therefore uses a within-subject design, following Neri et al.\ \cite{SRC-054}: for each learner, a random
+half of the cards gives a full explanation after a failed attempt, and the other half only a
+correct/incorrect signal. Assignment is fixed per learner and card, so a learner always receives the same
+condition on the same card.
+
+\paragraph{Outcomes} The primary outcome is the change in score from a failed attempt to the next attempt on
+the same card. Secondary outcomes are whether the error named in the explanation recurs at the same
+position, and the score on the same cards in a delayed test after 1--2 weeks.
+
+\paragraph{Analysis} The effect is estimated with a linear mixed model
+\begin{equation}
+  \Delta s_{ij} = \beta_0 + \beta_1\,\mathrm{Full}_{ij} + u_i + v_j + \varepsilon_{ij},
+\end{equation}
+where $\Delta s_{ij}$ is the score change of learner $i$ on card $j$, $\mathrm{Full}_{ij}$ indicates the
+full-explanation condition, and $u_i$, $v_j$ are random intercepts for learner and card. H3.2 uses the same
+model on delayed-test scores. Across the seven confirmatory hypotheses, the Holm procedure controls the
+family-wise error rate at $\alpha=0.05$; effect sizes and confidence intervals are always reported. Data
+collection stops at the planned end of the pilot, not when results become significant; interim reports
+are descriptive only.
+
+\section{Study 4: the development harness (RQ-4)}\label{sec:method-s4}
+
+The harness is evaluated as a single embedded case study \cite{SRC-102}. The case is the development of the
+tutor; the units of analysis are working sessions and individual changes. Four data sources are used: the
+hook journal, which records every block and approval request with time, hook and reason; session summaries,
+which record requests, decisions, deviations and unverified items; the log of every prompt to the agent; and
+the version history with its ADRs. Measures follow goal G6: blocks and approval requests by reason;
+human interventions per session (corrections, stop signals, rejected changes); iterations until the checks
+pass; and defects that passed all checks and were found later. Incidents described in the journals are
+coded thematically by failure mode (test gaming, scope creep, unverified claims, data exposure,
+fabricated dependencies). Self-reported productivity is deliberately not used \cite{SRC-030}.
+
+\section{Preregistration, provenance and reproducibility}\label{sec:method-prov}
+
+Three mechanisms protect the results from being shaped after the fact.
+
+\paragraph{Preregistration} Hypotheses, exclusions, sample size and analysis are written down before data
+collection. When the author and supervisor approve the plan, its SHA-256 fingerprint and date are recorded,
+and any later change requires a new version with a stated reason. Freezing data and evaluator by hash
+follows the practice of the supervisor's group \cite{SRC-067}.
+
+\paragraph{Protected evaluator} The module that computes RQ-1 metrics is a human-owned zone: the coding agent
+must ask before changing it, because an agent that can edit the evaluator can improve the score without
+improving the system \cite{SRC-027,SRC-082}.
+
+\paragraph{Provenance} Every attempt stores the canonical variants, the recognised phonemes, the raw model
+output, the thresholds, the code, curriculum and model versions, the book line as shown to the learner, and
+the SHA-256 of the audio. A traceability command prints fingerprints of code, curriculum, SQL reports,
+migrations, dependencies and preregistration. A number enters the thesis only if the corresponding analysis
+is implemented and the figure or table has a passport: report, date, number of attempts and learners, and
+code fingerprint.
+
+\section{Ethics}\label{sec:method-ethics}
+
+The study involves voice recordings on a religious topic, so it is designed as if the strictest reading of
+the law applied. Consent to the service and consent to voice recording are separate; audio is never stored
+without consent; consent can be withdrawn, which deletes recordings and their annotations; every learner can
+delete all data with one button; only pseudonyms appear in reports and datasets; research participation is
+limited to adults; no voice prints or speaker embeddings are computed; annotators see only the line and the
+tutor's answer, never the learner's identity, and recordings are sent to them in protected mode
+\cite{SRC-033,SRC-036,SRC-037}. The questions of who is the data operator, whether an ethics committee review
+is required and where the server is located are institutional and are being settled with the supervisor
+before learners outside the closed circle are invited.
+
+\section{Threats to validity}\label{sec:method-validity}
+
+Table~\ref{tab:validity} lists the main threats in the classification of Wohlin et al.\ \cite{SRC-106} and
+how the design addresses them.
+
+\begin{table}[ht]
+\centering\small
+\caption{Threats to validity and responses.}
+\label{tab:validity}
+\begin{tabularx}{\linewidth}{@{}P{2.2cm}LL@{}}
+\toprule
+Type & Threat & Response \\
+\midrule
+Construct & An annotator's label is not the ``true'' error; teachers may disagree. & Two annotators;
+teacher--teacher $\kappa$ as ceiling; written guide with versions. \\
+Construct & Annotators see the tutor's answer and may agree by suggestion. & Reported as a limitation;
+agreement analysed separately for passed and failed attempts. \\
+Internal & Improvement on a second attempt may be repetition, not explanation. & Within-subject control
+condition (RQ-3). \\
+Internal & Long lines dilute errors in the similarity score. & RQ-1 is computed per phoneme, not only per
+verdict. \\
+Internal & The agent may game its own checks. & Frozen tests, protected evaluator, logged blocks
+(RQ-4). \\
+External & Closed pilot of acquaintances; small sample. & Described as a pilot; effect sizes with
+intervals; no generalisation beyond the population. \\
+External & The model was trained on the Qur'an; pages 10--37 are not Qur'anic. & Results reported by
+material type. \\
+Conclusion & Dependent attempts; multiple tests. & Cluster bootstrap; mixed models; Holm correction. \\
+\bottomrule
+\end{tabularx}
+\end{table}

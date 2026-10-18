@@ -1,0 +1,228 @@
+% Chapter 5. Numbers only with status ✅ in docs/research/traceability.md and a passport in
+% docs/thesis/figures.md. Pilot results are marked \pending until they exist.
+% Preliminary checks: docs/research/research-log.md (2026-10-17), docs/requirements/quality-scenarios.md,
+% docs/architecture/change-scenarios.md. RQ-4 incidents: docs/thesis/materials-log.md, docs/journal/sessions/.
+\chapter{Evaluation and Discussion}\label{ch:eval}
+
+This chapter reports what has been measured so far and what the pilot will add. Section~\ref{sec:eval-status}
+summarises the state of each study. Section~\ref{sec:eval-prelim} presents preliminary technical
+validation. Sections~\ref{sec:eval-rq1}--\ref{sec:eval-rq3} describe the results for RQ-1 to RQ-3, which
+depend on pilot data, and Section~\ref{sec:eval-rq4} the evidence collected so far for RQ-4.
+Section~\ref{sec:eval-discussion} discusses the findings and Section~\ref{sec:eval-limits} their limits.
+
+\section{Status of the evaluation}\label{sec:eval-status}
+
+\begin{table}[ht]
+\centering\small
+\caption{State of the four studies.}
+\label{tab:eval-status}
+\begin{tabularx}{\linewidth}{@{}P{2.6cm}LL@{}}
+\toprule
+Study & Ready now & Needs \\
+\midrule
+1. Agreement (RQ-1) & Annotation in Telegram and packages; phoneme-level metrics, $\kappa$, $\alpha$
+computed automatically & Pilot attempts; two annotators; bootstrap intervals \\
+2. Errors (RQ-2) & Error catalogue; confusion and book-line reports; entry questionnaire & Pilot data;
+confirmed-only frequencies; attribute outputs stored separately \\
+3. Feedback (RQ-3) & Decision trace; retry data; preregistered model & Condition switch per card; delayed
+test; pilot \\
+4. Harness (RQ-4) & Hook journal (since 18 October 2026); session and prompt logs; ADRs; incidents &
+Counts over the whole project; coding of incidents \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Preliminary technical validation}\label{sec:eval-prelim}
+
+\subsection{Does the pipeline separate right from wrong reading?}
+
+Before any learner used the tutor, the pipeline was checked on expert audio: the teaching recitation of
+Mahmoud Khalil al-Husary \cite{SRC-042}. Four verses were sent as attempts for their own text, and three
+verses as attempts for a different text. Table~\ref{tab:husary} shows the scores.
+
+\begin{table}[ht]
+\centering\small
+\caption{Scores on expert recitation (17 October 2026, real model).}
+\label{tab:husary}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Condition & Verses & Score \\
+\midrule
+Audio matches the text & 112:1 & 100 \\
+ & 112:2 & 100 \\
+ & 1:2 & 99 \\
+ & 105:1 & 99 \\
+\midrule
+Audio of another verse & 112:1 vs.\ 112:2 & 67 \\
+ & 1:2 vs.\ 112:1 & 40 \\
+ & 105:1 vs.\ 1:2 & 48 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Correct readings scored 99--100 and mismatched texts 40--67, well apart from the pass threshold of 80. This
+shows that the pipeline --- conversion, recognition, phonetisation, alignment and grading --- works end to
+end and discriminates correct from incorrect reading on expert audio. It says nothing yet about beginners:
+the speaker is an expert, the text is Qur'anic, and the sample has seven pairs. A synthetic Arabic voice
+of the operating system was recognised poorly, so synthetic speech cannot replace human recordings in tests.
+
+\subsection{Response time}
+
+On the first nine attempts with the real model on the author's laptop, the median processing time was
+1.7\,s and the 90th percentile 5.0\,s, within the 10-second target of QAS-03. The measured interval covers
+recognition and assessment only; downloading the voice message, conversion and rendering the answer are
+not included, so the learner waits longer than these numbers. The pilot will report the same percentiles per
+day on the deployment server.
+
+\subsection{Robustness of the assessment algorithm}
+
+The model can return any sequence, so the assessment must behave sensibly for all of them. The six
+properties listed in Section~\ref{sec:impl-verification} were checked on random phoneme strings: 300 cases
+per property in every run of the suite and 5\,000 per property in a one-off run, without a violation.
+
+\subsection{Modifiability}
+
+Adding a second recogniser required three files and no change to the domain, the use cases, the database
+or the interface; all architecture contracts and tests passed (QAS-10). This supports the claim that the
+tutor can be used to compare models on the same recordings, which is planned for doctoral work.
+
+\section{RQ-1: agreement with teachers}\label{sec:eval-rq1}
+
+\begin{notebox}
+This section will be completed after the pilot and double annotation. The tables below show the planned
+layout; no value is reported before it has a passport (report, date, $n$, code fingerprint).
+\end{notebox}
+
+\begin{table}[ht]
+\centering\small
+\caption{Quality of error detection on beginners (T-01).}
+\label{tab:T-01}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Measure & Value & 95\,\% CI & $n$ \\
+\midrule
+Precision & \pending{T-01} & & \\
+Recall & & & \\
+F1 & & & \\
+Diagnosis accuracy & & & \\
+FAR (verdict) & & & \\
+FRR (verdict) & & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering\small
+\caption{Agreement on verdicts (T-02).}
+\label{tab:T-02}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Pair & Cohen's $\kappa$ & 95\,\% CI \\
+\midrule
+Tutor -- teacher A & \pending{T-02} & \\
+Tutor -- teacher B & & \\
+Teacher A -- teacher B & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The analysis will report precision and recall by error type and by letter (R-08), Krippendorff's $\alpha$ per
+phoneme between annotators, the share of disputed attempts that annotators corrected, and the
+self-correction block separately. H1.1--H1.3 will be tested as preregistered.
+
+\section{RQ-2: beginners' errors}\label{sec:eval-rq2}
+
+\pending{RQ-2 results}. The analysis will present the frequency of error kinds (T-03), the most difficult
+lines and minimal pairs of the book (T-04), and confusion matrices for all reported and for confirmed
+errors (R-09). The comparison of the two matrices is the main result: it shows which parts of the apparent
+learner profile are produced by the model. H2.1 will be tested only if both language groups are present; H2.2
+needs the attribute outputs of the model, which the tutor already receives but does not yet store
+separately.
+
+\section{RQ-3: effect of explanations}\label{sec:eval-rq3}
+
+\pending{RQ-3 results}. Before the pilot the tutor needs one more feature: a per-learner, per-card switch
+between the full explanation and the correct/incorrect signal, with the condition recorded in the attempt.
+The analysis will report the score change after each condition (R-11), the recurrence of named errors and the
+delayed-test results (T-05), with the mixed model of Section~\ref{sec:method-s3}. Without the control
+condition, an improvement on retry would mix the effect of the explanation with the effect of simply trying
+again; for this reason descriptive retry statistics collected before the switch will not be used as evidence.
+
+\section{RQ-4: the development harness}\label{sec:eval-rq4}
+
+Quantitative measures --- blocks by reason (R-13), interventions per session and iterations until green
+(T-08) --- will be computed over the whole project at its end; the hook journal started on 18 October 2026.
+\pending{RQ-4 counts}. The journals already contain incidents that show what the harness caught, what it
+missed and where the human was needed. Table~\ref{tab:incidents} groups them by failure mode.
+
+\begin{table}[ht]
+\centering\small
+\caption{Documented incidents from the session journals (October 2026).}
+\label{tab:incidents}
+\begin{tabularx}{\linewidth}{@{}P{3.0cm}LP{2.6cm}@{}}
+\toprule
+Failure mode & Incident & Caught by \\
+\midrule
+Test gaming & An accepted test contained a wrong expectation written by the agent; the change was made
+only through the tests phase with the author's consent. & Frozen tests, stop signal \\
+Architecture erosion & A new research module imported the bootstrap layer; the entry point was moved. &
+import-linter \\
+Leak of secrets & A regular expression written by the agent did not mask the bot token inside a URL. & Test
+on logs \\
+Silent defect & Dates lost their time zone in SQLite; a UTC-aware column type was added. & Integration
+test \\
+Destructive edit & While removing a keyboard, the agent truncated the file with the consent keyboards. &
+Type checker \\
+Unspoken assumption & The bot was handed to the author with the stub recogniser, which accepts everything;
+the author saw ``all correct''. & Not caught; a hook now reminds the agent \\
+Rule left as prose & Consent button texts lay outside the protected texts file, so the agent could change
+them without approval. & Review; moved and tested \\
+Check with a blind spot & An approval rule covered editing but not writing the same file. & Review \\
+Check with a blind spot & A path rule in \texttt{.gitignore} hid five documentation files from every
+commit. & Consistency audit \\
+Check with a blind spot & The dependency audit did not see the optional model extra and its
+vulnerabilities. & Dependency review \\
+Green but broken & The container could not write logs, and a CI job lacked a test dependency; both passed
+all local checks. & Direction reviewer (STOP) \\
+Text does not match action & A button promised the alphabet while the lesson started with the
+\emph{basmala}. & Console bot driver \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Three observations already stand out. First, the deterministic checks caught the classic agent failures:
+test gaming was blocked and handled through the author, architecture violations and type errors stopped
+the agent. Second, several checks were green while blind: a configuration rule, an ignore pattern and a
+dependency audit each covered less than they appeared to. Each was found by another check or a review, which
+argues for checking the checks. Third, the most costly incident --- the stub recogniser --- was a failure to
+communicate, not to compute; it was fixed by adding a hook that turns the reminder into a mechanism. The
+quantitative analysis will show how often such incidents occur relative to the volume of work.
+
+\section{Discussion}\label{sec:eval-discussion}
+
+\paragraph{Two probabilistic systems under one discipline} The thesis deals with two systems that can pass a
+test without doing the right thing. The coding agent can make tests pass by changing them; the recogniser can
+reject a correct reading or accept a wrong one. The remedies have the same shape: deterministic external
+checks that the system cannot edit, a log of every decision, and an escalation path to a human. For the
+agent these are frozen tests, layer contracts and STOP verdicts; for the model they are the decision trace,
+the ``the bot was wrong'' button, teacher annotation and, as a next step, a ``not sure'' outcome based on the
+model's confidence.
+
+\paragraph{What a tutor can and cannot claim} The literature and the preliminary checks support a modest
+role: a patient practice partner that gives immediate, explicit first-line feedback between lessons. The
+claim that it replaces a teacher is neither supported by evidence nor consistent with the book. The design
+reflects this by making disputes easy, sending disputed attempts to teachers first and recording everything
+a teacher needs to review a verdict.
+
+\paragraph{Pending findings} \pending{interpretation of RQ-1--RQ-3 results}.
+
+\section{Limitations}\label{sec:eval-limits}
+
+The pilot is small and closed, so its results describe the participants rather than all Russian-speaking
+beginners. Annotators see the tutor's answer, which may inflate agreement. The model was trained on Qur'anic
+recitation, whereas pages 10--37 of the book contain syllables and words that are not Qur'anic; results are
+therefore reported by material type. The similarity score used for verdicts is coarse on long lines. The
+case study of the harness has one developer, one project and an author who is also the evaluator; it is
+illustrative, not comparative. Finally, the curriculum text transcribed from the scan is still awaiting full
+human verification; every attempt stores the curriculum version, so attempts affected by a later correction
+can be identified and excluded.

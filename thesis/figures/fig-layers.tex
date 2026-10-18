@@ -1,0 +1,17 @@
+% Слои и разрешённые зависимости (ADR-0002); нарушение ловит import-linter.
+\begin{tikzpicture}[node distance=4.5mm and 6mm, every node/.style={font=\sffamily\small}]
+  \node[soft,text width=11.6cm] (boot) {\textbf{bootstrap} --- \LANG{configuration, DI container (dishka), entry points}{конфигурация, DI-контейнер (dishka), точки входа}};
+  \node[box,below=of boot,xshift=-4.1cm,text width=3.3cm] (pres) {\textbf{presentation}\\[-1pt]{\scriptsize\LANG{Telegram handlers, screens, texts}{обработчики Telegram, экраны, тексты}}};
+  \node[box,below=of boot,text width=3.3cm] (infra) {\textbf{infrastructure}\\[-1pt]{\scriptsize\LANG{PostgreSQL, Muaalem, ffmpeg, YAML}{PostgreSQL, Muaalem, ffmpeg, YAML}}};
+  \node[box,below=of boot,xshift=4.1cm,text width=3.3cm] (res) {\textbf{research}\\[-1pt]{\scriptsize\LANG{reports, annotation, dataset}{отчёты, разметка, датасет}}};
+  \node[box,below=12mm of infra,text width=7.0cm] (app) {\textbf{application}\\[-1pt]{\scriptsize\LANG{use cases + ports (recogniser, repositories, audio)}{сценарии + порты (распознаватель, репозитории, аудио)}}};
+  \node[hot,below=of app,text width=7.0cm] (dom) {\textbf{domain}\\[-1pt]{\scriptsize\LANG{assessment, error kinds, curriculum, policy --- standard library only}{оценка, типы ошибок, программа, пороги --- только stdlib}}};
+  \draw[arr] (boot) -- (pres);
+  \draw[arr] (boot) -- (infra);
+  \draw[arr] (boot) -- (res);
+  \draw[arr] (pres) -- (app);
+  \draw[arr] (infra) -- (app);
+  \draw[arr] (res) -- (infra);
+  \draw[arr] (app) -- (dom);
+  \draw[arr,draw=lesson,dashed] (pres.east) -- node[lab,text=lesson,above,pos=0.5]{\LANG{forbidden}{запрещено}} (infra.west);
+\end{tikzpicture}

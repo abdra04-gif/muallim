@@ -1,31 +1,44 @@
-% Двуязычный титульный лист. Формулировки шапки — сверить с официальным образцом вуза (thesis/README.md).
+% Двуязычный титульный лист ВКР — по образцу открытых работ выпускников Иннополиса.
+% Формулировки шапки сверить с официальным образцом вуза (thesis/README.md).
 \begin{titlepage}
+\thispagestyle{empty}
+\newgeometry{left=2.5cm,right=2cm,top=2cm,bottom=2cm}
+\setstretch{1.1}
+\newcommand{\tpbox}[2]{\fcolorbox{black}{softgray}{\parbox[c][#1][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\centering\bfseries #2}}}
 \begin{center}
 \textrussian{\textbf{Автономная некоммерческая организация высшего образования\\
-«Университет Иннополис»}}
+«Университет Иннополис»\\(АНО ВО «Университет Иннополис»)}}
 
-\vspace{1.5cm}
-\textrussian{\textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА\\(МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ)}\\
-по направлению подготовки \thesisProgramCode{} «\thesisProgramRu»\\
-направленность (профиль) «\thesisSpecialtyRu»}
+\vspace{1.2cm}
+\textrussian{\textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА\\(МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ)\\
+по направлению подготовки\\ \thesisProgramCode{} «\thesisProgramRu»}}
+
+\vspace{0.5cm}
+\textenglish{\textbf{FINAL QUALIFICATION WORK\\(MASTER GRADUATE THESIS)\\Academic Program\\
+\thesisProgramCode{} \textquotedblleft\thesisProgramEn\textquotedblright}}
+
+\vspace{0.5cm}
+\textrussian{\textbf{Направленность (профиль) образовательной программы\\«\thesisSpecialtyRu»}}\\
+\textenglish{\textbf{Field of Study: \textquotedblleft\thesisSpecialtyEn\textquotedblright}}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\begin{tabularx}{\linewidth}{@{}P{1.6cm}X@{}}
+\textrussian{\textbf{Тема}} & \tpbox{1.9cm}{\textrussian{\thesisTopicRu}}\\[4pt]
+\textenglish{\textbf{Topic}} & \tpbox{1.9cm}{\textenglish{\thesisTopicEn}}\\
+\end{tabularx}
 
 \vspace{0.8cm}
-\textbf{FINAL QUALIFICATION WORK\\(MASTER'S THESIS)}\\
-Academic program \thesisProgramCode{} \textquotedblleft\thesisProgramEn\textquotedblright\\
-Specialization \textquotedblleft\thesisSpecialtyEn\textquotedblright
-
-\vspace{1.5cm}
-{\large \textrussian{\textbf{\thesisTopicRu}}\par}
-\vspace{0.4cm}
-{\large \textbf{\thesisTopicEn}\par}
-
-\vfill
-\begin{flushright}
-\textrussian{Работу выполнил / Author: \thesisAuthorRu} / \thesisAuthorEn\\[0.3cm]
-\textrussian{Руководитель / Supervisor: \thesisSupervisorRu} / \thesisSupervisorEn
-\end{flushright}
+\noindent\begin{tabularx}{\linewidth}{@{}P{4.2cm}XP{3.2cm}@{}}
+\textrussian{Работу выполнил} / \textenglish{\emph{Prepared by}} &
+  \tpbox{1.7cm}{\textrussian{\thesisAuthorRu} / \textenglish{\thesisAuthorEnFull}} &
+  \fcolorbox{black}{softgray}{\parbox[b][1.7cm][b]{2.9cm}{\centering\tiny подпись / signature}}\\[8pt]
+\textrussian{Руководитель выпускной квалификационной работы} / \textenglish{\emph{Supervisor}} &
+  \tpbox{1.7cm}{\textrussian{\thesisSupervisorRu} / \textenglish{\thesisSupervisorEn}} &
+  \fcolorbox{black}{softgray}{\parbox[b][1.7cm][b]{2.9cm}{\centering\tiny подпись / signature}}\\
+\end{tabularx}
 
 \vfill
-\textrussian{\thesisCity}, \thesisYear
-\end{center}
+\begin{center}\textrussian{\thesisCity}, \textenglish{\thesisCityEn}, \thesisYear\end{center}
+\restoregeometry
 \end{titlepage}
