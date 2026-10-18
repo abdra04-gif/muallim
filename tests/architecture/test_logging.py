@@ -44,12 +44,14 @@ def _names(node: ast.AST) -> set[str]:
 
 
 def _log_calls() -> list[tuple[str, ast.Call]]:
-    calls = []
+    calls: list[tuple[str, ast.Call]] = []
     for path in sorted(SRC.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Call) and _is_log_call(node):
-                calls.append((f"{path.relative_to(ROOT)}:{node.lineno}", node))
+        calls.extend(
+            (f"{path.relative_to(ROOT)}:{node.lineno}", node)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and _is_log_call(node)
+        )
     return calls
 
 

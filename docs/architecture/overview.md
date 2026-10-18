@@ -17,7 +17,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (Muaalem, заглушка), `audio/` (ffmpeg, файлы), `curriculum/` (YAML) |
 | presentation | `src/muallim/presentation/telegram/` | `handlers.py`, `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
 | research | `src/muallim/research/` | `reports.py`, `annotation.py`, `dataset.py` |
-| bootstrap | `src/muallim/bootstrap/` | `config.py`, `di.py` (вся «склейка»), `main.py`, `research_cli.py` |
+| bootstrap | `src/muallim/bootstrap/` | `config.py`, `di.py` (вся «склейка»), `main.py`, `research_cli.py`, `console.py` (проверка в терминале `muallim --test`, ADR-0045) |
 
 Правила проверяются автоматически (ADR-0002): `uv run lint-imports`.
 

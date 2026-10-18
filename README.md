@@ -13,6 +13,7 @@ make setup                         # зависимости + pre-commit
 cp .env.example .env               # вписать BOT_TOKEN и пароль БД
 make db-up && make migrate         # PostgreSQL в Docker + схема
 make run-stub                      # бот без модели; отставшую схему БД обновит сам (с копией)
+make try a='"/start" "✅ Да, разрешаю"'  # проверка бота в терминале: без Telegram, .env и базы учеников
 uv sync --extra ml && make run     # бот с моделью (~2 ГБ, нужен ffmpeg)
 ```
 
@@ -32,4 +33,4 @@ uv run muallim-research verify                           # сверка БД и 
 
 ## Качество
 `make check` — ruff, mypy --strict, import-linter (архитектура), pytest (покрытие ≥ 80 %).
-То же в CI, плюс gitleaks и pip-audit.
+То же в CI, плюс gitleaks, pip-audit и `make hygiene` (deptry, zizmor).

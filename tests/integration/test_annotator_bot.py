@@ -188,6 +188,39 @@ async def test_annotator_fixes_phonemes_with_hints(
     assert (label["label"], label["corrected_phonemes"]) == ("fix", "صَ")
 
 
+@pytest.mark.parametrize(("presses", "expected"), [(1, True), (2, False)])
+async def test_annotator_marks_self_correction(
+    app: tuple[Dispatcher, AsyncContainer],
+    person: Callable[[int], tuple[Learner, VoiceTelegram]],
+    presses: int,
+    expected: bool,
+) -> None:
+    """«🔁 Сам исправился» — переключатель: отметить, снять; сохраняется вместе с меткой."""
+    _, container = app
+    annotator, _ = person(ANNOTATOR_TG)
+    await annotator.write("/annotate")
+    assert "Сам исправился" in str(annotator.last_screen().reply_markup)
+    for _ in range(presses):
+        await annotator.press(_act("self"))
+    assert await _labels(container) == []  # отметка сама по себе — ещё не метка
+    await annotator.press(_act("ok"))
+    (label,) = await _labels(container)
+    assert (label["label"], label["self_corrected"]) == ("agree", expected)
+
+
+async def test_self_correction_kept_when_fixing_phonemes(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    _, container = app
+    annotator, _ = person(ANNOTATOR_TG)
+    await annotator.write("/annotate")
+    await annotator.press(_act("self"))
+    await annotator.press(_act("fix"))
+    await annotator.write("صَ")
+    (label,) = await _labels(container)
+    assert (label["label"], label["self_corrected"]) == ("fix", True)
+
+
 async def test_invited_annotator_gets_in_with_code_once(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:

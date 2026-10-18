@@ -16,7 +16,7 @@ from uuid import UUID
 from muallim.domain.phonetics import CONSONANTS, SPECIAL, VOWELS
 
 # Версия docs/data/annotation-guide.md — пишется в каждую метку (это проверяет тест).
-GUIDE_VERSION: Final = "2.0"
+GUIDE_VERSION: Final = "2.1"
 
 
 class AnnotationStatus(StrEnum):
@@ -83,6 +83,19 @@ def check_label(status: AnnotationStatus, actual: str | None, bot_heard: str) ->
         raise LabelError("стоит «fix», но ничего не исправлено. Если бот прав — поставьте «agree».")
 
 
+def check_self_correction(status: AnnotationStatus, *, self_corrected: bool) -> None:
+    """«Сам исправился» — отдельная категория чтения (решение автора 2026-10-18, SRC-068).
+
+    Ученик ошибся и сам перечитал верно. Отмечается рядом с «agree»/«fix»: ответ модели
+    оценивается как обычно. У плохой записи и чужого текста чтения не слышно — отметка не к месту.
+    """
+    if self_corrected and status not in USABLE:
+        raise LabelError(
+            "«сам исправился» ставится только к «agree» или «fix»: у плохой записи и чужого "
+            "текста чтения не слышно."
+        )
+
+
 def valid_annotator_code(code: str) -> bool:
     """Код разметчика (A1, A2…): латиница, цифры, «-» и «_», до 64 символов. Имени — нет."""
     return bool(_ANNOTATOR_CODE.fullmatch(code))
@@ -121,3 +134,4 @@ class Label:
     source: AnnotationSource
     seconds_spent: int | None  # от показа записи до ответа (только Telegram)
     created_at: datetime
+    self_corrected: bool = False  # ученик ошибся и сам перечитал верно (руководство 2.1)

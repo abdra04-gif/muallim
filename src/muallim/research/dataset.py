@@ -57,17 +57,19 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
         select(
             annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
             annotations.c.corrected_phonemes, annotations.c.guide_version,
+            annotations.c.self_corrected,
         )
         .join(attempts, attempts.c.id == annotations.c.attempt_id)
         .join(learners, learners.c.id == attempts.c.learner_id)
         .where(*consenting_real, annotations.c.label.in_(_STATUSES))
         .order_by(annotations.c.created_at, annotations.c.id)
     )  # fmt: skip
-    latest: dict[UUID, dict[str, dict[str, str | None]]] = defaultdict(dict)
-    for attempt_id, annotator, status, actual, guide in labels.all():
+    latest: dict[UUID, dict[str, dict[str, str | bool | None]]] = defaultdict(dict)
+    for attempt_id, annotator, status, actual, guide, self_corrected in labels.all():
         latest[attempt_id][annotator] = {
             "annotator": annotator, "status": status, "actual_phonemes": actual,
             "guide_version": guide,
+            "self_corrected": self_corrected,  # None — метка до руководства 2.1 (не спрашивали)
         }  # fmt: skip
     rows = []
     for r in (await session.execute(query)).mappings():
@@ -83,8 +85,8 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
     return rows
 
 
-def _consensus(marks: list[dict[str, str | None]]) -> str | None:
-    actual = {m["actual_phonemes"] for m in marks}
+def _consensus(marks: list[dict[str, str | bool | None]]) -> str | None:
+    actual = {str(m["actual_phonemes"]) for m in marks if m["actual_phonemes"] is not None}
     usable = len(marks) >= 2 and all(m["status"] in USABLE for m in marks)
     return actual.pop() if usable and len(actual) == 1 else None
 

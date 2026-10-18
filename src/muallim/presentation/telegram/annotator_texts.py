@@ -32,6 +32,8 @@ LEARNER_REASONS: Final = {
 
 BTN_OK: Final = "✅ Бот прав"
 BTN_FIX: Final = "✏️ Бот ошибся — исправить"
+BTN_SELF: Final = "🔁 Сам исправился"  # ученик ошибся и сам перечитал верно (руководство 2.1)
+BTN_SELF_ON: Final = "🔁 Сам исправился ✓"
 BTN_BAD: Final = "🔇 Плохая запись"
 BTN_OFF: Final = "🙅 Читал не то"
 BTN_SKIP: Final = "⏭ Пропустить"

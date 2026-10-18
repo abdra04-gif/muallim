@@ -130,6 +130,7 @@ class SqlAnnotationTasks(AnnotationTasks):
                 corrected_phonemes=label.actual, comment=label.comment,
                 guide_version=GUIDE_VERSION, source=label.source,
                 seconds_spent=label.seconds_spent, created_at=label.created_at,
+                self_corrected=label.self_corrected,
             )
         )  # fmt: skip
 

@@ -66,10 +66,9 @@ def caption(text: str) -> str:
         "&lt;/blockquote&gt;", "</blockquote>"
     )
     # спойлер Telegram — в макете серой плашкой, текст виден при наведении
-    safe = safe.replace("&lt;tg-spoiler&gt;", '<span class="spoiler">').replace(
+    return safe.replace("&lt;tg-spoiler&gt;", '<span class="spoiler">').replace(
         "&lt;/tg-spoiler&gt;", "</span>"
     )
-    return safe
 
 
 def main() -> None:

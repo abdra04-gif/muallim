@@ -68,9 +68,11 @@ def _find(phrase: str):
         hits = []
         for s, a, words, sk in corpus():
             ks = [key(x) for x in sk]
-            for i in range(len(ks) - n + 1):
-                if ks[i : i + n] == want:
-                    hits.append((s, a, " ".join(words[i : i + n])))
+            hits.extend(
+                (s, a, " ".join(words[i : i + n]))
+                for i in range(len(ks) - n + 1)
+                if ks[i : i + n] == want
+            )
         if hits:
             return hits
     return []

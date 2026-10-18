@@ -32,10 +32,12 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `make check` | ruff + mypy --strict + import-linter + pytest с покрытием (как CI) |
 | `uv run pytest -q` | тесты (< 10 с, без модели и сети) |
 | `make run-stub` | бот без модели (если БД отстаёт от миграций — сначала копия и `alembic upgrade`) |
+| `make try a='"/start" "кнопка" "🎤"'` | проверка бота в терминале без Telegram и `.env` (агент `bot-driver`, ADR-0045) |
 | `make db-up` · `make migrate` · `make backup` · `make restore d=…` | PostgreSQL в Docker, миграции (сначала копия), резервная копия, восстановление (только человек) |
 | `make report` · `make verify` · `make errors a="--letter ص"` | отчёты, сверка БД и файлов записей, каталог ошибок (`docs/data/browsing.md`) |
 | `scripts/phase [tests\|impl\|off]` | TDD-фаза; в `impl` хук запрещает править `tests/` |
 | `make trace` | требования ↔ тесты сейчас, отпечаток версии (`docs/requirements/verification-status.md`) |
+| `make hygiene` | объявленные зависимости (deptry) и безопасность CI (zizmor), как в CI (ADR-0042) |
 | `make thesis` · `make thesis-check` | диссертация LaTeX → `thesis/build/main.pdf` |
 | `/ship` | проверки → сверка документов → коммит → push (`docs/process/git.md`) |
 
@@ -61,7 +63,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 1. Требование (FR/NFR) → если неясно, один вопрос с вариантами.
 2. `scripts/phase tests` (с подтверждения) → падающие тесты → человек принимает.
 3. `scripts/phase impl` → код до зелёного `make check`.
-4. Ревью: architecture-guardian, при необходимости security-auditor.
+4. Ревью: architecture-guardian, при необходимости security-auditor; экраны и кнопки — bot-driver.
 5. thesis-scribe: CHANGELOG, ADR (и отклонённые варианты), трассировка, materials-log.
 6. consistency-auditor: документы правдивы, ничего не потеряно (хук doc_sync ловит механическое).
 7. `scripts/phase off` → сводка: что сделано, что упрощено, что проверить в Telegram → `/ship`.

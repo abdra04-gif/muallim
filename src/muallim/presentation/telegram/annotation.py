@@ -43,6 +43,7 @@ router.callback_query.filter(F.message.chat.type == "private")
 _fixing: dict[int, UUID] = {}  # разметчик → попытка, для которой ждём исправленные фонемы
 _shown_at: dict[tuple[int, UUID], float] = {}  # когда показана запись — время ответа
 _skipped: dict[int, set[UUID]] = {}  # пропущенные в этот заход
+_self_corrected: set[tuple[int, UUID]] = set()  # отмечено «сам исправился» (до ответа)
 
 _STATUS: Final = {
     "ok": AnnotationStatus.AGREE,
@@ -51,18 +52,24 @@ _STATUS: Final = {
 }
 
 
-def _keyboard(task: AnnotationTask, has_reference: bool) -> InlineKeyboardMarkup:
+def _keyboard(
+    task: AnnotationTask, has_reference: bool, self_corrected: bool = False
+) -> InlineKeyboardMarkup:
     a = task.attempt_id.hex
     kb = InlineKeyboardBuilder()
     kb.button(text=t.BTN_OK, callback_data=AnnotateAct(a=a, act="ok"))
     kb.button(text=t.BTN_FIX, callback_data=AnnotateAct(a=a, act="fix"))
+    kb.button(
+        text=t.BTN_SELF_ON if self_corrected else t.BTN_SELF,
+        callback_data=AnnotateAct(a=a, act="self"),
+    )
     kb.button(text=t.BTN_BAD, callback_data=AnnotateAct(a=a, act="bad"))
     kb.button(text=t.BTN_OFF, callback_data=AnnotateAct(a=a, act="off"))
     if has_reference:
         kb.button(text=t.BTN_REF, callback_data=AnnotateAct(a=a, act="ref"))
     kb.button(text=t.BTN_SKIP, callback_data=AnnotateAct(a=a, act="skip"))
     kb.button(text=t.BTN_STOP, callback_data=AnnotateAct(a=a, act="stop"))
-    kb.adjust(1, 1, 2, *((1,) if has_reference else ()), 2)
+    kb.adjust(1, 1, 1, 2, *((1,) if has_reference else ()), 2)
     return kb.as_markup()
 
 
@@ -165,6 +172,7 @@ async def fixed_phonemes(
         saved = await submit.execute(
             learner, attempt, AnnotationStatus.FIX, actual=m.text or "",
             seconds_spent=_seconds(tg, attempt),
+            self_corrected=(tg, attempt) in _self_corrected,
         )  # fmt: skip
     except LabelError as error:
         _shown_at.setdefault((tg, attempt), time.monotonic())
@@ -174,8 +182,26 @@ async def fixed_phonemes(
         _fixing.pop(tg, None)
         raise SkipHandler from None
     _fixing.pop(tg, None)
+    _self_corrected.discard((tg, attempt))
     await m.answer(t.SAVED if saved else t.GONE)
     await _show_next(bot, m.chat.id, learner, uc, library)
+
+
+async def _toggle_self_correction(
+    message: Message,
+    tg: int,
+    attempt: UUID,
+    submit: SubmitAnnotation,
+    library: ReferenceAudioLibrary,
+) -> None:
+    """«🔁 Сам исправился» — переключатель до ответа; галочка на кнопке показывает состояние."""
+    key = (tg, attempt)
+    _self_corrected.symmetric_difference_update({key})
+    task = await submit.tasks.get(attempt)
+    if task is not None:
+        markup = _keyboard(task, library.has(task.item_id), key in _self_corrected)
+        with suppress(TelegramBadRequest):
+            await message.edit_reply_markup(reply_markup=markup)
 
 
 @router.callback_query(AnnotateAct.filter())
@@ -207,6 +233,8 @@ async def act(
                 t.FIX_ASK.format(bot_heard=escape(task.bot_heard if task else "")),
                 reply_markup=_cancel(attempt),
             )
+        case "self":
+            await _toggle_self_correction(cb.message, tg, attempt, submit, library)
         case "cancel":
             _fixing.pop(tg, None)
             await _drop_buttons(cb)
@@ -219,6 +247,7 @@ async def act(
             name = "reference.ogg" if audio[:4] == b"OggS" else "reference.mp3"
             await bot.send_audio(chat_id, BufferedInputFile(audio, filename=name))
         case "skip":
+            _self_corrected.discard((tg, attempt))
             _skipped.setdefault(tg, set()).add(attempt)
             _shown_at.pop((tg, attempt), None)
             await _drop_buttons(cb)
@@ -230,11 +259,16 @@ async def act(
         case act_name if act_name in _STATUS:
             try:
                 saved = await submit.execute(
-                    learner, attempt, _STATUS[act_name], seconds_spent=_seconds(tg, attempt)
-                )
+                    learner, attempt, _STATUS[act_name], seconds_spent=_seconds(tg, attempt),
+                    self_corrected=(tg, attempt) in _self_corrected,
+                )  # fmt: skip
             except NotAnnotator:  # доступ отозвали, пока запись была на экране
                 await cb.answer()
                 return
+            except LabelError as error:  # «сам исправился» у плохой записи или чужого текста
+                await cb.answer(str(error), show_alert=True)
+                return
+            _self_corrected.discard((tg, attempt))
             await _drop_buttons(cb)
             await cb.message.answer(t.SAVED if saved else t.GONE)
             await _show_next(bot, chat_id, learner, uc, library)

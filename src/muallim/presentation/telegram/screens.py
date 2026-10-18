@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from html import escape
 
+from aiogram.enums import ButtonStyle
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -67,10 +68,6 @@ def _home_row(kb: InlineKeyboardBuilder, *extra: tuple[str, object]) -> None:
     for text, data in extra:
         kb.button(text=text, callback_data=data)  # type: ignore[arg-type]
     kb.button(text=texts.HOME_BUTTON, callback_data=Home())
-
-
-def _short(lesson: Lesson) -> str:
-    return lesson.title
 
 
 def _letter_of(lesson: Lesson) -> str:
@@ -143,13 +140,14 @@ def home(curriculum: Curriculum, progress: Progress) -> Screen:
 
 
 def _days(n: int) -> str:
+    one, few, many = texts.DAY_FORMS
     if n % 10 == 1 and n % 100 != 11:
-        word = "день"
+        word = one
     elif 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
-        word = "дня"
+        word = few
     else:
-        word = "дней"
-    return f"{n} {word}" if n else "0 дней — начни сегодня"
+        word = many
+    return f"{n} {word}" if n else texts.STREAK_ZERO
 
 
 # ---------- уроки: части книги → уроки части ----------
@@ -337,10 +335,10 @@ def result(curriculum: Curriculum, r: RecitationResult, has_audio: bool) -> Scre
         parts.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
     if r.next_item is None:
         parts.append(texts.LAST_ITEM)
-    research = (
-        "<blockquote expandable>🔬 Для исследования\n"
-        f"{texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id))}\n"
-        f"Эталон: {escape(a.reference)}\nУслышано: {escape(a.heard)}</blockquote>"
+    research = texts.RESEARCH_BLOCK.format(
+        code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
+        reference=escape(a.reference),
+        heard=escape(a.heard),
     )
     details = ""
     if r.feedback:
@@ -479,7 +477,9 @@ def progress(curriculum: Curriculum, p: Progress) -> Screen:
         )
         if lp.weak:
             line += "\n    " + texts.PROGRESS_REPEAT.format(
-                items=", ".join(f"строка {lp.lesson.items.index(i) + 1}" for i in lp.weak[:5])
+                items=", ".join(
+                    texts.PROGRESS_ITEM.format(n=lp.lesson.items.index(i) + 1) for i in lp.weak[:5]
+                )
             )
         lines.append(line)
     if not shown:
@@ -508,10 +508,18 @@ def help_screen() -> Screen:
 def privacy(research_consent: bool) -> Screen:
     kb = InlineKeyboardBuilder()
     if research_consent:
-        kb.button(text="🚫 Запретить запись", callback_data=Consent(granted=False, then="privacy"))
+        kb.button(
+            text=texts.PRIVACY_DENY_BUTTON, callback_data=Consent(granted=False, then="privacy")
+        )
     else:
-        kb.button(text="✅ Разрешить запись", callback_data=Consent(granted=True, then="privacy"))
-    kb.button(text="🗑 Удалить мои данные", callback_data=DeleteData(confirmed=False))
+        kb.button(
+            text=texts.PRIVACY_ALLOW_BUTTON, callback_data=Consent(granted=True, then="privacy")
+        )
+    kb.button(
+        text=texts.PRIVACY_DELETE_BUTTON,
+        callback_data=DeleteData(confirmed=False),
+        style=ButtonStyle.DANGER,
+    )
     _home_row(kb)
     kb.adjust(1)
     return Screen(views.privacy(research_consent), kb.as_markup())
@@ -545,9 +553,16 @@ def quiz_answer(q: Question, picked: int) -> Screen:
         prompt=escape(q.prompt), answer=escape(q.correct), picked=escape(q.options[picked])
     )
     kb = InlineKeyboardBuilder()
-    kb.button(text=texts.QUIZ_NEXT, callback_data=Quiz())
+    # Варианты остаются на экране в цвете (Bot API 9.4): верный — зелёный, выбранный неверный —
+    # красный. Нажать их снова нельзя (Noop); старые клиенты цвет не покажут — подпись главнее.
+    for k, option in enumerate(q.options):
+        style = (
+            ButtonStyle.SUCCESS if k == q.answer else ButtonStyle.DANGER if k == picked else None
+        )
+        kb.button(text=option, callback_data=Noop(), style=style)
+    kb.button(text=texts.QUIZ_NEXT, callback_data=Quiz(), style=ButtonStyle.PRIMARY)
     _home_row(kb)
-    kb.adjust(2)
+    kb.adjust(2, 2, 2)
     image = render.card(q.prompt, set(), (0, 1)) if render.available() else None
     return Screen(caption, kb.as_markup(), image, f"quiz:{q.item_id}:{q.vowel}")
 

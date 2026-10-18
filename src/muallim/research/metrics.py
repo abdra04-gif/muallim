@@ -27,7 +27,7 @@ STUB = "stub"
 AGREE, FIX = "agree", "fix"  # разметчик согласен с ботом / исправил, что прозвучало
 USABLE = frozenset({AGREE, FIX})  # попытку можно оценить
 UNUSABLE = frozenset({"audio_unusable", "off_task"})
-STATUSES = USABLE | UNUSABLE  # метки руководства 2.0; старые (1.0, без фонем) в метрики не входят
+STATUSES = USABLE | UNUSABLE  # метки руководства 2.x; старые (1.0, без фонем) в метрики не входят
 RETURN_DAYS = 7
 
 
@@ -247,6 +247,18 @@ class Failures:
 
 
 @dataclass(frozen=True, slots=True)
+class SelfCorrection:
+    """Попытки, где ученик ошибся и тут же сам перечитал верно (руководство 2.1, ADR-0044).
+
+    Отдельно от главных цифр RQ-1: достаточно отметки одного разметчика — попытка целиком здесь.
+    """
+
+    attempts: int
+    phonemes: PhonemeCounts
+    quality: MddQuality
+
+
+@dataclass(frozen=True, slots=True)
 class Metrics:
     phonemes: PhonemeCounts
     quality: MddQuality
@@ -264,6 +276,7 @@ class Metrics:
     response: ResponseTime
     failures: Failures
     retention: Retention
+    self_corrected: SelfCorrection
 
 
 @dataclass(frozen=True, slots=True)
@@ -274,6 +287,7 @@ class _Label:
     heard: str
     bot_passed: bool
     policy: GradingPolicy
+    self_corrected: bool
 
 
 async def collect(session: AsyncSession, today: date) -> Metrics:
@@ -288,8 +302,13 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
     )
     pairs: list[tuple[bool, bool]] = []
     usable: dict[UUID, dict[str, tuple[bool, frozenset[int], int]]] = defaultdict(dict)
+    self_marked = {attempt_id for (attempt_id, _), lab in labels.items() if lab.self_corrected}
+    self_counts = PhonemeCounts()
     for (attempt_id, annotator), lab in sorted(labels.items(), key=lambda kv: kv[0][1]):
         if lab.status not in USABLE or lab.actual is None:
+            continue
+        if attempt_id in self_marked:  # самоисправление — отдельный блок, не в главных цифрах
+            self_counts += phoneme_decisions(lab.reference, lab.heard, lab.actual)
             continue
         counts += phoneme_decisions(lab.reference, lab.heard, lab.actual)
         by_model = phoneme_errors(lab.reference, lab.heard)
@@ -343,6 +362,7 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
         _review((annotator, lab.status, lab.bot_passed) for (_, annotator), lab in labels.items()),
         len(per_attempt), sum(1 for n in per_attempt.values() if n >= 2),
         response, await _failures(session), retention(days, today),
+        SelfCorrection(len(self_marked), self_counts, mdd_quality(self_counts)),
     )  # fmt: skip
 
 
@@ -355,15 +375,16 @@ async def _latest_labels(
             annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
             annotations.c.corrected_phonemes, attempts.c.reference_phonemes,
             attempts.c.heard_phonemes, attempts.c.verdict, attempts.c.policy,
+            annotations.c.self_corrected,
         )
         .join(attempts, attempts.c.id == annotations.c.attempt_id)
         .where(real, annotations.c.label.in_(STATUSES))
         .order_by(annotations.c.created_at, annotations.c.id)
     )  # fmt: skip
     latest: dict[tuple[UUID, str], _Label] = {}
-    for attempt_id, annotator, status, actual, reference, heard, verdict, policy in rows.all():
+    for attempt_id, annotator, status, actual, reference, heard, verdict, policy, own in rows.all():
         latest[(attempt_id, annotator)] = _Label(
-            status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy)
+            status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy), bool(own)
         )
     return latest
 
@@ -409,6 +430,12 @@ KIND_COLUMNS = (
 
 def render(m: Metrics) -> str:
     q, c, v, t, f, r = m.quality, m.phonemes, m.verdicts, m.response, m.failures, m.retention
+    sc, sq = m.self_corrected.phonemes, m.self_corrected.quality
+    own = [
+        ("precision", _num(sq.precision), f"TR {sc.tr}, FR {sc.fr}"),
+        ("recall", _num(sq.recall), f"TR {sc.tr}, FA {sc.fa}"),
+        ("F1", _num(sq.f1), ""),
+    ]
     quality = [
         ("precision", _num(q.precision), f"TR {c.tr}, FR {c.fr}"),
         ("recall", _num(q.recall), f"TR {c.tr}, FA {c.fa}"),
@@ -448,6 +475,16 @@ def render(m: Metrics) -> str:
             f"{m.double_annotated}. Фонем: TA {c.ta}, FR {c.fr}, FA {c.fa}, TR {c.tr}.",
             "",
             to_markdown_table(("метрика", "значение", "из чего"), quality),
+            "",
+            "## Самоисправления (руководство 2.1)",
+            "",
+            "Ученик ошибся и тут же сам перечитал верно — в одном голосовом. Такие попытки не "
+            "входят в цифры выше (ADR-0044); хватает отметки одного разметчика.",
+            "",
+            f"Попыток: {m.self_corrected.attempts}. Фонем: TA {sc.ta}, FR {sc.fr}, FA {sc.fa}, "
+            f"TR {sc.tr}.",
+            "",
+            to_markdown_table(("метрика", "значение", "из чего"), own),
             "",
             "## Согласие разметчиков с ботом",
             "",

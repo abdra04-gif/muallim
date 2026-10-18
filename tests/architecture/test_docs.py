@@ -202,12 +202,18 @@ def test_ready_figures_exist() -> None:
     assert not missing, missing
 
 
-def test_trace_script_runs() -> None:
+def test_trace_script_runs(tmp_path: Path) -> None:
+    """Скрипт пишет туда, куда сказано: прогон тестов не портит статус в git (TD-FN-67)."""
+    tracked = DOCS / "requirements" / "verification-status.md"
+    before = tracked.read_bytes()
+    out = tmp_path / "status.md"
     result = subprocess.run(  # noqa: S603
-        [sys.executable, str(ROOT / "scripts" / "trace.py"), "--no-tests"],
+        [sys.executable, str(ROOT / "scripts" / "trace.py"), "--no-tests", "--out", str(out)],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=False,
     )
     assert result.returncode == 0, result.stderr
+    assert out.is_file() and "Статус трассировки" in out.read_text(encoding="utf-8")
+    assert tracked.read_bytes() == before, "тест перезаписал verification-status.md"

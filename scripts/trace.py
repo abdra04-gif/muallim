@@ -158,10 +158,12 @@ def render(results: dict[str, Counter[str]] | None) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--no-tests", action="store_true", help="не прогонять pytest")
+    parser.add_argument("--out", type=Path, default=OUT, help="куда писать (тесты — во временный)")
     args = parser.parse_args()
     results = None if args.no_tests else run_tests()
-    OUT.write_text(render(results), encoding="utf-8")
-    print(f"→ {OUT.relative_to(ROOT)}")
+    out: Path = args.out
+    out.write_text(render(results), encoding="utf-8")
+    print(f"→ {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}")
 
 
 if __name__ == "__main__":

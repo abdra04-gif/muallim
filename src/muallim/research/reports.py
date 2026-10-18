@@ -1,5 +1,6 @@
 """Отчёт по данным исследования: выполняет analytics/sql/*.sql и собирает Markdown."""
 
+import asyncio
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
@@ -27,6 +28,11 @@ def _title(sql: str, fallback: str) -> str:
     return first.removeprefix("--").strip() if first.startswith("--") else fallback
 
 
+def _read_queries(sql_dir: Path) -> list[tuple[Path, str]]:
+    """Файлы читаются в отдельном потоке: в async-функции диск не блокирует цикл событий."""
+    return [(path, path.read_text(encoding="utf-8")) for path in sorted(sql_dir.glob("*.sql"))]
+
+
 async def build_report(engine: AsyncEngine, sql_dir: Path, generated_at: datetime) -> str:
     parts = [
         "# Отчёт по данным исследования",
@@ -35,9 +41,9 @@ async def build_report(engine: AsyncEngine, sql_dir: Path, generated_at: datetim
         f"БД: `{engine.dialect.name}`, запросы: `{sql_dir.name}/`",
         "",
     ]
+    queries = await asyncio.to_thread(_read_queries, sql_dir)
     async with engine.connect() as conn:
-        for path in sorted(sql_dir.glob("*.sql")):
-            sql = path.read_text(encoding="utf-8")
+        for path, sql in queries:
             result = await conn.execute(text(sql))
             parts += [
                 f"## {_title(sql, path.stem)}",

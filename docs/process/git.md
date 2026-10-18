@@ -39,7 +39,7 @@ Refs: FR-…, ADR-…, TD-…
 | каждое завершение ответа агента | архитектура, типы, тесты (если менялся код); связанные документы | `stop_gate`, `doc_sync` |
 | перед коммитом | запрещённые пути, секреты | `git_guard`, pre-commit |
 | перед push | архитектура, типы, тесты | `git_guard` |
-| после push | всё, как `make check`, + gitleaks, pip-audit | GitHub Actions (`.github/workflows/ci.yml`) |
+| после push | всё, как `make check`, + gitleaks, pip-audit, `make hygiene` | GitHub Actions (`.github/workflows/ci.yml`) |
 | перед коммитом, смысл | документы правдивы, ничего не потеряно | агент `consistency-auditor` в `/ship` |
 
 ## Как найти, откуда что взялось

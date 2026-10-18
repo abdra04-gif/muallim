@@ -24,6 +24,7 @@ from muallim.domain.annotation import (
     Label,
     check_label,
     check_phonemes,
+    check_self_correction,
     clean_phonemes,
     invite_digest,
 )
@@ -139,6 +140,7 @@ class SubmitAnnotation:
         actual: str | None = None,
         comment: str = "",
         seconds_spent: int | None = None,
+        self_corrected: bool = False,
     ) -> bool:
         """Сохраняет метку. False — попытки больше нет (ученик удалил данные или отозвал согласие).
 
@@ -155,10 +157,11 @@ class SubmitAnnotation:
             phonemes = clean_phonemes(actual or "")
             check_phonemes(phonemes)
         check_label(status, phonemes, task.bot_heard)
+        check_self_correction(status, self_corrected=self_corrected)
         await self.tasks.add(
             Label(
                 attempt_id, annotator, status, phonemes, comment.strip(),
-                AnnotationSource.TELEGRAM, seconds_spent, self.clock.now(),
+                AnnotationSource.TELEGRAM, seconds_spent, self.clock.now(), self_corrected,
             )
         )  # fmt: skip
         await self.events.record(

@@ -7,6 +7,7 @@
 `consistency-auditor`. Повторный Stop (stop_hook_active) пропускается — без вечной петли.
 """
 
+import ast
 import re
 import subprocess
 import sys
@@ -51,11 +52,47 @@ def head_text(path: str) -> str:
 
 
 def constants(source: str, pattern: str) -> dict[str, str]:
-    """Значения строковых констант верхнего уровня (NAME = ( … ) или NAME = "…")."""
+    """Значения текстовых констант верхнего уровня: NAME = ( … ), NAME = { … } или NAME = "…"."""
     found = {}
-    for m in re.finditer(rf"^({pattern}) = (\(.*?^\)|\".*?\")$", source, re.MULTILINE | re.DOTALL):
+    value = r"(\(.*?^\)|\{.*?^\}|\".*?\")$"
+    for m in re.finditer(rf"^({pattern}) = {value}", source, re.MULTILINE | re.DOTALL):
         found[m.group(1)] = m.group(2)
     return found
+
+
+def literals(source: str) -> list[str]:
+    """Строковые литералы в порядке текста; не разобралось — пусто (значит, не перенос)."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    nodes = [n for n in ast.walk(tree) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+    return [n.value for n in sorted(nodes, key=lambda n: (n.lineno, n.col_offset))]
+
+
+def moved_verbatim(value: str) -> bool:
+    """Новая константа повторяет строки, которые ученик уже видел, в том же порядке.
+
+    Перенос кнопок из keyboards.py в texts.py не меняет того, что видел ученик, — версия текста не
+    поднимается. Новые слова или перепутанные пары «код → подпись» — уже другой текст (TD-FN-57).
+    """
+    wanted = literals(value)
+    if not wanted:
+        return False
+    package = "src/muallim/presentation/telegram/"
+    for path in git("ls-tree", "-r", "--name-only", "HEAD", package).splitlines():
+        if not path.endswith(".py"):
+            continue
+        seen = literals(head_text(path))
+        if any(seen[i : i + len(wanted)] == wanted for i in range(len(seen) - len(wanted) + 1)):
+            return True
+    return False
+
+
+def versioned_text_changed(now: dict[str, str], before: dict[str, str]) -> bool:
+    if any(now.get(name) != value for name, value in before.items()):
+        return True
+    return any(name not in before and not moved_verbatim(value) for name, value in now.items())
 
 
 def text_versions_problems(changed: set[str]) -> list[str]:
@@ -67,7 +104,7 @@ def text_versions_problems(changed: set[str]) -> list[str]:
     versions_before = head_text(VERSIONS)
     problems = []
     for pattern, version in VERSIONED_TEXTS:
-        text_changed = constants(now, pattern) != constants(before, pattern)
+        text_changed = versioned_text_changed(constants(now, pattern), constants(before, pattern))
         same_version = constants(versions_now, version) == constants(versions_before, version)
         if text_changed and same_version:
             problems.append(

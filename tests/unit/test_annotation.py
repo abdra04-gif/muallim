@@ -25,6 +25,7 @@ from muallim.domain.annotation import (
     LabelError,
     check_label,
     check_phonemes,
+    check_self_correction,
     clean_phonemes,
     invite_digest,
     valid_annotator_code,
@@ -233,6 +234,38 @@ async def test_label_for_deleted_attempt_is_not_saved() -> None:
     w = World()
     gone = await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=99), AnnotationStatus.AGREE)
     assert gone is False and w.tasks.labels == []
+
+
+# ---------- самоисправление: отдельная категория (решение автора 2026-10-18, SRC-068) ----------
+def test_self_correction_only_where_reading_can_be_judged() -> None:
+    """«Сам исправился» — про чтение; у плохой записи и чужого текста чтения не слышно."""
+    for status in (AnnotationStatus.AGREE, AnnotationStatus.FIX):
+        check_self_correction(status, self_corrected=True)
+    for status in AnnotationStatus:
+        check_self_correction(status, self_corrected=False)
+    for status in (AnnotationStatus.AUDIO_UNUSABLE, AnnotationStatus.OFF_TASK):
+        with pytest.raises(LabelError, match="сам исправился"):
+            check_self_correction(status, self_corrected=True)
+
+
+async def test_self_correction_is_saved_beside_agree_and_fix() -> None:
+    """Отдельно от «бот прав / бот ошибся»: ответ модели оценивается как обычно."""
+    w = World()
+    submit, me = w.submit(), _learner(ANNOTATOR_TG)
+    await submit.execute(me, UUID(int=1), AnnotationStatus.AGREE, self_corrected=True)
+    await submit.execute(me, UUID(int=2), AnnotationStatus.FIX, actual="صَ", self_corrected=True)
+    assert [(lb.status, lb.self_corrected) for lb in w.tasks.labels] == [
+        (AnnotationStatus.AGREE, True), (AnnotationStatus.FIX, True),
+    ]  # fmt: skip
+    with pytest.raises(LabelError):
+        await submit.execute(me, UUID(int=1), AnnotationStatus.OFF_TASK, self_corrected=True)
+    assert len(w.tasks.labels) == 2
+
+
+async def test_without_mark_reading_is_not_self_corrected() -> None:
+    w = World()
+    await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=1), AnnotationStatus.AGREE)
+    assert w.tasks.labels[-1].self_corrected is False
 
 
 # ---------- настройки ----------

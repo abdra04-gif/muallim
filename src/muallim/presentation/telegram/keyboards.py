@@ -1,3 +1,4 @@
+from aiogram.enums import ButtonStyle
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -21,22 +22,21 @@ def dispute_reasons(attempt_hex: str) -> InlineKeyboardMarkup:
 
 def consent() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.button(text="✅ Да, разрешаю", callback_data=Consent(granted=True))
-    kb.button(text="🚫 Нет", callback_data=Consent(granted=False))
+    kb.button(text=texts.CONSENT_YES_BUTTON, callback_data=Consent(granted=True))
+    kb.button(text=texts.CONSENT_NO_BUTTON, callback_data=Consent(granted=False))
     return kb.as_markup()
 
 
 def profile_adult() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.button(text="Да, мне 18+", callback_data=Profile(adult=True))
-    kb.button(text="Нет", callback_data=Profile(adult=False))
+    kb.button(text=texts.PROFILE_ADULT_YES, callback_data=Profile(adult=True))
+    kb.button(text=texts.PROFILE_ADULT_NO, callback_data=Profile(adult=False))
     return kb.as_markup()
 
 
 def profile_language() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    options = (("ru", "Русский"), ("kk", "Казахский"), ("tt", "Татарский"), ("other", "Другой"))
-    for code, label in options:
+    for code, label in texts.PROFILE_LANGUAGES.items():
         kb.button(text=label, callback_data=Profile(adult=True, lang=code))
     kb.adjust(2)
     return kb.as_markup()
@@ -44,12 +44,7 @@ def profile_language() -> InlineKeyboardMarkup:
 
 def profile_reading(lang: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    options = (
-        ("none", "Совсем нет"),
-        ("some_letters", "Знаю некоторые буквы"),
-        ("slow_syllables", "Читаю медленно, по слогам"),
-    )
-    for code, label in options:
+    for code, label in texts.PROFILE_READING_OPTIONS.items():
         kb.button(text=label, callback_data=Profile(adult=True, lang=lang, read=code))
     kb.adjust(1)
     return kb.as_markup()
@@ -57,7 +52,11 @@ def profile_reading(lang: str) -> InlineKeyboardMarkup:
 
 def delete_confirm() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.button(text="🗑 Да, удалить всё", callback_data=DeleteData(confirmed=True))
-    kb.button(text="Отмена", callback_data=Home())
+    kb.button(
+        text=texts.DELETE_YES_BUTTON,
+        callback_data=DeleteData(confirmed=True),
+        style=ButtonStyle.DANGER,
+    )
+    kb.button(text=texts.CANCEL_BUTTON, callback_data=Home())
     kb.adjust(1)
     return kb.as_markup()

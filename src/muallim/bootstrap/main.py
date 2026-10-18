@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import sys
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher, Router
@@ -65,5 +66,10 @@ async def main() -> None:
 
 
 def run() -> None:
+    if sys.argv[1:2] == ["--test"]:  # проверка из терминала, без Telegram и .env (TD-FN-61)
+        from muallim.bootstrap import console  # noqa: PLC0415 — console импортирует этот модуль
+
+        print(asyncio.run(console.run_console(sys.argv[2:] or ["/start"])))  # noqa: T201
+        return
     with suppress(KeyboardInterrupt):
         asyncio.run(main())

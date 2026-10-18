@@ -189,6 +189,8 @@ annotations = Table(
     Column("created_at", UtcDateTime(), nullable=False),
     Column("source", String(16)),  # excel | telegram (FR-17); NULL — до миграции 0005
     Column("seconds_spent", Integer),  # от показа записи до ответа; только Telegram
+    # ученик ошибся и сам перечитал верно — отдельная категория; NULL — до руководства 2.1
+    Column("self_corrected", Boolean),
 )
 
 # Разметчики по приглашению и отозванные (FR-17). Разметчики из ANNOTATOR_IDS живут в настройках;

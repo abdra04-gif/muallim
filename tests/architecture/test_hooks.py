@@ -164,6 +164,7 @@ def hook_json(project: Path, name: str, event: dict[str, object]) -> dict[str, o
         ("Write", "migrations/versions/0009_x.py"),
         ("Edit", "pyproject.toml"),
         ("Edit", ".claude/hooks/guard.py"),
+        ("Edit", "src/muallim/research/metrics.py"),  # оценщик RQ-1 заморожен (TD-FN-60)
     ],
 )
 def test_human_zones_ask(project: Path, tool: str, value: str) -> None:
@@ -296,6 +297,49 @@ def test_doc_sync_wants_new_consent_version(repo: Path) -> None:
     (repo / "CHANGELOG.md").write_text("# log\n- согласие\n", encoding="utf-8")
     result = doc_sync(repo)
     assert result.returncode == 2 and "CONSENT_TEXT_VERSION" in result.stderr
+
+
+QUESTIONNAIRE = {
+    "src/muallim/presentation/telegram/keyboards.py": (
+        'OPTIONS = (("ru", "Русский"), ("kk", "Казахский"))\n'
+    ),
+    "src/muallim/application/use_cases/learners.py": (
+        'CONSENT_TEXT_VERSION = "1"\nQUESTIONNAIRE_VERSION = "1"\n'
+    ),
+}
+
+
+def _with_questionnaire(repo: Path) -> Path:
+    for name, text in QUESTIONNAIRE.items():
+        (repo / name).parent.mkdir(parents=True, exist_ok=True)
+        (repo / name).write_text(text, encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-qm", "анкета")
+    (repo / "CHANGELOG.md").write_text("# log\n- тексты в texts.py\n", encoding="utf-8")
+    return repo / "src/muallim/presentation/telegram/texts.py"
+
+
+def test_doc_sync_verbatim_move_needs_no_new_version(repo: Path) -> None:
+    """Перенос кнопок анкеты в texts.py без правки слов — ученик видит то же (TD-FN-57)."""
+    texts = _with_questionnaire(repo)
+    moved = '\nPROFILE_LANGUAGES = {\n    "ru": "Русский",\n    "kk": "Казахский",\n}\n'
+    texts.write_text(texts.read_text(encoding="utf-8") + moved, encoding="utf-8")
+    assert doc_sync(repo).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "edited",
+    [
+        '\nPROFILE_LANGUAGES = {\n    "ru": "Русский язык",\n    "kk": "Казахский",\n}\n',
+        '\nPROFILE_LANGUAGES = {\n    "ru": "Казахский",\n    "kk": "Русский",\n}\n',
+    ],
+)
+def test_doc_sync_edited_questionnaire_needs_new_version(repo: Path, edited: str) -> None:
+    """Новые слова или перепутанные ответы — это другая анкета: версию поднять."""
+    texts = _with_questionnaire(repo)
+    texts.write_text(texts.read_text(encoding="utf-8") + edited, encoding="utf-8")
+    result = doc_sync(repo)
+    assert result.returncode == 2 and "QUESTIONNAIRE_VERSION" in result.stderr
 
 
 def test_doc_sync_does_not_loop(repo: Path) -> None:

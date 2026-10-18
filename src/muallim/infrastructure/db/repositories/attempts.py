@@ -81,7 +81,7 @@ class SqlAttemptRepository(AttemptRepository):
             .where(attempts.c.learner_id == learner_id)
             .group_by(attempts.c.item_id)
         )
-        return {item_id: score for item_id, score in (await self.session.execute(query)).all()}
+        return dict((await self.session.execute(query)).tuples().all())
 
     async def last_assessment(self, learner_id: UUID, item_id: str) -> Assessment | None:
         query = (

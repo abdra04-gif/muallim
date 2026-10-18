@@ -32,6 +32,7 @@ from muallim.domain.annotation import (
     LabelError,
     check_label,
     check_phonemes,
+    check_self_correction,
     clean_phonemes,
     valid_annotator_code,
 )
@@ -49,8 +50,11 @@ __all__ = [
 PACKAGE_COLUMNS: Final = (
     "n", "attempt_id", "annotator", "audio", "item_id", "item_text", "page", "line",
     "learner_says", "bot_verdict", "bot_errors", "reference_phonemes", "bot_heard",
-    "actual_phonemes", "status", "comment",
+    "actual_phonemes", "status", "self_corrected", "comment",
 )  # fmt: skip
+# «Сам исправился» (руководство 2.1): «да» — ученик ошибся и сам перечитал верно; пусто — нет.
+_YES: Final = frozenset({"да", "1", "yes", "y", "+"})
+_NO: Final = frozenset({"", "нет", "0", "no", "n", "-"})
 _REQUIRED: Final = ("attempt_id", "annotator", "actual_phonemes", "status")
 _LEARNER_SAYS: Final = {
     "read_correctly": "«я прочитал правильно»",
@@ -117,7 +121,7 @@ async def export_package(
                     "bot_verdict": "не засчитано" if r.verdict == Verdict.FAILED else "засчитано",
                     "bot_errors": errors.get(r.id, ""), "reference_phonemes": r.reference_phonemes,
                     "bot_heard": r.heard_phonemes, "actual_phonemes": r.heard_phonemes,
-                    "status": "", "comment": "",
+                    "status": "", "self_corrected": "", "comment": "",
                 }
             )  # fmt: skip
     return len(rows)
@@ -135,6 +139,20 @@ class _Label:
     status: AttemptStatus
     actual: str | None
     comment: str
+    self_corrected: bool
+
+
+def _self_corrected(row: dict[str, str], line_no: int, status: AttemptStatus) -> bool:
+    """Колонки может не быть (пакет до руководства 2.1) — тогда «нет»."""
+    value = (row.get("self_corrected") or "").strip().lower()
+    if value not in _YES | _NO:
+        raise AnnotationError(f"Строка {line_no}: self_corrected — «да» или пусто, а не {value!r}")
+    flag = value in _YES
+    try:
+        check_self_correction(status, self_corrected=flag)
+    except LabelError as error:
+        raise AnnotationError(f"Строка {line_no}: {error}") from error
+    return flag
 
 
 def _parse(row: dict[str, str], line_no: int, annotator: str) -> _Label | None:
@@ -160,7 +178,7 @@ def _parse(row: dict[str, str], line_no: int, annotator: str) -> _Label | None:
             raise AnnotationError(f"Строка {line_no}: {error}") from error
     return _Label(
         line_no, attempt_id, status, actual if status in USABLE else None,
-        (row.get("comment") or "").strip(),
+        (row.get("comment") or "").strip(), _self_corrected(row, line_no, status),
     )  # fmt: skip
 
 
@@ -206,25 +224,29 @@ async def import_package(
             learners.c.research_consent.is_(True),
         )
     )
-    heard = {attempt_id: phonemes for attempt_id, phonemes in found.all()}
+    heard = dict(found.tuples().all())
     for label in labels:
         if label.attempt_id in heard:
             _check_against_bot(label, heard[label.attempt_id])
     previous = await session.execute(
         select(
             annotations.c.attempt_id, annotations.c.label, annotations.c.corrected_phonemes,
-            annotations.c.comment,
+            annotations.c.comment, annotations.c.self_corrected,
         )
         .where(annotations.c.attempt_id.in_(ids), annotations.c.annotator == annotator)
         .order_by(annotations.c.created_at, annotations.c.id)
     )  # fmt: skip
-    latest = {a: (status, actual, comment) for a, status, actual, comment in previous.all()}
+    latest = {
+        a: (status, actual, comment, bool(flag))
+        for a, status, actual, comment, flag in previous.all()
+    }
     imported = unchanged = gone = 0
     for label in labels:
         if label.attempt_id not in heard:
             gone += 1
             continue
-        if latest.get(label.attempt_id) == (label.status, label.actual, label.comment):
+        mark = (label.status, label.actual, label.comment, label.self_corrected)
+        if latest.get(label.attempt_id) == mark:
             unchanged += 1
             continue
         await session.execute(
@@ -232,9 +254,10 @@ async def import_package(
                 attempt_id=label.attempt_id, annotator=annotator, label=label.status,
                 corrected_phonemes=label.actual, comment=label.comment,
                 guide_version=GUIDE_VERSION, source=AnnotationSource.EXCEL, created_at=clock.now(),
+                self_corrected=label.self_corrected,
             )
         )  # fmt: skip
-        latest[label.attempt_id] = (label.status, label.actual, label.comment)
+        latest[label.attempt_id] = mark
         imported += 1
     await session.commit()
     return ImportResult(imported, unchanged, len(parsed) - len(labels), gone)

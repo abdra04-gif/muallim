@@ -180,6 +180,49 @@ async def test_reimport_adds_nothing_and_correction_keeps_history(
     assert stored == ["صَ", "سَ"]  # история сохраняется, в метриках — последняя
 
 
+async def test_self_correction_column_is_a_separate_category(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """Колонка self_corrected: «да» — ученик ошибся и сам перечитал верно (SRC-068)."""
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    assert all(r["self_corrected"] == "" for r in rows)  # в пакете пусто — решает разметчик
+    _row(rows, 10).update(status="agree", self_corrected="да")
+    _row(rows, 11).update(status="agree")
+    clock = FixedClock()
+    path = _save_like_excel(rows, tmp_path / "done.csv")
+    assert (await annotation.import_package(session, path, "A1", clock)).imported == 2
+    stored = dict((await session.execute(
+        select(annotations.c.attempt_id, annotations.c.self_corrected)
+    )).tuples().all())  # fmt: skip
+    assert stored == {UUID(int=10): True, UUID(int=11): False}
+
+    _row(rows, 10)["self_corrected"] = ""  # разметчик передумал — это новая метка
+    again = await annotation.import_package(
+        session, _save_like_excel(rows, tmp_path / "again.csv"), "A1", clock
+    )
+    assert (again.imported, again.unchanged) == (1, 1)
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        ({"status": "agree", "self_corrected": "может быть"}, "self_corrected"),
+        ({"status": "off_task", "self_corrected": "да"}, "сам исправился"),
+    ],
+)
+async def test_self_correction_column_is_checked(
+    session: AsyncSession, tmp_path: Path, change: dict[str, str], message: str
+) -> None:
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    _row(rows, 10).update(change)
+    with pytest.raises(annotation.AnnotationError, match=message):
+        await annotation.import_package(
+            session, _save_like_excel(rows, tmp_path / "bad.csv"), "A1", FixedClock()
+        )
+
+
 async def test_import_strips_invisible_marks(session: AsyncSession, tmp_path: Path) -> None:
     """Excel и редакторы добавляют знаки направления письма и неразрывные пробелы."""
     await _seed(session)
@@ -310,6 +353,7 @@ async def test_dataset_carries_every_annotator_and_consensus(
     by_id = {r["attempt_id"]: r for r in await dataset.dataset_rows(session)}
     first = by_id[str(UUID(int=10))]
     assert [a["annotator"] for a in first["annotations"]] == ["A1", "A2"]
+    assert all(a["self_corrected"] is False for a in first["annotations"])
     assert first["consensus_phonemes"] == "سَ"
 
     dataset.write_iqraeval(list(by_id.values()), tmp_path)

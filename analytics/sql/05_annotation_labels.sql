@@ -1,6 +1,7 @@
 -- Разметка: согласие разметчиков с ботом — последняя метка каждого разметчика (docs/data/annotation-guide.md).
 -- agree — бот услышал верно, fix — разметчик исправил; прежние метки разметчика — история, не считаются.
 -- source — откуда метка: excel (пакет tasks.csv) или telegram (FR-17); секунды на запись — только Telegram.
+-- self_corrected — сколько из них «ученик сам исправился» (руководство 2.1, отдельная категория).
 WITH latest AS (
     SELECT
         an.attempt_id,
@@ -8,11 +9,12 @@ WITH latest AS (
         an.label,
         COALESCE(an.source, 'excel') AS source,
         an.seconds_spent,
+        an.self_corrected,
         ROW_NUMBER() OVER (
             PARTITION BY an.attempt_id, an.annotator ORDER BY an.created_at DESC, an.id DESC
         ) AS rn
     FROM annotations an
-    WHERE an.label IN ('agree', 'fix', 'audio_unusable', 'off_task')  -- метки руководства 2.0
+    WHERE an.label IN ('agree', 'fix', 'audio_unusable', 'off_task')  -- метки руководства 2.x
 )
 SELECT
     l.annotator,
@@ -20,6 +22,7 @@ SELECT
     l.label,
     a.verdict AS bot_verdict,
     COUNT(*) AS attempts,
+    SUM(CASE WHEN l.self_corrected THEN 1 ELSE 0 END) AS self_corrected,
     ROUND(AVG(l.seconds_spent), 1) AS avg_seconds
 FROM latest l
 JOIN attempts a ON a.id = l.attempt_id

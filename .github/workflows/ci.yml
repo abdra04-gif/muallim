@@ -24,13 +24,14 @@ jobs:
       # Включает tests/integration/test_postgres.py (миграции и отчёты на настоящем PostgreSQL)
       TEST_POSTGRES_URL: postgresql+asyncpg://test:test@localhost:5432/test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e  # v6.8.0
       # Без extra `ml`: модель для тестов не нужна (ADR-0006)
       - run: sudo apt-get update && sudo apt-get install -y libfribidi0  # арабский текст на картинках (ADR-0024)
       - run: uv sync --frozen --python 3.12
@@ -42,5 +43,7 @@ jobs:
         run: uv run lint-imports
       - name: Тесты и покрытие
         run: uv run pytest -q --cov --cov-report=term-missing:skip-covered
+      - name: Объявленные зависимости и безопасность CI (deptry, zizmor)
+        run: make hygiene
       - name: Уязвимости зависимостей
         run: uv run pip-audit --skip-editable

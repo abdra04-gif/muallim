@@ -6,7 +6,8 @@ readme = "README.md"
 authors = [{ name = "Исмаилов", email = "abdraoper@gmail.com" }]
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "aiogram~=3.20",
+    "aiogram~=3.31",  # ButtonStyle (Bot API 9.4) и BaseSession режима --test (ADR-0043, ADR-0045)
+    "aiohttp>=3.14,<4",
     "alembic~=1.14",
     "asyncpg~=0.30",
     "dishka>=1.8",
@@ -22,6 +23,7 @@ dependencies = [
 ml = [
     "numpy>=1.26",
     "quran-muaalem>=0.2.2",
+    "quran-transcript>=0.6.4",
     "torch>=2.4",
     "transformers>=4.55,<5",
 ]
@@ -33,6 +35,7 @@ muallim-research = "muallim.bootstrap.research_cli:main"
 [dependency-groups]
 dev = [
     "aiosqlite>=0.20",
+    "hypothesis==6.168.3",
     "import-linter>=2.1",
     "mypy>=1.14",
     "pip-audit>=2.7",
@@ -82,7 +85,7 @@ target-version = "py312"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "N", "S", "DTZ", "T20", "SIM", "RUF", "PL"]
+select = ["E", "F", "W", "I", "B", "UP", "N", "S", "DTZ", "T20", "SIM", "RUF", "PL", "ASYNC", "BLE", "C4", "PERF", "RET", "SLF"]
 ignore = [
     "RUF001", "RUF002", "RUF003",  # кириллица и арабский в строках — это норма проекта
     "PLR0913",                      # use case'ы принимают много портов через DI
@@ -90,7 +93,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004", "S311"]
+"tests/**" = ["S101", "PLR2004", "S311", "ASYNC109", "SLF001"]  # поддельный бот повторяет сигнатуры aiogram; тесты смотрят внутрь роутера
 "scripts/**" = ["T201", "S603", "S607"]
 "src/muallim/bootstrap/research_cli.py" = ["T201"]
 "src/muallim/presentation/telegram/handlers.py" = ["PLR0917"]  # aiogram/dishka внедряют зависимости параметрами
@@ -110,6 +113,18 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = ["quran_muaalem.*", "quran_transcript.*", "torch.*", "numpy.*"]
 ignore_missing_imports = true
+
+# ---------- объявленные зависимости: make hygiene (deptry) ----------
+[tool.deptry]
+known_first_party = ["muallim"]
+
+[tool.deptry.package_module_name_map]
+pyyaml = "yaml"
+pillow = "PIL"
+
+[tool.deptry.per_rule_ignores]
+# alembic и asyncpg подключаются строкой (alembic.ini, URL БД), transformers нужен модели Muaalem
+DEP002 = ["alembic", "asyncpg", "transformers"]
 
 # ---------- архитектура: правила слоёв (ADR-0002) ----------
 [tool.importlinter]

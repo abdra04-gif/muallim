@@ -149,6 +149,45 @@ async def test_agreement_with_bot_per_annotator(session: AsyncSession) -> None:
     assert review["T2"].agreement == pytest.approx(1.0) and review["T2"].unusable == 1
 
 
+async def test_self_corrections_are_counted_separately(session: AsyncSession) -> None:
+    """Решение автора 2026-10-18 (ADR-0044): ученик ошибся и тут же сам перечитал верно — в одном
+    голосовом. Такая попытка не входит в главные цифры RQ-1, у неё — свой блок."""
+    await _seed(session)
+    before = await metrics.collect(session, TODAY)
+    learner = Learner(UUID(int=3), 765432198, "L-cccc", "ru", _at(16))
+    await SqlLearnerRepository(session).add(learner)
+    heard = "سَصَ"  # «са…» — и сразу верно «ṣа»
+    result = assess("صَ", heard)
+    await SqlAttemptRepository(session).add(
+        Attempt(UUID(int=6), learner.id, "L01-14", "v1", "muaalem", result,
+                GradingPolicy().verdict(result), None, 900, 1200, _at(16)),
+        tuple("msg" for _ in result.errors),
+    )  # fmt: skip
+    mark = {"detected_error_id": None, "comment": "", "guide_version": "2.1", "created_at": _at(17)}
+    await session.execute(
+        insert(annotations),
+        [
+            {"attempt_id": UUID(int=6), "annotator": "T1", "label": "agree",
+             "corrected_phonemes": heard, "self_corrected": True, **mark},
+            # второй разметчик не отметил — попытка всё равно отдельно: хватает одной отметки
+            {"attempt_id": UUID(int=6), "annotator": "T2", "label": "agree",
+             "corrected_phonemes": heard, "self_corrected": False, **mark},
+        ],
+    )  # fmt: skip
+    await session.commit()
+
+    m = await metrics.collect(session, TODAY)
+    assert m.phonemes == before.phonemes and m.quality == before.quality
+    assert m.verdicts == before.verdicts and m.pairs_bot_teacher == before.pairs_bot_teacher
+    assert m.alpha_units == before.alpha_units
+    own = metrics.phoneme_decisions("صَ", heard, heard)
+    assert m.self_corrected.attempts == 1
+    assert m.self_corrected.phonemes == own + own  # оба разметчика, как в главных цифрах
+    assert m.self_corrected.quality == metrics.mdd_quality(own + own)
+    assert before.self_corrected.attempts == 0
+    assert "## Самоисправления" in metrics.render(m)
+
+
 async def test_annotation_coverage(session: AsyncSession) -> None:
     await _seed(session)
     m = await metrics.collect(session, TODAY)

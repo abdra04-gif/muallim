@@ -104,5 +104,5 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 — fail-closed: любой сбой отменяет действие
         block(f"guard.py упал ({type(exc).__name__}) — действие отменено, сообщи человеку.")

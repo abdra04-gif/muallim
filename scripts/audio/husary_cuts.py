@@ -55,7 +55,7 @@ def phonemes(token: str) -> str | None:
         text = "ء" + text[1:]
     try:
         return str(quran_phonetizer(text + " مَ", MOSHAF, remove_spaces=True).phonemes[:-1])
-    except Exception:
+    except Exception:  # noqa: BLE001 — фонетизатор чужой: строка, которую он не берёт, пропускается
         return None
 
 
@@ -293,7 +293,7 @@ def find_cuts(
         for c in options[:per_token]:
             try:
                 found = try_cut(model, target, c, refs[(c.sura, c.aya)])
-            except Exception as error:
+            except Exception as error:  # noqa: BLE001 — пакетная нарезка: сбой одного аята не останавливает остальные
                 print(f"    {c.sura}:{c.aya}: {error}", file=sys.stderr)
             if found:
                 found.token = token

@@ -184,6 +184,43 @@ def test_quiz_screen_offers_four_answers_and_home(curriculum: Curriculum) -> Non
     assert cb.Quiz().pack() in [d for _, d in _buttons(right.keyboard)]
 
 
+def _styles(kb: InlineKeyboardMarkup) -> dict[str, str | None]:
+    return {b.text: b.style for row in kb.inline_keyboard for b in row}
+
+
+def test_quiz_answer_colours_right_green_and_wrong_pick_red(curriculum: Curriculum) -> None:
+    """Цвет кнопок (Bot API 9.4, SRC-088): верный вариант — зелёный, выбранный неверный — красный.
+
+    Старые клиенты цвет не покажут — подпись «✅/❌» остаётся главной.
+    """
+    q = make_question(curriculum, _letters(curriculum)[:5], seed=7)
+    picked = (q.answer + 1) % 4
+    wrong = screens.quiz_answer(q, picked)
+    styles = _styles(wrong.keyboard)
+    assert styles[q.options[q.answer]] == "success"
+    assert styles[q.options[picked]] == "danger"
+    others = [o for k, o in enumerate(q.options) if k not in (q.answer, picked)]
+    assert all(styles[o] is None for o in others)
+    answered = [d for t, d in _buttons(wrong.keyboard) if t in q.options]
+    assert answered and all(d == cb.Noop().pack() for d in answered)  # повторно не ответить
+    right = _styles(screens.quiz_answer(q, q.answer).keyboard)
+    assert right[q.options[q.answer]] == "success"
+    assert list(right.values()).count("danger") == 0
+    assert right[texts.QUIZ_NEXT] == "primary"
+
+
+def test_deleting_data_is_red_and_consent_is_not_coloured() -> None:
+    """Удаление — опасное действие. Согласие на исследование цветом не подталкиваем: оба ответа
+    равны (этика, TD-SEC-02)."""
+    from muallim.presentation.telegram import keyboards  # noqa: PLC0415
+
+    assert _styles(keyboards.delete_confirm())[texts.DELETE_YES_BUTTON] == "danger"
+    assert _styles(screens.privacy(True).keyboard)[texts.PRIVACY_DELETE_BUTTON] == "danger"
+    assert set(_styles(keyboards.consent()).values()) == {None}
+    assert texts.PRIVACY_DENY_BUTTON in _styles(screens.privacy(True).keyboard)
+    assert _styles(screens.privacy(True).keyboard)[texts.PRIVACY_DENY_BUTTON] is None
+
+
 def _result(c: Curriculum, item_id: str, heard: str, completed: bool) -> RecitationResult:
     item = c.item(item_id)
     a = assess(item.text, heard)

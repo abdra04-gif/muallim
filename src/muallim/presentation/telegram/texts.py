@@ -37,6 +37,11 @@ CONSENT_ON = "разрешено"
 CONSENT_OFF = "запрещено"
 CONSENT_SAVED_YES = "Спасибо! Записи будут помогать улучшать бота 🙏"
 CONSENT_SAVED_NO = "Понял, записи сохраняться не будут."
+CONSENT_YES_BUTTON = "✅ Да, разрешаю"
+CONSENT_NO_BUTTON = "🚫 Нет"
+PRIVACY_DENY_BUTTON = "🚫 Запретить запись"
+PRIVACY_ALLOW_BUTTON = "✅ Разрешить запись"
+PRIVACY_DELETE_BUTTON = "🗑 Удалить мои данные"
 
 # Анкета один раз после согласия (FR-44, ADR-0038). Только кнопки — без свободного текста.
 PROFILE_ADULT = (
@@ -47,29 +52,34 @@ PROFILE_LANGUAGE = "Какой у тебя <b>родной язык</b>?"
 PROFILE_READING = "Читал(а) ли ты по-арабски <b>до этого бота</b>?"
 PROFILE_MINOR = "Хорошо! Учиться можно, а голосовые записи сохранять не будем."
 PROFILE_THANKS = "Спасибо! Больше спрашивать не буду 🙏"
+PROFILE_ADULT_YES = "Да, мне 18+"
+PROFILE_ADULT_NO = "Нет"
+PROFILE_LANGUAGES = {
+    "ru": "Русский",
+    "kk": "Казахский",
+    "tt": "Татарский",
+    "other": "Другой",
+}
+PROFILE_READING_OPTIONS = {
+    "none": "Совсем нет",
+    "some_letters": "Знаю некоторые буквы",
+    "slow_syllables": "Читаю медленно, по слогам",
+}
 
 DELETE_CONFIRM = (
     "⚠️ Удалить <b>все</b> твои данные: прогресс, попытки и записи? Отменить будет нельзя."
 )
 DELETE_DONE = "Готово, все данные удалены. Чтобы начать заново, нажми /start."
+DELETE_YES_BUTTON = "🗑 Да, удалить всё"
+CANCEL_BUTTON = "Отмена"
 
-LESSONS_HEADER = "📋 <b>Уроки</b>"
 SEND_VOICE = "🎙 Отправь <b>голосовое</b> — я проверю чтение. Или выбери урок 👇"
 LISTENING = "🎧 Слушаю, как ты читаешь <b>{item}</b>..."
 RECORD_AGAIN = "Запиши голосовое ещё раз 🎙"
 CANT_PROCESS = "😔 Не получилось обработать запись. Попробуй записать ещё раз, чуть громче."
 STALE_BUTTON = "Эта карточка устарела — выбери урок заново."
 
-CARD_LETTER = (
-    "<b>{text}</b>\n\nБуква: <b>{name}</b>\nЧитается: «{sound}»\n💡 {tip}\n\n"
-    "🎙 Запиши голосовое: прочитай букву с фатхой, кясрой и даммой."
-)
-CARD_LINE = "<b>{text}</b>\n\n🎙 Запиши голосовое: прочитай строку справа налево."
 CARD_NOTE = "📌 {note}"
-CARD_WORD = (
-    "<b>{text}</b>\n\nПо слогам: «{sound}»\nПеревод: {translation}\n\n"
-    "🎙 Запиши голосовое: прочитай слово по слогам или слитно."
-)
 
 VERDICT_EXCELLENT = "✅ <b>Отлично! Прочитано верно.</b>"
 VERDICT_PASSED = "🟡 <b>Почти! Есть небольшие неточности.</b>"
@@ -96,6 +106,11 @@ MORE_HEAD = "👄 Подробнее — как сказать"
 PLAN_LISTEN = "🔁 Послушай 🔊 «Как правильно» и прочитай строку ещё раз."
 PLAN_READ = "🔁 Прочитай строку ещё раз — медленно, по слогам."
 ATTEMPT_CODE = "Попытка № {code}"
+RESEARCH_BLOCK = (
+    "<blockquote expandable>🔬 Для исследования\n"
+    "{code}"
+    "\nЭталон: {reference}\nУслышано: {heard}</blockquote>"
+)
 DISPUTE_BUTTON = "🚩 Бот ошибся"
 DISPUTE_ASK = "Что не так с проверкой попытки № {code}?"
 DISPUTE_REASONS = {
@@ -169,6 +184,9 @@ PROGRESS_HEAD = (
 )
 PROGRESS_NOTHING = "\nПока нет попыток — начни с урока 1 👇"
 PROGRESS_REPEAT = "повторить: {items}"
+PROGRESS_ITEM = "строка {n}"
+DAY_FORMS = ("день", "дня", "дней")  # 1 день, 2 дня, 5 дней
+STREAK_ZERO = "0 дней — начни сегодня"
 HELP = (
     "❓ <b>Как заниматься</b>\n\n"
     "Так учат по «Муаллим сани» с учителем, только проверяет бот:\n"

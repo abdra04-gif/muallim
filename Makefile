@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit
+.PHONY: try thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -27,6 +27,9 @@ test: ## Тесты с покрытием
 
 run: db-sync ## Бот с моделью (нужно uv sync --extra ml)
 	$(LIBS) uv run muallim
+
+try: ## Проверка бота в терминале: make try a='"/start" "✅ Да, разрешаю" "🎤"' (без Telegram и .env)
+	$(LIBS) uv run muallim --test $(if $(a),$(a),"/start")
 
 run-stub: db-sync ## Бот с заглушкой распознавания
 	$(LIBS) ASR_BACKEND=stub uv run muallim
@@ -88,3 +91,7 @@ diagrams: ## Перерисовать схемы в docs/architecture/diagrams
 
 audit: ## Проверка зависимостей на уязвимости
 	uv run pip-audit
+
+hygiene: ## Объявленные зависимости (deptry) и безопасность CI (zizmor); версии закреплены
+	uvx deptry@0.25.1 src
+	uvx zizmor@1.30.1 --offline .github/workflows

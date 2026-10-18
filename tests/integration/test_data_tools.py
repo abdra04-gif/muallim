@@ -51,8 +51,7 @@ def _course(version: str = "v1", text_l02: str = "صَرَفَ صَبَرَ") ->
                        note="Обратите внимание: пары похожих слов"),
         ),
     )  # fmt: skip
-    base = Curriculum("c", version, "t", (lesson,), _lexicon())
-    return base
+    return Curriculum("c", version, "t", (lesson,), _lexicon())
 
 
 def _lexicon() -> Lexicon:

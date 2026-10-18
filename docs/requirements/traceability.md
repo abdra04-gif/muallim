@@ -42,7 +42,7 @@
 | FR-36 | `scripts/book/build.py`, `scripts/book/letters.py`, `scripts/book/rules.py`, `scripts/book/quran.py`, `curriculum/course.ru.yaml`, `book/contents.yaml` | `tests/unit/test_curriculum_content.py` | ADR-0025 | ✅ |
 | FR-37 | `scripts/book/texts.py`, `src/muallim/presentation/telegram/screens.py` | `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py` | ADR-0025, M-13 | ✅ |
 | FR-38 | `src/muallim/presentation/telegram/render.py`, `src/muallim/presentation/telegram/texts.py` | `tests/unit/test_screens.py`, `tests/unit/test_render.py` | ADR-0025 | ✅ |
-| FR-39 | `src/muallim/domain/quiz.py`, `src/muallim/application/use_cases/quiz.py` | `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ADR-0025 | ✅ |
+| FR-39 | `src/muallim/domain/quiz.py`, `src/muallim/application/use_cases/quiz.py`, `src/muallim/presentation/telegram/screens.py` | `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py`, `tests/unit/test_screens.py` | ADR-0025, ADR-0043 | ✅ |
 | FR-40 | `src/muallim/infrastructure/audio/reference_library.py`, `src/muallim/infrastructure/audio/http.py` | `tests/integration/test_reference_audio.py` | ADR-0025 | ✅ |
 | FR-41 | `scripts/book/build.py` | `tests/unit/test_curriculum_content.py` | ADR-0025 | ✅ |
 | FR-42 | `src/muallim/infrastructure/asr/muaalem.py`, `src/muallim/bootstrap/config.py` | `tests/integration/test_di.py` | ADR-0025 | ✅ |
@@ -60,5 +60,8 @@
 | NFR-SEC-04 | `src/muallim/infrastructure/db/tables.py` | `tests/integration/test_sql_repositories.py` | ADR-0010 | ✅ |
 | NFR-MNT-01 | `pyproject.toml` | `tests/architecture/test_layers.py` | ADR-0002 | ✅ |
 | NFR-MNT-03 | `migrations/versions/0001_initial_schema.py` | `tests/architecture/test_migrations.py` | ADR-0004 | ✅ |
+| NFR-SEC-06 | `.github/workflows/ci.yml`, `Makefile` (`make hygiene`), `pyproject.toml` (`[tool.deptry]`) | — проверка в CI: `pip-audit`, deptry, zizmor | ADR-0042 | 🟡 |
+| NFR-MNT-06 | `src/muallim/presentation/telegram/texts.py` | `tests/architecture/test_learner_texts.py` | ADR-0042 | ✅ |
+| NFR-MNT-07 | `src/muallim/bootstrap/console.py` | `tests/integration/test_console.py` | ADR-0045 | ✅ |
 | NFR-SEC-07 | `src/muallim/bootstrap/logs.py`, `docker-compose.yml` | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ADR-0027 | ✅ |
 | NFR-TR-05 | `.github/workflows/links.yml` | `tests/architecture/test_docs.py` | ADR-0028 | 🟡 |

@@ -23,6 +23,7 @@ ZONES: tuple[tuple[str, str], ...] = (
     ("src/muallim/domain/policy.py", "пороги и методика"),
     ("src/muallim/infrastructure/asr/muaalem.py", "параметры чтения MOSHAF_PARAMS"),
     ("docs/pedagogy/methodology.md", "методика"),
+    ("src/muallim/research/metrics.py", "оценщик RQ-1: метрику не правит тот, кого оценивают"),
     ("src/muallim/infrastructure/db/tables.py", "схема БД"),
     ("migrations/versions/", "схема БД"),
     ("pyproject.toml", "зависимости и настройки проверок"),
