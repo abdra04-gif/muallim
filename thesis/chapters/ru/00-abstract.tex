@@ -1,5 +1,6 @@
 % Аннотация (русская и английская) и заявление об использовании ИИ. Дописать после пилота:
 % предложение о результатах помечено \pending, пока у RQ-1…RQ-3 нет чисел с паспортом (docs/thesis/figures.md).
+% С ADR-0051 цель включает адаптацию модели на собственном наборе (RQ-2).
 \chapter*{Аннотация}
 \addcontentsline{toc}{chapter}{Аннотация}
 \thispagestyle{plain}
@@ -12,25 +13,32 @@
 голосовое; открытая модель Quran Muaalem распознаёт фонемы; выравнивание по правилам относит расхождения
 к десяти типам ошибок с привязкой к слогам; ученик получает короткое объяснение на русском и эталонную
 запись. По каждой попытке сохраняется полный след решения, поэтому любой вердикт можно пересчитать.
+Собранные с согласия записи с разметкой преподавателей образуют набор данных, на котором модель
+адаптируется к русскоязычным начинающим: калиброванный верификатор с исходом «не уверен» и
+дообучение низкого ранга (LoRA) с пополнением данных по минимальным парам книги.
 
-Работа выполнена в парадигме design science и оценивает два артефакта. Тренажёр оценивается
-измерением согласия с двумя преподавателями (RQ-1), анализом ошибок начинающих, в котором ошибки
-ученика отделены от ошибок модели (RQ-2), и внутрисубъектным пилотным экспериментом, сравнивающим полные
-объяснения с сигналом «верно / неверно» (RQ-3). Обвязка разработки --- хуки, которые замораживают тесты,
-защищают зоны человека и не дают агенту закончить при красных проверках, вместе с
-субагентами-ревьюерами и журналами --- оценивается как встроенное кейс-стади (RQ-4). Гипотезы и план
-анализа предрегистрированы.
+Работа выполнена в парадигме design science и оценивает три артефакта. Тренажёр оценивается
+измерением согласия готовой модели с двумя преподавателями с отделением ошибок ученика от ошибок модели
+(RQ-1) и внутрисубъектным пилотным экспериментом, сравнивающим полные объяснения с сигналом
+«верно / неверно» (RQ-3). Адаптированная модель оценивается контролируемым экспериментом на
+замороженном тесте из учеников, не участвовавших в обучении, со слепой разметкой: насколько она
+уменьшает ложные отклонения и закрывает разрыв с учителем, не ухудшая чтение экспертов (RQ-2). Обвязка
+разработки --- хуки, которые замораживают тесты и тестовую выборку, защищают зоны человека и не дают агенту
+закончить при красных проверках, вместе с субагентами-ревьюерами и журналами --- оценивается как встроенное
+кейс-стади (RQ-4). Гипотезы, разбиение данных и план анализа предрегистрированы.
 
 Предварительные проверки показывают, что конвейер отличает верное чтение эксперта от неверного
-(99--100 против 40--67 баллов) и отвечает быстрее 10 секунд. \pending{результаты пилота по RQ-1--RQ-3}.
+(99--100 против 40--67 баллов) и отвечает быстрее 10 секунд. \pending{результаты пилота и адаптации по RQ-1--RQ-3}.
 Вклад работы --- первая оценка открытой модели проверки чтения Корана на букварном чтении начинающих,
-для которых арабский не родной, относительно оценки преподавателей; набор данных с двойной разметкой,
-собранный с согласия участников; доказательное описание разработки исследовательского ПО ИИ-агентами под
-механическим контролем.
+для которых арабский не родной, относительно оценки преподавателей; адаптация этой модели к новой
+аудитории на малых данных с честной оценкой на новых учениках; набор данных с разметкой преподавателей
+и воспроизводимый конвейер обучения как основа докторского исследования; доказательное описание
+разработки исследовательского ПО ИИ-агентами под механическим контролем.
 
 \medskip
 \noindent\textbf{Ключевые слова:} компьютерное обучение произношению; обнаружение ошибок произношения;
-чтение Корана; Telegram-бот; design science; ИИ-агенты; обвязка агента.
+чтение Корана; адаптация модели; LoRA; калибровка; Telegram-бот; design science; ИИ-агенты;
+обвязка агента.
 
 \chapter*{\textenglish{Abstract}}
 \addcontentsline{toc}{chapter}{Abstract (аннотация на английском)}
@@ -38,24 +46,38 @@
 \begin{otherlanguage}{english}
 Adults who learn to read the Qur'an usually start with a primer and a teacher who listens to every
 syllable. This thesis asks how much of that listening can be done by a machine for Russian-speaking
-beginners, and builds the instrument needed to answer the question: a Telegram tutor that follows the
-primer \emph{Muallim al-Sani} by Ahmad Hadi Maksudi in the book's own order, with 125 lessons and 800 cards
-traceable to a page and line of the 2010 edition. The learner sends a voice message; the open model Quran
-Muaalem recognises phonemes; a rule-based alignment classifies differences into ten error kinds tied to
-syllables; and the learner receives a short explanation in Russian with a reference recording.
+beginners, and how much better the machine becomes when it is adapted to them. The instrument is a
+Telegram tutor that follows the classical primer \emph{Muallim al-Sani} by Ahmad Hadi Maksudi in the
+book's own order: 125 lessons and 800 cards, each traceable to a page and line of the 2010 edition. The
+learner sends a voice message; the open model Quran Muaalem recognises phonemes; a rule-based alignment
+classifies differences into ten error kinds tied to syllables; and the learner receives a short
+explanation in Russian with a reference recording. Every attempt keeps a full decision trace, so that
+verdicts can be recomputed later. The consented, teacher-annotated recordings form a dataset on which
+the model is adapted to Russian-speaking beginners: a calibrated verifier that can answer ``not sure'',
+and low-rank fine-tuning (LoRA) with augmentation from the book's minimal pairs.
 
-Following design science research, the thesis evaluates the tutor by agreement with two teachers (RQ-1),
-an analysis of beginners' errors that separates learner errors from model errors (RQ-2) and a within-subject
-pilot experiment on explanations (RQ-3), and evaluates the AI-agent development harness as an embedded case
-study (RQ-4). Preliminary checks show that the pipeline separates correct from incorrect expert recitation
-(99--100 versus 40--67 points). \pending{pilot results}. The contribution is the first teacher-referenced
-evaluation of an open Qur'anic pronunciation model on primer-level reading by second-language beginners, a
-consented, doubly annotated dataset, and an evidence-based account of building research software with AI
-coding agents under mechanical guard-rails.
+The thesis follows design science research and evaluates three artefacts. The tutor is evaluated by a
+measurement study of the off-the-shelf model's agreement with two teachers that separates learner errors
+from model errors (RQ-1), and by a within-subject pilot experiment comparing full explanations with a
+bare correct/incorrect signal (RQ-3). The adapted model is evaluated by a controlled experiment on a
+frozen, blindly annotated test set of learners unseen in training: how much it reduces false rejections
+and closes the gap to a teacher without degrading expert recitation (RQ-2). The development harness ---
+hooks that freeze tests and the test set, protect human-owned zones and stop the agent while checks fail,
+together with reviewer sub-agents and journals --- is evaluated as an embedded case study (RQ-4).
+Hypotheses, the data split and the analysis plan are preregistered.
+
+Preliminary checks show that the pipeline separates correct from incorrect expert recitation (99--100
+versus 40--67 points) and answers within the 10-second target. \pending{pilot and adaptation results for
+RQ-1--RQ-3}. The contribution is the first teacher-referenced evaluation of an open Qur'anic
+pronunciation model on primer-level reading by second-language beginners; the small-data adaptation of
+this model to the new population, honestly evaluated on unseen learners; a consented, teacher-annotated
+dataset and a reproducible training pipeline that found the doctoral project; and an evidence-based
+account of building research software with AI coding agents under mechanical guard-rails.
 
 \medskip
 \noindent\textbf{Keywords:} computer-assisted pronunciation training; mispronunciation detection;
-Qur'anic Arabic; Telegram bot; design science; AI coding agents; harness engineering.
+Qur'anic Arabic; model adaptation; LoRA; calibration; Telegram bot; design science; AI coding agents;
+harness engineering.
 \end{otherlanguage}
 
 \chapter*{Заявление об использовании ИИ-инструментов}
@@ -68,6 +90,7 @@ Qur'anic Arabic; Telegram bot; design science; AI coding agents; harness enginee
 контенте, текстах для ученика, порогах, согласии и данных принимал автор. Черновики этого текста
 подготовлены тем же агентом по материалам проекта и отредактированы автором. Каждый запрос к агенту
 сохранён с датой в журнале проекта, поэтому использование ИИ можно проверить. Агент не размечал данные
-и не вычислял ни одного результата вне версионированного кода, на который ссылается каждая таблица.
+и не вычислял ни одного результата вне версионированного кода, на который ссылается каждая таблица;
+метки тестовой выборки агенту недоступны.
 Библиографические данные сверены с Crossref, arXiv или сайтом издателя. Заявление будет приведено в
 соответствие с политикой университета об использовании ИИ, когда она будет подтверждена.

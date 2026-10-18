@@ -15,8 +15,9 @@ The thesis follows design science research, which produces knowledge by building
 addresses a real problem and evaluating it rigorously \cite{SRC-100}. Wieringa separates two kinds of
 work inside such a project: \emph{design problems}, which ask how to change the world (``build a tutor
 that \ldots''), and \emph{knowledge questions}, which ask what is true about it (``how often does the model
-reject correct reading?'') \cite{SRC-101}. The research questions of this thesis are knowledge questions;
-the objectives O1--O3 and O6 are design problems that make them answerable. Table~\ref{tab:hevner} shows
+reject correct reading?'', ``how much does adaptation reduce false rejections?'') \cite{SRC-101}. The
+research questions of this thesis are knowledge questions; the objectives O1--O4 and O7 are design
+problems that make them answerable. Table~\ref{tab:hevner} shows
 how the thesis addresses Hevner's seven guidelines.
 
 \begin{table}[ht]
@@ -27,16 +28,18 @@ how the thesis addresses Hevner's seven guidelines.
 \toprule
 Guideline & In this thesis \\
 \midrule
-Design as an artefact & Artefact A, the reading tutor; artefact B, the development harness. \\
+Design as an artefact & Artefact A, the reading tutor with its dataset; artefact C, the adapted model
+and its training pipeline; artefact B, the development harness. \\
 Problem relevance & Beginners practise alone; teachers' time does not scale; no tool checks primer-level
 reading in the learners' language. \\
-Design evaluation & Measurement against two teachers (RQ-1), error analysis (RQ-2), pilot experiment
-(RQ-3), case study (RQ-4). \\
-Research contributions & Evaluation on an unstudied population and material; dataset; method. \\
-Research rigour & Preregistration; standard MDD metrics; agreement statistics with confidence intervals;
+Design evaluation & Measurement of B0 against two teachers and error analysis (RQ-1), controlled
+experiment on a frozen test set (RQ-2), pilot experiment (RQ-3), case study (RQ-4). \\
+Research contributions & Evaluation and adaptation of a model on an unstudied population and material;
+dataset; method. \\
+Research rigour & Preregistration; learner-disjoint split and blind test set; standard MDD metrics; agreement statistics with confidence intervals;
 case-study protocol \cite{SRC-102}; Empirical Standards as checklist \cite{SRC-103}. \\
 Design as a search process & 50 recorded decisions with rejected alternatives; seven design iterations. \\
-Communication & Thesis, dataset card, open architecture, and a doctoral roadmap. \\
+Communication & Thesis, dataset card, fine-tuned weights, open architecture, and a doctoral roadmap. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -115,9 +118,10 @@ results.
 Metrics were derived with the Goal--Question--Metric method \cite{SRC-048}: a goal is stated in a fixed
 template (analyse \emph{object} for the purpose of \emph{purpose} with respect to \emph{quality focus} from
 the viewpoint of \emph{stakeholder} in the context of \emph{context}), refined into questions, and only then
-into metrics and data. A metric without a goal is not collected. Six goals were defined: G1 agreement with
-teachers (RQ-1), G2 beginners' errors (RQ-2), G3 effect of explanations (RQ-3), G4 engagement and the
-beginner's path, G5 system quality, and G6 development with AI agents (RQ-4).
+into metrics and data. A metric without a goal is not collected. Seven goals were defined: G1 agreement with
+teachers (RQ-1), G2 beginners' errors (RQ-1), G3 effect of explanations (RQ-3), G4 engagement and the
+beginner's path, G5 system quality, G6 development with AI agents (RQ-4), and G7 model adaptation (RQ-2).
+Goals G1 and G2 together answer RQ-1.
 
 For the pilot, one \emph{main metric} and one \emph{counter-metric} were chosen. The main metric is the
 number of book lines passed by learners for the first time in a week: it grows only when learners move
@@ -128,23 +132,28 @@ share of falsely accepted attempts, attempts passed by the tutor but not by the 
 
 Table~\ref{tab:hyp} lists the confirmatory hypotheses. They are recorded in the preregistration
 (Section~\ref{sec:method-prov}); every other analysis is labelled exploratory and its findings are offered
-as hypotheses for future work.
+as hypotheses for future work. The comparison of Kazakh and Russian speakers on \ar{ق} and \ar{غ} (E-1),
+the learning curve (E-2), the contribution of data augmentation (E-3), the risk--coverage curve (E-4)
+and the verifier on top of the fine-tuned model (E-5) are declared exploratory in advance.
 
 \begin{table}[ht]
 \centering\small
-\caption{Confirmatory hypotheses (preregistration v0.2).}
+\caption{Confirmatory hypotheses (preregistration v0.3).}
 \label{tab:hyp}
 \begin{tabularx}{\linewidth}{@{}llL@{}}
 \toprule
 ID & RQ & Hypothesis \\
 \midrule
-H1.1 & RQ-1 & Precision and recall of error detection on beginners are lower than reported on the model's
-training domain. \\
-H1.2 & RQ-1 & False rejections (FRR) are more frequent than false acceptances (FAR). \\
-H1.3 & RQ-1 & $\kappa$ between tutor and teacher is lower than $\kappa$ between teachers. \\
-H2.1 & RQ-2 & Errors on \ar{ق} and \ar{غ} are less frequent among Kazakh speakers than among Russian
-speakers (tested only if both groups are present). \\
-H2.2 & RQ-2 & Russian speakers make more errors in emphasis than in place of articulation. \\
+H1.1 & RQ-1 & Precision and recall of B0 error detection on beginners are lower than reported on the
+model's training domain. \\
+H1.2 & RQ-1 & For B0, false rejections (FRR) are more frequent than false acceptances (FAR). \\
+H1.3 & RQ-1 & $\kappa$ between B0 and a teacher is lower than $\kappa$ between teachers. \\
+H1.4 & RQ-1 & Russian speakers make more confirmed errors in emphasis than in place of articulation. \\
+H2.1 & RQ-2 & On test learners, B1 has a lower FRR than B0 with recall no lower than B0's minus
+$\delta=0.05$. \\
+H2.2 & RQ-2 & On test learners, B2 has a higher phoneme-level F1 than B0. \\
+H2.3 & RQ-2 & On expert recitation, B2's PER exceeds B0's by at most one percentage point
+(non-inferiority). \\
 H3.1 & RQ-3 & The score gain on the next attempt is larger after a full explanation than after a
 correct/incorrect signal. \\
 H3.2 & RQ-3 & The difference in H3.1 persists on a delayed test after 1--2 weeks. \\
@@ -157,7 +166,8 @@ H3.2 & RQ-3 & The difference in H3.1 persists on a delayed test after 1--2 weeks
 The pilot is closed: learners are invited through teachers and the author's acquaintances, and the target is
 20--40 adult learners over 4--6 weeks. Participation in research requires a separate consent; a short entry
 questionnaire, asked only of consenting learners, records age (18+), first language and prior experience of
-reading Arabic. Learners who do not consent can still use the tutor; their attempts are graded but no audio
+reading Arabic. Consent to voice recording explicitly covers training the model on the recording and
+releasing the weights. Learners who do not consent can still use the tutor; their attempts are graded but no audio
 is kept and they are excluded from the analysis. The materials are the cards of the letter and vowel lessons
 (pages 10--24 of the book) and, for exploratory analysis, later lessons that learners reach. The unit of
 analysis is an attempt; learners are clusters, because attempts by one learner are not independent.
@@ -199,16 +209,81 @@ data, which handles missing labels and any number of coders \cite{SRC-065}.
 learners with replacement. Comparisons with published benchmarks are qualitative only, because the data
 differ.
 
-\section{Study 2: beginners' errors (RQ-2)}\label{sec:method-s2}
+\paragraph{Error profile} Error frequencies by type, confusion matrices ``expected $\to$ heard'' and
+difficulty by book line and by the book's minimal pairs are computed twice: over all errors reported by the
+tutor and over errors confirmed by annotators (true rejections). The difference between the two shows how
+much of an apparent learner profile is produced by the model. To avoid conclusions driven by one active
+learner, every frequency is reported with the number of learners who contribute to it. H1.4 uses the
+attribute (\emph{sifat}) outputs of the model and is tested with a mixed logistic model with learner as a
+random effect. The comparison by first language (E-1) is run only if both groups are large enough.
 
-Error frequencies by type, confusion matrices ``expected $\to$ heard'' and difficulty by book line and by
-the book's minimal pairs are computed twice: over all errors reported by the tutor and over errors
-confirmed by annotators (true rejections). The difference between the two shows how much of an apparent
-learner profile is produced by the model. To avoid conclusions driven by one active learner, every
-frequency is reported with the number of learners who contribute to it. H2.1 is tested with a mixed
-logistic model, with first language as a fixed effect and learner as a random effect, if both groups are
-large enough; otherwise it is reported descriptively. H2.2 uses the attribute (\emph{sifat}) outputs of the
-model and is reported descriptively with intervals.
+\section{Study 2: model adaptation (RQ-2)}\label{sec:method-s2}
+
+\paragraph{Systems} Three systems are compared on the same recordings. \textbf{B0} is Muaalem as is,
+with alignment and thresholds (Chapter~\ref{ch:impl}). \textbf{B1} is a verifier on top of B0's outputs.
+For every canonical phoneme $j$ of an attempt it receives a feature vector $x_j$: the model's confidence for
+the phoneme, the probabilities of the articulatory attributes, the Goodness of Pronunciation score
+\begin{equation}
+  \mathrm{GOP}(p_j) = \frac{1}{d_j}\log\frac{P(p_j\mid O_j)}{\max_{q} P(q\mid O_j)},
+\end{equation}
+where $O_j$ are the audio frames assigned to the phoneme and $d_j$ their number \cite{SRC-115}, as well as
+duration, the error kind from the alignment and the material type (Qur'anic or not). A logistic model or
+gradient boosting estimates $\hat p_j = P(\text{error}\mid x_j)$; probabilities are calibrated on separate
+learners of the training part, and calibration quality is measured by the expected calibration error (ECE)
+\cite{SRC-112}. An attempt is rejected if $\max_j \hat p_j \ge \lambda$. The threshold $\lambda$ is chosen by
+conformal risk control \cite{SRC-114}: on the calibration learners, the smallest $\lambda$ is taken for which
+\begin{equation}
+  \frac{n}{n+1}\,\widehat{\mathrm{FRR}}_n(\lambda) + \frac{1}{n+1} \le \varepsilon,
+\end{equation}
+where $\widehat{\mathrm{FRR}}_n$ is the false-rejection rate on $n$ calibration attempts and
+$\varepsilon=0.05$ (QAS-02). Attempts with $\hat p_j$ in an uncertainty band around the threshold receive a
+``not sure'' outcome \cite{SRC-117}: the learner is asked to read again and the attempt goes to a teacher.
+The conformal guarantee requires exchangeability; attempts by one learner are dependent, so calibration is
+done by learner, and whether the guarantee holds on the test set is checked rather than assumed.
+
+\textbf{B2} is Muaalem fine-tuned with LoRA \cite{SRC-111}: a low-rank correction is added to the attention
+matrices $W_0\in\mathbb{R}^{d\times k}$,
+\begin{equation}
+  W = W_0 + \tfrac{\alpha}{r}\,BA, \qquad B\in\mathbb{R}^{d\times r},\; A\in\mathbb{R}^{r\times k},\; r\ll\min(d,k),
+\end{equation}
+and only $A$, $B$ and the output CTC heads are trained, while $W_0$ stays frozen. The training objective is
+Muaalem's multi-level CTC on teacher-corrected phonemes. The training data are augmented in two ways: from
+the book's minimal pairs (a correct reading of a card with one letter of a pair, labelled with the canonical
+phonemes of the paired card, is a substitution example) \cite{SRC-119}, and by speed perturbation
+$0.9/1.0/1.1$ \cite{SRC-120}. The hyperparameter grid ($r\in\{8,16\}$, learning rate, number of epochs with
+early stopping) is fixed in the preregistration.
+
+\paragraph{Split and test-set protection} Before the first training run, about 30\,\% of learners, stratified
+by first language and activity, are assigned to the test set, and the list is fixed with a SHA-256
+fingerprint. The split is by learner, not by attempt; otherwise one speaker's voice would appear in both
+training and evaluation \cite{SRC-122}. B2's hyperparameters and B1's calibration are chosen only by
+5-fold learner-grouped cross-validation inside the training part \cite{SRC-121}. Both teachers annotate the
+test attempts blind, without seeing the tutor's answer, and reconcile disagreements; these gold labels are
+what all three systems are compared against. The test set is opened once, after all systems are trained and
+frozen and the evaluator is fixed by fingerprint.
+
+\paragraph{Metrics and analysis} For every system the Study~1 metrics are computed on the test set:
+phoneme-level precision, recall, F1 and diagnosis accuracy, verdict-level FAR and FRR, and $\kappa$ with the
+gold labels. H2.1 and H2.2 are tested with a paired cluster bootstrap over learners: the difference between
+two systems is recomputed on the same resampled learners. H2.3 is tested on a held-out set of expert
+recitation not used in training: the upper bound of the 95\,\% interval of the PER difference must be below
+one percentage point \cite{SRC-118}. The summary measure is the \emph{share of the gap closed}
+\begin{equation}
+  G_B = \frac{\kappa_B - \kappa_{B0}}{\kappa_{TT} - \kappa_{B0}},
+\end{equation}
+where $\kappa_{TT}$ is the agreement between teachers: $G_B=0$ means adaptation achieved nothing, and
+$G_B=1$ means the system agrees with a teacher as well as teachers agree with each other. The learning curve
+of B2 (25, 50, 75 and 100\,\% of training learners), the contribution of augmentation and B1's
+risk--coverage curve are reported as exploratory.
+
+\paragraph{Fallback} If fewer than about 1\,500 annotated attempts exist in the training part by 15 April
+2027, B2 is reported as a feasibility check, H2.2 and H2.3 are withdrawn by a new preregistration version
+before the test set is opened, and RQ-2 is answered by B1. The decision depends on the number of annotated
+attempts, not on results.
+
+\paragraph{Shadow mode} After training, B1 and B2 run inside the tutor in shadow mode: the learner sees B0's
+verdict, and the adapted systems' verdicts are stored in the attempt. This keeps the RQ-3 experiment free
+of a model change and gives a descriptive check on attempts that arrive after training.
 
 \section{Study 3: effect of explanations (RQ-3)}\label{sec:method-s3}
 
@@ -229,7 +304,7 @@ position, and the score on the same cards in a delayed test after 1--2 weeks.
 \end{equation}
 where $\Delta s_{ij}$ is the score change of learner $i$ on card $j$, $\mathrm{Full}_{ij}$ indicates the
 full-explanation condition, and $u_i$, $v_j$ are random intercepts for learner and card. H3.2 uses the same
-model on delayed-test scores. Across the seven confirmatory hypotheses, the Holm procedure controls the
+model on delayed-test scores. Across the nine confirmatory hypotheses, the Holm procedure controls the
 family-wise error rate at $\alpha=0.05$; effect sizes and confidence intervals are always reported. Data
 collection stops at the planned end of the pilot, not when results become significant; interim reports
 are descriptive only.
@@ -244,7 +319,7 @@ the version history with its ADRs. Measures follow goal G6: blocks and approval 
 human interventions per session (corrections, stop signals, rejected changes); iterations until the checks
 pass; and defects that passed all checks and were found later. Incidents described in the journals are
 coded thematically by failure mode (test gaming, scope creep, unverified claims, data exposure,
-fabricated dependencies). Self-reported productivity is deliberately not used \cite{SRC-030}.
+fabricated dependencies, access to the test set). Self-reported productivity is deliberately not used \cite{SRC-030}.
 
 \section{Preregistration, provenance and reproducibility}\label{sec:method-prov}
 
@@ -252,16 +327,19 @@ Three mechanisms protect the results from being shaped after the fact.
 
 \paragraph{Preregistration} Hypotheses, exclusions, sample size and analysis are written down before data
 collection. When the author and supervisor approve the plan, its SHA-256 fingerprint and date are recorded,
-and any later change requires a new version with a stated reason. Freezing data and evaluator by hash
-follows the practice of the supervisor's group \cite{SRC-067}.
+and any later change requires a new version with a stated reason. Separately, before the first training
+run, the list of test learners and the RQ-2 evaluator code are fixed by fingerprint. Freezing data and
+evaluator by hash follows the practice of the supervisor's group \cite{SRC-067}.
 
-\paragraph{Protected evaluator} The module that computes RQ-1 metrics is a human-owned zone: the coding agent
-must ask before changing it, because an agent that can edit the evaluator can improve the score without
-improving the system \cite{SRC-027,SRC-082}.
+\paragraph{Protected evaluator and test set} The module that computes RQ-1 and RQ-2 metrics is a human-owned
+zone: the coding agent must ask before changing it, because an agent that can edit the evaluator can
+improve the score without improving the system \cite{SRC-027,SRC-082}. A hook forbids the agent to read the
+test learners' labels: an agent that had seen the test set could fit a model to it.
 
 \paragraph{Provenance} Every attempt stores the canonical variants, the recognised phonemes, the raw model
 output, the thresholds, the code, curriculum and model versions, the book line as shown to the learner, and
-the SHA-256 of the audio. A traceability command prints fingerprints of code, curriculum, SQL reports,
+the SHA-256 of the audio; a fine-tuned model carries the hash of its weights and of its training set. A
+traceability command prints fingerprints of code, curriculum, SQL reports,
 migrations, dependencies and preregistration. A number enters the thesis only if the corresponding analysis
 is implemented and the figure or table has a passport: report, date, number of attempts and learners, and
 code fingerprint.
@@ -272,7 +350,9 @@ The study involves voice recordings on a religious topic, so it is designed as i
 the law applied. Consent to the service and consent to voice recording are separate; audio is never stored
 without consent; consent can be withdrawn, which deletes recordings and their annotations; every learner can
 delete all data with one button; only pseudonyms appear in reports and datasets; research participation is
-limited to adults; no voice prints or speaker embeddings are computed; annotators see only the line and the
+limited to adults; no voice prints or speaker embeddings are computed; consent to voice recording
+explicitly covers model training and the release of weights, and withdrawing consent removes the
+recordings from subsequent versions of the dataset and the model; annotators see only the line and the
 tutor's answer, never the learner's identity, and recordings are sent to them in protected mode
 \cite{SRC-033,SRC-036,SRC-037}. The questions of who is the data operator, whether an ethics committee review
 is required and where the server is located are institutional and are being settled with the supervisor
@@ -293,8 +373,14 @@ Type & Threat & Response \\
 \midrule
 Construct & An annotator's label is not the ``true'' error; teachers may disagree. & Two annotators;
 teacher--teacher $\kappa$ as ceiling; written guide with versions. \\
-Construct & Annotators see the tutor's answer and may agree by suggestion. & Reported as a limitation;
-agreement analysed separately for passed and failed attempts. \\
+Construct & Annotators see the tutor's answer and may agree by suggestion, which favours B0. & The
+test set is annotated blind; H1.3 is also reported on the blind part; agreement analysed separately for
+passed and failed attempts. \\
+Internal & Leakage between training and test (same speaker, tuning on the test set). & Learner-disjoint
+split; frozen test list; CV inside training; hook on test labels; test set opened once. \\
+Internal & Gains on beginners bought by forgetting. & H2.3 on held-out expert recitation. \\
+Conclusion & Small test set (about ten learners). & Paired cluster bootstrap; wide intervals reported as
+they are; the learning curve shows how much data is missing. \\
 Internal & Improvement on a second attempt may be repetition, not explanation. & Within-subject control
 condition (RQ-3). \\
 Internal & Long lines dilute errors in the similarity score. & RQ-1 is computed per phoneme, not only per

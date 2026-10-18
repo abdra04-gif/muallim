@@ -3,9 +3,10 @@
 % screens 07_line.png and 09_result_errors.png (docs/design/screens/).
 \chapter{Implementation}\label{ch:impl}
 
-This chapter describes the two artefacts as built in version 0.6.0. Sections~\ref{sec:impl-overview}--%
+This chapter describes the artefacts as built in version 0.6.0. Sections~\ref{sec:impl-overview}--%
 \ref{sec:impl-privacy} cover the tutor: its context, the curriculum, the architecture, the assessment
-pipeline, the learner interface, the research data and privacy. Section~\ref{sec:impl-harness} describes
+pipeline, the learner interface, the research data, the training pipeline of the adapted model
+(Section~\ref{sec:impl-training}, still a design) and privacy. Section~\ref{sec:impl-harness} describes
 the development harness, and Section~\ref{sec:impl-verification} the verification of both.
 
 \section{Overview}\label{sec:impl-overview}
@@ -279,6 +280,40 @@ confirmation and runs in one transaction. A verification command compares the da
 and finds lost, extra or damaged files and copies that should have been deleted after a withdrawal of
 consent.
 
+\section{Training and evaluation pipeline}\label{sec:impl-training}
+
+\begin{notebox}
+This section describes the pipeline as designed (technical-debt item TD-FN-72); the code is written in
+November--December 2026 and debugged on open data before the pilot. What already exists in version 0.6.0
+is stated explicitly.
+\end{notebox}
+
+\paragraph{What already exists} Every attempt stores the raw model output with per-phoneme confidence and
+attribute probabilities, the canonical variants, the recognised phonemes, the model version and the
+SHA-256 of the audio, and annotations store the corrected phonemes. These are the training pairs and the
+features for B1: nothing has to be recomputed. The recogniser sits behind a port, and adding a second
+recogniser has already shown that a new model plugs in without changing the domain
+(Section~\ref{sec:impl-architecture}).
+
+\paragraph{Export and split} An export command assembles the training and test parts from the frozen list
+of test learners and writes a datasheet \cite{SRC-123} and fingerprints next to them: of the learner list,
+of each part and of the annotation-guide version. Test labels are stored in a directory that a hook forbids
+the agent to read; the evaluator loads them itself.
+
+\paragraph{B1} Per-phoneme features are built from the stored model output; training and calibration run on
+a CPU. The chosen threshold, the level $\varepsilon$ and the fingerprint of the calibration set are written
+into the model version, so every B1 verdict is reproducible.
+
+\paragraph{B2} LoRA fine-tuning runs outside the bot on a GPU (university cluster or cloud, TD-FN-74); only a
+small file of adapter weights reaches the bot. B2's model version includes the hash of the base model, of
+the adapter and of the training set, so every attempt graded by B2 can be traced to the data the model was
+trained on.
+
+\paragraph{Shadow mode and comparison} The second and third recognisers are connected through the same port
+in shadow mode: their verdicts are stored next to B0's and are not shown to the learner. Storing shadow
+verdicts is a schema change and is approved by a human. The protected evaluator compares the systems on the
+test set with one command and writes a report with a passport for the tables in Chapter~\ref{ch:eval}.
+
 \section{Privacy and security}\label{sec:impl-privacy}
 
 \paragraph{Consent and deletion} Learners first see a consent screen; consent to voice recording is separate
@@ -325,10 +360,11 @@ the action is refused.
 Hook & Event & What it does \\
 \midrule
 guard & before a tool call & Blocks reading of secrets and learner data, editing tests in the
-implementation phase, changing the phase directly, bypassing checks, force pushes. \\
+implementation phase, changing the phase directly, bypassing checks, force pushes; with the training
+pipeline (TD-FN-72) it will also block reading test-set labels. \\
 human\_zones & before a tool call & Asks for approval with a reason before changes to content, learner
 texts, thresholds, reading parameters, schema, dependencies, the checks themselves and the RQ-1
-evaluator. \\
+evaluator (with TD-FN-72, also RQ-2). \\
 dep\_check & before a tool call & Blocks packages that do not exist on PyPI; shows version, age,
 repository, known vulnerabilities and name similarity for the rest. \\
 git\_guard & before a tool call & Forbids forced adds, forbidden paths and secrets in commits; push only

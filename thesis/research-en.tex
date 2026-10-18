@@ -24,14 +24,17 @@
 \end{center}
 
 \begin{keybox}[Abstract]
-This review brings together five bodies of knowledge that a reading tutor for the primer
+This review brings together six bodies of knowledge that a reading tutor for the primer
 \emph{Muallim al-Sani} has to respect: the history and method of the book, the phonetic difficulties of
 Russian-speaking beginners, research on computer-assisted pronunciation training, the state of automatic
-assessment of Qur'anic recitation, and the emerging practice of building software with AI coding agents.
+assessment of Qur'anic recitation, ways to adapt a speech model to a new population with little data, and
+the emerging practice of building software with AI coding agents.
 It also summarises the legal and ethical constraints on collecting voice data. The evidence supports a
 narrow claim: automatic feedback can multiply practice and first-line correction for beginners, but it
 cannot yet replace a teacher. The best open model, Quran Muaalem, was trained on expert male reciters, and
-no study has measured it on primer-level reading by second-language beginners. Explicit,
+no study has measured it on primer-level reading by second-language beginners or tried to adapt it to
+them, although the methods --- low-rank fine-tuning, calibration, abstention with guarantees --- exist and
+work with little data, provided that the evaluation is not spoiled by leakage. Explicit,
 segment-level feedback is the condition under which pronunciation training works best, and it is what a
 primer requires. Development with AI agents is productive but prone to gaming its own tests, which argues
 for mechanical guard-rails rather than written rules. The review ends with a map of gaps and the research
@@ -39,8 +42,8 @@ questions they generate for the thesis.
 
 \smallskip
 \textbf{Keywords:} computer-assisted pronunciation training; mispronunciation detection and diagnosis;
-Qur'anic recitation; Arabic as a second language; Telegram bot; design science; AI coding agents;
-harness engineering.
+Qur'anic recitation; Arabic as a second language; model adaptation; LoRA; calibration; conformal
+prediction; Telegram bot; design science; AI coding agents; harness engineering.
 \end{keybox}
 
 \section{Introduction}
@@ -54,17 +57,20 @@ half of the method.
 
 This review asks whether that half can be supplied by a machine, and under what conditions. It is the
 research background for a master's thesis that builds a Telegram tutor following the book page by page,
-recognises the learner's phonemes with an open model, and explains errors in Russian. Four questions
-guide the review:
+recognises the learner's phonemes with an open model, explains errors in Russian, and adapts the model
+to Russian-speaking beginners using the consented recordings it collects. Five questions guide the
+review:
 
 \begin{enumerate}[label=\textbf{Q\arabic*.}]
   \item What do the book and its teaching tradition require from a tutor?
   \item What makes Arabic reading hard for Russian- and Kazakh-speaking beginners?
   \item What does research say about automatic pronunciation feedback and how it should be designed?
   \item How good are current models for Qur'anic pronunciation assessment, and where are they untested?
+  \item How can such a model be adapted to a new population when data are scarce, and how can the gain
+    be measured honestly?
 \end{enumerate}
 
-A fifth, methodological question concerns the way the tutor itself is built: what is known about
+A sixth, methodological question concerns the way the tutor itself is built: what is known about
 developing research software with AI coding agents, and how to keep such development honest.
 
 \paragraph{Method of the review} The review is narrative and scoping rather than systematic. Searches
@@ -310,6 +316,55 @@ independently. Digital versions of \emph{Muallim al-Sani} exist as an app and an
 listening rather than speaking \cite{SRC-070}. No Russian-, Kazakh- or Uzbek-language tool that checks
 primer-level reading by voice was found.
 
+\section{Adapting a model to a new population}
+
+\subsection{Fine-tuning on learner speech}
+
+Mispronunciation detectors built on self-supervised speech encoders are usually obtained by fine-tuning
+with CTC on annotated learner speech. Xu and colleagues showed on L2-ARCTIC that a fine-tuned wav2vec~2.0
+outperforms earlier systems and keeps its quality when little labelled data is available
+\cite{SRC-116}; Muaalem is built the same way, but was fine-tuned on experts \cite{SRC-002}. With a few
+hours of speech, full fine-tuning of a 600-million-parameter model is risky: it overfits and may damage
+what the model already knows. LoRA freezes the original weights and trains small low-rank matrices
+added to the attention layers; the number of trainable parameters is orders of magnitude smaller, and
+the original model is recovered by simply disabling the additions \cite{SRC-111}. Fine-tuning on a new
+task can erase old skills --- catastrophic forgetting \cite{SRC-118} --- so the adapted model must also be
+checked on its original domain, here expert recitation.
+
+\subsection{Where the errors come from}
+
+Beginners make more errors than experts, but there are still few of them for training, and particular
+sound pairs are rare. The MDD literature augments data with synthetic errors by substituting phonemes in
+the reference transcription as if the learner had erred \cite{SRC-119}; a standard speech-recognition
+technique is speed perturbation \cite{SRC-120}. The primer offers a more natural source: its minimal
+pairs (\ar{ق}/\ar{ك}, \ar{ص}/\ar{س}, \ar{ح}/\ar{خ} and others) mean that a correct reading of one card is
+a real recording of a real error for the paired card. Such augmentation uses human audio rather than
+synthesis, which the model recognises poorly (the project's preliminary check).
+
+\subsection{Confidence, calibration and ``not sure''}
+
+The second route is not to change the model but to learn where not to trust it. The classical Goodness
+of Pronunciation score turns phoneme posteriors into a pronunciation score \cite{SRC-115}; a small
+verifier can be trained on such features with a few hundred labelled examples. Neural networks are
+overconfident, however, and their probabilities need calibration; the standard measure is the expected
+calibration error \cite{SRC-112}. Selective classification lets a system abstain and describes the
+trade-off with a risk--coverage curve \cite{SRC-117}. Conformal prediction provides distribution-free
+guarantees under exchangeability \cite{SRC-113}, and conformal risk control chooses a threshold so that
+the expected false-rejection rate stays below a chosen level \cite{SRC-114}. For the tutor this answers
+the main danger that pronunciation-training reviews warn about: a false ``incorrect'' on a correct
+reading.
+
+\subsection{How not to fool ourselves}
+
+Small data make inflated results easy. Tuning hyperparameters on the data on which quality is reported
+biases the estimate upwards; nested cross-validation or a separate test set is required \cite{SRC-121}.
+Kapoor and Narayanan found data leakage in hundreds of ML-based studies and proposed a taxonomy of it
+\cite{SRC-122}; in speech, the main leak is the same speaker in training and evaluation. Hence the rules
+of this work: a learner-disjoint split, a test set frozen before training, blind annotation of the test
+set, and a single run on it. The supervisor's group formulated the same requirements for studies in
+which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
+following Gebru and colleagues \cite{SRC-123}.
+
 \section{Building research software with AI coding agents}
 
 \subsection{From agent loops to harnesses}
@@ -383,22 +438,27 @@ Area & Known & Missing & Thesis \\
 Primer & Sound method, principles, letter order \cite{SRC-015,SRC-016,SRC-017} & Study of \emph{Muallim
 al-Sani} as a Qur'an primer; any digital adaptation with checking & Artefact A \\
 Learners & Difficult sounds from other L1 \cite{SRC-034,SRC-035} & Measured errors of Russian/Kazakh
-speakers & RQ-2 \\
+speakers & RQ-1 \\
 Feedback & Medium effect; explicit and segmental works best \cite{SRC-025,SRC-026} & Effect for Arabic
 letters; trials of primer methods & RQ-3 \\
 Models & Strong on experts; F1 0.72 on benchmark \cite{SRC-002,SRC-031} & Accuracy on beginners,
 false-rejection rate, agreement with teachers & RQ-1 \\
+Adaptation & LoRA, calibration, conformal guarantees \cite{SRC-111,SRC-112,SRC-114} & Adapting a
+Qur'anic model to L2 beginners with honest evaluation on unseen learners & RQ-2 \\
 Agents & Test gaming; rules decay; checks help \cite{SRC-027,SRC-076,SRC-078} & Whole-project evidence
 on guarded harnesses & RQ-4 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-From this map follow the four research questions of the thesis. RQ-1 asks how closely the automatic
-check agrees with teachers on beginners reading the primer. RQ-2 asks which errors Russian-speaking
-beginners make, separating learner errors from model errors. RQ-3 asks whether explanations in Russian
-improve the next attempt and retention compared with a bare correct/incorrect signal. RQ-4 asks what a
-mechanically enforced harness prevents in AI-agent development and at what human cost.
+From this map follow the four research questions of the thesis. RQ-1 asks how closely the
+off-the-shelf model agrees with teachers on beginners reading the primer, and which reported errors
+belong to the learner rather than the model. RQ-2, the central question, asks how much adapting the model
+on the collected dataset --- a calibrated verifier with ``not sure'' and LoRA fine-tuning --- closes the gap
+to a teacher on unseen learners without degrading expert recitation. RQ-3 asks whether explanations in
+Russian improve the next attempt and retention compared with a bare correct/incorrect signal. RQ-4 asks
+what a mechanically enforced harness prevents in AI-agent development and ML experimentation, and at
+what human cost.
 
 \section{Conclusion}
 
@@ -407,9 +467,11 @@ compatible with automatic feedback: it is sound-based, incremental and built on 
 The conditions under which pronunciation training works best, segmental targets and explicit feedback,
 are exactly those of a primer. The model exists and is open. What is missing is measurement: how often the
 model is right about a Russian-speaking adult reading a syllable for the first time, how often it rejects
-a correct reading, and whether its explanations help. A small, honestly annotated dataset and a
-transparent table of precision and recall against teachers would be worth more than another claim of
-``AI checking''. In the same spirit, the development method should be judged by what its logs show, not
+a correct reading, whether its explanations help --- and how far it can be improved on the new
+population's own data. A small, honestly annotated dataset, a frozen test set and a transparent table of
+precision and recall against teachers before and after adaptation would be worth more than another claim
+of ``AI checking''. The same dataset and test set become the starting point of doctoral work on
+human-in-the-loop adaptation. In the same spirit, the development method should be judged by what its logs show, not
 by how fast it felt.
 
 \printbibliography[heading=bibintoc,title={References}]

@@ -23,16 +23,21 @@
 
 \begin{keybox}[Summary]
 Learning to read the Qur'an starts with a primer and a teacher who listens to every syllable.
-This thesis designs, builds and evaluates a Telegram tutor that follows the classical primer
-\emph{Muallim al-Sani} by Ahmad Hadi Maksudi page by page, listens to a learner's voice message,
-detects pronunciation errors with the open phoneme-level model Quran Muaalem, and explains each error
-in Russian. The work answers four questions: how closely the automatic check agrees with teachers on
-beginners' speech (RQ-1), which errors Russian-speaking beginners make and which are artefacts of the
-model (RQ-2), whether explanations improve the next attempt and retention (RQ-3), and what a guarded
-AI-agent development harness prevents and costs (RQ-4). The expected contribution is the first
-teacher-referenced evaluation of an open Qur'anic pronunciation model on primer-level reading by
-second-language beginners, a small consented and doubly annotated dataset, and an evidence-based
-account of building research software with AI coding agents under mechanical guard-rails.
+This thesis builds a Telegram tutor that follows the classical primer \emph{Muallim al-Sani} by Ahmad
+Hadi Maksudi page by page, listens to a learner's voice message, detects pronunciation errors at
+phoneme level and explains each error in Russian. With the learners' consent the tutor also collects the
+first teacher-annotated dataset of primer-level reading by Russian-speaking beginners. On this dataset
+the open model Quran Muaalem is \emph{adapted} to the new population in two ways: a calibrated verifier
+with a ``not sure'' outcome, and low-rank fine-tuning (LoRA). The work answers four questions: how
+closely the off-the-shelf model agrees with teachers and which of its ``learner errors'' are model
+errors (RQ-1); how much of the gap to a teacher adaptation on the collected data closes for learners the
+model has never seen, without degrading expert recitation (RQ-2, the central question); whether
+explanations improve the next attempt and retention (RQ-3); and what the AI-agent harness in which the
+system was built and trained prevents and costs (RQ-4). The expected contribution is a measured
+adaptation of an open Qur'anic pronunciation model for adult second-language beginners, evaluated on a
+frozen, blindly annotated test set; a dataset and a reproducible training pipeline that form the
+foundation for doctoral work; and an evidence-based account of building research software with AI
+coding agents under mechanical guard-rails.
 \end{keybox}
 
 \section{Motivation}
@@ -65,12 +70,17 @@ qdat\_bench set with real errors its phoneme error rate rises to 5.78\,\%, and t
 phoneme-level F1 of 0.72, and the organisers note that no second-language learners are present in the
 data \cite{SRC-031,SRC-086}. Automatic systems also produce false alarms on accented speech, which is
 why reviews recommend keeping a teacher in the loop \cite{SRC-026}. Nobody has measured how such a
-model behaves on a Russian-speaking adult who reads isolated syllables slowly, for the first time.
+model behaves on a Russian-speaking adult who reads isolated syllables slowly, for the first time,
+and nobody has tried to adapt it to such a learner. Adaptation is feasible with little data:
+fine-tuning self-supervised speech encoders on learner speech improves mispronunciation detection
+\cite{SRC-116}, low-rank adaptation changes only a small fraction of the weights \cite{SRC-111}, and
+calibration with selective prediction lets a model say ``not sure'' instead of issuing a false verdict
+\cite{SRC-112,SRC-117}.
 
 \section{Research gap}
 
 A review of literature, applications and datasets carried out for this proposal
-\cite{SRC-038} found four gaps that this thesis can address within a master's timeline.
+\cite{SRC-038} found five gaps that this thesis can address within a master's timeline.
 
 \begin{enumerate}
   \item \textbf{No evaluation on primer-level beginners.} Benchmarks for Qur'anic pronunciation
@@ -81,6 +91,10 @@ A review of literature, applications and datasets carried out for this proposal
     difficulties (pharyngeals, emphatics, interdentals, vowel length, gemination) are described in
     methodological sources and in studies of other first languages \cite{SRC-023,SRC-034,SRC-035},
     but not measured for this population.
+  \item \textbf{No adaptation of models to second-language beginners.} Open Qur'anic models are trained
+    on experts \cite{SRC-002}; we found no work that fine-tunes such a model on non-Arab beginners and
+    honestly measures the gain on unseen learners, while small-data ML studies frequently leak
+    information between training and evaluation \cite{SRC-122}.
   \item \textbf{No digital adaptation of the primer with automatic checking,} and no controlled
     trials of primer-based methods for reading the Qur'an in general \cite{SRC-038}. Telegram bots for
     pronunciation have been studied only as channels, not as automatic tutors \cite{SRC-092}.
@@ -93,9 +107,10 @@ A review of literature, applications and datasets carried out for this proposal
 
 \section{Aim, objectives and research questions}
 
-\textbf{Aim.} To design a reading tutor that faithfully follows \emph{Muallim al-Sani}, and to measure
-how far an open phoneme-level model can take the role of the listening teacher for Russian-speaking
-beginners, without overstating what it can do.
+\textbf{Aim.} To build a reading tutor that faithfully follows \emph{Muallim al-Sani}, to collect
+with it an annotated dataset of Russian-speaking beginners' reading, and to adapt an open phoneme-level
+model on this dataset so that it takes the role of the listening teacher more reliably --- measuring how
+much of the gap to a teacher the adaptation closes and where the gap remains.
 
 \textbf{Objectives.}
 \begin{enumerate}[label=O\arabic*.]
@@ -103,23 +118,30 @@ beginners, without overstating what it can do.
     to a page and line of a concrete edition \cite{SRC-040}.
   \item Build a tutor that assesses phoneme-level reading, explains errors in Russian for a learner who
     starts from zero, and records a full decision trace for each attempt.
-  \item Build research infrastructure: consent and pseudonyms, phoneme-level annotation by two teachers,
-    automated metrics, and a preregistered analysis plan.
-  \item Run a closed pilot with 20--40 learners over 4--6 weeks, including a within-subject feedback
-    experiment and a delayed post-test.
-  \item Answer RQ-1 to RQ-3 with effect sizes and confidence intervals.
-  \item Document the AI-agent harness used to build the system and evaluate it as a case study (RQ-4).
+  \item Collect a dataset: consent (including consent to model training) and pseudonyms, a closed pilot
+    with 20--40 learners over 4--6 weeks, phoneme-level annotation by two teachers, blind annotation
+    of test learners, and a datasheet \cite{SRC-123}.
+  \item Build a reproducible training and evaluation pipeline: a learner-disjoint split with a frozen
+    test set, the calibrated verifier B1, LoRA fine-tuning B2 with augmentation from the primer's
+    minimal pairs, and a protected evaluator.
+  \item Run a within-subject feedback experiment and a delayed post-test.
+  \item Answer RQ-1 to RQ-3 with effect sizes and confidence intervals following the preregistered plan.
+  \item Document the AI-agent harness in which the system was built and trained, and evaluate it as a
+    case study (RQ-4).
 \end{enumerate}
 
 \begin{rqbox}
-\textbf{RQ-1 (agreement).} How closely does the automatic assessment --- Muaalem, rule-based alignment
-and grading thresholds --- agree with qualified teachers on beginners reading \emph{Muallim al-Sani}?\\[4pt]
-\textbf{RQ-2 (error profile).} Which reading errors do Russian-speaking beginners make, and which of the
-errors reported by the tutor are errors of the learner rather than of the model?\\[4pt]
+\textbf{RQ-1 (baseline).} How closely does the off-the-shelf assessment B0 --- Muaalem, rule-based
+alignment and grading thresholds --- agree with teachers on beginners reading \emph{Muallim al-Sani}, and
+which of the errors it reports belong to the learner rather than to the model?\\[4pt]
+\textbf{RQ-2 (adaptation, central).} How much does adapting the model on the collected dataset --- a
+calibrated verifier with a ``not sure'' outcome (B1) and low-rank fine-tuning (B2) --- reduce false
+rejections and bring the assessment closer to teachers on learners unseen in training, without
+degrading recognition of expert recitation?\\[4pt]
 \textbf{RQ-3 (feedback).} Do explicit explanations in Russian improve the next attempt and delayed
 retention compared with a bare correct/incorrect signal?\\[4pt]
-\textbf{RQ-4 (method).} Which known failure modes of AI-agent development does a mechanically enforced
-harness prevent or expose, and how much human intervention does it require?
+\textbf{RQ-4 (method).} Which known failure modes of AI-agent development and ML experimentation does a
+mechanically enforced harness prevent or expose, and how much human intervention does it require?
 \end{rqbox}
 
 The hypotheses below are recorded in a preregistration that will be frozen with a SHA-256
@@ -127,20 +149,22 @@ fingerprint before data collection begins \cite{SRC-067}. Everything else is rep
 
 \begin{table}[ht]
 \centering\small
-\caption{Confirmatory hypotheses (preregistration v0.2, to be approved with the supervisor).}
+\caption{Confirmatory hypotheses (preregistration v0.3, to be approved with the supervisor).}
 \label{tab:hyp-en}
 \begin{tabularx}{\linewidth}{@{}lL@{}}
 \toprule
 ID & Hypothesis \\
 \midrule
-H1.1 & Precision and recall of error detection on beginners are lower than reported on the model's
+H1.1 & Precision and recall of B0 error detection on beginners are lower than reported on the model's
        training domain (Qur'anic recitation). \\
-H1.2 & False rejections (FRR) occur more often than false acceptances (FAR). \\
-H1.3 & Bot--teacher agreement ($\kappa$) is lower than teacher--teacher agreement; the gap quantifies
-       how far the tutor is from a human listener. \\
-H2.1 & Kazakh-speaking learners find \ar{ق} and \ar{غ} easier than Russian speakers (tested only if both
-       groups are present). \\
-H2.2 & Russian speakers make more errors in emphasis (\emph{tafkhim}) than in place of articulation. \\
+H1.2 & For B0, false rejections (FRR) occur more often than false acceptances (FAR). \\
+H1.3 & B0--teacher agreement ($\kappa$) is lower than teacher--teacher agreement. \\
+H1.4 & Russian speakers make more confirmed errors in emphasis (\emph{tafkhim}) than in place of
+       articulation. \\
+H2.1 & On test learners, B1 has a lower FRR than B0 while its recall is no lower than B0's minus 0.05. \\
+H2.2 & On test learners, B2 has a higher phoneme-level F1 than B0. \\
+H2.3 & B2 is not worse than B0 on expert recitation: its phoneme error rate rises by at most one
+       percentage point. \\
 H3.1 & After a full explanation, the score gain on the next attempt is larger than after a
        correct/incorrect signal. \\
 H3.2 & The difference in H3.1 persists on a delayed test after 1--2 weeks. \\
@@ -150,23 +174,25 @@ H3.2 & The difference in H3.1 persists on a delayed test after 1--2 weeks. \\
 
 \paragraph{Scope} The thesis covers the whole primer as curriculum (pages 10--85), but the
 evaluation concentrates on the letter and vowel lessons (pages 10--24), where beginners start and where
-errors are most frequent. Tajweed rules such as \emph{ikhfa} and \emph{idgham}, other first languages
-and fine-tuning the model are left for doctoral work. The tutor complements a teacher; it does not
-claim to replace one.
+errors are most frequent. Tajweed rules such as \emph{ikhfa} and \emph{idgham}, other first languages,
+active learning and per-learner personalisation of the model are left for doctoral work. The model is
+adapted, not trained from scratch: the pilot yields orders of magnitude less data than training from
+scratch would need. The tutor complements a teacher; it does not claim to replace one.
 
 \section{Research approach}
 
 The thesis follows design science research \cite{SRC-100,SRC-101}: it builds artefacts that solve a
-real problem and evaluates them with methods suited to each claim. Two artefacts are involved
-(Figure~\ref{fig:design-en}). Artefact~A is the reading tutor, evaluated by a measurement study, a
-descriptive error analysis and a pilot experiment. Artefact~B is the development harness, evaluated as
-an embedded case study following Runeson and Höst \cite{SRC-102}. The ACM SIGSOFT Empirical Standards
+real problem and evaluates them with methods suited to each claim. Three artefacts are involved
+(Figure~\ref{fig:design-en}). Artefact~A is the reading tutor together with its dataset, evaluated by a
+measurement study and a pilot experiment. Artefact~C is the adapted model and its training pipeline,
+evaluated by a controlled experiment on a frozen test set. Artefact~B is the development harness,
+evaluated as an embedded case study following Runeson and Höst \cite{SRC-102}. The ACM SIGSOFT Empirical Standards
 serve as a checklist for each study type \cite{SRC-103}.
 
 \begin{figure}[ht]
 \centering
 \resizebox{\linewidth}{!}{\input{figures/fig-research-design}}
-\caption{Research design: two artefacts, four research questions, and the evidence for each.}
+\caption{Research design: three artefacts, four research questions, and the evidence for each.}
 \label{fig:design-en}
 \end{figure}
 
@@ -199,6 +225,29 @@ code, curriculum and model versions, so that any verdict can be recomputed later
 thresholds or a different model. Audio is stored only with explicit, revocable consent; learners are
 identified by pseudonyms; and a learner can delete all their data with one button.
 
+\subsection{Artefact C: the adapted model}
+
+Three systems are compared on the same recordings. \textbf{B0} is Muaalem as is, with rules and
+thresholds; this is how the tutor works today. \textbf{B1} is a verifier trained on top of B0's outputs:
+for every phoneme it receives the model's confidence, the probabilities of the articulatory attributes,
+the Goodness of Pronunciation score \cite{SRC-115}, duration and material type, and estimates the
+probability of a real error. Its probabilities are calibrated \cite{SRC-112}, and its threshold is chosen
+by conformal risk control so that the false-rejection rate stays below a chosen $\varepsilon$
+\cite{SRC-113,SRC-114}; attempts without enough confidence receive a ``not sure'' outcome
+\cite{SRC-117} --- the learner is asked to read again and the attempt goes to a teacher. The verifier
+needs only hundreds of examples and trains on a CPU. \textbf{B2} is Muaalem fine-tuned with LoRA
+\cite{SRC-111} on teacher-corrected phonemes, as self-supervised speech encoders have been fine-tuned for
+learner mispronunciation detection before \cite{SRC-116}. To obtain more errors for training, the book
+itself is used: a correct reading of a card with \ar{ك} is a ready-made error example for the paired
+card with \ar{ق}, and likewise for every minimal pair. This is a form of phoneme-substitution
+augmentation \cite{SRC-119}, complemented by speed perturbation \cite{SRC-120}. The fine-tuned model is
+also checked on expert recitation, so that gains on beginners are not bought by forgetting
+\cite{SRC-118}.
+
+At the end of the pilot, B1 and B2 run inside the tutor \emph{in shadow mode}: the learner still sees
+B0's verdict, while the adapted systems' verdicts are recorded alongside it. This keeps the RQ-3
+experiment free of a model change and gives an additional post-training check on new attempts.
+
 \subsection{Artefact B: the development harness}
 
 The system is built by one author with an AI coding agent (Claude Code). Rules that matter are
@@ -207,8 +256,10 @@ to tests during the implementation phase, refuse reads of personal data, ask for
 human-owned zones (curriculum, texts shown to learners, thresholds, the RQ-1 evaluator), check that a
 new library really exists on PyPI, and stop the agent from finishing while architecture contracts, type
 checks or tests are red. Reviewer subagents without write access check code, architecture and whether
-the change matches what the author asked for. Each block and each approval request is written to a
-journal. This journal, together with the session and prompt logs, is the data for RQ-4.
+the change matches what the author asked for. The same mechanisms protect training experiments: the
+list of test learners and the evaluator are frozen with a SHA-256 fingerprint, and a hook forbids the
+agent to read test labels, following the rules formulated by the supervisor's group for research with
+agents \cite{SRC-067}. Each block and each approval request is written to a journal. This journal, together with the session and prompt logs, is the data for RQ-4.
 
 \subsection{Studies}
 
@@ -222,12 +273,27 @@ Agreement between annotators per phoneme is measured with Krippendorff's $\alpha
 Confidence intervals come from a bootstrap that resamples learners, because attempts by one learner are
 not independent. Self-corrections and unusable recordings are reported separately.
 
-\paragraph{Study 2 --- error profile (RQ-2)} Confusion matrices ``expected $\to$ heard'' are built twice:
-for all errors reported by the tutor, and only for errors confirmed by annotators. The difference shows
-how much of the apparent learner profile is model noise. The primer's own minimal pairs
+The error profile belongs to the same study. Confusion matrices ``expected $\to$ heard'' are built
+twice: for all errors reported by the tutor, and only for errors confirmed by annotators. The difference
+shows how much of the apparent learner profile is model noise. The primer's own minimal pairs
 (\ar{ق}/\ar{ك}, \ar{ص}/\ar{س}, \ar{ط}/\ar{ت}, \ar{ح}/\ar{خ}, \ar{ع}/\ar{غ} and others) serve as a
 pre-defined lens. A short entry questionnaire records the learner's first language and prior reading
 experience as covariates.
+
+\paragraph{Study 2 --- model adaptation (RQ-2)} Before the first training run, about 30\,\% of learners,
+stratified by first language and activity, are assigned to the test set, and the list is fingerprinted.
+No recording of a test learner is used for training, calibration or threshold selection: splitting by
+attempt would leak the speaker's voice \cite{SRC-122}. Both teachers annotate the test learners'
+attempts \emph{blind}, without seeing the tutor's answer, and reconcile disagreements; the resulting gold
+labels do not tilt the comparison towards B0. Hyperparameters are chosen only by learner-grouped
+cross-validation inside the training part, since tuning on the evaluation data inflates estimates
+\cite{SRC-121}. The test set is opened once, after all systems are trained and frozen. B0, B1 and B2 are
+compared with the metrics of Study~1 using a paired cluster bootstrap over learners. The summary measure
+is the \emph{share of the gap closed}: how far a system's $\kappa$ with the gold labels rises from B0
+towards the teacher--teacher ceiling. Calibration error, the verifier's risk--coverage curve and, as an
+exploratory analysis, a learning curve --- how B2 improves with the number of training learners --- are
+also reported. The learning curve answers a doctoral question directly: how much data a new learner
+population needs.
 
 \paragraph{Study 3 --- feedback experiment (RQ-3)} Because 20--40 learners are too few for two
 independent groups (a medium effect needs about 45 per group), the design is within-subject, after
@@ -235,12 +301,12 @@ Neri et al.\ \cite{SRC-054}. Each learner receives a full explanation on a rando
 and only a correct/incorrect signal on the other half. The primary outcome is the score change from a
 failed attempt to the next attempt on the same card; the secondary outcome is the score on a delayed
 test after 1--2 weeks. A mixed model with learner and card as random effects estimates the effect
-\cite{SRC-106}. Holm correction is applied across the seven confirmatory hypotheses.
+\cite{SRC-106}. Holm correction is applied across the nine confirmatory hypotheses.
 
 \paragraph{Study 4 --- harness case study (RQ-4)} Data sources are the hook journal (blocks and
 approval requests by reason), session summaries, prompt logs, commits and architecture decision records.
-Measures include blocks by type, human interventions per session, iterations until green checks, and
-defects that the checks missed. Self-reported productivity is not used, because it diverges from
+Measures include blocks by type, human interventions per session, iterations until green checks,
+defects that the checks missed, and attempts by the agent to access the test set. Self-reported productivity is not used, because it diverges from
 measured productivity \cite{SRC-030}.
 
 \section{Expected contributions}
@@ -249,15 +315,25 @@ measured productivity \cite{SRC-030}.
   \item \textbf{Empirical:} the first teacher-referenced measurement of an open Qur'anic phoneme model
     on primer-level reading by second-language beginners, including where it fails and how often it
     wrongly rejects correct reading.
-  \item \textbf{Data:} a small, consented, doubly annotated set of beginners' readings with phoneme-level
-    labels, released if ethics approval and consent allow \cite{SRC-097}.
-  \item \textbf{Design knowledge:} a documented mapping from Maksudi's didactic principles to tutor
-    features, and a pilot estimate of the effect of explanations.
+  \item \textbf{Model and method:} small-data adaptation of an open model to a new population --- a
+    calibrated verifier with a guarantee on the false-rejection rate and LoRA fine-tuning with
+    augmentation from the primer's minimal pairs --- honestly evaluated on unseen learners and checked
+    for forgetting.
+  \item \textbf{Data:} a consented set of beginners' readings with phoneme-level labels, a blind gold
+    test set and a datasheet, released together with the fine-tuned weights if ethics approval and
+    consent allow \cite{SRC-097,SRC-123}.
   \item \textbf{Software-engineering method:} an evidence-based description of a guarded AI-agent
-    harness for research software, with its measured benefits, costs and limits.
+    harness for research software and ML experiments, with its measured benefits, costs and limits.
   \item \textbf{Artefact:} an open-architecture tutor where model, database and messenger can be
-    replaced without touching the domain logic.
+    replaced without touching the domain logic --- a ready test bed for comparing models.
 \end{enumerate}
+
+\paragraph{Foundation for doctoral work} The master's thesis leaves the doctoral project not only
+questions but also instruments: a frozen test set that remains the test set, a training pipeline, a
+learning curve and shadow mode. The main doctoral line follows from them --- human-in-the-loop
+adaptation: which attempts to send to a teacher for labelling (active learning), how to use ``the bot
+was wrong'' reports as weak labels, how to personalise the model per learner and transfer it to other
+first languages.
 
 \section{Ethics, data protection and religious sensitivity}
 
@@ -269,13 +345,18 @@ institutional: who acts as data operator, whether the university ethics committe
 study, and where the server is located. They will be settled with the supervisor before any learner
 outside the closed circle is invited. The tutor uses only the Arabic text of the mushaf and its own
 neutral explanations; it does not reproduce the book's Russian prose, which is protected by copyright.
+Consent to voice recording explicitly covers model training and the release of weights; no voice prints
+are computed. Muaalem and its base model w2v-BERT~2.0 are released under the MIT licence \cite{SRC-003},
+so fine-tuning and releasing weights are permitted.
 
 \section{Work plan}
 
 Figure~\ref{fig:gantt-en} shows the plan. Preparation (proposal, ethics, proofreading of the curriculum
-against the scan, reference recordings, recruiting annotators) runs until December 2026. Data collection
-runs from January to March 2027; analysis and writing follow, with a pre-defence in May and the defence
-in June 2027.
+against the scan, reference recordings, recruiting annotators) runs until December 2026; in November
+and December the training pipeline is debugged on open data, so that in April it only has to be run on
+pilot data. Data collection runs from January to March 2027, and the list of test learners is frozen in
+February. Training B1 and B2 and the single test run take place in April; analysis and writing follow,
+with a pre-defence in May and the defence in June 2027.
 
 \begin{figure}[ht]
 \centering
@@ -301,9 +382,15 @@ No second annotator & Agree with two teachers before the pilot; fallback: the au
 both labelling every attempt. \\
 Ethics and data-protection blockers & Raise operator and ethics questions with the supervisor now;
 close all pilot-blocking items in the technical-debt register first. \\
+Too little data for fine-tuning & B1 works with hundreds of examples; minimal-pair augmentation; if
+fewer than about 1\,500 annotated attempts exist by 15 April, B2 is reported as a feasibility check and
+RQ-2 is answered by B1 (fixed in the preregistration). \\
+Leakage between training and test & Learner-disjoint split; test list and evaluator frozen by
+fingerprint; a hook forbids the agent to read test labels; the test set is opened once. \\
+No GPU & University cluster or cloud; LoRA needs a single card; B1 trains on a CPU. \\
 Errors in the Arabic text of the curriculum & Human proofreading against the scan; every attempt
 stores the curriculum version, so affected attempts can be excluded. \\
-Scope larger than the timeline & Prioritise RQ-1 on pages 10--24; MoSCoW priorities; review at each
+Scope larger than the timeline & Prioritise RQ-1 and RQ-2 on pages 10--24; MoSCoW priorities; review at each
 supervisor meeting. \\
 \bottomrule
 \end{tabularx}
@@ -318,7 +405,9 @@ attempts the median processing time was 1.7\,s (90th percentile 5.0\,s), within 
 although this excludes download and rendering. Properties of the assessment algorithm were checked on
 5\,000 random phoneme strings per property without a violation \cite{SRC-096}. The code base has about
 9\,000 lines of Python in 92 modules, 736 passing automated tests, 50 architecture decision records and
-47 functional requirements traced to tests. None of these numbers answers a research question yet;
+47 functional requirements traced to tests. Every attempt already stores the raw model output with
+per-phoneme confidence and the model version --- exactly what training B1 and comparing systems
+requires. None of these numbers answers a research question yet;
 they show that the instrument is ready.
 
 \section{Proposed thesis outline}
@@ -326,11 +415,12 @@ they show that the instrument is ready.
 \begin{enumerate}[leftmargin=2em]
   \item \textbf{Introduction} --- context, problem, aim, research questions, contributions.
   \item \textbf{Literature Review} --- the primer and the sound-based method; computer-assisted
-    pronunciation training; Qur'anic mispronunciation detection; AI-agent software engineering.
+    pronunciation training; Qur'anic mispronunciation detection; adapting and calibrating speech
+    models; AI-agent software engineering.
   \item \textbf{Methodology} --- design science; requirements and quality scenarios; GQM metrics;
-    study designs; preregistration; threats to validity.
+    study designs; data splitting and test-set protection; preregistration; threats to validity.
   \item \textbf{Implementation} --- curriculum from the book; architecture; assessment and feedback;
-    research data and annotation; privacy; the agent harness.
+    research data and annotation; the B1 and B2 training pipeline; privacy; the agent harness.
   \item \textbf{Evaluation and Discussion} --- RQ-1 to RQ-4, limitations.
   \item \textbf{Conclusion} --- answers, contributions, doctoral directions.
 \end{enumerate}

@@ -20,10 +20,11 @@ Section~\ref{sec:eval-discussion} discusses the findings and Section~\ref{sec:ev
 \toprule
 Study & Ready now & Needs \\
 \midrule
-1. Agreement (RQ-1) & Annotation in Telegram and packages; phoneme-level metrics, $\kappa$, $\alpha$
-computed automatically & Pilot attempts; two annotators; bootstrap intervals \\
-2. Errors (RQ-2) & Error catalogue; confusion and book-line reports; entry questionnaire & Pilot data;
-confirmed-only frequencies; attribute outputs stored separately \\
+1. Baseline (RQ-1) & Annotation in Telegram and packages; phoneme-level metrics, $\kappa$, $\alpha$
+computed automatically; error catalogue; confusion and book-line reports; entry questionnaire & Pilot
+attempts; two annotators; bootstrap intervals; confirmed-only frequencies \\
+2. Adaptation (RQ-2) & Raw model output and versions in every attempt; recogniser port; phoneme-level
+metrics & Training pipeline (TD-FN-72); blind test annotation (TD-FN-73); GPU (TD-FN-74); pilot data \\
 3. Feedback (RQ-3) & Decision trace; retry data; preregistered model & Condition switch per card; delayed
 test; pilot \\
 4. Harness (RQ-4) & Hook journal (since 18 October 2026); session and prompt logs; ADRs; incidents &
@@ -84,9 +85,10 @@ per property in every run of the suite and 5\,000 per property in a one-off run,
 
 Adding a second recogniser required three files and no change to the domain, the use cases, the database
 or the interface; all architecture contracts and tests passed (QAS-10). This supports the claim that the
-tutor can be used to compare models on the same recordings, which is planned for doctoral work.
+tutor can be used to compare models on the same recordings; this is exactly how RQ-2 compares B0, B1 and
+B2.
 
-\section{RQ-1: agreement with teachers}\label{sec:eval-rq1}
+\section{RQ-1: the baseline model and the error profile}\label{sec:eval-rq1}
 
 \begin{notebox}
 This section will be completed after the pilot and double annotation. The tables below show the planned
@@ -128,16 +130,59 @@ Teacher A -- teacher B & & \\
 
 The analysis will report precision and recall by error type and by letter (R-08), Krippendorff's $\alpha$ per
 phoneme between annotators, the share of disputed attempts that annotators corrected, and the
-self-correction block separately. H1.1--H1.3 will be tested as preregistered.
+self-correction block separately. H1.1--H1.3 will be tested as preregistered, H1.3 also on the blindly
+annotated part.
 
-\section{RQ-2: beginners' errors}\label{sec:eval-rq2}
+\paragraph{Error profile} \pending{error-profile results}. The analysis will present the frequency of
+error kinds (T-03), the most difficult lines and minimal pairs of the book (T-04), and confusion matrices
+for all reported and for confirmed errors (R-09). The comparison of the two matrices shows which parts of
+the apparent learner profile are produced by the model, and also suggests on which sounds adaptation may
+gain most. H1.4 needs the attribute outputs of the model, which the tutor already receives but does not yet
+store separately; the comparison by first language (E-1) is run only if both groups are present.
 
-\pending{RQ-2 results}. The analysis will present the frequency of error kinds (T-03), the most difficult
-lines and minimal pairs of the book (T-04), and confusion matrices for all reported and for confirmed
-errors (R-09). The comparison of the two matrices is the main result: it shows which parts of the apparent
-learner profile are produced by the model. H2.1 will be tested only if both language groups are present; H2.2
-needs the attribute outputs of the model, which the tutor already receives but does not yet store
-separately.
+\section{RQ-2: model adaptation}\label{sec:eval-rq2}
+
+\begin{notebox}
+This section will be completed after B1 and B2 are trained and the test set is run once (April 2027).
+Below is the planned layout of the tables; values will appear only with a passport.
+\end{notebox}
+
+\begin{table}[ht]
+\centering\small
+\caption{B0, B1 and B2 on test learners with blind gold labels (T-11).}
+\label{tab:T-11}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Measure & B0 & B1 & B2 \\
+\midrule
+Precision / recall / F1 & \pending{T-11} & & \\
+FAR / FRR (verdict) & & & \\
+$\kappa$ with gold labels & & & \\
+Share of gap closed $G_B$ & 0 & & \\
+ECE & & & \\
+Share of ``not sure'' & --- & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering\small
+\caption{Retention on expert recitation: PER of B0 and B2 (T-12, H2.3).}
+\label{tab:T-12}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Set & B0 & B2 & Difference, 95\,\% CI \\
+\midrule
+Held-out expert recitation & \pending{T-12} & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The analysis will report the differences B1 $-$ B0 and B2 $-$ B0 with paired cluster-bootstrap intervals
+(H2.1, H2.2), the non-inferiority check on expert recitation (H2.3), whether the conformal guarantee holds
+on the test set, B1's risk--coverage curve (R-14) and B2's learning curve (R-15). If the fallback of
+Section~\ref{sec:method-s2} applies, B2 will be described as a feasibility check and RQ-2 will be answered
+by B1.
 
 \section{RQ-3: effect of explanations}\label{sec:eval-rq3}
 
@@ -202,11 +247,12 @@ quantitative analysis will show how often such incidents occur relative to the v
 
 \paragraph{Two probabilistic systems under one discipline} The thesis deals with two systems that can pass a
 test without doing the right thing. The coding agent can make tests pass by changing them; the recogniser can
-reject a correct reading or accept a wrong one. The remedies have the same shape: deterministic external
+reject a correct reading or accept a wrong one, and an adapted model can show a gain that comes from
+leakage rather than learning. The remedies have the same shape: deterministic external
 checks that the system cannot edit, a log of every decision, and an escalation path to a human. For the
 agent these are frozen tests, layer contracts and STOP verdicts; for the model they are the decision trace,
-the ``the bot was wrong'' button, teacher annotation and, as a next step, a ``not sure'' outcome based on the
-model's confidence.
+the ``the bot was wrong'' button, teacher annotation, a frozen and blindly annotated test set, and a
+``not sure'' outcome with a guarantee on the false-rejection rate.
 
 \paragraph{What a tutor can and cannot claim} The literature and the preliminary checks support a modest
 role: a patient practice partner that gives immediate, explicit first-line feedback between lessons. The
@@ -214,12 +260,16 @@ claim that it replaces a teacher is neither supported by evidence nor consistent
 reflects this by making disputes easy, sending disputed attempts to teachers first and recording everything
 a teacher needs to review a verdict.
 
-\paragraph{Pending findings} \pending{interpretation of RQ-1--RQ-3 results}.
+\paragraph{Pending findings} \pending{interpretation of RQ-1--RQ-3 results, including how much of the gap to a
+teacher adaptation closed and how much data it needed}.
 
 \section{Limitations}\label{sec:eval-limits}
 
 The pilot is small and closed, so its results describe the participants rather than all Russian-speaking
-beginners. Annotators see the tutor's answer, which may inflate agreement. The model was trained on Qur'anic
+beginners. Annotators of the training part see the tutor's answer, which may inflate agreement; the test
+set is therefore annotated blind. The test set is small --- about ten learners --- so intervals for RQ-2 will
+be wide, and the gain from adaptation on these learners need not transfer to other Russian speakers or to
+later lessons of the book. The model was trained on Qur'anic
 recitation, whereas pages 10--37 of the book contain syllables and words that are not Qur'anic; results are
 therefore reported by material type. The similarity score used for verdicts is coarse on long lines. The
 case study of the harness has one developer, one project and an author who is also the evaluator; it is

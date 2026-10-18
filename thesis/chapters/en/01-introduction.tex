@@ -38,7 +38,11 @@ reviews warn that speech recognisers produce false alarms on accented speech and
 or partner stay in the loop \cite{SRC-026}. A Russian-speaking adult who reads an isolated syllable slowly
 for the first time is far from the model's training data, and nobody knows how often the model will be
 wrong about such a learner, how often it will reject a correct reading, or whether its explanations will
-help.
+help. Even less is known about whether the model can be adapted to such a learner. Methods exist ---
+low-rank fine-tuning \cite{SRC-111}, calibration and abstention \cite{SRC-112,SRC-117} --- but they need
+data from the new population, and there are none: no dataset of primer-level reading by Russian-speaking
+beginners exists. Even when data appear, small datasets make inflated results easy through leakage
+between training and evaluation \cite{SRC-122}.
 
 A second problem concerns how such a system is built. The software in this thesis was written by one
 author with an AI coding agent. Agents are productive, but they are known to make their own tests pass by
@@ -48,9 +52,10 @@ instruction file.
 
 \section{Aim and objectives}
 
-The aim of the thesis is \emph{to design a reading tutor that faithfully follows} Muallim al-Sani,
-\emph{and to measure how far an open phoneme-level model can take the role of the listening teacher for
-Russian-speaking beginners, without overstating what it can do.}
+The aim of the thesis is \emph{to build a reading tutor that faithfully follows} Muallim al-Sani,
+\emph{to collect with it an annotated dataset of Russian-speaking beginners' reading, and to adapt an open
+phoneme-level model on this dataset so that it takes the role of the listening teacher more reliably ---
+measuring how much of the gap to a teacher the adaptation closes and where it remains.}
 
 The objectives are:
 \begin{enumerate}[label=O\arabic*.]
@@ -58,38 +63,48 @@ The objectives are:
     traceable to a page and line of a concrete edition;
   \item to build a tutor that assesses phoneme-level reading, explains errors in Russian for a learner who
     starts from zero, and records a full decision trace for every attempt;
-  \item to build the research infrastructure: consent and pseudonyms, phoneme-level annotation by two
-    teachers, automated metrics and a preregistered analysis plan;
-  \item to run a closed pilot with 20--40 learners over 4--6 weeks, including a within-subject feedback
-    experiment and a delayed post-test;
-  \item to answer the research questions with effect sizes and confidence intervals;
-  \item to document the AI-agent harness used to build the system and evaluate it as a case study.
+  \item to collect a dataset: consent, including consent to model training, and pseudonyms; a closed
+    pilot with 20--40 learners over 4--6 weeks; phoneme-level annotation by two teachers, blind for test
+    learners; a datasheet;
+  \item to build a reproducible training and evaluation pipeline: a learner-disjoint split with a frozen
+    test set, a calibrated verifier, LoRA fine-tuning with data augmentation, and a protected evaluator;
+  \item to run a within-subject feedback experiment and a delayed post-test;
+  \item to answer the research questions with effect sizes and confidence intervals following the
+    preregistered plan;
+  \item to document the AI-agent harness in which the system was built and trained, and evaluate it as a
+    case study.
 \end{enumerate}
 
 \section{Research questions}\label{sec:rq}
 
 \begin{rqbox}
-\textbf{RQ-1.} How closely does the automatic assessment --- Muaalem, rule-based alignment and grading
-thresholds --- agree with qualified teachers on beginners reading \emph{Muallim al-Sani}?\\[4pt]
-\textbf{RQ-2.} Which reading errors do Russian-speaking beginners make, and which of the errors reported by
-the tutor are errors of the learner rather than of the model?\\[4pt]
+\textbf{RQ-1.} How closely does the off-the-shelf assessment B0 --- Muaalem, rule-based alignment and
+grading thresholds --- agree with qualified teachers on beginners reading \emph{Muallim al-Sani}, and which
+of the errors it reports belong to the learner rather than to the model?\\[4pt]
+\textbf{RQ-2.} How much does adapting the model on the collected dataset --- a calibrated verifier with a
+``not sure'' outcome (B1) and low-rank fine-tuning (B2) --- reduce false rejections and bring the
+assessment closer to teachers on learners unseen in training, without degrading recognition of expert
+recitation?\\[4pt]
 \textbf{RQ-3.} Do explicit explanations in Russian improve the next attempt and delayed retention compared
 with a bare correct/incorrect signal?\\[4pt]
-\textbf{RQ-4.} Which known failure modes of AI-agent development does a mechanically enforced harness
-prevent or expose, and how much human intervention does it require?
+\textbf{RQ-4.} Which known failure modes of AI-agent development and ML experimentation does a
+mechanically enforced harness prevent or expose, and how much human intervention does it require?
 \end{rqbox}
 
-RQ-1 to RQ-3 concern the tutor; RQ-4 concerns the way it was built. Seven confirmatory hypotheses for
-RQ-1 to RQ-3 are listed in Section~\ref{sec:method-hyp}; everything else is reported as exploratory.
+RQ-1 and RQ-3 concern the tutor, RQ-2 --- the central question --- the adapted model, and RQ-4 the way
+they were built. RQ-1 sets the baseline from which RQ-2 measures the gain. Nine confirmatory hypotheses
+for RQ-1 to RQ-3 are listed in Section~\ref{sec:method-hyp}; everything else is reported as exploratory.
 
 \section{Approach}
 
-The thesis follows design science research \cite{SRC-100,SRC-101}. It builds two artefacts and evaluates
-each claim with a method suited to it. The tutor (artefact A) is evaluated by a measurement study against
-teachers, a descriptive analysis of errors and a pilot experiment. The development harness (artefact B)
-is evaluated as an embedded case study \cite{SRC-102}. Requirements are written as quality-attribute
+The thesis follows design science research \cite{SRC-100,SRC-101}. It builds three artefacts and evaluates
+each claim with a method suited to it. The tutor with its dataset (artefact A) is evaluated by a
+measurement study against teachers and a pilot experiment. The adapted model (artefact C) is evaluated by a
+controlled experiment on a frozen test set of new learners. The development harness (artefact B) is
+evaluated as an embedded case study \cite{SRC-102}. Requirements are written as quality-attribute
 scenarios \cite{SRC-047}, metrics are derived with the Goal--Question--Metric method \cite{SRC-048}, and
-the analysis plan is preregistered and fingerprinted before data collection.
+the analysis plan and the data split are preregistered and fingerprinted before data collection and
+before the first training run.
 
 \section{Contributions}
 
@@ -97,8 +112,13 @@ the analysis plan is preregistered and fingerprinted before data collection.
   \item \textbf{Empirical.} The first teacher-referenced measurement of an open Qur'anic phoneme model on
     primer-level reading by second-language beginners, including how often it wrongly rejects correct
     reading.
-  \item \textbf{Data.} A small consented dataset of beginners' readings with phoneme-level labels from two
-    teachers, prepared for release in the Iqra'Eval format if ethics and consent allow.
+  \item \textbf{Model and method.} Small-data adaptation of an open model to a new population: a
+    calibrated verifier with a guarantee on the false-rejection rate and LoRA fine-tuning with augmentation
+    from the book's minimal pairs, evaluated on unseen learners with blind annotation and a check for
+    forgetting.
+  \item \textbf{Data.} A consented dataset of beginners' readings with phoneme-level labels from two
+    teachers and a blind gold test set, with a datasheet, prepared for release in the Iqra'Eval format
+    together with the fine-tuned weights if ethics and consent allow.
   \item \textbf{Design.} A tutor whose features are derived from Maksudi's didactic principles and from
     feedback research, with an open architecture in which the model, the database and the messenger can be
     replaced without touching domain logic.
@@ -110,16 +130,18 @@ the analysis plan is preregistered and fingerprinted before data collection.
 
 The curriculum covers the whole book (pages 10--85), but the evaluation concentrates on the letter and vowel
 lessons (pages 10--24), where beginners start and errors are most frequent. Tajwid rules such as
-\emph{ikhfa} and \emph{idgham}, other first languages and fine-tuning of the model are left for future
-work. The tutor is meant to complement a teacher; the thesis does not claim that it can replace one, and
+\emph{ikhfa} and \emph{idgham}, other first languages, active learning and per-learner personalisation of
+the model are left for future work. The model is adapted, not trained from scratch: the pilot yields
+orders of magnitude less data than training from scratch would need. The tutor is meant to complement a teacher; the thesis does not claim that it can replace one, and
 the book itself says it cannot.
 
 \section{Structure of the thesis}
 
 Chapter~\ref{ch:review} reviews the primer and its method, the learners, research on pronunciation
-feedback, automatic assessment of Qur'anic recitation and AI-agent software engineering.
+feedback, automatic assessment of Qur'anic recitation, methods for adapting speech models and AI-agent
+software engineering.
 Chapter~\ref{ch:method} sets out the methodology: requirements, metrics, the four studies, preregistration
 and threats to validity. Chapter~\ref{ch:impl} describes the implementation, from the curriculum to the
-assessment pipeline, the research data and the development harness. Chapter~\ref{ch:eval} presents and
+assessment pipeline, the research data, the training pipeline and the development harness. Chapter~\ref{ch:eval} presents and
 discusses the evaluation, and Chapter~\ref{ch:concl} concludes with answers and directions for doctoral
 research.

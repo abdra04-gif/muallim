@@ -1,25 +1,29 @@
-% Дизайн исследования: два артефакта, четыре RQ, данные и тип исследования.
-% Источник: docs/research/metrics-gqm.md (G1–G6), preregistration.md, roadmap 1.4–1.8.
+% Дизайн исследования: три артефакта, четыре RQ, данные и тип исследования.
+% Источник: docs/research/metrics-gqm.md (G1–G7), preregistration.md (v0.3), roadmap 1.4–1.8, ADR-0051.
 \begin{tikzpicture}[node distance=4mm and 6mm]
-  \node[hot,text width=5.6cm] (a1) {\textbf{\LANG{Artefact A}{Артефакт A}}: \LANG{reading tutor}{тренажёр чтения}\\[-1pt]{\scriptsize\LANG{book-ordered curriculum, ASR assessment, feedback}{программа по книге, ASR-оценка, объяснения}}};
-  \node[goldbox,right=14mm of a1,text width=5.6cm] (a2) {\textbf{\LANG{Artefact B}{Артефакт B}}: \LANG{agent harness}{обвязка агента}\\[-1pt]{\scriptsize\LANG{hooks, frozen tests, reviewers, journals}{хуки, замороженные тесты, ревьюеры, журналы}}};
+  \node[hot,text width=4.1cm] (a1) {\textbf{\LANG{Artefact A}{Артефакт A}}: \LANG{reading tutor}{тренажёр чтения}\\[-1pt]{\scriptsize\LANG{book-ordered curriculum, B0 assessment, feedback, dataset}{программа по книге, оценка B0, объяснения, набор данных}}};
+  \node[hot,right=5mm of a1,text width=4.1cm] (a3) {\textbf{\LANG{Artefact C}{Артефакт C}}: \LANG{adapted model}{адаптированная модель}\\[-1pt]{\scriptsize\LANG{B1 calibrated verifier, B2 LoRA fine-tuning}{B1 калиброванный верификатор, B2 дообучение LoRA}}};
+  \node[goldbox,right=5mm of a3,text width=4.1cm] (a2) {\textbf{\LANG{Artefact B}{Артефакт B}}: \LANG{agent harness}{обвязка агента}\\[-1pt]{\scriptsize\LANG{hooks, frozen tests and test set, reviewers, journals}{хуки, замороженные тесты и тест, ревьюеры, журналы}}};
 
-  \node[rqbox-node,below=7mm of a1,xshift=-2.6cm,text width=2.9cm] (rq1) {\textbf{RQ-1}\\[-1pt]{\scriptsize\LANG{agreement with teachers}{согласие с учителями}}};
-  \node[rqbox-node,right=of rq1,text width=2.9cm] (rq2) {\textbf{RQ-2}\\[-1pt]{\scriptsize\LANG{beginner error profile}{профиль ошибок новичков}}};
-  \node[rqbox-node,right=of rq2,text width=2.9cm] (rq3) {\textbf{RQ-3}\\[-1pt]{\scriptsize\LANG{effect of explanations}{эффект объяснений}}};
-  \node[rqbox-node,right=of rq3,text width=2.9cm] (rq4) {\textbf{RQ-4}\\[-1pt]{\scriptsize\LANG{what the harness prevents, at what cost}{что предотвращает обвязка и какой ценой}}};
+  \node[rqbox-node,minimum height=1.25cm,below=7mm of a1,xshift=-2.0cm,text width=2.9cm] (rq1) {\textbf{RQ-1}\\[-1pt]{\scriptsize\LANG{baseline vs.\ teachers; error profile}{B0 против учителей; профиль ошибок}}};
+  \node[rqbox-node,minimum height=1.25cm,right=of rq1,text width=2.9cm] (rq2) {\textbf{RQ-2}\\[-1pt]{\scriptsize\LANG{does adaptation close the gap?}{закрывает ли адаптация разрыв?}}};
+  \node[rqbox-node,minimum height=1.25cm,right=of rq2,text width=2.9cm] (rq3) {\textbf{RQ-3}\\[-1pt]{\scriptsize\LANG{effect of explanations}{эффект объяснений}}};
+  \node[rqbox-node,minimum height=1.25cm,right=of rq3,text width=2.9cm] (rq4) {\textbf{RQ-4}\\[-1pt]{\scriptsize\LANG{what the harness prevents, at what cost}{что предотвращает обвязка и какой ценой}}};
 
-  \node[soft,minimum height=1.75cm,below=of rq1,text width=2.9cm] (d1) {\scriptsize\LANG{double phoneme-level annotation; P/R/F1, FAR/FRR, $\kappa$}{двойная разметка по фонемам; P/R/F1, FAR/FRR, $\kappa$}};
-  \node[soft,minimum height=1.75cm,below=of rq2,text width=2.9cm] (d2) {\scriptsize\LANG{confusion matrices, confirmed errors, L1 groups}{матрицы путаниц, подтверждённые ошибки, группы L1}};
+  \node[soft,minimum height=1.75cm,below=of rq1,text width=2.9cm] (d1) {\scriptsize\LANG{phoneme-level annotation; P/R/F1, FAR/FRR, $\kappa$; confirmed confusions}{разметка по фонемам; P/R/F1, FAR/FRR, $\kappa$; подтверждённые путаницы}};
+  \node[soft,minimum height=1.75cm,below=of rq2,text width=2.9cm] (d2) {\scriptsize\LANG{learner-disjoint frozen test, blind gold labels; B0 vs.\ B1 vs.\ B2}{замороженный тест по ученикам, слепое «золото»; B0, B1, B2}};
   \node[soft,minimum height=1.75cm,below=of rq3,text width=2.9cm] (d3) {\scriptsize\LANG{within-subject: full vs.\ minimal feedback; delayed test}{внутрисубъектно: полное vs.\ краткое; отложенный тест}};
   \node[soft,minimum height=1.75cm,below=of rq4,text width=2.9cm] (d4) {\scriptsize\LANG{embedded case study: hook logs, sessions, commits}{встроенное кейс-стади: журналы хуков, сессии, коммиты}};
 
   \node[lab,below=1mm of d1] {\LANG{measurement study}{измерительное}};
-  \node[lab,below=1mm of d2] {\LANG{descriptive / exploratory}{описательное}};
+  \node[lab,below=1mm of d2] {\LANG{controlled ML experiment}{контролируемый ML-эксперимент}};
   \node[lab,below=1mm of d3] {\LANG{pilot experiment}{пилотный эксперимент}};
   \node[lab,below=1mm of d4] {\LANG{case study}{кейс-стади}};
 
-  \foreach \r in {rq1,rq2,rq3}{\draw[arr] (a1.south) -- (\r.north);}
+  \draw[arr] (a1.south) -- (rq1.north);
+  \draw[arr] (a1.south) -- (rq3.north);
+  \draw[arr] (a1.south) -- (rq2.north);
+  \draw[arr] (a3.south) -- (rq2.north);
   \draw[arr] (a2.south) -- (rq4.north);
   \foreach \r/\d in {rq1/d1,rq2/d2,rq3/d3,rq4/d4}{\draw[arr] (\r) -- (\d);}
 \end{tikzpicture}

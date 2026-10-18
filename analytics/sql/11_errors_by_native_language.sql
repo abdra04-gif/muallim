@@ -1,4 +1,4 @@
--- Ошибки по родному языку и опыту чтения из анкеты (FR-44, H2.1, ADR-0038); только агрегаты, без Telegram ID.
+-- Ошибки по родному языку и опыту чтения из анкеты (FR-44, E-1 — бывшая H2.1, ADR-0038, ADR-0051); только агрегаты, без Telegram ID.
 SELECT
     COALESCE(p.native_language, 'нет анкеты') AS native_language,
     COALESCE(p.arabic_reading, 'нет анкеты') AS arabic_reading,
