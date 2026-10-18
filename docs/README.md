@@ -24,6 +24,7 @@
 | вспомнить, что и когда просили у ИИ | `journal/prompts/` |
 | открытые вопросы | `research/open-questions.md` |
 | хронология исследования | `research/research-log.md` |
+| какие линтеры, хуки, агенты добавить; работы и бот научрука | `research/linters-hooks-agents.md` |
 | термины | `glossary.md` |
 | что отложено (безопасность и др.) и когда закрыть | `tech-debt.md` |
 | план на магистратуру и докторантуру | `roadmap.md` |
