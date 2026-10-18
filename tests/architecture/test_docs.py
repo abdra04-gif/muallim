@@ -1,6 +1,8 @@
 """Документация не расходится с проектом: ADR, трассировка, источники (NFR-TR-01, NFR-TR-02)."""
 
 import re
+import subprocess
+import sys
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -166,3 +168,46 @@ def test_traceability_rows_have_honest_status() -> None:
         assert len(cells) == 5 and cells[4] in {"✅", "🟡", "❌"}, row[:40]
         if cells[2].startswith("—"):
             assert cells[4] != "✅", f"{cells[0]}: нет автотеста, а статус ✅"
+
+
+RESEARCH = DOCS / "research" / "traceability.md"
+FIGURES = DOCS / "thesis" / "figures.md"
+
+
+def test_every_gqm_question_is_traced_to_research() -> None:
+    gqm = set(
+        re.findall(
+            r"^\| (Q\d\.\d)",
+            (DOCS / "research" / "metrics-gqm.md").read_text(encoding="utf-8"),
+            re.M,
+        )
+    )
+    traced = set(re.findall(r"\| (Q\d\.\d) \|", RESEARCH.read_text(encoding="utf-8")))
+    assert gqm and not gqm - traced, f"нет в research/traceability.md: {sorted(gqm - traced)}"
+
+
+def test_research_results_are_registered_figures() -> None:
+    used = set(re.findall(r"\b([РТ]-\d{2})\b", RESEARCH.read_text(encoding="utf-8")))
+    registered = set(re.findall(r"^\| ([РТ]-\d{2}) \|", FIGURES.read_text(encoding="utf-8"), re.M))
+    assert not used - registered, f"нет в thesis/figures.md: {sorted(used - registered)}"
+
+
+def test_ready_figures_exist() -> None:
+    missing = []
+    for line in FIGURES.read_text(encoding="utf-8").splitlines():
+        if line.startswith("| Р-") and "| ✅" in line:
+            missing += [
+                p for p in re.findall(r"`(docs/[^`]+\.png)`", line) if not (ROOT / p).exists()
+            ]
+    assert not missing, missing
+
+
+def test_trace_script_runs() -> None:
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, str(ROOT / "scripts" / "trace.py"), "--no-tests"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr

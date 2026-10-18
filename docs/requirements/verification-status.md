@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-17T22:06:19+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-18T00:44:11+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `74b58432737b9e67` | 74 |
+| код | `ccc70adf50d2b3f6` | 74 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
-| SQL-отчёты | `5dad640ebf8103cd` | 10 |
-| миграции | `6b6aafec6229ecfe` | 3 |
+| SQL-отчёты | `6797c7f129642e6c` | 11 |
+| миграции | `d83a9fe5cd87809b` | 4 |
 | зависимости | `af8a1c870e87abfe` | 1 |
 | предрегистрация | `3b058998859d2b6e` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **49 из 52**.
+Проверено зелёными тестами: **52 из 53**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -57,8 +57,9 @@
 | FR-41 | `tests/unit/test_curriculum_content.py` | ✅ |
 | FR-42 | `tests/integration/test_di.py` | ✅ |
 | FR-43 | `tests/integration/test_reading_guide.py`, `tests/unit/test_feedback.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-44 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
-| NFR-TR-02 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
+| NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/integration/test_audio_store.py` | ✅ |
 | NFR-TR-04 | `tests/architecture/test_hooks.py` | ✅ |
 | NFR-REL-02 | `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
@@ -70,7 +71,7 @@
 | NFR-MNT-01 | `tests/architecture/test_layers.py` | ✅ |
 | NFR-MNT-03 | `tests/architecture/test_migrations.py` | ✅ |
 | NFR-SEC-07 | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ✅ |
-| NFR-TR-05 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
+| NFR-TR-05 | `tests/architecture/test_docs.py` | ✅ |
 
 ## Исследование
 Строк в матрице: 27 — считается ✅ 9, частично 🟡 5, нет ❌ 10, данных не собираем 3.

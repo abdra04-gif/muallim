@@ -35,12 +35,16 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `make db-up` · `make migrate` · `make backup` | PostgreSQL в Docker, миграции, резервная копия |
 | `make report` · `make errors a="--letter ص"` | отчёты и каталог ошибок (`docs/data/browsing.md`) |
 | `scripts/phase [tests\|impl\|off]` | TDD-фаза; в `impl` хук запрещает править `tests/` |
+| `make trace` | требования ↔ тесты сейчас, отпечаток версии (`docs/requirements/verification-status.md`) |
+| `make thesis` · `make thesis-check` | диссертация LaTeX → `thesis/build/main.pdf` |
+| `/ship` | проверки → сверка документов → коммит → push (`docs/process/git.md`) |
 
 ## Кто что решает
 **Только человек:** учебный контент (`curriculum/`, буквы, огласовки, переводы, подсказки), тексты
 ученику (`texts.py`, `feedback.*.yaml`, включение языков), эталонные записи, методика и пороги (`domain/policy.py`, `docs/pedagogy/methodology.md`),
 параметры чтения (`MOSHAF_PARAMS`), текст согласия, разметка данных, новые зависимости, изменения
-схемы БД, удаление/ослабление тестов и проверок, коммит и push, всё про персональные данные.
+схемы БД, удаление/ослабление тестов и проверок, всё про персональные данные. Коммит и push
+готовит агент командой `/ship`, человек подтверждает каждый (ADR-0039, `docs/process/git.md`).
 
 **Агент сам, с отчётом одной строкой:** имена, внутренняя структура, вспомогательные функции,
 раскладка тестов, выбор между равноценными реализациями, документация.
@@ -59,7 +63,8 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 3. `scripts/phase impl` → код до зелёного `make check`.
 4. Ревью: architecture-guardian, при необходимости security-auditor.
 5. thesis-scribe: CHANGELOG, ADR (и отклонённые варианты), трассировка, materials-log.
-6. `scripts/phase off` → сводка: что сделано, что упрощено, что проверить в Telegram.
+6. consistency-auditor: документы правдивы, ничего не потеряно (хук doc_sync ловит механическое).
+7. `scripts/phase off` → сводка: что сделано, что упрощено, что проверить в Telegram → `/ship`.
 
 ## Правила кода
 - Слои проверяет import-linter (ADR-0002). Нарушение = красный CI и блок Stop-хука.

@@ -1,17 +1,20 @@
-%% Цикл разработки с ИИ-агентами (agent harness loop), ADR-0012.
+%% Цикл разработки с ИИ-агентами (agent harness loop): ADR-0012, ADR-0034, ADR-0039.
 flowchart TB
     task["📝 Задача от человека<br/>+ требование FR/NFR"] --> spec["Уточнение: один вопрос с вариантами"]
-    spec --> phT["scripts/phase tests"]
-    phT --> tw["🤖 tdd-test-writer<br/>пишет падающие тесты"]
-    tw --> human1{"👤 Человек<br/>принимает тесты?"}
+    spec --> sa["🤖 solution-architect<br/>варианты и черновик ADR<br/>(если затронуто больше одного слоя)"]
+    sa --> phT["scripts/phase tests"]
+    phT --> tw["🤖 tdd-test-writer<br/>падающие тесты"]
+    tw --> ta["🤖 test-auditor<br/>ловят ли тесты ошибки"]
+    ta --> human1{"👤 Человек<br/>принимает тесты?"}
     human1 -- нет --> tw
-    human1 -- да --> phI["scripts/phase impl<br/>тесты заморожены хуком"]
+    human1 -- да --> phI["scripts/phase impl<br/>тесты заморожены хуком guard"]
     phI --> impl["🤖 implementer<br/>код до зелёного"]
-    impl --> gates{"Хуки и проверки:<br/>pytest · ruff · mypy · lint-imports"}
-    gates -- "красно (Stop-хук)" --> impl
-    gates -- зелено --> arch["🤖 architecture-guardian<br/>ревью по ADR"]
-    arch -- замечания --> impl
-    arch --> sec["🤖 security-auditor"]
-    sec --> scribe["🤖 thesis-scribe<br/>CHANGELOG, ADR, материалы диплома"]
-    scribe --> phO["scripts/phase off"]
-    phO --> human2{"👤 Человек:<br/>проверка в Telegram, коммит"}
+    impl --> gates{"Stop-хуки:<br/>stop_gate — архитектура · типы · тесты<br/>doc_sync — связанные документы"}
+    gates -- красно --> impl
+    gates -- зелено --> cr["🤖 code-reviewer → architecture-guardian<br/>(→ security-auditor, learner-simulator)"]
+    cr -- замечания --> impl
+    cr --> scribe["🤖 thesis-scribe<br/>CHANGELOG, ADR, материалы диплома"]
+    scribe --> ca["🤖 consistency-auditor<br/>документы правдивы, ничего не потеряно"]
+    ca --> phO["scripts/phase off"]
+    phO --> ship["/ship: make check → make trace →<br/>коммит (git_guard: пути, gitleaks) →<br/>push (git_guard: проверки)"]
+    ship --> human2{"👤 Человек:<br/>подтверждает коммит и push,<br/>проверяет в Telegram"}

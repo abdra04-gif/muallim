@@ -100,3 +100,183 @@ def test_prompt_logged_with_secrets_redacted(project: Path) -> None:
 def test_empty_prompt_not_logged(project: Path) -> None:
     run_hook(project, "log_prompt.py", {"prompt": "  "})
     assert not (project / "docs" / "journal" / "prompts").exists()
+
+
+def hook_json(project: Path, name: str, event: dict[str, object]) -> dict[str, object]:
+    result = run_hook(project, name, event)
+    assert result.returncode == 0, result.stderr
+    out = result.stdout.strip()
+    return json.loads(out)["hookSpecificOutput"] if out else {}
+
+
+@pytest.mark.parametrize(
+    ("tool", "value"),
+    [
+        ("Write", "curriculum/course.ru.yaml"),
+        ("Edit", "src/muallim/presentation/telegram/texts.py"),
+        ("MultiEdit", "src/muallim/domain/policy.py"),
+        ("Edit", "src/muallim/infrastructure/db/tables.py"),
+        ("Write", "migrations/versions/0009_x.py"),
+        ("Edit", "pyproject.toml"),
+        ("Edit", ".claude/hooks/guard.py"),
+    ],
+)
+def test_human_zones_ask(project: Path, tool: str, value: str) -> None:
+    out = hook_json(
+        project,
+        "human_zones.py",
+        {"tool_name": tool, "tool_input": {"file_path": str(project / value)}},
+    )
+    assert out["permissionDecision"] == "ask"
+    assert "Зона человека" in str(out["permissionDecisionReason"])
+
+
+def test_human_zones_asks_for_new_dependency(project: Path) -> None:
+    out = hook_json(
+        project,
+        "human_zones.py",
+        {"tool_name": "Bash", "tool_input": {"command": "pip install requests"}},
+    )
+    assert out["permissionDecision"] == "ask"
+
+
+@pytest.mark.parametrize(
+    ("tool", "key", "value"),
+    [
+        ("Edit", "file_path", "src/muallim/domain/assessment.py"),
+        ("Write", "file_path", "docs/thesis/chapters/01-обзор.md"),
+        ("Bash", "command", "uv run pytest -q"),
+    ],
+)
+def test_human_zones_silent_elsewhere(project: Path, tool: str, key: str, value: str) -> None:
+    target = str(project / value) if key == "file_path" else value
+    assert (
+        hook_json(project, "human_zones.py", {"tool_name": tool, "tool_input": {key: target}}) == {}
+    )
+
+
+def test_guard_fails_closed(project: Path) -> None:
+    result = run_hook(project, "guard.py", {"tool_name": "Read", "tool_input": ["не словарь"]})
+    assert result.returncode == 2
+    assert "упал" in result.stderr
+
+
+def test_block_is_logged_without_details(project: Path) -> None:
+    assert guard(project, "Bash", command="cat .env") == 2
+    (log,) = (project / "docs" / "journal" / "hooks").glob("*.jsonl")
+    record = json.loads(log.read_text(encoding="utf-8").splitlines()[-1])
+    assert record["hook"] == "guard" and record["kind"] == "block"
+    assert "cat .env" not in record["reason"]
+
+
+def test_stub_notice_only_for_stub(project: Path) -> None:
+    out = hook_json(
+        project, "stub_notice.py", {"tool_name": "Bash", "tool_input": {"command": "make run-stub"}}
+    )
+    assert "ЗАГЛУШК" in str(out["additionalContext"])
+    assert (
+        hook_json(
+            project, "stub_notice.py", {"tool_name": "Bash", "tool_input": {"command": "make run"}}
+        )
+        == {}
+    )
+
+
+def test_session_context_reports_phase(project: Path) -> None:
+    (project / ".agent-phase").write_text("impl", encoding="utf-8")
+    result = run_hook(project, "session_context.py", {})
+    assert result.returncode == 0
+    assert "TDD-фаза: impl" in result.stdout
+
+
+# --- ADR-0039: сверка документов (doc_sync) и безопасные коммиты (git_guard) ---
+def git(project: Path, *args: str) -> None:
+    subprocess.run(  # noqa: S603
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],  # noqa: S607
+        cwd=project, check=True, capture_output=True,
+    )  # fmt: skip
+
+
+@pytest.fixture
+def repo(project: Path) -> Path:
+    """Мини-проект в git: один коммит, дальше тест меняет файлы."""
+    files = {
+        ".gitignore": "/data/\n.agent-phase\n",
+        "CHANGELOG.md": "# log\n",
+        "src/muallim/infrastructure/db/tables.py": "x = 1\n",
+        "docs/data/data-dictionary.md": "# dict\n",
+        "docs/requirements/traceability.md": "| FR-01 | a |\n",
+        "src/muallim/presentation/telegram/texts.py": 'CONSENT_TEXT = (\n    "да"\n)\n',
+        "src/muallim/application/use_cases/learners.py": 'CONSENT_TEXT_VERSION = "1"\n',
+    }
+    for name, text in files.items():
+        (project / name).parent.mkdir(parents=True, exist_ok=True)
+        (project / name).write_text(text, encoding="utf-8")
+    git(project, "init", "-q")
+    git(project, "add", ".")
+    git(project, "commit", "-q", "-m", "base")
+    return project
+
+
+def doc_sync(project: Path) -> subprocess.CompletedProcess[str]:
+    return run_hook(project, "doc_sync.py", {})
+
+
+def test_doc_sync_blocks_schema_change_without_dictionary(repo: Path) -> None:
+    (repo / "src/muallim/infrastructure/db/tables.py").write_text("x = 2\n", encoding="utf-8")
+    (repo / "CHANGELOG.md").write_text("# log\n- схема\n", encoding="utf-8")
+    result = doc_sync(repo)
+    assert result.returncode == 2 and "data-dictionary.md" in result.stderr
+
+
+def test_doc_sync_passes_consistent_change(repo: Path) -> None:
+    (repo / "src/muallim/infrastructure/db/tables.py").write_text("x = 2\n", encoding="utf-8")
+    (repo / "CHANGELOG.md").write_text("# log\n- схема\n", encoding="utf-8")
+    (repo / "docs/data/data-dictionary.md").write_text("# dict\n- x\n", encoding="utf-8")
+    (repo / "migrations/versions").mkdir(parents=True)
+    (repo / "migrations/versions/0002_x.py").write_text("# m\n", encoding="utf-8")
+    assert doc_sync(repo).returncode == 0
+
+
+def test_doc_sync_finds_files_hidden_by_gitignore(repo: Path) -> None:
+    (repo / ".gitignore").write_text("data/\n.agent-phase\n", encoding="utf-8")  # как было
+    (repo / "docs/data/reports.md").write_text("# r\n", encoding="utf-8")
+    result = doc_sync(repo)
+    assert result.returncode == 2 and "docs/data/reports.md" in result.stderr
+
+
+def test_doc_sync_wants_new_consent_version(repo: Path) -> None:
+    texts = repo / "src/muallim/presentation/telegram/texts.py"
+    texts.write_text('CONSENT_TEXT = (\n    "да, и анкета"\n)\n', encoding="utf-8")
+    (repo / "CHANGELOG.md").write_text("# log\n- согласие\n", encoding="utf-8")
+    result = doc_sync(repo)
+    assert result.returncode == 2 and "CONSENT_TEXT_VERSION" in result.stderr
+
+
+def test_doc_sync_does_not_loop(repo: Path) -> None:
+    (repo / "src/muallim/infrastructure/db/tables.py").write_text("x = 3\n", encoding="utf-8")
+    assert run_hook(repo, "doc_sync.py", {"stop_hook_active": True}).returncode == 0
+
+
+def git_guard(project: Path, command: str) -> subprocess.CompletedProcess[str]:
+    return run_hook(
+        project, "git_guard.py", {"tool_name": "Bash", "tool_input": {"command": command}}
+    )
+
+
+@pytest.mark.parametrize("command", ["git add -f data/dev.sqlite3", "git add . && git commit -m x"])
+def test_git_guard_blocks_unsafe_commands(repo: Path, command: str) -> None:
+    assert git_guard(repo, command).returncode == 2
+
+
+def test_git_guard_blocks_secret_files_in_commit(repo: Path) -> None:
+    (repo / ".env").write_text("BOT_TOKEN=x\n", encoding="utf-8")
+    git(repo, "add", "-f", ".env")  # как если бы обошли .gitignore руками
+    result = git_guard(repo, "git commit -m 'x'")
+    assert result.returncode == 2 and ".env" in result.stderr
+
+
+def test_git_guard_allows_clean_commit(repo: Path) -> None:
+    (repo / "CHANGELOG.md").write_text("# log\n- ок\n", encoding="utf-8")
+    git(repo, "add", "CHANGELOG.md")
+    assert git_guard(repo, "git commit -m 'docs: ок'").returncode == 0

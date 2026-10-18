@@ -16,7 +16,7 @@
 | Р-03 | Обработка голосового (последовательность) | 2 | `docs/architecture/diagrams/03-voice-sequence.png` | `docs/architecture/diagrams/03-voice-sequence.mmd` | ✅ |
 | Р-04 | Схема БД | 2 | `docs/architecture/diagrams/04-er.png` | `docs/architecture/diagrams/04-er.mmd` | ✅ |
 | Р-05 | Жизненный цикл данных | 5 | `docs/architecture/diagrams/05-data-lifecycle.png` | `docs/architecture/diagrams/05-data-lifecycle.mmd` | ✅ |
-| Р-06 | Петля агента: хуки и TDD-фазы | 3 | `docs/architecture/diagrams/06-agent-loop.png` | `docs/architecture/diagrams/06-agent-loop.mmd` | ✅ (обновить: 8 хуков, ADR-0034) |
+| Р-06 | Петля агента: хуки и TDD-фазы | 3 | `docs/architecture/diagrams/06-agent-loop.png` | `docs/architecture/diagrams/06-agent-loop.mmd` | ✅ (обновлено 2026-10-18, ADR-0039) |
 | Р-07 | Смысловые области (bounded contexts) | 2 | `docs/architecture/diagrams/07-contexts.png` | `docs/architecture/diagrams/07-contexts.mmd` | ✅ |
 | Р-08 | Precision/recall по типу ошибки и букве | 4 | — | `src/muallim/research/metrics.py` | ⏳ |
 | Р-09 | Матрица путаниц: все ошибки / подтверждённые | 4 | — | `analytics/sql/04_letter_confusions.sql` | ⏳ |
