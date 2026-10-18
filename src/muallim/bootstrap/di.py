@@ -14,6 +14,7 @@ from muallim.application.ports.recognition import PronunciationRecognizer
 from muallim.application.ports.repositories import (
     AttemptRepository,
     CurriculumSnapshots,
+    LearnerProfileRepository,
     LearnerRepository,
     UnitOfWork,
 )
@@ -24,6 +25,7 @@ from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.application.use_cases.learners import (
     DeleteMyData,
     EnsureLearner,
+    Questionnaire,
     SetFeedbackLanguage,
     SetResearchConsent,
 )
@@ -50,7 +52,10 @@ from muallim.infrastructure.db.engine import create_engine, create_session_facto
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
 from muallim.infrastructure.db.repositories.curriculum import SqlCurriculumSnapshots
 from muallim.infrastructure.db.repositories.events import SqlEventLog
-from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
+from muallim.infrastructure.db.repositories.learners import (
+    SqlLearnerProfileRepository,
+    SqlLearnerRepository,
+)
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
 from muallim.presentation.telegram.learner import LearnerProvider
@@ -146,6 +151,7 @@ class RequestProvider(Provider):
 
     uow = provide(SqlUnitOfWork, provides=UnitOfWork)
     learners = provide(SqlLearnerRepository, provides=LearnerRepository)
+    profiles = provide(SqlLearnerProfileRepository, provides=LearnerProfileRepository)
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
     events = provide(SqlEventLog, provides=EventLog)
     snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
@@ -163,6 +169,7 @@ class RequestProvider(Provider):
     use_cases = provide_all(
         EnsureLearner,
         SetResearchConsent,
+        Questionnaire,
         SetFeedbackLanguage,
         DeleteMyData,
         OpenItem,

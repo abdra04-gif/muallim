@@ -56,6 +56,14 @@ class Consent(CallbackData, prefix="consent"):
     then: str = "home"  # куда вернуться: home — после /start, privacy — со страницы данных
 
 
+class Profile(CallbackData, prefix="pf"):
+    """Ответы анкеты копятся в кнопке: пустое поле — вопрос ещё не задан (FR-44)."""
+
+    adult: bool
+    lang: str = ""
+    read: str = ""
+
+
 class DeleteData(CallbackData, prefix="delete"):
     confirmed: bool
 

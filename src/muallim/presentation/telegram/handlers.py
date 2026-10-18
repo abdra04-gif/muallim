@@ -27,7 +27,11 @@ from dishka import FromDishka
 from muallim.application.ports.recognition import RecognitionError
 from muallim.application.ports.storage import ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
-from muallim.application.use_cases.learners import DeleteMyData, SetResearchConsent
+from muallim.application.use_cases.learners import (
+    DeleteMyData,
+    Questionnaire,
+    SetResearchConsent,
+)
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.reading import HowToRead
@@ -35,7 +39,7 @@ from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.domain.curriculum import Curriculum
-from muallim.domain.learner import Learner
+from muallim.domain.learner import ArabicReading, Learner, NativeLanguage
 from muallim.domain.report import ReportReason
 from muallim.presentation.telegram import keyboards, screens, texts, views
 from muallim.presentation.telegram.callbacks import (
@@ -52,6 +56,7 @@ from muallim.presentation.telegram.callbacks import (
     Menu,
     Noop,
     Privacy,
+    Profile,
     Quiz,
     QuizAnswer,
     ShowProgress,
@@ -152,10 +157,14 @@ async def start(
     is_new: FromDishka[NewLearner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
+    questionnaire: FromDishka[Questionnaire],
 ) -> None:
     if is_new and not learner.research_consent:
         await m.answer(texts.WELCOME)
         await m.answer(texts.CONSENT_TEXT, reply_markup=keyboards.consent())
+        return
+    if await questionnaire.needed(learner):  # анкету бросили на середине — спросить ещё раз
+        await send(bot, m.chat.id, PROFILE_START)
         return
     await send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
 
@@ -348,16 +357,60 @@ async def cb_consent(
     uc: FromDishka[SetResearchConsent],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
+    questionnaire: FromDishka[Questionnaire],
 ) -> None:
     await uc.execute(learner, callback_data.granted)
     await cb.answer(texts.CONSENT_SAVED_YES if callback_data.granted else texts.CONSENT_SAVED_NO)
     if msg := _message(cb):
-        screen = (
-            screens.privacy(learner.research_consent)
-            if callback_data.then == "privacy"
-            else screens.home(cur, await progress.execute(learner))
-        )
+        if await questionnaire.needed(learner):  # анкета — один раз, сразу после согласия (FR-44)
+            screen = PROFILE_START
+        elif callback_data.then == "privacy":
+            screen = screens.privacy(learner.research_consent)
+        else:
+            screen = screens.home(cur, await progress.execute(learner))
         await show(msg, screen)
+
+
+PROFILE_START: Final = Screen(texts.PROFILE_ADULT, keyboards.profile_adult())
+
+
+@router.callback_query(Profile.filter())
+async def cb_profile(
+    cb: CallbackQuery,
+    callback_data: Profile,
+    learner: FromDishka[Learner],
+    questionnaire: FromDishka[Questionnaire],
+    cur: FromDishka[Curriculum],
+    progress: FromDishka[GetProgress],
+) -> None:
+    """Анкета по шагам: 18+ → родной язык → опыт чтения; ответы копятся в кнопке (FR-44)."""
+    msg = _message(cb)
+    if callback_data.adult and not callback_data.lang:
+        await cb.answer()
+        if msg:
+            await show(msg, Screen(texts.PROFILE_LANGUAGE, keyboards.profile_language()))
+        return
+    if callback_data.adult and not callback_data.read:
+        await cb.answer()
+        if msg:
+            await show(
+                msg, Screen(texts.PROFILE_READING, keyboards.profile_reading(callback_data.lang))
+            )
+        return
+    if callback_data.adult:
+        try:
+            native = NativeLanguage(callback_data.lang)
+            reading = ArabicReading(callback_data.read)
+        except ValueError:  # кнопка от старой версии анкеты
+            await cb.answer(texts.STALE_BUTTON)
+            return
+        saved = await questionnaire.answer(learner, adult=True, native=native, reading=reading)
+        await cb.answer(texts.PROFILE_THANKS if saved else None)
+    else:
+        saved = await questionnaire.answer(learner, adult=False)
+        await cb.answer(texts.PROFILE_MINOR if saved else None)
+    if msg:
+        await show(msg, screens.home(cur, await progress.execute(learner)))
 
 
 @router.callback_query(DeleteData.filter(F.confirmed.is_(False)))

@@ -7,6 +7,7 @@ from muallim.presentation.telegram.callbacks import (
     DeleteData,
     DisputeReason,
     Home,
+    Profile,
 )
 
 
@@ -22,6 +23,35 @@ def consent() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.button(text="✅ Да, разрешаю", callback_data=Consent(granted=True))
     kb.button(text="🚫 Нет", callback_data=Consent(granted=False))
+    return kb.as_markup()
+
+
+def profile_adult() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="Да, мне 18+", callback_data=Profile(adult=True))
+    kb.button(text="Нет", callback_data=Profile(adult=False))
+    return kb.as_markup()
+
+
+def profile_language() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    options = (("ru", "Русский"), ("kk", "Казахский"), ("tt", "Татарский"), ("other", "Другой"))
+    for code, label in options:
+        kb.button(text=label, callback_data=Profile(adult=True, lang=code))
+    kb.adjust(2)
+    return kb.as_markup()
+
+
+def profile_reading(lang: str) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    options = (
+        ("none", "Совсем нет"),
+        ("some_letters", "Знаю некоторые буквы"),
+        ("slow_syllables", "Читаю медленно, по слогам"),
+    )
+    for code, label in options:
+        kb.button(text=label, callback_data=Profile(adult=True, lang=lang, read=code))
+    kb.adjust(1)
     return kb.as_markup()
 
 

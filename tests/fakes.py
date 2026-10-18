@@ -8,7 +8,7 @@ from uuid import UUID
 from muallim.application.ports.recognition import Recognition, RecognitionError
 from muallim.domain.assessment import Assessment
 from muallim.domain.attempt import Attempt
-from muallim.domain.learner import ConsentRecord, Learner
+from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
 from muallim.domain.report import LearnerReport
 
 
@@ -50,6 +50,19 @@ class InMemoryLearners:
     async def delete(self, learner_id: UUID) -> None:
         self.by_tg = {k: v for k, v in self.by_tg.items() if v.id != learner_id}
         self.consents = [c for c in self.consents if c.learner_id != learner_id]
+
+
+@dataclass
+class InMemoryProfiles:
+    """Анкета ученика (FR-44): одна на ученика."""
+
+    by_learner: dict[UUID, LearnerProfile] = field(default_factory=dict)
+
+    async def get(self, learner_id: UUID) -> LearnerProfile | None:
+        return self.by_learner.get(learner_id)
+
+    async def add(self, profile: LearnerProfile) -> None:
+        self.by_learner[profile.learner_id] = profile
 
 
 @dataclass

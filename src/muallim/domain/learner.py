@@ -33,3 +33,32 @@ class ConsentRecord:
     granted: bool
     text_version: str  # версия текста согласия, который видел ученик
     at: datetime
+
+
+class NativeLanguage(StrEnum):
+    """Родной язык из анкеты (FR-44) — группа для сравнения ошибок (H2.1)."""
+
+    RU = "ru"
+    KK = "kk"
+    TT = "tt"
+    OTHER = "other"
+
+
+class ArabicReading(StrEnum):
+    """Опыт чтения по-арабски до бота (FR-44): новичок или продолжающий."""
+
+    NONE = "none"
+    SOME_LETTERS = "some_letters"
+    SLOW_SYLLABLES = "slow_syllables"
+
+
+@dataclass(frozen=True, slots=True)
+class LearnerProfile:
+    """Анкета ученика: заполняется один раз. Младшим 18 остальное не задаётся (None)."""
+
+    learner_id: UUID
+    adult: bool
+    native_language: NativeLanguage | None
+    arabic_reading: ArabicReading | None
+    questionnaire_version: str
+    answered_at: datetime

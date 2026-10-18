@@ -8,7 +8,7 @@ from uuid import UUID
 from muallim.domain.assessment import Assessment
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum
-from muallim.domain.learner import ConsentRecord, Learner
+from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
 from muallim.domain.report import LearnerReport
 
 
@@ -23,6 +23,14 @@ class LearnerRepository(Protocol):
 
     async def delete(self, learner_id: UUID) -> None:
         """Удаляет ученика и все его данные (право на удаление, FR-10)."""
+
+
+class LearnerProfileRepository(Protocol):
+    """Анкета ученика (FR-44). Удаляется вместе с учеником (FR-10)."""
+
+    async def get(self, learner_id: UUID) -> LearnerProfile | None: ...
+
+    async def add(self, profile: LearnerProfile) -> None: ...
 
 
 class AttemptRepository(Protocol):

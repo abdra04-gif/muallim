@@ -16,6 +16,7 @@ from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.learners import (
     DeleteMyData,
     EnsureLearner,
+    Questionnaire,
     SetFeedbackLanguage,
     SetResearchConsent,
 )
@@ -25,7 +26,7 @@ from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
-from muallim.domain.learner import ConsentKind, Learner
+from muallim.domain.learner import ArabicReading, ConsentKind, Learner, NativeLanguage
 from muallim.domain.policy import GradingPolicy, Verdict
 from muallim.domain.report import ReportReason
 from tests.fakes import (
@@ -33,6 +34,7 @@ from tests.fakes import (
     InMemoryAttempts,
     InMemoryAudio,
     InMemoryLearners,
+    InMemoryProfiles,
     InMemoryReferenceAudio,
     ListEventLog,
     ScriptedReadingGuide,
@@ -131,6 +133,56 @@ async def test_consent_change_is_journaled(w: World) -> None:
     assert [c.granted for c in w.learners.consents] == [True, False]
     assert all(c.kind is ConsentKind.RESEARCH_AUDIO for c in w.learners.consents)
     assert not learner.research_consent
+
+
+# ---------- анкета (FR-44) ----------
+def _questionnaire(w: World) -> Questionnaire:
+    consent = SetResearchConsent(w.learners, w.uow, w.clock, w.events)
+    return Questionnaire(InMemoryProfiles(), consent, w.uow, w.clock, w.events)
+
+
+async def test_questionnaire_asked_only_after_research_consent(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    assert not await q.needed(learner)  # без согласия эти данные не нужны и не собираются
+    await SetResearchConsent(w.learners, w.uow, w.clock, w.events).execute(learner, True)
+    assert await q.needed(learner)
+
+
+async def test_questionnaire_saved_once_and_not_asked_again(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    assert await q.answer(learner, adult=True, native=NativeLanguage.KK, reading=ArabicReading.NONE)
+    profile = await q.profiles.get(learner.id)
+    assert profile is not None
+    assert (profile.adult, profile.native_language, profile.arabic_reading) == (
+        True, NativeLanguage.KK, ArabicReading.NONE,
+    )  # fmt: skip
+    assert profile.answered_at < w.clock.now() and profile.questionnaire_version  # часы тикают
+    assert not await q.needed(learner)
+    # второй ответ не перезаписывает первый: анкета — один раз
+    assert not await q.answer(learner, adult=True, native=NativeLanguage.RU, reading=None)
+    assert (await q.profiles.get(learner.id)) == profile
+
+
+async def test_minor_keeps_learning_but_voice_is_not_kept(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    await SetResearchConsent(w.learners, w.uow, w.clock, w.events).execute(learner, True)
+    assert await q.answer(learner, adult=False)
+    assert not learner.research_consent  # участие в исследовании — только 18+ (TD-SEC-05)
+    assert [c.granted for c in w.learners.consents] == [True, False]
+    profile = await q.profiles.get(learner.id)
+    assert profile is not None and not profile.adult and profile.native_language is None
+    assert not await q.needed(learner)
+
+
+async def test_questionnaire_event_has_no_answers(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    await q.answer(
+        learner, adult=True, native=NativeLanguage.RU, reading=ArabicReading.SOME_LETTERS
+    )
+    assert ("questionnaire_answered", learner.id, {}) in w.events.events  # ответы — только в анкете
+    assert w.uow.commits >= 1
 
 
 # ---------- проверка чтения ----------

@@ -85,6 +85,17 @@ consents = Table(
     Column("at", UtcDateTime(), nullable=False),
 )
 
+learner_profiles = Table(
+    "learner_profiles",
+    metadata,
+    Column("learner_id", Uuid, ForeignKey("learners.id", ondelete="CASCADE"), primary_key=True),
+    Column("adult", Boolean, nullable=False),
+    Column("native_language", String(8)),
+    Column("arabic_reading", String(16)),
+    Column("questionnaire_version", String(16), nullable=False),
+    Column("answered_at", UtcDateTime(), nullable=False),
+)
+
 attempts = Table(
     "attempts",
     metadata,

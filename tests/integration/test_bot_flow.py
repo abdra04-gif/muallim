@@ -40,7 +40,11 @@ from dishka import AsyncContainer
 from dishka.integrations.aiogram import setup_dishka
 from pydantic import SecretStr
 
-from muallim.application.ports.repositories import AttemptRepository, LearnerRepository
+from muallim.application.ports.repositories import (
+    AttemptRepository,
+    LearnerProfileRepository,
+    LearnerRepository,
+)
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.bootstrap.config import Settings
 from muallim.bootstrap.di import create_container
@@ -55,6 +59,7 @@ from muallim.presentation.telegram.callbacks import (
     Dispute,
     DisputeReason,
     GoItem,
+    Profile,
 )
 from muallim.presentation.telegram.handlers import router
 
@@ -266,9 +271,15 @@ async def test_new_learner_consents_reads_disputes_and_deletes_data(
     await ali.write("/start")
     assert ali.tg.texts()[:2] == [texts.WELCOME, texts.CONSENT_TEXT]
 
-    # 2. Согласие → главный экран
+    # 2. Согласие → анкета один раз (FR-44): 18+ → родной язык → опыт чтения → главный экран
     await ali.press(Consent(granted=True))
     assert texts.CONSENT_SAVED_YES in ali.tg.alerts()
+    assert ali.tg.texts()[-1] == texts.PROFILE_ADULT
+    await ali.press(Profile(adult=True))
+    assert ali.tg.texts()[-1] == texts.PROFILE_LANGUAGE
+    await ali.press(Profile(adult=True, lang="kk"))
+    assert ali.tg.texts()[-1] == texts.PROFILE_READING
+    await ali.press(Profile(adult=True, lang="kk", read="none"))
     assert ali.button(GoItem)  # на главном есть «Начать»/«Продолжить»
 
     # 3. Открыть строку для чтения и прочитать её голосовым
@@ -323,3 +334,60 @@ async def test_text_instead_of_voice_shows_hint_and_home(
     shown = ali.tg.texts()
     assert texts.SEND_VOICE in shown
     assert ali.button(GoItem)  # после подсказки — главный экран с кнопками
+
+
+async def test_questionnaire_is_asked_only_once(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    _, container = bot_app
+    ali = learner_factory(5101)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.press(Profile(adult=True, lang="ru", read="some_letters"))
+    asked = ali.tg.texts().count(texts.PROFILE_ADULT)
+
+    await ali.write("/start")  # вернулся — анкеты больше нет, сразу главный экран
+    assert ali.tg.texts().count(texts.PROFILE_ADULT) == asked == 1
+    assert ali.button(GoItem)
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(5101)
+        assert learner is not None
+        profile = await (await request.get(LearnerProfileRepository)).get(learner.id)
+        assert profile is not None and profile.native_language == "ru"
+
+
+async def test_unfinished_questionnaire_is_asked_on_next_start(
+    learner_factory: Callable[[int], Learner],
+) -> None:
+    ali = learner_factory(5102)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.press(Profile(adult=True))  # ушёл, не ответив на язык
+    await ali.write("/start")
+    assert ali.tg.texts()[-1] == texts.PROFILE_ADULT
+
+
+async def test_minor_learns_without_research_and_is_not_asked_more(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    _, container = bot_app
+    kid = learner_factory(5103)
+    await kid.write("/start")
+    await kid.press(Consent(granted=True))
+    await kid.press(Profile(adult=False))
+    assert texts.PROFILE_MINOR in kid.tg.alerts()
+    assert kid.button(GoItem)  # учиться можно
+    assert texts.PROFILE_LANGUAGE not in kid.tg.texts()  # остальное у младших не спрашиваем
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(5103)
+        assert learner is not None and not learner.research_consent  # голос не сохраняется
+
+
+async def test_declined_consent_skips_questionnaire(
+    learner_factory: Callable[[int], Learner],
+) -> None:
+    ali = learner_factory(5104)
+    await ali.write("/start")
+    await ali.press(Consent(granted=False))
+    assert texts.PROFILE_ADULT not in ali.tg.texts()
+    assert ali.button(GoItem)

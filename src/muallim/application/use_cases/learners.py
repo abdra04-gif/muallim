@@ -1,19 +1,29 @@
-"""Регистрация ученика, согласие на исследование, удаление данных."""
+"""Регистрация ученика, согласие на исследование, анкета, удаление данных."""
 
 from dataclasses import dataclass
 
 from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.repositories import (
     AttemptRepository,
+    LearnerProfileRepository,
     LearnerRepository,
     UnitOfWork,
 )
 from muallim.application.ports.storage import AudioStore
 from muallim.application.ports.system import Clock, EventLog, IdGenerator
-from muallim.domain.learner import ConsentKind, ConsentRecord, Learner
+from muallim.domain.learner import (
+    ArabicReading,
+    ConsentKind,
+    ConsentRecord,
+    Learner,
+    LearnerProfile,
+    NativeLanguage,
+)
 
 # Меняйте версию при каждом изменении текста согласия в presentation/telegram/texts.py.
 CONSENT_TEXT_VERSION = "2026-10-17"
+# Меняйте при изменении вопросов анкеты (presentation/telegram/texts.py, PROFILE_*).
+QUESTIONNAIRE_VERSION = "2026-10-18"
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,6 +74,51 @@ class SetResearchConsent:
         )
         await self.events.record("consent_changed", learner.id, {"granted": int(granted)})
         await self.uow.commit()
+
+
+@dataclass(frozen=True, slots=True)
+class Questionnaire:
+    """Анкета один раз после согласия на исследование (FR-44, ADR-0038).
+
+    Без согласия анкета не нужна: эти данные собираются только для исследования. Ответ не
+    перезаписывается. «Нет 18» снимает согласие на запись голоса (TD-SEC-05), учиться можно.
+    """
+
+    profiles: LearnerProfileRepository
+    consent: SetResearchConsent
+    uow: UnitOfWork
+    clock: Clock
+    events: EventLog
+
+    async def needed(self, learner: Learner) -> bool:
+        return learner.research_consent and await self.profiles.get(learner.id) is None
+
+    async def answer(
+        self,
+        learner: Learner,
+        adult: bool,
+        native: NativeLanguage | None = None,
+        reading: ArabicReading | None = None,
+    ) -> bool:
+        """Сохраняет анкету; False — уже была заполнена, ничего не изменено."""
+        if await self.profiles.get(learner.id) is not None:
+            return False
+        await self.profiles.add(
+            LearnerProfile(
+                learner_id=learner.id,
+                adult=adult,
+                native_language=native if adult else None,
+                arabic_reading=reading if adult else None,
+                questionnaire_version=QUESTIONNAIRE_VERSION,
+                answered_at=self.clock.now(),
+            )
+        )
+        await self.events.record("questionnaire_answered", learner.id, {})
+        if not adult and learner.research_consent:
+            await self.consent.execute(learner, False)  # сохраняет и анкету: общий commit
+        else:
+            await self.uow.commit()
+        return True
 
 
 @dataclass(frozen=True, slots=True)

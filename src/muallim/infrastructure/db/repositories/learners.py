@@ -5,9 +5,15 @@ from uuid import UUID
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from muallim.application.ports.repositories import LearnerRepository
-from muallim.domain.learner import ConsentRecord, Learner
-from muallim.infrastructure.db.tables import consents, learners
+from muallim.application.ports.repositories import LearnerProfileRepository, LearnerRepository
+from muallim.domain.learner import (
+    ArabicReading,
+    ConsentRecord,
+    Learner,
+    LearnerProfile,
+    NativeLanguage,
+)
+from muallim.infrastructure.db.tables import consents, learner_profiles, learners
 
 _FIELDS = (
     "id",
@@ -59,3 +65,35 @@ class SqlLearnerRepository(LearnerRepository):
     async def delete(self, learner_id: UUID) -> None:
         # Попытки, ошибки, разметка и согласия удаляются каскадом (ON DELETE CASCADE).
         await self.session.execute(delete(learners).where(learners.c.id == learner_id))
+
+
+@dataclass(frozen=True, slots=True)
+class SqlLearnerProfileRepository(LearnerProfileRepository):
+    session: AsyncSession
+
+    async def get(self, learner_id: UUID) -> LearnerProfile | None:
+        query = select(learner_profiles).where(learner_profiles.c.learner_id == learner_id)
+        row = (await self.session.execute(query)).mappings().first()
+        if row is None:
+            return None
+        native, reading = row["native_language"], row["arabic_reading"]
+        return LearnerProfile(
+            learner_id=row["learner_id"],
+            adult=row["adult"],
+            native_language=NativeLanguage(native) if native else None,
+            arabic_reading=ArabicReading(reading) if reading else None,
+            questionnaire_version=row["questionnaire_version"],
+            answered_at=row["answered_at"],
+        )
+
+    async def add(self, profile: LearnerProfile) -> None:
+        await self.session.execute(
+            insert(learner_profiles).values(
+                learner_id=profile.learner_id,
+                adult=profile.adult,
+                native_language=profile.native_language,
+                arabic_reading=profile.arabic_reading,
+                questionnaire_version=profile.questionnaire_version,
+                answered_at=profile.answered_at,
+            )
+        )
