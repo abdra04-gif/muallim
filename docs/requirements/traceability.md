@@ -16,8 +16,8 @@
 | FR-06 | `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/db/repositories/attempts.py` | `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0004, `docs/data/data-dictionary.md` | ✅ |
 | FR-07 | `src/muallim/application/use_cases/progress.py` | `tests/unit/test_use_cases.py` | — | ✅ |
 | FR-08 | `src/muallim/application/use_cases/learners.py` | `tests/unit/test_use_cases.py` | ADR-0010 | ✅ |
-| FR-09 | `src/muallim/application/use_cases/learners.py`, `src/muallim/application/use_cases/recitation.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_bot_flow.py` | ADR-0010, `docs/security/privacy.md` | ✅ |
-| FR-10 | `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0010 | ✅ |
+| FR-09 | `src/muallim/application/use_cases/learners.py`, `src/muallim/application/use_cases/recitation.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py` | ADR-0010, ADR-0040, `docs/security/privacy.md` | ✅ |
+| FR-10 | `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0010, ADR-0040 | ✅ |
 | FR-11 | `analytics/sql/`, `src/muallim/research/reports.py` | `tests/integration/test_research.py` | `docs/data/reports.md` | ✅ |
 | FR-12 | `src/muallim/infrastructure/db/repositories/events.py` | `tests/unit/test_use_cases.py` | `docs/data/data-dictionary.md` | ✅ |
 | FR-13 | `src/muallim/research/annotation.py` | `tests/integration/test_research.py` | `docs/data/annotation-guide.md` | ✅ |
@@ -49,7 +49,7 @@
 | FR-44 | `src/muallim/domain/learner.py`, `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py`, `migrations/versions/0004_learner_profiles.py`, `src/muallim/presentation/telegram/handlers.py`, `src/muallim/presentation/telegram/keyboards.py`, `analytics/sql/11_errors_by_native_language.sql` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0038, `docs/data/data-dictionary.md`, `docs/security/privacy.md` | ✅ |
 | NFR-TR-01 | `curriculum/course.ru.yaml` | `tests/unit/test_curriculum_content.py` | `docs/research/sources.md` | ✅ |
 | NFR-TR-02 | `docs/adr/README.md` | `tests/architecture/test_docs.py` | ADR-0001 | ✅ |
-| NFR-TR-03 | `src/muallim/infrastructure/audio/file_store.py` | `tests/integration/test_audio_store.py` | — | ✅ |
+| NFR-TR-03 | `src/muallim/infrastructure/audio/file_store.py`, `src/muallim/research/integrity.py`, `scripts/db/backup.sh`, `scripts/db/restore.sh` | `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py`, `tests/architecture/test_db_scripts.py` | ADR-0040 | ✅ |
 | NFR-TR-04 | `.claude/hooks/log_prompt.py` | `tests/architecture/test_hooks.py` | `docs/journal/README.md` | ✅ |
 | NFR-REL-02 | `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/audio/ffmpeg.py`, `src/muallim/research/metrics.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py` | `docs/requirements/quality-scenarios.md` (QAS-04) | ✅ |
 | NFR-ACC-01 | `src/muallim/research/metrics.py`, `src/muallim/bootstrap/research_cli.py` | `tests/unit/test_metrics.py`, `tests/integration/test_metrics_report.py` | ADR-0026, `docs/research/metrics-gqm.md` | 🟡 |

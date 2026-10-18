@@ -5,6 +5,8 @@
 2. Фаза меняется только через scripts/phase.
 3. В фазе impl тесты заморожены.
 4. Опасные команды git/shell запрещены.
+5. Данные пилота не уничтожаются: удаление тома БД, откат миграций, восстановление поверх
+   рабочей базы, DROP/TRUNCATE/DELETE через консоль БД — только человек.
 Типовые обходы через shell ловятся регулярками; хитрый обход ловят CI и ревью diff.
 """
 
@@ -30,6 +32,19 @@ SHELL_SECRET = re.compile(
 SHELL_DANGER = re.compile(
     r"(--no-verify|git\s+push\s+.*(--force|-f\b)|git\s+reset\s+--hard|rm\s+-[a-z]*r[a-z]*f"
     r"|rm\s+-[a-z]*f[a-z]*r|git\s+clean\s+-[a-z]*f|chmod\s+-R\s+777)"
+)
+DB_DESTROY = re.compile(
+    r"(docker[\s-]+compose\b[^|;&]*\bdown\b[^|;&]*(\s-v\b|\s--volumes\b)"
+    r"|docker\s+volume\s+(rm|prune)\b|docker\s+system\s+prune\b[^|;&]*--volumes"
+    r"|\balembic\b[^|;&]*\bdowngrade\b|\bmake\s+restore\b|\bpg_restore\b|\bdropdb\b"
+    r"|--delete-orphans|\brm\b[^|;&]*(^|\s)\.?/?data\b|\bfind\b[^|;&]*\bdata\b[^|;&]*-delete"
+    r"|(^|[;&|]\s*)(sh\s+|bash\s+)?\.?/?scripts/db/restore)",
+    re.IGNORECASE,
+)
+SQL_CLIENT = re.compile(r"\b(psql|db-shell|sqlite3)\b")
+SQL_DESTROY = re.compile(
+    r"\b(drop\s+(table|database|schema|view|role|owned)|truncate|delete\s+from|alter\s+table)\b",
+    re.IGNORECASE,
 )
 SHELL_WRITES_TESTS = re.compile(
     r"(>>?|\btee\b|\bsed\s+-i|\bperl\s+-[a-z]*i|\bcp\b|\bmv\b|\brm\b|\btouch\b|python3?\s+-c|\bgit\s+(checkout|restore)\b)"
@@ -61,6 +76,11 @@ def check_shell(command: str) -> None:
         block("Запрещено: команда обращается к секретам или данным учеников.")
     if SHELL_DANGER.search(command):
         block("Запрещено: опасная команда (--no-verify, force push, reset --hard, rm -rf...).")
+    if DB_DESTROY.search(command) or (SQL_CLIENT.search(command) and SQL_DESTROY.search(command)):
+        block(
+            "Запрещено: команда может уничтожить данные пилота (том БД, откат миграций, "
+            "восстановление, DROP/TRUNCATE/DELETE). Это делает человек — сначала make backup."
+        )
     if ".agent-phase" in command and not command.lstrip().startswith("scripts/phase"):
         block("Фазу меняют только через scripts/phase.")
     if phase() == "impl" and SHELL_WRITES_TESTS.search(command):

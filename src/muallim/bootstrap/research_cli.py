@@ -1,10 +1,14 @@
 """``uv run muallim-research <команда>`` — инструменты для работы с данными исследования.
 
 Команды:
-  report                        Markdown-отчёт в analytics/reports/ (SQL-отчёты + метрики GQM)
-  annotation-export [--limit N]  CSV-очередь на разметку в data/annotation/
+  report                         Markdown-отчёт в analytics/reports/ (SQL-отчёты + метрики GQM)
+  annotation-export --annotator A1 [--limit N]
+                                 пакет разметчика: data/annotation/A1_<дата>/ (tasks.csv + audio/)
   annotation-import FILE --annotator A1
-  dataset-export                 JSONL + аудио в data/exports/<дата>/
+                                 загрузить размеченный tasks.csv (docs/data/annotation-guide.md)
+  dataset-export                 manifest.jsonl + truth.csv/predictions.csv (Iqra'Eval) + аудио
+                                 в data/exports/<дата>/
+  verify [--delete-orphans]      сверка БД и файлов записей: потери, лишние, повреждённые
   errors [фильтры]               каталог ошибок: таблица на экран + CSV в data/errors/
                                  (muallim-research errors --help — все фильтры)
 """
@@ -21,7 +25,7 @@ from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.system import SystemClock
-from muallim.research import annotation, dataset, errors, metrics, reports
+from muallim.research import annotation, dataset, errors, integrity, metrics, reports
 
 
 async def _run(args: argparse.Namespace) -> str:
@@ -41,25 +45,44 @@ async def _run(args: argparse.Namespace) -> str:
             return f"Отчёт: {out}"
         async with create_session_factory(engine)() as session:
             if args.command == "annotation-export":
-                rows = await annotation.export_queue(session, settings.audio_dir, args.limit)
-                out = PROJECT_ROOT / "data" / "annotation" / f"queue_{stamp}.csv"
-                out.parent.mkdir(parents=True, exist_ok=True)
-                annotation.write_csv(rows, out)
-                return f"На разметку: {len(rows)} попыток → {out}"
+                out = PROJECT_ROOT / "data" / "annotation" / f"{args.annotator}_{stamp}"
+                count = await annotation.export_package(
+                    session, settings.audio_dir, out, args.annotator, args.limit
+                )
+                return f"Разметчику {args.annotator}: {count} попыток → {out}"
             if args.command == "annotation-import":
-                result = await annotation.import_labels(session, args.file, args.annotator, clock)
-                return f"Загружено меток: {result.imported}, пустых строк: {result.skipped_empty}"
+                r = await annotation.import_package(session, args.file, args.annotator, clock)
+                return (
+                    f"Загружено меток: {r.imported}; без изменений: {r.unchanged}; "
+                    f"пустых строк: {r.skipped_empty}; пропущено (ученик удалил данные или "
+                    f"отозвал согласие): {r.skipped_gone}"
+                )
+            if args.command == "verify":
+                copies = [PROJECT_ROOT / "data" / "annotation", PROJECT_ROOT / "data" / "exports"]
+                report = await integrity.check(session, settings.audio_dir, copies)
+                text = integrity.render(report)
+                if args.delete_orphans and report.orphans:
+                    deleted = await integrity.delete_orphans(session, report, settings.audio_dir)
+                    text += f"\nУдалено лишних файлов (старше 10 минут): {deleted}"
+                return text
             if args.command == "errors":
                 return await _errors(session, args, settings, stamp)
             if args.command == "dataset-export":
                 rows = await dataset.dataset_rows(session)
+                store = FileAudioStore(settings.audio_dir)
+                missing = [r for r in rows if not store.path_for(r["audio_sha256"]).is_file()]
+                if missing:  # до создания папки: недоделанная выгрузка хуже, чем никакой
+                    raise annotation.AnnotationError(
+                        f"Нет файлов записей: {len(missing)}. Сначала: muallim-research verify"
+                    )
                 out_dir = PROJECT_ROOT / "data" / "exports" / stamp
                 (out_dir / "audio").mkdir(parents=True)
-                store = FileAudioStore(settings.audio_dir)
                 for row in rows:
                     shutil.copy2(store.path_for(row["audio_sha256"]), out_dir / row["audio"])
                 dataset.write_jsonl(rows, out_dir / "manifest.jsonl")
-                return f"Датасет: {len(rows)} записей → {out_dir}"
+                dataset.write_iqraeval(rows, out_dir)
+                agreed = sum(r["consensus_phonemes"] is not None for r in rows)
+                return f"Датасет: {len(rows)} записей, согласованная разметка: {agreed} → {out_dir}"
     finally:
         await engine.dispose()
     raise SystemExit(f"Неизвестная команда {args.command}")
@@ -95,11 +118,16 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("report")
     exp = sub.add_parser("annotation-export")
+    exp.add_argument("--annotator", required=True, help="код разметчика, например A1")
     exp.add_argument("--limit", type=int, default=100)
     imp = sub.add_parser("annotation-import")
     imp.add_argument("file", type=Path)
     imp.add_argument("--annotator", required=True)
     sub.add_parser("dataset-export")
+    ver = sub.add_parser("verify", help="сверка БД и файлов записей")
+    ver.add_argument(
+        "--delete-orphans", action="store_true", help="удалить файлы, на которые нет попыток"
+    )
     err = sub.add_parser("errors", help="каталог ошибок с фильтрами")
     err.add_argument("--letter", help="какая буква должна была прозвучать, например ص")
     err.add_argument("--heard", help="что услышала модель, например س")
@@ -117,4 +145,7 @@ def main() -> None:
     err.add_argument("--with-audio", action="store_true", help="только с записью")
     err.add_argument("--include-stub", action="store_true", help="включить попытки-заглушки")
     err.add_argument("--limit", type=int, default=500)
-    print(asyncio.run(_run(parser.parse_args())))
+    try:
+        print(asyncio.run(_run(parser.parse_args())))
+    except annotation.AnnotationError as error:
+        raise SystemExit(f"Ошибка: {error}") from None

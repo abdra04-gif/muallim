@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-up db-down db-shell backup restore migrate migration report errors diagrams audit
+.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -40,18 +40,14 @@ db-down: ## Остановить PostgreSQL
 db-shell: ## Консоль psql к базе в Docker (выход — \q)
 	docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
 
-backup: ## Резервная копия: БД (pg_dump) + голосовые записи → data/backups/<дата>/
-	@d=data/backups/$$(date +%Y-%m-%d_%H%M%S); mkdir -p $$d && \
-	docker compose exec -T postgres sh -c 'pg_dump -U "$$POSTGRES_USER" -Fc "$$POSTGRES_DB"' > $$d/db.dump && \
-	tar -czf $$d/audio.tar.gz -C data audio 2>/dev/null || true; \
-	ls -la $$d && echo "Копия: $$d (хранить вне ноутбука — см. docs/data/browsing.md)"
+backup: ## Резервная копия: БД + голосовые записи → data/backups/<дата>/ (с проверкой и SHA256SUMS)
+	sh scripts/db/backup.sh
 
-restore: ## Восстановить БД из копии: make restore d=data/backups/<дата> (ПЕРЕЗАПИШЕТ данные)
+restore: ## Восстановить из копии: make restore d=data/backups/<дата> (ПЕРЕЗАПИШЕТ данные, спросит «да»)
 	@test -n "$(d)" || (echo "укажите d=data/backups/<дата>" && exit 1)
-	docker compose exec -T postgres sh -c 'pg_restore -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --clean --if-exists' < $(d)/db.dump
-	@test ! -f $(d)/audio.tar.gz || tar -xzf $(d)/audio.tar.gz -C data
+	sh scripts/db/restore.sh "$(d)"
 
-migrate: ## Применить миграции
+migrate: backup ## Применить миграции (сначала — проверенная копия)
 	uv run alembic upgrade head
 
 migration: ## Новая миграция: make migration m="описание"
@@ -63,6 +59,9 @@ husary-cuts: ## Нарезка «как правильно» из чтения �
 
 errors: ## Каталог ошибок: make errors a="--letter ص --lesson L18" (все фильтры: --help)
 	uv run muallim-research errors $(a)
+
+verify: ## Сверка БД и файлов записей: потери, лишние, повреждённые
+	uv run muallim-research verify
 
 report: ## Отчёт по данным исследования
 	uv run muallim-research report

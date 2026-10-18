@@ -4,7 +4,7 @@ flowchart LR
     a -- да --> s[("Аудио<br/>sha256.ogg")]
     a -- нет --> x["аудио не сохраняется"]
     v --> m["Модель → фонемы"] --> db[("attempts +<br/>detected_errors")]
-    s --> q["annotation-export<br/>CSV очередь"] --> h["🎧 Разметчик<br/>слушает, ставит метку"] --> i["annotation-import"] --> db
+    s --> q["annotation-export --annotator<br/>пакет tasks.csv + audio"] --> h["🎧 Разметчик<br/>слушает, видит ответ бота, agree/fix"] --> i["annotation-import"] --> db
     db --> r["report → analytics/reports/*.md"]
     db --> e["dataset-export<br/>manifest.jsonl + audio"] --> t["🧠 Дообучение / оценка модели"]
     u["Ученик: /privacy → удалить"] --> d["DELETE learner<br/>каскад + удаление файлов"]

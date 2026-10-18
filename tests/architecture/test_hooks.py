@@ -76,6 +76,51 @@ def test_guard_allows(project: Path, tool: str, arg: str, value: str) -> None:
     assert guard(project, tool, **{arg: target}) == 0
 
 
+@pytest.mark.parametrize(
+    "command",
+    [
+        "docker compose down -v",
+        "docker compose down --volumes",
+        "docker volume rm muallim_postgres-data",
+        "docker volume prune -f",
+        "docker system prune --volumes",
+        "uv run alembic downgrade base",
+        "uv run alembic downgrade -1",
+        "make restore d=data/backups/x",
+        "docker compose exec postgres psql -c 'DROP TABLE attempts'",
+        "psql -c 'truncate annotations'",
+        "echo 'DELETE FROM learners;' | make db-shell",
+        "rm -r data",
+        "rm -r data/backups",
+        "find data -delete",
+        "uv run muallim-research verify --delete-orphans",
+        "docker compose exec -T postgres pg_restore --clean -d muallim",
+        "docker compose exec postgres dropdb muallim",
+        "uv run alembic -c alembic.ini downgrade base",
+        "sh scripts/db/restore.sh data/backups/x",
+    ],
+)
+def test_guard_blocks_destroying_research_data(project: Path, command: str) -> None:
+    """Данные пилота невосстановимы: удаление тома, откат миграций, DROP — только человек."""
+    assert guard(project, "Bash", command=command) == 2
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "docker compose up -d postgres",
+        "uv run alembic upgrade head",
+        "make backup",
+        "make migrate",
+        "git add scripts/db/restore.sh",  # смотреть и коммитить скрипт можно, запускать — нет
+        "git diff scripts/db/restore.sh",
+        "uv run muallim-research verify",
+    ],
+)
+def test_guard_allows_safe_database_commands(project: Path, command: str) -> None:
+    assert guard(project, "Bash", command=command) == 0
+
+
 def test_tests_frozen_in_impl_phase(project: Path) -> None:
     (project / ".agent-phase").write_text("impl", encoding="utf-8")
     test_file = str(project / "tests" / "unit" / "test_x.py")

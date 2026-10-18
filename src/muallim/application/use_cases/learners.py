@@ -1,5 +1,6 @@
 """Регистрация ученика, согласие на исследование, анкета, удаление данных."""
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from muallim.application.feedback import FeedbackCatalog
@@ -55,7 +56,11 @@ class EnsureLearner:
 
 @dataclass(frozen=True, slots=True)
 class SetResearchConsent:
+    """Согласие на запись голоса. Отзыв удаляет записи и разметку по ним (privacy.md)."""
+
     learners: LearnerRepository
+    attempts: AttemptRepository
+    audio: AudioStore
     uow: UnitOfWork
     clock: Clock
     events: EventLog
@@ -63,6 +68,7 @@ class SetResearchConsent:
     async def execute(self, learner: Learner, granted: bool) -> None:
         learner.research_consent = granted
         await self.learners.save(learner)
+        released = [] if granted else await self.attempts.forget_audio(learner.id)
         await self.learners.add_consent(
             ConsentRecord(
                 learner_id=learner.id,
@@ -72,8 +78,11 @@ class SetResearchConsent:
                 at=self.clock.now(),
             )
         )
-        await self.events.record("consent_changed", learner.id, {"granted": int(granted)})
+        await self.events.record(
+            "consent_changed", learner.id, {"granted": int(granted), "audio_deleted": len(released)}
+        )
         await self.uow.commit()
+        await delete_unused_audio(released, self.attempts, self.audio)
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,12 +139,25 @@ class DeleteMyData:
     events: EventLog
 
     async def execute(self, learner: Learner) -> None:
-        for sha in await self.attempts.audio_hashes(learner.id):
-            await self.audio.delete(sha)
+        hashes = await self.attempts.audio_hashes(learner.id)
         await self.learners.delete(learner.id)
         # Факт удаления фиксируем без привязки к ученику: его записи больше нет.
         await self.events.record("learner_deleted", None, {})
         await self.uow.commit()
+        await delete_unused_audio(hashes, self.attempts, self.audio)
+
+
+async def delete_unused_audio(
+    hashes: Iterable[str], attempts: AttemptRepository, audio: AudioStore
+) -> None:
+    """Файлы — только после commit: при сбое БД не останется ссылок на удалённые записи.
+
+    Ту же запись (тот же SHA-256) мог прислать другой ученик — её не трогаем. Если удаление
+    файла сорвётся, `muallim-research verify` покажет его как лишний.
+    """
+    for sha in sorted(set(hashes)):
+        if not await attempts.audio_in_use(sha):
+            await audio.delete(sha)
 
 
 @dataclass(frozen=True, slots=True)

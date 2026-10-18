@@ -19,9 +19,10 @@ uv sync --extra ml && make run     # бот с моделью (~2 ГБ, нуже
 ## Для исследователя
 ```bash
 make report                                              # отчёт → analytics/reports/
-uv run muallim-research annotation-export --limit 50     # очередь на разметку (CSV)
+uv run muallim-research annotation-export --annotator A1 --limit 50   # пакет разметчика → data/annotation/A1_<дата>/
 uv run muallim-research annotation-import FILE --annotator A1
 uv run muallim-research dataset-export                   # датасет → data/exports/<дата>/
+uv run muallim-research verify                           # сверка БД и файлов записей
 ```
 
 ## Документация

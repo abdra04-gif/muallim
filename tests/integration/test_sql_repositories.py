@@ -1,9 +1,10 @@
 """Репозитории на настоящем SQL (SQLite в памяти)."""
 
+from dataclasses import replace
 from uuid import UUID
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.domain.assessment import assess
@@ -23,7 +24,12 @@ from muallim.infrastructure.db.repositories.learners import (
     SqlLearnerProfileRepository,
     SqlLearnerRepository,
 )
-from muallim.infrastructure.db.tables import consents, detected_errors, interaction_events
+from muallim.infrastructure.db.tables import (
+    annotations,
+    consents,
+    detected_errors,
+    interaction_events,
+)
 from tests.fakes import FixedClock
 
 pytestmark = pytest.mark.integration
@@ -224,3 +230,41 @@ async def test_profile_deleted_with_learner(session: AsyncSession) -> None:
     await learners.delete(learner.id)  # право на удаление (FR-10): анкета уходит каскадом
     await session.commit()
     assert await SqlLearnerProfileRepository(session).get(learner.id) is None
+
+
+async def test_forget_audio_clears_hashes_and_labels_but_keeps_attempts(
+    session: AsyncSession,
+) -> None:
+    """Отзыв согласия: записи и разметка по ним удаляются, баллы остаются (privacy.md)."""
+    clock = FixedClock()
+    await SqlLearnerRepository(session).add(learner := _learner(clock))
+    repo = SqlAttemptRepository(session)
+    await repo.add(_attempt(learner, 1, "سَ", clock), ("msg",))
+    await session.execute(
+        insert(annotations).values(
+            attempt_id=UUID(int=101), annotator="A1", label="ok", corrected_phonemes="سَ",
+            comment="", guide_version="2.0", created_at=clock.now(),
+        )
+    )  # fmt: skip
+    await session.commit()
+
+    assert await repo.forget_audio(learner.id) == ["a" * 64]
+    await session.commit()
+    assert await repo.count(learner.id) == 1
+    assert await repo.audio_hashes(learner.id) == []
+    assert await session.scalar(select(func.count()).select_from(annotations)) == 0
+    assert not await repo.audio_in_use("a" * 64)
+
+
+async def test_audio_in_use_sees_other_learners(session: AsyncSession) -> None:
+    clock = FixedClock()
+    learners = SqlLearnerRepository(session)
+    await learners.add(first := _learner(clock))
+    await learners.add(second := Learner(UUID(int=2), 4343, "L-00000002", "ru", clock.now()))
+    repo = SqlAttemptRepository(session)
+    await repo.add(_attempt(first, 1, "صَ", clock), ())
+    await repo.add(replace(_attempt(second, 2, "صَ", clock), learner_id=second.id), ())
+    await session.commit()
+    await repo.forget_audio(first.id)
+    await session.commit()
+    assert await repo.audio_in_use("a" * 64)  # та же запись у второго ученика

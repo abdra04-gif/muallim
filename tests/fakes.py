@@ -1,7 +1,7 @@
 """Тестовые реализации портов: в памяти, детерминированные."""
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
@@ -34,6 +34,7 @@ class SequentialIds:
 class InMemoryLearners:
     by_tg: dict[int, Learner] = field(default_factory=dict)
     consents: list[ConsentRecord] = field(default_factory=list)
+    cascade_to: "InMemoryAttempts | None" = None  # как ON DELETE CASCADE в БД
 
     async def get_by_telegram_id(self, telegram_user_id: int) -> Learner | None:
         return self.by_tg.get(telegram_user_id)
@@ -50,6 +51,10 @@ class InMemoryLearners:
     async def delete(self, learner_id: UUID) -> None:
         self.by_tg = {k: v for k, v in self.by_tg.items() if v.id != learner_id}
         self.consents = [c for c in self.consents if c.learner_id != learner_id]
+        if self.cascade_to is not None:
+            self.cascade_to.items = [
+                (a, f) for a, f in self.cascade_to.items if a.learner_id != learner_id
+            ]
 
 
 @dataclass
@@ -106,6 +111,17 @@ class InMemoryAttempts:
             a.audio_sha256 for a, _ in self.items if a.learner_id == learner_id and a.audio_sha256
         ]
 
+    async def forget_audio(self, learner_id: UUID) -> list[str]:
+        hashes = await self.audio_hashes(learner_id)
+        self.items = [
+            (replace(a, audio_sha256=None) if a.learner_id == learner_id else a, f)
+            for a, f in self.items
+        ]
+        return sorted(set(hashes))
+
+    async def audio_in_use(self, sha256: str) -> bool:
+        return any(a.audio_sha256 == sha256 for a, _ in self.items)
+
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
         days: dict[date, int] = {}
         for a, _ in self.items:
@@ -118,6 +134,7 @@ class InMemoryAttempts:
 @dataclass
 class InMemoryAudio:
     files: dict[str, bytes] = field(default_factory=dict)
+    journal: list[str] = field(default_factory=list)  # общий с SpyUoW: порядок commit/удаления
 
     async def save(self, audio: bytes) -> str:
         import hashlib  # noqa: PLC0415
@@ -127,6 +144,7 @@ class InMemoryAudio:
         return sha
 
     async def delete(self, sha256: str) -> None:
+        self.journal.append(f"delete:{sha256}")
         self.files.pop(sha256, None)
 
 
@@ -154,9 +172,11 @@ class ScriptedRecognizer:
 @dataclass
 class SpyUoW:
     commits: int = 0
+    journal: list[str] = field(default_factory=list)
 
     async def commit(self) -> None:
         self.commits += 1
+        self.journal.append("commit")
 
     async def rollback(self) -> None:
         pass

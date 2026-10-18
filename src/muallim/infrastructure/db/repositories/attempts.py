@@ -3,14 +3,19 @@ from dataclasses import dataclass
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import func, insert, select
+from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.repositories import AttemptRepository
 from muallim.domain.assessment import Assessment, ErrorKind, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.report import LearnerReport
-from muallim.infrastructure.db.tables import attempts, detected_errors, learner_reports
+from muallim.infrastructure.db.tables import (
+    annotations,
+    attempts,
+    detected_errors,
+    learner_reports,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,6 +116,20 @@ class SqlAttemptRepository(AttemptRepository):
             attempts.c.learner_id == learner_id, attempts.c.audio_sha256.is_not(None)
         )
         return list((await self.session.scalars(query)).all())
+
+    async def forget_audio(self, learner_id: UUID) -> list[str]:
+        hashes = await self.audio_hashes(learner_id)
+        own = select(attempts.c.id).where(attempts.c.learner_id == learner_id)
+        # Разметка — производная от голоса (метки ставились, слушая запись): удаляется с ней.
+        await self.session.execute(delete(annotations).where(annotations.c.attempt_id.in_(own)))
+        await self.session.execute(
+            update(attempts).where(attempts.c.learner_id == learner_id).values(audio_sha256=None)
+        )
+        return sorted(set(hashes))
+
+    async def audio_in_use(self, sha256: str) -> bool:
+        query = select(attempts.c.id).where(attempts.c.audio_sha256 == sha256).limit(1)
+        return await self.session.scalar(query) is not None
 
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
         # Дату считаем в Python: так одинаково в PostgreSQL и SQLite (UTC, ADR-0004).

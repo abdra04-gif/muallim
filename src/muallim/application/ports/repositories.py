@@ -46,6 +46,15 @@ class AttemptRepository(Protocol):
 
     async def audio_hashes(self, learner_id: UUID) -> list[str]: ...
 
+    async def forget_audio(self, learner_id: UUID) -> list[str]:
+        """Отзыв согласия: убирает ссылки на записи и разметку по ним; возвращает их SHA-256.
+
+        Попытки (фонемы, баллы) остаются — по ним считается прогресс ученика.
+        """
+
+    async def audio_in_use(self, sha256: str) -> bool:
+        """Есть ли ещё попытка с этой записью (ту же запись мог переслать другой ученик)."""
+
     async def owner(self, attempt_id: UUID) -> UUID | None:
         """Чья попытка (learner_id) или None, если такой нет."""
 

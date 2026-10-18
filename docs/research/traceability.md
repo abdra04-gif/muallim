@@ -13,10 +13,10 @@
 |---|---|---|---|---|---|
 | H1.1 | Q1.1 | precision обнаружения ошибок | `src/muallim/research/metrics.py` | ✅ | Т-01 |
 | H1.1 | Q1.2 | recall, F1 | `src/muallim/research/metrics.py` | ✅ | Т-01 |
-| H1.2 | Q1.3 | FAR, FRR, доля `correct` | `src/muallim/research/metrics.py`, `analytics/sql/05_annotation_labels.sql` | ✅ | Т-01 |
+| H1.2 | Q1.3 | FAR, FRR, доля согласия с ботом (`agree`) | `src/muallim/research/metrics.py`, `analytics/sql/05_annotation_labels.sql` | ✅ | Т-01 |
 | H1.3 | Q1.4 | κ «бот — учитель» против κ «учитель — учитель», бутстрэп-ДИ | `src/muallim/research/metrics.py` | 🟡 нет ДИ (TD-FN-24) | Т-02 |
 | — (разведка) | Q1.5 | precision и recall по типу ошибки и по букве | `src/muallim/research/metrics.py` | 🟡 нет по букве | Р-08 |
-| — (разведка) | Q1.6 | оспоренные учеником попытки, признанные `false_alarm` | `analytics/sql/07_learner_disputes.sql` | 🟡 | Т-01 (примечание) |
+| — (разведка) | Q1.6 | оспоренные учеником попытки, исправленные разметчиком (`fix`) | `analytics/sql/07_learner_disputes.sql` | 🟡 | Т-01 (примечание) |
 
 ## RQ-2. Какие ошибки делают новички и где ошибается модель
 | Гипотеза | Вопрос | Метрика | Расчёт | Статус | Результат |

@@ -114,13 +114,17 @@
 |---|---|---|
 | `id` | int, PK | |
 | `attempt_id` | UUID → attempts, CASCADE | |
-| `detected_error_id` | int → detected_errors, null | `null` — метка на всю попытку |
-| `annotator` | varchar(64) | **код** разметчика (A1, T2), не имя |
-| `label` | varchar(32) | метка из `annotation-guide.md` |
-| `corrected_phonemes` | text, null | что на самом деле прочитал ученик, по мнению разметчика |
+| `detected_error_id` | int → detected_errors, null | не заполняется с руководства 2.0: ошибки по фонемам выводятся из `corrected_phonemes`; кандидат на удаление миграцией (TD-DB-04) |
+| `annotator` | varchar(64) | **код** разметчика (A1, T2), не имя; латиница, цифры, `-`, `_` |
+| `label` | varchar(32) | с 2.0: `agree` (бот услышал верно), `fix` (исправлено), `audio_unusable`, `off_task`; метки 1.0 (`correct`, `false_alarm`, …) в метрики не входят |
+| `corrected_phonemes` | text, null | что прозвучало на самом деле (Quran Phonetic Script): при `agree` — то, что услышал бот, при `fix` — исправленное; `null` — `audio_unusable` / `off_task` |
 | `comment` | text | |
 | `guide_version` | varchar(16) | версия руководства по разметке |
 | `created_at` | timestamptz | |
+
+Строки не изменяются и не удаляются при исправлении: исправленная метка — новая строка, в
+метриках и датасете берётся **последняя метка каждого разметчика** на попытку (история
+сохраняется). Удаляются вместе с попыткой (CASCADE) и при отзыве согласия на запись голоса.
 
 ## `learner_reports` — жалобы «бот ошибся» (ADR-0020)
 | Поле | Тип | Описание |
@@ -136,7 +140,7 @@
 |---|---|---|
 | `id` | int, PK | |
 | `learner_id` | UUID → learners, SET NULL | после удаления ученика событие остаётся обезличенным |
-| `event` | varchar(48) | `learner_registered`, `consent_changed`, `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_answered`, `feedback_language_set`, `learner_deleted` |
+| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_answered`, `feedback_language_set`, `learner_deleted` |
 | `payload` | JSON | только ID карточек, баллы, флаги; **никогда** — текст сообщений |
 | `created_at` | timestamptz | |
 
@@ -147,5 +151,6 @@
 | Учебная программа | `curriculum/course.ru.yaml` | версия → `attempts.curriculum_version` |
 | Объяснения на языках | `curriculum/lexicon.<язык>.yaml`, `curriculum/feedback.<язык>.yaml` | язык → `attempts.feedback_language` |
 | Эталонные записи | `curriculum/audio/<id>.ogg` | источник — `curriculum/audio/SOURCES.md` |
-| Очереди разметки | `data/annotation/queue_*.csv` | |
-| Выгрузки датасета | `data/exports/<дата>/` | `manifest.jsonl` + `audio/` |
+| Пакеты разметки | `data/annotation/<код>_<дата>/` | `tasks.csv` (UTF-8 с BOM) + `audio/` — копии голосов; удалить после загрузки |
+| Выгрузки датасета | `data/exports/<дата>/` | `manifest.jsonl` + `truth.csv`/`predictions.csv` (Iqra'Eval) + `audio/` |
+| Резервные копии | `data/backups/<дата>/` | `db.dump` + `audio.tar.gz` + `SHA256SUMS`; неудачная — с суффиксом `-FAILED` |

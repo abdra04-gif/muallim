@@ -1,20 +1,37 @@
-"""Выгрузка датасета для обучения/дообучения модели (FR-14).
+"""Выгрузка датасета для оценки и дообучения модели (FR-14).
 
 В выгрузку попадают только ученики с согласием и только реальные попытки (не заглушка).
 Telegram ID не выгружается никогда — только псевдоним.
+
+Строка — попытка: эталон, что услышала модель, и разметка каждого разметчика (последняя его
+метка). ``consensus_phonemes`` — что прозвучало, если попытку оценили минимум двое разметчиков
+и все записали одно и то же; иначе None — такие попытки сначала разбирают вместе
+(docs/data/annotation-guide.md).
+Для оценки по протоколу Iqra'Eval (``mdd_eval``) — ``truth.csv`` и ``predictions.csv``.
 """
 
+import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.infrastructure.db.tables import annotations, attempts, learners
+from muallim.research.annotation import USABLE, AttemptStatus
+
+_STATUSES = [str(s) for s in AttemptStatus]  # метки руководства 2.0; старые (без фонем) — нет
 
 
 async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
+    consenting_real = (
+        learners.c.research_consent.is_(True),
+        attempts.c.audio_sha256.is_not(None),
+        attempts.c.model_version != "stub",
+    )
     query = (
         select(
             attempts.c.id,
@@ -31,33 +48,79 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
             attempts.c.reference_variant,
             attempts.c.feedback_language,
             attempts.c.app_version,
-            annotations.c.label,
-            annotations.c.corrected_phonemes,
-            annotations.c.annotator,
         )
         .join(learners, learners.c.id == attempts.c.learner_id)
-        .outerjoin(
-            annotations,
-            (annotations.c.attempt_id == attempts.c.id) & annotations.c.detected_error_id.is_(None),
-        )
-        .where(
-            learners.c.research_consent.is_(True),
-            attempts.c.audio_sha256.is_not(None),
-            attempts.c.model_version != "stub",
-        )
-        .order_by(attempts.c.created_at)
+        .where(*consenting_real)
+        .order_by(attempts.c.created_at, attempts.c.id)
     )
+    labels = await session.execute(
+        select(
+            annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
+            annotations.c.corrected_phonemes, annotations.c.guide_version,
+        )
+        .join(attempts, attempts.c.id == annotations.c.attempt_id)
+        .join(learners, learners.c.id == attempts.c.learner_id)
+        .where(*consenting_real, annotations.c.label.in_(_STATUSES))
+        .order_by(annotations.c.created_at, annotations.c.id)
+    )  # fmt: skip
+    latest: dict[UUID, dict[str, dict[str, str | None]]] = defaultdict(dict)
+    for attempt_id, annotator, status, actual, guide in labels.all():
+        latest[attempt_id][annotator] = {
+            "annotator": annotator, "status": status, "actual_phonemes": actual,
+            "guide_version": guide,
+        }  # fmt: skip
     rows = []
     for r in (await session.execute(query)).mappings():
         row = dict(r)
-        row["attempt_id"] = str(row.pop("id"))
+        attempt_id = row.pop("id")
+        marks = [latest[attempt_id][a] for a in sorted(latest.get(attempt_id, {}))]
+        row["attempt_id"] = str(attempt_id)
         row["created_at"] = row["created_at"].isoformat()
         row["audio"] = f"audio/{row['audio_sha256']}.ogg"
+        row["annotations"] = marks
+        row["consensus_phonemes"] = _consensus(marks)
         rows.append(row)
     return rows
+
+
+def _consensus(marks: list[dict[str, str | None]]) -> str | None:
+    actual = {m["actual_phonemes"] for m in marks}
+    usable = len(marks) >= 2 and all(m["status"] in USABLE for m in marks)
+    return actual.pop() if usable and len(actual) == 1 else None
 
 
 def write_jsonl(rows: list[dict[str, Any]], path: Path) -> None:
     with path.open("w", encoding="utf-8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def write_iqraeval(rows: list[dict[str, Any]], out_dir: Path) -> None:
+    """Файлы для ``mdd_eval`` Iqra'Eval: фонемы через пробел; только согласованная разметка."""
+    agreed = [r for r in rows if r["consensus_phonemes"] is not None]
+    tables: dict[str, tuple[tuple[str, ...], list[tuple[str, ...]]]] = {
+        "truth.csv": (
+            ("ID", "Reference_phn", "Annotated_phn"),
+            [
+                (
+                    r["attempt_id"],
+                    _spaced(r["reference_phonemes"]),
+                    _spaced(r["consensus_phonemes"]),
+                )
+                for r in agreed
+            ],
+        ),
+        "predictions.csv": (
+            ("ID", "Prediction"),
+            [(r["attempt_id"], _spaced(r["heard_phonemes"])) for r in agreed],
+        ),
+    }
+    for name, (header, values) in tables.items():
+        with (out_dir / name).open("w", encoding="utf-8", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(values)
+
+
+def _spaced(phonemes: str) -> str:
+    return " ".join(phonemes)

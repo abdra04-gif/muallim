@@ -60,6 +60,11 @@ class World:
     def ensure(self) -> EnsureLearner:
         return EnsureLearner(self.learners, self.uow, self.clock, self.ids, self.events)
 
+    def consent(self) -> SetResearchConsent:
+        return SetResearchConsent(
+            self.learners, self.attempts, self.audio, self.uow, self.clock, self.events
+        )
+
     def cards(self) -> OpenItem:
         return OpenItem(self.curriculum, self.learners, self.uow, self.events)
 
@@ -100,9 +105,13 @@ def course(curriculum: Curriculum) -> Curriculum:
 
 @pytest.fixture
 def w(course: Curriculum, catalog: FeedbackCatalog) -> World:
+    journal: list[str] = []  # общий журнал: commit и удаление файлов — проверяем порядок
+    attempts = InMemoryAttempts()
     return World(
-        course, catalog, InMemoryLearners(), InMemoryAttempts(), InMemoryAudio(),
-        ScriptedRecognizer(), SpyUoW(), ListEventLog(), FixedClock(), SequentialIds(),
+        course, catalog, InMemoryLearners(cascade_to=attempts), attempts,
+        InMemoryAudio(journal=journal),
+        ScriptedRecognizer(), SpyUoW(journal=journal), ListEventLog(), FixedClock(),
+        SequentialIds(),
     )  # fmt: skip
 
 
@@ -127,7 +136,7 @@ async def test_missing_language_defaults_to_ru(w: World) -> None:
 # ---------- согласие ----------
 async def test_consent_change_is_journaled(w: World) -> None:
     learner = await w.learner()
-    uc = SetResearchConsent(w.learners, w.uow, w.clock, w.events)
+    uc = w.consent()
     await uc.execute(learner, True)
     await uc.execute(learner, False)
     assert [c.granted for c in w.learners.consents] == [True, False]
@@ -135,16 +144,48 @@ async def test_consent_change_is_journaled(w: World) -> None:
     assert not learner.research_consent
 
 
+async def test_withdrawn_consent_deletes_recordings_after_commit(w: World) -> None:
+    """privacy.md: голос хранится «до отзыва согласия». Попытки (баллы) остаются для прогресса."""
+    learner = await w.learner()
+    await w.consent().execute(learner, True)
+    await w.assess().execute(learner, b"ogg")
+    sha = w.attempts.items[0][0].audio_sha256
+    assert sha is not None
+    w.audio.journal.clear()
+    await w.consent().execute(learner, False)
+    assert w.audio.files == {}
+    assert [a.audio_sha256 for a, _ in w.attempts.items] == [None]
+    # файл удаляется только после фиксации в БД: иначе при сбое БД ссылается на пустоту
+    assert w.audio.journal == ["commit", f"delete:{sha}"]
+
+
+async def test_withdrawn_consent_keeps_recording_shared_with_another_learner(w: World) -> None:
+    """Ученик переслал чужое голосовое — та же запись (тот же SHA-256) у двоих."""
+    first = await w.learner()
+    second, _ = await w.ensure().execute(43, "ru")
+    for learner in (first, second):
+        await w.consent().execute(learner, True)
+        await w.assess().execute(learner, b"same voice")
+    await w.consent().execute(first, False)
+    assert len(w.audio.files) == 1  # запись второго ученика на месте
+
+
+async def test_granting_consent_deletes_nothing(w: World) -> None:
+    learner = await w.learner()
+    await w.consent().execute(learner, True)
+    assert not any(e.startswith("delete:") for e in w.audio.journal)
+
+
 # ---------- анкета (FR-44) ----------
 def _questionnaire(w: World) -> Questionnaire:
-    consent = SetResearchConsent(w.learners, w.uow, w.clock, w.events)
+    consent = w.consent()
     return Questionnaire(InMemoryProfiles(), consent, w.uow, w.clock, w.events)
 
 
 async def test_questionnaire_asked_only_after_research_consent(w: World) -> None:
     learner, q = await w.learner(), _questionnaire(w)
     assert not await q.needed(learner)  # без согласия эти данные не нужны и не собираются
-    await SetResearchConsent(w.learners, w.uow, w.clock, w.events).execute(learner, True)
+    await w.consent().execute(learner, True)
     assert await q.needed(learner)
 
 
@@ -166,7 +207,7 @@ async def test_questionnaire_saved_once_and_not_asked_again(w: World) -> None:
 
 async def test_minor_keeps_learning_but_voice_is_not_kept(w: World) -> None:
     learner, q = await w.learner(), _questionnaire(w)
-    await SetResearchConsent(w.learners, w.uow, w.clock, w.events).execute(learner, True)
+    await w.consent().execute(learner, True)
     assert await q.answer(learner, adult=False)
     assert not learner.research_consent  # участие в исследовании — только 18+ (TD-SEC-05)
     assert [c.granted for c in w.learners.consents] == [True, False]
@@ -363,6 +404,26 @@ async def test_delete_my_data_removes_learner_attempts_and_audio(w: World) -> No
     assert await w.learners.get_by_telegram_id(42) is None
     assert w.audio.files == {}
     assert w.events.events[-1] == ("learner_deleted", None, {})
+
+
+async def test_delete_my_data_removes_files_only_after_commit(w: World) -> None:
+    learner = await w.learner()
+    learner.research_consent = True
+    await w.assess().execute(learner, b"ogg")
+    sha = w.attempts.items[0][0].audio_sha256
+    w.audio.journal.clear()
+    await DeleteMyData(w.learners, w.attempts, w.audio, w.uow, w.events).execute(learner)
+    assert w.audio.journal == ["commit", f"delete:{sha}"]
+
+
+async def test_delete_my_data_keeps_recording_shared_with_another_learner(w: World) -> None:
+    first = await w.learner()
+    second, _ = await w.ensure().execute(43, "ru")
+    for learner in (first, second):
+        learner.research_consent = True
+        await w.assess().execute(learner, b"same voice")
+    await DeleteMyData(w.learners, w.attempts, w.audio, w.uow, w.events).execute(first)
+    assert len(w.audio.files) == 1
 
 
 # ---------- след решения (FR-24, ADR-0019) ----------

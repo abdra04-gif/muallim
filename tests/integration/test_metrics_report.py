@@ -4,7 +4,7 @@ from datetime import UTC, date, datetime
 from uuid import UUID
 
 import pytest
-from sqlalchemy import insert, select
+from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.domain.assessment import assess
@@ -13,7 +13,7 @@ from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
 from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
-from muallim.infrastructure.db.tables import annotations, detected_errors, interaction_events
+from muallim.infrastructure.db.tables import annotations, interaction_events
 from muallim.research import metrics
 
 pytestmark = pytest.mark.integration
@@ -24,12 +24,12 @@ def _at(day: int) -> datetime:
     return datetime(2026, 10, day, 12, 0, tzinfo=UTC)
 
 
-async def _seed(session: AsyncSession) -> dict[int, str]:
+async def _seed(session: AsyncSession) -> None:
     """Попытки 1–3 и 5 — настоящая модель, 4 — заглушка; разметка двумя учителями T1, T2."""
     policy = GradingPolicy()
     learners, attempts = SqlLearnerRepository(session), SqlAttemptRepository(session)
-    a = Learner(UUID(int=1), 111, "L-aaaa", "ru", _at(1))
-    b = Learner(UUID(int=2), 222, "L-bbbb", "ru", _at(15))
+    a = Learner(UUID(int=1), 987654321, "L-aaaa", "ru", _at(1))
+    b = Learner(UUID(int=2), 876543219, "L-bbbb", "ru", _at(15))
     await learners.add(a)
     await learners.add(b)
     plan = [  # n, ученик, услышано, день, processing_ms, модель
@@ -48,30 +48,40 @@ async def _seed(session: AsyncSession) -> dict[int, str]:
             ),
             tuple("msg" for _ in result.errors),
         )  # fmt: skip
-    rows = await session.execute(select(detected_errors.c.attempt_id, detected_errors.c.id))
-    error_of = {attempt.int: error_id for attempt, error_id in rows.all()}
 
-    def label(n: int, annotator: str, value: str, *, on_error: bool = False) -> dict[str, object]:
+    def label(
+        n: int,
+        annotator: str,
+        actual: str | None,
+        *,
+        status: str,
+        day: int = 17,
+        guide: str = "2.0",
+    ) -> dict[str, object]:
         return {
-            "attempt_id": UUID(int=n),
-            "detected_error_id": error_of[n] if on_error else None,
-            "annotator": annotator, "label": value, "guide_version": "1.0",
-            "comment": "", "created_at": _at(17),
+            "attempt_id": UUID(int=n), "detected_error_id": None, "annotator": annotator,
+            "label": status, "corrected_phonemes": actual, "guide_version": guide,
+            "comment": "", "created_at": _at(day),
         }  # fmt: skip
 
+    # Эталон «صَ». Разметчик пишет, что прозвучало на самом деле (docs/data/annotation-guide.md).
     await session.execute(
         insert(annotations),
         [
-            label(2, "T1", "correct", on_error=True),  # TP
-            label(5, "T1", "false_alarm", on_error=True),  # FP
-            label(1, "T1", "missed_error"),  # FN; бот засчитал, учитель — нет
-            label(2, "T1", "correct"),
-            label(5, "T1", "false_alarm"),  # бот не засчитал верное чтение
-            label(3, "T1", "correct"),
-            label(3, "T2", "correct"),
-            label(2, "T2", "correct"),
-            label(1, "T2", "audio_unusable"),  # не входит в метрики
-            label(4, "T1", "correct"),  # заглушка — не входит
+            label(1, "T1", "سَ", status="fix"),  # модель: верно; учитель: ص→س — пропуск (FA)
+            label(1, "T2", None, status="audio_unusable"),  # не входит в метрики
+            label(2, "T1", "سَ", status="agree"),  # модель и учитель: ص→س (TR, диагноз верный)
+            label(2, "T2", "سَ", status="agree"),
+            label(3, "T1", "صَ", status="agree"),  # оба: верно
+            label(3, "T2", "صَ", status="agree"),
+            label(5, "T1", "صِ", day=16, status="agree"),  # сначала согласился с моделью…
+            label(
+                5, "T1", "صَ", status="fix"
+            ),  # …потом исправил: берётся последняя метка — ложная тревога
+            label(
+                5, "T2", None, status="correct", guide="1.0"
+            ),  # старая метка без фонем — не в счёт
+            label(4, "T1", "سَ", status="fix"),  # заглушка — не входит
         ],
     )
     events: list[tuple[str, dict[str, object]]] = [("attempt_assessed", {})] * 3 + [
@@ -83,32 +93,66 @@ async def _seed(session: AsyncSession) -> dict[int, str]:
         [{"learner_id": a.id, "event": e, "payload": p, "created_at": _at(16)} for e, p in events],
     )
     await session.commit()
-    kinds = await session.execute(select(detected_errors.c.attempt_id, detected_errors.c.kind))
-    return {attempt.int: kind for attempt, kind in kinds.all()}
 
 
-async def test_detection_quality_from_annotations(session: AsyncSession) -> None:
-    kinds = await _seed(session)
+async def test_phoneme_level_detection_from_annotations(session: AsyncSession) -> None:
+    """Счёт по каждой фонеме эталона (L2-ARCTIC, Iqra'Eval); каждый разметчик — отдельно."""
+    await _seed(session)
     m = await metrics.collect(session, TODAY)
-    assert (m.detection.tp, m.detection.fp, m.detection.fn) == (1, 1, 1)
-    assert m.detection.precision == pytest.approx(0.5)
-    assert m.detection.recall == pytest.approx(0.5)
-    assert m.by_kind[kinds[2]].precision == pytest.approx(1.0)
-    assert m.by_kind[kinds[5]].precision == pytest.approx(0.0)
+    # 1/T1: TA1 FA1 · 2/T1, 2/T2: TA1 TR1 CD1 · 3/T1, 3/T2: TA2 · 5/T1 (последняя): TA1 FR1
+    assert m.phonemes == metrics.PhonemeCounts(ta=8, fr=1, fa=1, tr=2, correct_diagnosis=2)
+    assert m.quality.precision == pytest.approx(2 / 3)
+    assert m.quality.recall == pytest.approx(2 / 3)
+    assert m.quality.far == pytest.approx(1 / 3)
+    assert m.quality.frr == pytest.approx(1 / 9)
+    assert m.quality.diagnosis == pytest.approx(1.0)
+
+
+async def test_detection_by_error_kind(session: AsyncSession) -> None:
+    """Precision — по типу ошибки модели, recall — по типу ошибки в разметке."""
+    await _seed(session)
+    by_kind = (await metrics.collect(session, TODAY)).by_kind
+    assert by_kind["letter_substitution"] == metrics.KindQuality(
+        flagged=2, confirmed=2, errors=3, caught=2
+    )
+    assert by_kind["letter_substitution"].recall == pytest.approx(2 / 3)
+    assert by_kind["vowel_substitution"].precision == pytest.approx(0.0)
 
 
 async def test_false_accept_and_reject_rates(session: AsyncSession) -> None:
+    """Вердикт учителя = та же политика оценки, применённая к его транскрипции."""
     await _seed(session)
     v = (await metrics.collect(session, TODAY)).verdicts
     assert (v.accepted, v.false_accepts, v.rejected, v.false_rejects) == (3, 1, 3, 1)
     assert v.far == pytest.approx(1 / 3) and v.frr == pytest.approx(1 / 3)
 
 
-async def test_kappa_bot_vs_teacher_and_between_teachers(session: AsyncSession) -> None:
+async def test_agreement_bot_teacher_and_between_teachers(session: AsyncSession) -> None:
     await _seed(session)
     m = await metrics.collect(session, TODAY)
     assert m.kappa_bot_teacher == pytest.approx(1 / 3) and m.pairs_bot_teacher == 6
     assert m.kappa_teachers == pytest.approx(1.0) and m.pairs_teachers == 2
+    # α по фонемам: попытки 2 и 3 размечены двумя, по 2 фонемы — 4 единицы, полное согласие
+    assert m.alpha_phonemes == pytest.approx(1.0) and m.alpha_units == 4
+
+
+async def test_agreement_with_bot_per_annotator(session: AsyncSession) -> None:
+    """Учёт: сколько раз разметчик согласился с ботом и сколько исправил — по вердикту бота."""
+    await _seed(session)
+    review = (await metrics.collect(session, TODAY)).review
+    # T1 (последние метки): 1 fix — бот засчитал, 2 agree — не засчитал, 3 agree — засчитал,
+    # 5 fix — не засчитал
+    assert review["T1"] == metrics.ReviewCounts(
+        agree_passed=1, fix_passed=1, agree_failed=1, fix_failed=1, unusable=0
+    )
+    assert review["T1"].agreement == pytest.approx(0.5)
+    assert review["T2"].agreement == pytest.approx(1.0) and review["T2"].unusable == 1
+
+
+async def test_annotation_coverage(session: AsyncSession) -> None:
+    await _seed(session)
+    m = await metrics.collect(session, TODAY)
+    assert (m.annotated_attempts, m.double_annotated) == (4, 3)
 
 
 async def test_response_time_excludes_stub(session: AsyncSession) -> None:
@@ -135,8 +179,9 @@ async def test_render_is_markdown_without_telegram_ids(session: AsyncSession) ->
     md = metrics.render(await metrics.collect(session, TODAY))
     for heading in ("Точность проверки", "Время ответа", "Сбои распознавания", "Возврат учеников"):
         assert f"## {heading}" in md
-    assert "κ" in md and "FAR" in md
-    assert "111" not in md and "222" not in md
+    assert "κ" in md and "α" in md and "FAR" in md and "диагноз" in md
+    assert "Согласие разметчиков с ботом" in md
+    assert "987654321" not in md and "876543219" not in md
 
 
 async def test_empty_database_renders_without_errors(session: AsyncSession) -> None:

@@ -5,47 +5,80 @@ from datetime import date
 import pytest
 
 from muallim.research.metrics import (
+    PhonemeCounts,
     Retention,
     cohen_kappa,
-    detection_quality,
+    krippendorff_alpha_nominal,
+    mdd_quality,
     nearest_rank,
+    phoneme_decisions,
     retention,
-    teacher_passes,
 )
 
 
-def test_detection_quality_precision_recall_f1() -> None:
-    q = detection_quality(tp=8, fp=2, fn=2)
-    assert q.precision == pytest.approx(0.8)
-    assert q.recall == pytest.approx(0.8)
-    assert q.f1 == pytest.approx(0.8)
-
-
-def test_detection_quality_without_data_is_undefined() -> None:
-    q = detection_quality(tp=0, fp=0, fn=0)
-    assert q.precision is None and q.recall is None and q.f1 is None
-
-
-def test_detection_quality_without_missed_errors_known_has_no_recall() -> None:
-    """По типу ошибки пропуски неизвестны: `missed_error` ставится на всю попытку."""
-    q = detection_quality(tp=3, fp=1, fn=None)
-    assert q.precision == pytest.approx(0.75) and q.recall is None and q.f1 is None
-
-
+# Эталон «صَ» = [ص, фатха]. Человек (разметчик) и модель сравниваются с эталоном по каждой
+# фонеме — схема MDD: TA, FR, FA, TR (SRC-064), как в L2-ARCTIC (SRC-063) и Iqra'Eval.
 @pytest.mark.parametrize(
-    ("label", "bot_passed", "expected"),
+    ("model", "human", "expected"),
     [
-        ("correct", True, True),  # бот прав — учитель согласен с его вердиктом
-        ("correct", False, False),
-        ("false_alarm", False, True),  # бот нашёл несуществующую ошибку — прочитано верно
-        ("missed_error", True, False),  # бот пропустил ошибку — читать заново
-        ("wrong_error", True, False),  # ошибка была, хоть и описана не так
-        ("audio_unusable", True, None),  # оценить нельзя — не входит в метрики
-        ("off_task", False, None),
+        ("صَ", "صَ", PhonemeCounts(ta=2)),  # оба: прочитано верно
+        ("سَ", "سَ", PhonemeCounts(ta=1, tr=1, correct_diagnosis=1)),  # ошибку нашли и назвали
+        ("ثَ", "سَ", PhonemeCounts(ta=1, tr=1)),  # ошибку нашли, но назвали не ту букву
+        ("سَ", "صَ", PhonemeCounts(ta=1, fr=1)),  # ложная тревога: ученик прочитал верно
+        ("صَ", "سَ", PhonemeCounts(ta=1, fa=1)),  # пропуск: модель не заметила ошибку
+        ("صِ", "صُ", PhonemeCounts(ta=1, tr=1)),  # огласовка: обе не фатха, но разные
+        ("ص", "ص", PhonemeCounts(ta=1, tr=1, correct_diagnosis=1)),  # оба: огласовка пропущена
+        ("صَا", "صَ", PhonemeCounts(ta=1, fr=1)),  # лишний мадд в конце — к последней фонеме
+        ("صَڇ", "صَ", PhonemeCounts(ta=2)),  # калькаля при остановке — не ошибка (методика)
     ],
 )
-def test_teacher_verdict_from_label(label: str, bot_passed: bool, expected: bool | None) -> None:
-    assert teacher_passes(label, bot_passed) is expected
+def test_phoneme_decisions(model: str, human: str, expected: PhonemeCounts) -> None:
+    assert phoneme_decisions("صَ", model, human) == expected
+
+
+def test_phoneme_counts_add_up() -> None:
+    total = PhonemeCounts(ta=1, fr=1) + PhonemeCounts(ta=2, tr=1, correct_diagnosis=1)
+    assert total == PhonemeCounts(ta=3, fr=1, tr=1, correct_diagnosis=1)
+
+
+def test_mdd_quality_formulas() -> None:
+    # TR — найденные ошибки, FR — ложные тревоги, FA — пропущенные, TA — верно принятые
+    q = mdd_quality(PhonemeCounts(ta=80, fr=4, fa=4, tr=12, correct_diagnosis=9))
+    assert q.precision == pytest.approx(12 / 16)  # TR / (TR + FR)
+    assert q.recall == pytest.approx(12 / 16)  # TR / (TR + FA)
+    assert q.f1 == pytest.approx(0.75)
+    assert q.far == pytest.approx(4 / 16)  # FA / (FA + TR): пропущено из ошибок
+    assert q.frr == pytest.approx(4 / 84)  # FR / (TA + FR): забраковано из верного
+    assert q.diagnosis == pytest.approx(9 / 12)  # верно названа ошибка среди найденных
+
+
+def test_mdd_quality_without_data_is_undefined() -> None:
+    q = mdd_quality(PhonemeCounts())
+    assert (q.precision, q.recall, q.f1, q.far, q.frr, q.diagnosis) == (None,) * 6
+
+
+def test_krippendorff_alpha_nominal_reference_example() -> None:
+    """Пример Krippendorff (2011) «Computing Krippendorff's Alpha-Reliability»: α = 0,743.
+
+    Строка — единица (что оценивали), столбцы — 4 оценщика, None — не оценивал. То же значение
+    даёт библиотека fast-krippendorff (external/), сверено 2026-10-18.
+    """
+    n = None
+    coders = [
+        [1, 2, 3, 3, 2, 1, 4, 1, 2, n, n, n],
+        [1, 2, 3, 3, 2, 2, 4, 1, 2, 5, n, 3],
+        [n, 3, 3, 3, 2, 3, 4, 2, 2, 5, 1, n],
+        [1, 2, 3, 3, 2, 4, 4, 1, 2, 5, 1, n],
+    ]
+    units = [list(values) for values in zip(*coders, strict=True)]
+    assert krippendorff_alpha_nominal(units) == pytest.approx(0.743421, abs=1e-6)
+
+
+def test_krippendorff_alpha_perfect_and_undefined() -> None:
+    assert krippendorff_alpha_nominal([["ok", "ok"], ["err", "err"]]) == pytest.approx(1.0)
+    assert krippendorff_alpha_nominal([]) is None
+    assert krippendorff_alpha_nominal([["ok", "ok"], ["ok", "ok"]]) is None  # нет разброса
+    assert krippendorff_alpha_nominal([["ok", None]]) is None  # одна оценка — не пара
 
 
 def test_cohen_kappa_known_value() -> None:
