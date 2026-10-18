@@ -5,6 +5,7 @@ Script (см. docs/research/sources.md, SRC-002). Здесь только сим
 и подсказки на русском — это учебный контент, он лежит в curriculum/lexicon.ru.yaml.
 """
 
+from enum import StrEnum
 from typing import Final
 
 # 28 согласных: хамза вместо алифа, т.к. алиф с огласовкой читается как хамза.
@@ -19,6 +20,33 @@ VOWELS: Final[frozenset[str]] = SHORT_VOWELS | LONG_VOWELS | {QALQALA}
 # Остальные символы фонетизатора quran-transcript (``quran_transcript.alphabet.phonetics``):
 # ималя (۪ ـ), облегчённая хамза (ٲ), скрытые нун и мим — ихфа (ں ۾), сакт (ۜ), краткая дамма (ؙ).
 SPECIAL: Final[frozenset[str]] = frozenset("\u06ea\u0640\u0672\u06ba\u06fe\u06dc\u0619")
+
+
+class Zone(StrEnum):
+    """Где рождается звук — три упрощённые зоны для начинающих (ADR-0050).
+
+    Упрощение 17 мест образования (махāридж) аль-Джазарийи (SRC-059) до «горло / язык / губы»;
+    утвердил автор 2026-10-18.
+    """
+
+    THROAT = "throat"
+    TONGUE = "tongue"
+    LIPS = "lips"
+
+
+_THROAT: Final[frozenset[str]] = frozenset("ءأإؤئآهعحغخ")
+_LIPS: Final[frozenset[str]] = frozenset("بمفو")
+
+
+def articulation_zone(letter: str) -> Zone | None:
+    """Зона буквы; None — не согласный (алиф-мадд, не арабская буква)."""
+    if letter in _THROAT:
+        return Zone.THROAT
+    if letter in _LIPS:
+        return Zone.LIPS
+    return Zone.TONGUE if letter in CONSONANTS else None
+
+
 _SYLLABLE_VOWELS: Final[frozenset[str]] = (
     SHORT_VOWELS | LONG_VOWELS | frozenset("\u06ea\u0640\u0619")
 )

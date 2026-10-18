@@ -3,3 +3,7 @@ Copyright (c) 2026 Исмаилов
 
 Распознавание произношения использует пакеты quran-muaalem и quran-transcript
 (https://github.com/obadx/quran-muaalem) — см. docs/research/sources.md, SRC-002, SRC-003.
+
+Шрифты картинок бота (src/muallim/presentation/telegram/assets/fonts/), лицензия SIL Open Font
+License 1.1: Scheherazade New (SIL International, OFL.txt) и PT Sans (ParaType, OFL-PTSans.txt,
+https://github.com/google/fonts/tree/main/ofl/ptsans).

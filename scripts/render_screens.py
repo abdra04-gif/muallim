@@ -5,10 +5,11 @@
 """
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
+from muallim.application.feedback import Explanation
 from muallim.application.transcription import as_text, legend, reading
 from muallim.application.use_cases.progress import LessonProgress, Progress
 from muallim.application.use_cases.reading import HowToRead
@@ -41,7 +42,11 @@ def main() -> None:
         mastered = n if lesson.id in done else (1 if lesson.id == started else 0)
         lessons.append(LessonProgress(lesson, mastered, weak))
     current = c.lesson(started).items[1]
-    p = Progress(tuple(lessons), 37, streak_days=4, today_attempts=6, continue_item=current)
+    week = (True, True, False, True, True, True, True)  # 7 дней, последний — сегодня
+    p = Progress(
+        tuple(lessons), 37, streak_days=4, today_attempts=6, continue_item=current,
+        today=date(2026, 10, 18), week=week,
+    )  # fmt: skip
 
     def find(pred) -> str:  # type: ignore[no-untyped-def]
         return next(i.id for les in c.lessons for i in les.items if pred(les, i))
@@ -70,7 +75,8 @@ def main() -> None:
         expected = reading(ref, lex, [e.syllable for e in a.errors])
         heard_r = reading(heard, lex)
         return RecitationResult(
-            item, attempt, renderer.render(a.errors, ref), as_text(heard_r),
+            item, attempt, tuple(Explanation(t) for t in renderer.render(a.errors, ref)),
+            as_text(heard_r),
             c.next_item(item.id), completed,
             expected_reading=expected, heard_reading=heard_r,
             legend=legend(as_text(expected) + as_text(heard_r), lex),
@@ -91,7 +97,7 @@ def main() -> None:
         "05_alphabet": screens.card(
             c, c.item(find(lambda les, i: i.kind.value == "alphabet")), False, False
         ),
-        "06_letter": card(mim.items[0].id),
+        "06_letter": card(next(i.id for i in mim.items if i.kind.value == "letter")),
         "07_line": card(mim.items[1].id),
         "08_quran": card(find(lambda les, i: i.quran == "112:1")),
         "09_result_errors": screens.result(c, result(sad_line.id, ("ص", "س"), False), True),
@@ -102,6 +108,8 @@ def main() -> None:
         "14_progress": screens.progress(c, p),
         "15_help": screens.help_screen(),
         "16_teacher": card(letters[4].items[0].id, has_audio=False, teacher=True),
+        "17_opening": screens.opening(c),
+        "18_postcard": screens.postcard(c, mim, p, bot_username="muallim_bot"),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     meta = {}

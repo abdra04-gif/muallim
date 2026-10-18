@@ -9,11 +9,23 @@ from typing import Final
 
 from aiogram import Router
 
-from muallim.presentation.telegram.handlers import commands, data, navigation, reference, voice
+from muallim.presentation.telegram.handlers import (
+    commands,
+    daily,
+    data,
+    navigation,
+    reference,
+    voice,
+)
 
 router: Final = Router(name="learner")
 router.include_routers(
-    commands.router, navigation.router, data.router, reference.router, voice.router
+    commands.router,
+    navigation.router,
+    daily.router,
+    data.router,
+    reference.router,
+    voice.router,
 )
 
 __all__ = ("router",)

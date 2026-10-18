@@ -638,3 +638,12 @@ def _attempt_for(learner: Learner, item_id: str):  # type: ignore[no-untyped-def
         SequentialIds().new_id(), learner.id, item_id, "v", "m", a, Verdict.EXCELLENT,
         None, None, 1, FixedClock().now(),
     )  # fmt: skip
+
+
+async def test_progress_week_marks_days_with_attempts(w: World) -> None:
+    """Неделя для картинки прогресса (ADR-0050): 7 дней, последний — сегодня."""
+    learner = await w.learner()
+    await w.assess().execute(learner, b"1")
+    progress = await w.progress().execute(learner)
+    assert progress.week == (False,) * 6 + (True,)
+    assert progress.today == w.clock.current.date()

@@ -95,3 +95,15 @@ class AnnotateAct(CallbackData, prefix="ann"):
 
     a: str  # UUID.hex попытки — 32 символа
     act: str
+
+
+class Opening(CallbackData, prefix="open"):
+    """Начало занятия (ADR-0050): ``start`` — читать истиазу и басмалу, ``skip`` — пропустить."""
+
+    act: str
+
+
+class ShareLesson(CallbackData, prefix="share"):
+    """«📤 Поделиться» — прислать открытку пройденного урока для пересылки (ADR-0050)."""
+
+    lesson: str

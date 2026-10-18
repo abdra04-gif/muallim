@@ -5,6 +5,7 @@ from typing import Final
 
 from aiogram import Bot, Router
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from dishka import FromDishka
 
@@ -15,6 +16,7 @@ from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.presentation.telegram import keyboards, screens, texts, views
 from muallim.presentation.telegram.display import Display
+from muallim.presentation.telegram.handlers.daily import home_or_opening
 from muallim.presentation.telegram.learner import NewLearner
 from muallim.presentation.telegram.screens import Screen
 
@@ -27,6 +29,7 @@ PROFILE_START: Final = Screen(texts.PROFILE_ADULT, keyboards.profile_adult())
 async def start(
     m: Message,
     bot: Bot,
+    state: FSMContext,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     is_new: FromDishka[NewLearner],
@@ -41,7 +44,8 @@ async def start(
     if await questionnaire.needed(learner):  # анкету бросили на середине — спросить ещё раз
         await display.send(bot, m.chat.id, PROFILE_START)
         return
-    await display.send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
+    screen = await home_or_opening(cur, await progress.execute(learner), state)
+    await display.send(bot, m.chat.id, screen)
 
 
 @router.message(Command("lessons"))

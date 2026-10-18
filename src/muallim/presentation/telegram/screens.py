@@ -4,6 +4,7 @@
 уезжает вниз. На каждом экране, кроме главного, есть кнопка 🏠.
 """
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from html import escape
@@ -17,8 +18,9 @@ from muallim.application.transcription import as_text
 from muallim.application.use_cases.progress import LessonStatus, Progress
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
+from muallim.domain.assessment import Assessment
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
-from muallim.domain.phonetics import count_syllables, syllables
+from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import Question
 from muallim.presentation.telegram import render, texts, views
@@ -32,13 +34,16 @@ from muallim.presentation.telegram.callbacks import (
     Lessons,
     Listen,
     Noop,
+    Opening,
     Privacy,
     Quiz,
     QuizAnswer,
     RecordReference,
+    ShareLesson,
     ShowProgress,
     Signs,
 )
+from muallim.presentation.telegram.opening import OPENING_ITEMS
 
 LESSONS_PER_PAGE = 10
 CAPTION_LIMIT = 1024  # подпись к фото в Telegram
@@ -275,6 +280,10 @@ def _card_image(lesson: Lesson, item: LessonItem, i: int) -> bytes | None:
         return render.letters(item.text)
     if item.kind is ItemKind.RULE:
         return render.rule(item.text)
+    if item.kind is ItemKind.LETTER and (letter := _letter_of(lesson)):
+        zone = articulation_zone(letter)
+        zones = [(texts.ZONES[z.value], z is zone) for z in Zone] if zone else []
+        return render.letter_forms(letter, item.text, texts.LETTER_FORMS, zones)
     return render.card(item.text, lesson.accent, (i, len(lesson.items)))
 
 
@@ -314,18 +323,29 @@ def _lessons_of(curriculum: Curriculum, lesson: Lesson) -> Lessons:
 
 
 # ---------- результат ----------
-def result(curriculum: Curriculum, r: RecitationResult, has_audio: bool) -> Screen:
+def result(
+    curriculum: Curriculum,
+    r: RecitationResult,
+    has_audio: bool,
+    resume: LessonItem | None = None,
+) -> Screen:
+    """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие»."""
     a = r.attempt.assessment
     lesson, _ = curriculum.locate(r.item.id)
     head = [_VERDICT[r.verdict], texts.RESULT_SCORE.format(bar=views.bar(a.score), score=a.score)]
     image = None
-    if render.available():
+    if render.available() and r.lesson_completed and not a.errors:  # с ошибками — сначала разбор
+        image = _postcard_image(lesson)
+    elif render.available():
         wrong = render.error_clusters(r.item.text, [e.syllable or 1 for e in a.errors], a.reference)
         unread = set()
         if r.unread_from is not None:
             first = _first_unread_consonant(a.reference, r.unread_from)
             unread = render.unread_clusters(r.item.text, a.reference, first)
-        image = render.result(r.item.text, wrong, a.score, unread)
+        states = render.word_states(r.item.text, wrong, unread)
+        ok = sum(1 for s in states if s is render.WordState.OK)
+        label = texts.RESULT_WORDS.format(ok=ok, total=len(states))
+        image = render.result_words(r.item.text, states, a.score, label, _swap(a))
     else:
         head.insert(1, f"<b>{escape(r.item.text)}</b>")
     head += [*_progress(r), *_praise(r)]
@@ -349,8 +369,16 @@ def result(curriculum: Curriculum, r: RecitationResult, has_audio: bool) -> Scre
     if r.feedback and r.expected_reading:  # «Нужно / У тебя» — сразу под вердиктом
         rest = len("\n\n".join(head + parts)) + 2
         head.append(_comparison(r, CAPTION_LIMIT - rest))
-    keyboard = _result_keyboard(curriculum, r, lesson, has_audio)
+    keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume)
     return Screen("\n\n".join(p for p in head + parts if p), keyboard, image, details=details)
+
+
+def _swap(a: Assessment) -> tuple[str, str, str, str, str] | None:
+    """Первая замена одной буквы другой — «нужна ص вместо прозвучала س» на картинке."""
+    for e in a.errors:
+        if e.expected in CONSONANTS and e.heard in CONSONANTS and e.expected != e.heard:
+            return e.expected, e.heard, texts.SWAP_NEED, texts.SWAP_INSTEAD, texts.SWAP_HEARD
+    return None
 
 
 def _progress(r: RecitationResult) -> list[str]:
@@ -387,7 +415,11 @@ def _first_unread_consonant(reference: str, unread: int) -> int:
 
 
 def _result_keyboard(
-    curriculum: Curriculum, r: RecitationResult, lesson: Lesson, has_audio: bool
+    curriculum: Curriculum,
+    r: RecitationResult,
+    lesson: Lesson,
+    has_audio: bool,
+    resume: LessonItem | None = None,
 ) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     if has_audio:
@@ -400,13 +432,21 @@ def _result_keyboard(
         nav += 1
     kb.button(text=texts.AGAIN_BUTTON, callback_data=GoItem(item_id=r.item.id))
     next_row = False
-    if r.next_item is not None:
+    if resume is not None:  # начало занятия прочитано — туда, где ученик остановился
+        title = curriculum.locate(resume.id)[0].title
+        kb.button(
+            text=texts.RESUME_BUTTON.format(title=title), callback_data=GoItem(item_id=resume.id)
+        )
+        next_row = True
+    elif r.next_item is not None:
         next_lesson, _ = curriculum.locate(r.next_item.id)
         if next_lesson != lesson:  # длинная подпись — отдельной строкой
             label, next_row = texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title), True
         else:
             label, nav = texts.NEXT_BUTTON, nav + 1
         kb.button(text=label, callback_data=GoItem(item_id=r.next_item.id))
+    if r.lesson_completed:
+        kb.button(text=texts.SHARE_BUTTON, callback_data=ShareLesson(lesson=lesson.id))
     prev = _previous_lesson_button(kb, curriculum, lesson)
     kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
     _home_row(kb)
@@ -414,6 +454,7 @@ def _result_keyboard(
         *((1,) if has_audio else ()),
         nav,
         *((1,) if next_row else ()),
+        *((1,) if r.lesson_completed else ()),
         *((1,) if prev else ()),
         2,
     )
@@ -494,8 +535,79 @@ def progress(curriculum: Curriculum, p: Progress) -> Screen:
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
     _home_row(kb)
     kb.adjust(1, 2)
-    image, key = _alphabet_map(curriculum, p)
+    image, key = _book_progress(curriculum, p)
     return Screen("\n".join(lines)[:1000], kb.as_markup(), image, key)
+
+
+def _book_progress(curriculum: Curriculum, p: Progress) -> tuple[bytes | None, str]:
+    """Вся книга по частям и неделя занятий (ADR-0050); карта алфавита осталась на главной."""
+    if not render.available():
+        return None, ""
+    parts = []
+    for name, lessons_ in curriculum.parts():
+        counted = [p.of(les.id) for les in lessons_ if les.practice_items]
+        done = sum(1 for lp in counted if lp.status is LessonStatus.DONE)
+        parts.append((plain_title(name), done, len(counted)))
+    week = p.week
+    labels: tuple[str, ...] = ()
+    if week and p.today is not None:
+        start = p.today.weekday() - len(week) + 1
+        labels = tuple(texts.WEEKDAYS[(start + k) % 7] for k in range(len(week)))
+    image = render.book_progress(parts, week if labels else (), labels)
+    key = (
+        "book:"
+        + ",".join(f"{d}" for _, d, _ in parts)
+        + ":"
+        + "".join("1" if x else "0" for x in week)
+    )
+    return image, key
+
+
+# ---------- открытка «урок пройден» и начало занятия (ADR-0050) ----------
+_ARABIC = re.compile(r"[\u0600-\u06ff\u0750-\u077f]+")
+
+
+def plain_title(title: str) -> str:
+    """Название без арабских букв — для картинок (в PT Sans нет арабского).
+
+    «6. م · Мим» → «6. Мим».
+    """
+    clean = _ARABIC.sub("", title)
+    clean = re.sub(r"\s+([:,.])", r"\1", clean)
+    clean = re.sub(r"(\.)\s*·\s*", r"\1 ", clean)
+    clean = re.sub(r"\s*·\s*(·\s*)+", " · ", clean)
+    return re.sub(r"\s{2,}", " ", clean).strip(" ·")
+
+
+def _postcard_image(lesson: Lesson, p: Progress | None = None) -> bytes:
+    letter = _letter_of(lesson) if lesson.section == "letter" else ""
+    page = lesson.source.page if lesson.source is not None else None
+    subtitle = texts.POSTCARD_SUBTITLE.format(lesson=plain_title(lesson.title), page=page or "—")
+    streak = texts.POSTCARD_STREAK.format(days=_days(p.streak_days)) if p and p.streak_days else ""
+    return render.postcard(
+        letter or str(lesson.number), texts.POSTCARD_TITLE, subtitle, p.week if p else (), streak
+    )
+
+
+def postcard(curriculum: Curriculum, lesson: Lesson, p: Progress, bot_username: str) -> Screen:
+    """Открытка для пересылки: картинка и приглашение в бот, без имени и псевдонима."""
+    caption = texts.SHARE_CAPTION.format(lesson=escape(plain_title(lesson.title)), bot=bot_username)
+    kb = InlineKeyboardBuilder()
+    image = _postcard_image(lesson, p) if render.available() else None
+    return Screen(caption, kb.as_markup(), image)
+
+
+def opening(curriculum: Curriculum) -> Screen:
+    lines = [curriculum.item(i).text for i in OPENING_ITEMS]
+    caption = f"{texts.OPENING_TITLE}\n\n{texts.OPENING_TEXT}"
+    image = render.opening(lines) if render.available() else None
+    if image is None:
+        caption += "\n\n" + "\n".join(f"<b>{escape(line)}</b>" for line in lines)
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.OPENING_START, callback_data=Opening(act="start"))
+    kb.button(text=texts.OPENING_SKIP, callback_data=Opening(act="skip"))
+    kb.adjust(1, 1)
+    return Screen(caption, kb.as_markup(), image, f"opening:{curriculum.version}")
 
 
 def help_screen() -> Screen:

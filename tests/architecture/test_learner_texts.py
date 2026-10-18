@@ -92,6 +92,10 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.Dispute: callbacks.Dispute(attempt=attempt),
         callbacks.DisputeReason: callbacks.DisputeReason(attempt=attempt, reason=reason),
         callbacks.AnnotateAct: callbacks.AnnotateAct(a=attempt, act="cancel"),
+        callbacks.Opening: callbacks.Opening(act="start"),
+        callbacks.ShareLesson: callbacks.ShareLesson(
+            lesson=max((les.id for les in curriculum.lessons), key=len)
+        ),
     }
 
 
@@ -125,3 +129,16 @@ def test_every_text_is_used(module: str) -> None:
     )
     unused = [name for name in names if not re.search(rf"\b{name}\b", code)]
     assert not unused, f"{module}: тексты нигде не используются: {unused}"
+
+
+def test_texts_are_not_defined_twice() -> None:
+    """Второе объявление с тем же именем молча затирает первое (так было с RESULT_HEARD)."""
+    tree = ast.parse(Path(texts.__file__).read_text(encoding="utf-8"))
+    names: list[str] = []
+    for node in tree.body:
+        targets = node.targets if isinstance(node, ast.Assign) else []
+        if isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        names += [t.id for t in targets if isinstance(t, ast.Name)]
+    twice = sorted({n for n in names if names.count(n) > 1})
+    assert not twice, f"тексты объявлены дважды: {twice}"

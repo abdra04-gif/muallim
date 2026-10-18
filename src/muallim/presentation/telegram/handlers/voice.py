@@ -20,7 +20,8 @@ from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import RecordReference
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import screens, texts
+from muallim.domain.policy import Verdict
+from muallim.presentation.telegram import opening, screens, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
 
@@ -81,8 +82,13 @@ async def on_voice(
         attempt.assessment.score,
         attempt.processing_ms,
     )
+    resume = None
+    if result.item.id == opening.OPENING_ITEMS[-1] and attempt.verdict is not Verdict.FAILED:
+        resume_id = await opening.finish(state)  # басмала прочитана — вернуть, где остановился
+        resume = cur.item(resume_id) if resume_id else None
     await wait.delete()
-    await display.send(bot, m.chat.id, screens.result(cur, result, library.has(result.item.id)))
+    screen = screens.result(cur, result, library.has(result.item.id), resume)
+    await display.send(bot, m.chat.id, screen)
 
 
 @router.message()

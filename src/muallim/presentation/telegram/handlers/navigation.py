@@ -4,6 +4,7 @@ import random
 from typing import Final
 
 from aiogram import Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
@@ -30,6 +31,7 @@ from muallim.presentation.telegram.callbacks import (
     Signs,
 )
 from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.handlers.daily import home_or_opening
 
 router: Final = Router(name="learner.navigation")
 
@@ -38,13 +40,14 @@ router: Final = Router(name="learner.navigation")
 @router.callback_query(Menu.filter())  # кнопки из старых сообщений
 async def cb_home(
     cb: CallbackQuery,
+    state: FSMContext,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
     if msg := message_of(cb):
-        await display.show(msg, screens.home(cur, await progress.execute(learner)))
+        await display.show(msg, await home_or_opening(cur, await progress.execute(learner), state))
     await cb.answer()
 
 

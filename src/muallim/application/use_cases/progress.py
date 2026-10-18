@@ -46,6 +46,8 @@ class Progress:
     streak_days: int = 0  # сколько дней подряд занимается (сегодня или вчера — серия жива)
     today_attempts: int = 0
     continue_item: LessonItem | None = None  # где остановился
+    today: date | None = None  # «сегодня» по часам бота — для начала занятия (ADR-0050)
+    week: tuple[bool, ...] = ()  # 7 дней, последний — сегодня: была ли хоть одна попытка
 
     def of(self, lesson_id: str) -> LessonProgress:
         return next(lp for lp in self.lessons if lp.lesson.id == lesson_id)
@@ -83,6 +85,8 @@ class GetProgress:
             streak_days=_streak(set(days), today),
             today_attempts=days.get(today, 0),
             continue_item=self._continue(learner),
+            today=today,
+            week=tuple(days.get(today - timedelta(days=k), 0) > 0 for k in range(6, -1, -1)),
         )
 
     def _continue(self, learner: Learner) -> LessonItem:
