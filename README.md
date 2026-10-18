@@ -12,7 +12,7 @@ Quran Muaalem, находит ошибки и объясняет их по-ру�
 make setup                         # зависимости + pre-commit
 cp .env.example .env               # вписать BOT_TOKEN и пароль БД
 make db-up && make migrate         # PostgreSQL в Docker + схема
-make run-stub                      # бот без модели (для проверки интерфейса)
+make run-stub                      # бот без модели; отставшую схему БД обновит сам (с копией)
 uv sync --extra ml && make run     # бот с моделью (~2 ГБ, нужен ffmpeg)
 ```
 

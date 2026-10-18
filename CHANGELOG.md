@@ -13,6 +13,9 @@
   `annotator-revoke` закрывает сразу; `annotators` — список. Права проверяются на каждом нажатии.
 - **Откуда метка и сколько секунд на запись** (`annotations.source`, `seconds_spent`, миграция 0005) — в отчёте
   разметки (`analytics/sql/05_annotation_labels.sql`).
+### Исправлено
+- **Бот не падает на старой схеме БД** (`relation "learner_profiles" does not exist`): `make run` / `make run-stub`
+  сначала проверяют миграции и, если БД отстаёт, делают копию и `alembic upgrade head` (`make db-sync`), как Docker-образ.
 ### Исправлено (ADR-0040, аудит БД)
 - **Главная метрика не считалась**: precision/recall/F1 брали метки «на ошибку», которые импорт никогда не ставил.
   Теперь — по каждой фонеме эталона: TA/FR/FA/TR, precision, recall, F1, FAR, FRR, верный диагноз (как Iqra'Eval,

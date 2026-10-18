@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit
+.PHONY: thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -25,10 +25,10 @@ lint: ## ruff + mypy + архитектура
 test: ## Тесты с покрытием
 	$(LIBS) uv run pytest -q --cov --cov-report=term-missing:skip-covered
 
-run: ## Бот с моделью (нужно uv sync --extra ml)
+run: db-sync ## Бот с моделью (нужно uv sync --extra ml)
 	$(LIBS) uv run muallim
 
-run-stub: ## Бот с заглушкой распознавания
+run-stub: db-sync ## Бот с заглушкой распознавания
 	$(LIBS) ASR_BACKEND=stub uv run muallim
 
 db-up: ## PostgreSQL в Docker
@@ -49,6 +49,10 @@ restore: ## Восстановить из копии: make restore d=data/backup
 
 migrate: backup ## Применить миграции (сначала — проверенная копия)
 	uv run alembic upgrade head
+
+db-sync: ## Если в БД не все миграции — копия и upgrade; иначе ничего
+	@if uv run alembic current 2>/dev/null | grep -q '(head)'; then :; else \
+		echo 'БД отстаёт от кода — применяю миграции'; $(MAKE) migrate; fi
 
 migration: ## Новая миграция: make migration m="описание"
 	@test -n "$(m)" || (echo 'укажите m="описание"' && exit 1)

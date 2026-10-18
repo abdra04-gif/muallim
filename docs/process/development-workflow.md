@@ -34,7 +34,8 @@
 | `make check` | все проверки как в CI |
 | `make test` | только тесты |
 | `make db-up` / `make migrate` | поднять PostgreSQL в Docker / применить миграции |
-| `make run-stub` | бот без модели (заглушка распознавания) |
-| `make run` | бот с моделью (нужно `uv sync --extra ml`) |
+| `make run-stub` | бот без модели (заглушка распознавания); перед стартом `db-sync` |
+| `make run` | бот с моделью (нужно `uv sync --extra ml`); перед стартом `db-sync` |
+| `make db-sync` | БД не на последней миграции → `make migrate` (копия + upgrade); иначе ничего |
 | `make report` | отчёт по данным |
 | `make diagrams` | перерисовать схемы |

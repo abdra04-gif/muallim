@@ -31,7 +31,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 |---|---|
 | `make check` | ruff + mypy --strict + import-linter + pytest с покрытием (как CI) |
 | `uv run pytest -q` | тесты (< 10 с, без модели и сети) |
-| `make run-stub` | бот без модели |
+| `make run-stub` | бот без модели (если БД отстаёт от миграций — сначала копия и `alembic upgrade`) |
 | `make db-up` · `make migrate` · `make backup` · `make restore d=…` | PostgreSQL в Docker, миграции (сначала копия), резервная копия, восстановление (только человек) |
 | `make report` · `make verify` · `make errors a="--letter ص"` | отчёты, сверка БД и файлов записей, каталог ошибок (`docs/data/browsing.md`) |
 | `scripts/phase [tests\|impl\|off]` | TDD-фаза; в `impl` хук запрещает править `tests/` |
