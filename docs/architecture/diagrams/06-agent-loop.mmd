@@ -13,7 +13,10 @@ flowchart TB
     gates -- красно --> impl
     gates -- зелено --> cr["🤖 code-reviewer → architecture-guardian<br/>(→ security-auditor, learner-simulator)"]
     cr -- замечания --> impl
-    cr --> scribe["🤖 thesis-scribe<br/>CHANGELOG, ADR, материалы диплома"]
+    cr --> dr["🤖 direction-reviewer<br/>то ли просил автор; СТОП → вопросы"]
+    dr -- СТОП --> askAuthor(["👤 автор отвечает на вопросы"])
+    askAuthor --> impl
+    dr --> scribe["🤖 thesis-scribe<br/>CHANGELOG, ADR, материалы диплома"]
     scribe --> ca["🤖 consistency-auditor<br/>документы правдивы, ничего не потеряно"]
     ca --> phO["scripts/phase off"]
     phO --> ship["/ship: make check → make trace →<br/>коммит (git_guard: пути, gitleaks) →<br/>push (git_guard: проверки)"]

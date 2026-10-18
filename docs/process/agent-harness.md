@@ -19,6 +19,7 @@
 | `format_python.py` | PostToolUse | `ruff format` + `ruff check --fix` для изменённого .py, остатки ошибок — агенту |
 | `stop_gate.py` | Stop | если код изменён и не проходят `lint-imports`/`mypy`/`pytest` — агент не может закончить, получает ошибки и продолжает (это и есть «петля») |
 | `human_zones.py` | PreToolUse | правка зоны человека (учебный контент, тексты ученику, пороги, `MOSHAF_PARAMS`, схема БД, зависимости, сами проверки, оценщик RQ-1 `src/muallim/research/metrics.py` — ADR-0042) и `pip/uv add` — только с подтверждения человека, с причиной (ADR-0034) |
+| `dep_check.py` | PreToolUse | новая библиотека (`uv add`, `pip install`, строка в `pyproject.toml`): нет на PyPI — блок; есть — карточка (версия, возраст, репозиторий, уязвимости OSV, похожее имя) в запросе подтверждения (ADR-0046) |
 | `stub_notice.py` | PostToolUse | бот запущен с заглушкой → агенту напоминание сказать об этом человеку |
 | `session_context.py` | SessionStart | в контекст: TDD-фаза, установлена ли модель, открытый техдолг T1, последняя сводка сессии |
 | `notify.py` | Notification | уведомление macOS, когда агент ждёт человека |
@@ -53,10 +54,11 @@
 | `book-proofreader` | арабский текст программы ↔ скан книги, постранично (TD-FN-11) | ничего (только отчёт) |
 | `pilot-readiness` | можно ли звать учеников: T1, модель, согласие, копии | ничего (только отчёт) |
 | `consistency-auditor` | документы правдивы после изменения, ничего не потеряно (ADR-0039) | ничего (только отчёт) |
+| `direction-reviewer` | то ли делаем, что просил автор, и в его ли полномочиях; только с доказательствами, не додумывает — при сомнении вердикт СТОП и вопросы автору (ADR-0047) | ничего (только отчёт) |
 
 Порядок в `/feature` с новыми агентами: `solution-architect` (если затронуто больше одного слоя) →
 `tdd-test-writer` → `test-auditor` → человек принимает тесты → `implementer` → `code-reviewer` →
-`architecture-guardian` (→ `security-auditor`) → `thesis-scribe` → `consistency-auditor` → `/ship`.
+`architecture-guardian` (→ `security-auditor`) → `direction-reviewer` (СТОП → вопросы автору) → `thesis-scribe` → `consistency-auditor` → `/ship`.
 Сломалось — `debugger`.
 
 ## Скиллы и MCP проекта (ADR-0035)
