@@ -5,7 +5,7 @@ from typing import Any
 
 from aiogram.types import InlineKeyboardMarkup
 
-from muallim.presentation.telegram import handlers
+from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.screens import Screen
 
 KB = InlineKeyboardMarkup(inline_keyboard=[])
@@ -35,7 +35,7 @@ class FakeBot:
 
 async def test_details_go_to_second_message_with_buttons() -> None:
     bot = FakeBot()
-    await handlers.send(bot, 7, Screen("подпись", KB, b"png", details="объяснения"))  # type: ignore[arg-type]
+    await Display().send(bot, 7, Screen("подпись", KB, b"png", details="объяснения"))  # type: ignore[arg-type]
     (kind1, photo), (kind2, text) = bot.calls[:2]
     assert kind1 == "photo" and photo.get("reply_markup") is None and photo["caption"] == "подпись"
     assert kind2 == "text" and text["text"] == "объяснения" and text["reply_markup"] is KB
@@ -43,6 +43,16 @@ async def test_details_go_to_second_message_with_buttons() -> None:
 
 async def test_screen_without_details_is_one_message() -> None:
     bot = FakeBot()
-    await handlers.send(bot, 8, Screen("подпись", KB, b"png"))  # type: ignore[arg-type]
+    await Display().send(bot, 8, Screen("подпись", KB, b"png"))  # type: ignore[arg-type]
     assert [k for k, _ in bot.calls] == ["photo"]
     assert bot.calls[0][1]["reply_markup"] is KB
+
+
+async def test_previous_screen_loses_buttons_per_display() -> None:
+    """Номер прошлого экрана хранит свой Display: два диспетчера не мешают друг другу."""
+    bot, first, second = FakeBot(), Display(), Display()
+    await first.send(bot, 9, Screen("a", KB))  # type: ignore[arg-type]
+    await second.send(bot, 9, Screen("b", KB))  # type: ignore[arg-type]
+    assert not [c for c in bot.calls if c[0] == "retire"], "чужой Display не трогает экраны"
+    await first.send(bot, 9, Screen("c", KB))  # type: ignore[arg-type]
+    assert [c[1]["message_id"] for c in bot.calls if c[0] == "retire"] == [1]

@@ -4,6 +4,7 @@ import io
 import logging
 import sys
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 
@@ -74,3 +75,43 @@ def test_configure_logging_installs_filters_on_the_handler(restore_root: None) -
     output = stream.getvalue()
     assert "token ***" in output
     assert TOKEN not in output and "не видно" not in output
+
+
+def test_log_file_keeps_records_after_the_terminal_is_closed(
+    restore_root: None, tmp_path: Path
+) -> None:
+    """ADR-0048: логи пишутся и в файл — с теми же фильтрами, что и в консоль."""
+    log_file = tmp_path / "logs" / "bot.log"
+    configure_logging("INFO", [TOKEN], stream=io.StringIO(), file=log_file)
+    logging.getLogger("muallim.test").info("запуск, токен %s", TOKEN)
+    for handler in logging.getLogger().handlers:
+        handler.flush()
+    written = log_file.read_text(encoding="utf-8")
+    assert "запуск, токен ***" in written
+    assert TOKEN not in written
+
+
+def test_log_file_is_rotated(restore_root: None, tmp_path: Path) -> None:
+    """Срок хранения ограничен объёмом: не больше backups + 1 файлов по max_bytes."""
+    log_file = tmp_path / "bot.log"
+    configure_logging("INFO", [], stream=io.StringIO(), file=log_file, max_bytes=2_000, backups=2)
+    for i in range(200):
+        logging.getLogger("muallim.test").info("строка %03d %s", i, "x" * 40)
+    files = sorted(p.name for p in tmp_path.iterdir())
+    assert files == ["bot.log", "bot.log.1", "bot.log.2"]
+
+
+def test_no_log_file_when_disabled(restore_root: None, tmp_path: Path) -> None:
+    configure_logging("INFO", [], stream=io.StringIO(), file=None)
+    logging.getLogger("muallim.test").info("только в консоль")
+    assert not any(isinstance(h, logging.FileHandler) for h in logging.getLogger().handlers)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_empty_log_file_setting_means_console_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``LOG_FILE=`` (пусто, как в .env.example и Docker) — без файла, а не файл с путём «.»."""
+    from muallim.bootstrap.config import Settings  # noqa: PLC0415
+
+    monkeypatch.setenv("BOT_TOKEN", "x")
+    monkeypatch.setenv("LOG_FILE", "")
+    assert Settings().log_file is None

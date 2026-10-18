@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
 from pathlib import Path
+from typing import Final
 
 from PIL import Image, ImageDraw, ImageFont, features
 
@@ -28,7 +29,7 @@ ZWJ = "‍"
 SHADDA = "ّ"
 HAMZA_FORMS = frozenset("ءأإؤئآ")
 MADD_LETTERS = frozenset("اىوي")  # без знаков — удлинение, а не согласный
-PHONEME_OF = {"ة": "ت", "ى": "ي"}  # как буква текста записана в фонемах
+PHONEME_OF: Final = {"ة": "ت", "ى": "ي"}  # как буква текста записана в фонемах
 
 WIDTH = 1280
 PAD = 64

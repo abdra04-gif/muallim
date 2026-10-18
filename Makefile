@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: try thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs try thesis thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -69,6 +69,9 @@ errors: ## Каталог ошибок: make errors a="--letter ص --lesson L18"
 
 verify: ## Сверка БД и файлов записей: потери, лишние, повреждённые
 	uv run muallim-research verify
+
+logs: ## Последние строки лога бота (logs/bot.log, ADR-0048); n=200 — больше строк
+	@tail -n $(if $(n),$(n),50) logs/bot.log 2>/dev/null || echo "Лога ещё нет: бот не запускался через make run"
 
 report: ## Отчёт по данным исследования
 	uv run muallim-research report

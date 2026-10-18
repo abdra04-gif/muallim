@@ -69,6 +69,7 @@ from muallim.infrastructure.db.repositories.learners import (
 )
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
+from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.learner import LearnerProvider
 
 
@@ -109,6 +110,11 @@ class AppProvider(Provider):
             HusaryCuts.load(self.settings.reference_audio_dir / "husary"),
             texts,
         )
+
+    @provide
+    def display(self) -> Display:
+        """Кэш экранов Telegram — один на контейнер: у каждого бота (и теста) свой."""
+        return Display()
 
     @provide
     def build_info(self) -> BuildInfo:

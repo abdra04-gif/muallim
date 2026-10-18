@@ -34,3 +34,4 @@ book/pages/
 
 # Сборка LaTeX
 thesis/build/
+logs/

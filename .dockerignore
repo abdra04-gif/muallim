@@ -9,3 +9,4 @@ analytics/reports
 .claude
 **/__pycache__
 book
+logs/

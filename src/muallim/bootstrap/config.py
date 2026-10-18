@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from muallim.domain.annotation import valid_annotator_code
@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     pass_threshold: int = Field(default=80, ge=0, le=100)
     excellent_threshold: int = Field(default=90, ge=0, le=100)
     log_level: str = "INFO"
+    # Файл логов, ротация 3 × 10 МБ (ADR-0048): вне data/, без ПДн; LOG_FILE= — только консоль
+    log_file: Path | None = PROJECT_ROOT / "logs" / "bot.log"
+
+    @field_validator("log_file", mode="before")
+    @classmethod
+    def _empty_log_file_is_none(cls, value: object) -> object:
+        return None if value == "" else value
+
     # Telegram ID учителей через запятую: им доступна кнопка «🎙 Записать эталон» (ADR-0024)
     teacher_ids: str = ""
 

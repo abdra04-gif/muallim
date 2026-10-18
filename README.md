@@ -33,4 +33,4 @@ uv run muallim-research verify                           # сверка БД и 
 
 ## Качество
 `make check` — ruff, mypy --strict, import-linter (архитектура), pytest (покрытие ≥ 80 %).
-То же в CI, плюс gitleaks, pip-audit и `make hygiene` (deptry, zizmor).
+То же в CI, плюс gitleaks, pip-audit, `make hygiene` (deptry, zizmor) и сборка Docker-образа.

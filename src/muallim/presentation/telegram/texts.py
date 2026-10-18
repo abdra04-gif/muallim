@@ -4,6 +4,8 @@
 при изменении PROFILE_* — QUESTIONNAIRE_VERSION там же.
 """
 
+from typing import Final
+
 WELCOME = (
     "🌙 <b>Ассаляму алейкум!</b>\n\n"
     "Здесь учатся читать по-арабски <b>с нуля</b> — по книге «Муаллим сани» Ахмадхади Максуди, "
@@ -54,13 +56,13 @@ PROFILE_MINOR = "Хорошо! Учиться можно, а голосовые 
 PROFILE_THANKS = "Спасибо! Больше спрашивать не буду 🙏"
 PROFILE_ADULT_YES = "Да, мне 18+"
 PROFILE_ADULT_NO = "Нет"
-PROFILE_LANGUAGES = {
+PROFILE_LANGUAGES: Final = {
     "ru": "Русский",
     "kk": "Казахский",
     "tt": "Татарский",
     "other": "Другой",
 }
-PROFILE_READING_OPTIONS = {
+PROFILE_READING_OPTIONS: Final = {
     "none": "Совсем нет",
     "some_letters": "Знаю некоторые буквы",
     "slow_syllables": "Читаю медленно, по слогам",
@@ -77,6 +79,7 @@ SEND_VOICE = "🎙 Отправь <b>голосовое</b> — я провер�
 LISTENING = "🎧 Слушаю, как ты читаешь <b>{item}</b>..."
 RECORD_AGAIN = "Запиши голосовое ещё раз 🎙"
 CANT_PROCESS = "😔 Не получилось обработать запись. Попробуй записать ещё раз, чуть громче."
+SOMETHING_WENT_WRONG = "😔 Что-то пошло не так. Попробуй ещё раз или нажми /start."
 STALE_BUTTON = "Эта карточка устарела — выбери урок заново."
 
 CARD_NOTE = "📌 {note}"
@@ -113,7 +116,7 @@ RESEARCH_BLOCK = (
 )
 DISPUTE_BUTTON = "🚩 Бот ошибся"
 DISPUTE_ASK = "Что не так с проверкой попытки № {code}?"
-DISPUTE_REASONS = {
+DISPUTE_REASONS: Final = {
     "read_correctly": "Я прочитал правильно",
     "wrong_error": "Ошибка указана не та",
     "other": "Другое",

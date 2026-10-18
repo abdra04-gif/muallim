@@ -38,6 +38,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `scripts/phase [tests\|impl\|off]` | TDD-фаза; в `impl` хук запрещает править `tests/` |
 | `make trace` | требования ↔ тесты сейчас, отпечаток версии (`docs/requirements/verification-status.md`) |
 | `make hygiene` | объявленные зависимости (deptry) и безопасность CI (zizmor), как в CI (ADR-0042) |
+| `make logs` (`n=200`) | последние строки лога бота `logs/bot.log` (ADR-0048) |
 | `make thesis` · `make thesis-check` | диссертация LaTeX → `thesis/build/main.pdf` |
 | `/ship` | проверки → сверка документов → коммит → push (`docs/process/git.md`) |
 
@@ -63,7 +64,8 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 1. Требование (FR/NFR) → если неясно, один вопрос с вариантами.
 2. `scripts/phase tests` (с подтверждения) → падающие тесты → человек принимает.
 3. `scripts/phase impl` → код до зелёного `make check`.
-4. Ревью: architecture-guardian, при необходимости security-auditor; экраны и кнопки — bot-driver.
+4. Ревью: architecture-guardian, при необходимости security-auditor; экраны и кнопки — bot-driver;
+   затем direction-reviewer (ADR-0047): вердикт СТОП → его вопросы человеку дословно, дальше не идти.
 5. thesis-scribe: CHANGELOG, ADR (и отклонённые варианты), трассировка, materials-log.
 6. consistency-auditor: документы правдивы, ничего не потеряно (хук doc_sync ловит механическое).
 7. `scripts/phase off` → сводка: что сделано, что упрощено, что проверить в Telegram → `/ship`.

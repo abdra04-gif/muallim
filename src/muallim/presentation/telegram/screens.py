@@ -1,12 +1,13 @@
 """Экраны бота: картинка + подпись + кнопки (ADR-0024). Без обращений к Telegram API.
 
-Один экран — одно сообщение, которое меняется на месте (handlers.show): чат не растёт и не
+Один экран — одно сообщение, которое меняется на месте (Display.show): чат не растёт и не
 уезжает вниз. На каждом экране, кроме главного, есть кнопка 🏠.
 """
 
 from collections.abc import Sequence
 from dataclasses import dataclass
 from html import escape
+from typing import Final
 
 from aiogram.enums import ButtonStyle
 from aiogram.types import InlineKeyboardMarkup
@@ -41,8 +42,8 @@ from muallim.presentation.telegram.callbacks import (
 
 LESSONS_PER_PAGE = 10
 CAPTION_LIMIT = 1024  # подпись к фото в Telegram
-_ICON = {LessonStatus.DONE: "✅", LessonStatus.STARTED: "🟡", LessonStatus.NEW: "⚪"}
-_VERDICT = {
+_ICON: Final = {LessonStatus.DONE: "✅", LessonStatus.STARTED: "🟡", LessonStatus.NEW: "⚪"}
+_VERDICT: Final = {
     Verdict.EXCELLENT: texts.VERDICT_EXCELLENT,
     Verdict.PASSED: texts.VERDICT_PASSED,
     Verdict.FAILED: texts.VERDICT_FAILED,

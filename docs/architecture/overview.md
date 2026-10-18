@@ -15,7 +15,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | domain | `src/muallim/domain/` | `assessment.py` (сравнение фонем, типы ошибок), `policy.py` (пороги), `curriculum.py`, `learner.py`, `attempt.py`, `phonetics.py` |
 | application | `src/muallim/application/` | `use_cases/*.py` (сценарии), `ports/*.py` (протоколы), `feedback.py` (тексты ошибок) |
 | infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (Muaalem, заглушка), `audio/` (ffmpeg, файлы), `curriculum/` (YAML) |
-| presentation | `src/muallim/presentation/telegram/` | `handlers.py`, `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
+| presentation | `src/muallim/presentation/telegram/` | `handlers/` (по темам: команды, навигация, данные, эталон и жалоба, голосовое), `annotation.py`, `errors.py` (перехват сбоев), `display.py` (показ экранов), `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
 | research | `src/muallim/research/` | `reports.py`, `annotation.py`, `dataset.py` |
 | bootstrap | `src/muallim/bootstrap/` | `config.py`, `di.py` (вся «склейка»), `main.py`, `research_cli.py`, `console.py` (проверка в терминале `muallim --test`, ADR-0045) |
 
@@ -57,6 +57,8 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | урок | `curriculum/course.ru.yaml` (только человек) | |
 | язык объяснений | `curriculum/lexicon.<код>.yaml` + `feedback.<код>.yaml`, `enabled: true` | узбекский |
 | эталонную запись | `curriculum/audio/<id>.ogg` + строка в `SOURCES.md` | `L02-01.ogg` |
+
+Проверка на практике (пробная замена модели, слабые места): `change-scenarios.md`.
 
 ## 6. Технологии
 | Что | Чем | Почему |

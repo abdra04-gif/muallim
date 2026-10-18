@@ -47,3 +47,19 @@ jobs:
         run: make hygiene
       - name: Уязвимости зависимостей
         run: uv run pip-audit --skip-editable
+
+  # Образ бота собирается и запускается в CI: поломку Dockerfile (права, пути) видно до
+  # развёртывания (docs/architecture/change-scenarios.md). Без extra `ml` — образ лёгкий.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Сборка образа
+        run: docker build -t muallim-ci .
+      # Режим --test здесь не подходит: ему нужен aiosqlite из dev-зависимостей, а в рабочем образе его нет
+      - name: Код импортируется, пользователь бота может писать в /app/data
+        run: >-
+          docker run --rm muallim-ci python -c "import muallim.bootstrap.main, os;
+          assert os.access('/app/data/audio', os.W_OK), 'нет прав на /app/data/audio'"

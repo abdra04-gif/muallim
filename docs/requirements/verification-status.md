@@ -1,13 +1,13 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-18T10:52:40+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-18T15:48:34+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `a3f4e1553145b2f1` | 83 |
+| код | `5dc344d7c5ae7c76` | 90 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
 | SQL-отчёты | `afa7eff9f6c0a7af` | 11 |
 | миграции | `556a14013df1972c` | 6 |
@@ -15,7 +15,7 @@
 | предрегистрация | `a9728f767a393f17` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **55 из 57**.
+Проверено зелёными тестами: **56 из 57**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -44,7 +44,7 @@
 | FR-27 | `tests/architecture/test_migrations.py`, `tests/integration/test_data_tools.py` | ✅ |
 | FR-28 | `tests/integration/test_data_tools.py`, `tests/integration/test_postgres.py` | ✅ |
 | FR-29 | — | нет автотестов |
-| FR-30 | `tests/integration/test_reference_audio.py`, `tests/unit/test_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-30 | `tests/integration/test_reference_audio.py`, `tests/integration/test_teacher_bot.py`, `tests/unit/test_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-31 | `tests/unit/test_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-32 | `tests/unit/test_curriculum_model.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-33 | `tests/unit/test_render.py` | ✅ |
@@ -63,15 +63,15 @@
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |
 | NFR-TR-04 | `tests/architecture/test_hooks.py` | ✅ |
-| NFR-REL-02 | `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
+| NFR-REL-02 | `tests/architecture/test_logging.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
 | NFR-ACC-01 | `tests/integration/test_metrics_report.py`, `tests/unit/test_metrics.py` | ✅ |
 | NFR-SEC-01 | `tests/architecture/test_hooks.py` | ✅ |
 | NFR-SEC-02 | `tests/integration/test_research.py` | ✅ |
 | NFR-SEC-03 | `tests/integration/test_audio_store.py` | ✅ |
 | NFR-SEC-04 | `tests/integration/test_sql_repositories.py` | ✅ |
-| NFR-MNT-01 | `tests/architecture/test_layers.py` | ✅ |
+| NFR-MNT-01 | `tests/architecture/test_layers.py`, `tests/architecture/test_presentation_state.py`, `tests/integration/test_teacher_bot.py` | ✅ |
 | NFR-MNT-03 | `tests/architecture/test_migrations.py` | ✅ |
-| NFR-SEC-06 | — | нет автотестов |
+| NFR-SEC-06 | `tests/architecture/test_dep_check.py` | ✅ |
 | NFR-MNT-06 | `tests/architecture/test_learner_texts.py` | ✅ |
 | NFR-MNT-07 | `tests/integration/test_console.py` | ✅ |
 | NFR-SEC-07 | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ✅ |

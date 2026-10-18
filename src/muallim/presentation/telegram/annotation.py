@@ -8,6 +8,7 @@
 
 import time
 from contextlib import suppress
+from dataclasses import dataclass
 from html import escape
 from typing import Final
 from uuid import UUID
@@ -16,6 +17,7 @@ from aiogram import Bot, F, Router
 from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
+from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile, CallbackQuery, InlineKeyboardMarkup, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dishka import FromDishka
@@ -39,11 +41,76 @@ router: Final = Router(name="annotator")
 router.message.filter(F.chat.type == "private")
 router.callback_query.filter(F.message.chat.type == "private")
 
-# Память процесса (сбрасывается при перезапуске — это не данные исследования):
-_fixing: dict[int, UUID] = {}  # разметчик → попытка, для которой ждём исправленные фонемы
-_shown_at: dict[tuple[int, UUID], float] = {}  # когда показана запись — время ответа
-_skipped: dict[int, set[UUID]] = {}  # пропущенные в этот заход
-_self_corrected: set[tuple[int, UUID]] = set()  # отмечено «сам исправился» (до ответа)
+
+@dataclass(frozen=True, slots=True)
+class Desk:
+    """Что разметчик делает сейчас — в FSM aiogram, свой у каждого чата и диспетчера.
+
+    Хранится только JSON-совместимое (hex попыток, секунды). Время показа — по ``time.monotonic``,
+    как до ADR-0049: при постоянном хранилище FSM (TD-FN-70) перейти на часы с защитой от
+    отрицательных значений. Не данные исследования: ответ — в БД.
+    """
+
+    state: FSMContext
+
+    async def _get(self) -> dict[str, object]:
+        return await self.state.get_data()
+
+    async def fixing(self) -> UUID | None:
+        """Попытка, для которой ждём исправленные фонемы текстом."""
+        value = (await self._get()).get("fixing")
+        return UUID(hex=value) if isinstance(value, str) else None
+
+    async def set_fixing(self, attempt: UUID | None) -> None:
+        await self.state.update_data({"fixing": attempt.hex if attempt else None})
+
+    async def skipped(self) -> frozenset[UUID]:
+        """Пропущенные в этот заход — не показывать снова."""
+        value = (await self._get()).get("skipped") or []
+        return frozenset(UUID(hex=h) for h in value) if isinstance(value, list) else frozenset()
+
+    async def skip(self, attempt: UUID) -> None:
+        await self.state.update_data(
+            {"skipped": sorted({a.hex for a in await self.skipped()} | {attempt.hex})}
+        )
+
+    async def self_corrected(self, attempt: UUID) -> bool:
+        value = (await self._get()).get("self_corrected") or []
+        return isinstance(value, list) and attempt.hex in value
+
+    async def toggle_self_corrected(self, attempt: UUID) -> bool:
+        """«🔁 Сам исправился» — переключатель до ответа; возвращает новое значение."""
+        value = (await self._get()).get("self_corrected") or []
+        marked = set(value) if isinstance(value, list) else set()
+        marked.symmetric_difference_update({attempt.hex})
+        await self.state.update_data({"self_corrected": sorted(marked)})
+        return attempt.hex in marked
+
+    async def forget_self_corrected(self, attempt: UUID) -> None:
+        value = (await self._get()).get("self_corrected") or []
+        marked = set(value) if isinstance(value, list) else set()
+        await self.state.update_data({"self_corrected": sorted(marked - {attempt.hex})})
+
+    async def shown(self, attempt: UUID, *, keep: bool = False) -> None:
+        """Когда показана запись — для времени ответа; ``keep`` — не сбрасывать уже отмеченное."""
+        value = (await self._get()).get("shown_at") or {}
+        times = dict(value) if isinstance(value, dict) else {}
+        if not (keep and attempt.hex in times):
+            times[attempt.hex] = time.monotonic()
+        await self.state.update_data({"shown_at": times})
+
+    async def seconds(self, attempt: UUID) -> int | None:
+        """Сколько секунд разметчик думал над записью; отметка снимается."""
+        value = (await self._get()).get("shown_at") or {}
+        times = dict(value) if isinstance(value, dict) else {}
+        started = times.pop(attempt.hex, None)
+        await self.state.update_data({"shown_at": times})
+        return round(time.monotonic() - started) if isinstance(started, float | int) else None
+
+    async def start_over(self) -> None:
+        """Новый заход /annotate: не ждём исправления, пропущенные снова доступны."""
+        await self.state.update_data({"fixing": None, "skipped": []})
+
 
 _STATUS: Final = {
     "ok": AnnotationStatus.AGREE,
@@ -102,14 +169,18 @@ def _task_text(shown: ShownTask) -> str:
 
 
 async def _show_next(
-    bot: Bot, chat_id: int, learner: Learner, uc: NextAnnotation, library: ReferenceAudioLibrary
+    bot: Bot,
+    chat_id: int,
+    learner: Learner,
+    desk: Desk,
+    uc: NextAnnotation,
+    library: ReferenceAudioLibrary,
 ) -> None:
-    tg = learner.telegram_user_id
-    shown = await uc.execute(learner, frozenset(_skipped.get(tg, set())))
+    shown = await uc.execute(learner, await desk.skipped())
     if shown is None:
         await bot.send_message(chat_id, t.DONE)
         return
-    _shown_at[(tg, shown.task.attempt_id)] = time.monotonic()
+    await desk.shown(shown.task.attempt_id)
     await bot.send_voice(
         chat_id, BufferedInputFile(shown.audio, filename="attempt.ogg"), protect_content=True
     )
@@ -119,9 +190,26 @@ async def _show_next(
     )  # fmt: skip
 
 
-def _seconds(tg: int, attempt: UUID) -> int | None:
-    started = _shown_at.pop((tg, attempt), None)
-    return None if started is None else round(time.monotonic() - started)
+async def _submit(
+    learner: Learner,
+    desk: Desk,
+    submit: SubmitAnnotation,
+    attempt: UUID,
+    status: AnnotationStatus,
+    actual: str | None = None,
+) -> bool:
+    """Сохранить ответ разметчика. В лог не пишется: событие — в БД (ADR-0027 п. 4)."""
+    extra = {} if actual is None else {"actual": actual}
+    saved = await submit.execute(
+        learner, attempt, status, seconds_spent=await desk.seconds(attempt),
+        self_corrected=await desk.self_corrected(attempt), **extra,
+    )  # fmt: skip
+    await desk.forget_self_corrected(attempt)
+    return saved
+
+
+async def _waiting_for_fix(message: Message, state: FSMContext) -> bool:
+    return await Desk(state).fixing() is not None
 
 
 async def _drop_buttons(cb: CallbackQuery) -> None:
@@ -136,6 +224,7 @@ async def annotate(
     m: Message,
     bot: Bot,
     command: CommandObject,
+    state: FSMContext,
     learner: FromDishka[Learner],
     access: FromDishka[AnnotatorAccess],
     redeem: FromDishka[RedeemInvite],
@@ -152,54 +241,50 @@ async def annotate(
             return
     if await access.code_for(tg) is None:
         raise SkipHandler  # как обычное сообщение ученика: о разметке посторонний не узнает
-    _fixing.pop(tg, None)
-    _skipped.pop(tg, None)
-    await _show_next(bot, m.chat.id, learner, uc, library)
+    desk = Desk(state)
+    await desk.start_over()
+    await _show_next(bot, m.chat.id, learner, desk, uc, library)
 
 
-@router.message(F.text, lambda m: m.from_user is not None and m.from_user.id in _fixing)
+@router.message(F.text, _waiting_for_fix)
 async def fixed_phonemes(
     m: Message,
     bot: Bot,
+    state: FSMContext,
     learner: FromDishka[Learner],
     submit: FromDishka[SubmitAnnotation],
     uc: FromDishka[NextAnnotation],
     library: FromDishka[ReferenceAudioLibrary],
 ) -> None:
-    tg = learner.telegram_user_id
-    attempt = _fixing[tg]
+    desk = Desk(state)
+    attempt = await desk.fixing()
+    assert attempt is not None  # гарантирует фильтр _waiting_for_fix  # noqa: S101
     try:
-        saved = await submit.execute(
-            learner, attempt, AnnotationStatus.FIX, actual=m.text or "",
-            seconds_spent=_seconds(tg, attempt),
-            self_corrected=(tg, attempt) in _self_corrected,
-        )  # fmt: skip
+        saved = await _submit(learner, desk, submit, attempt, AnnotationStatus.FIX, m.text or "")
     except LabelError as error:
-        _shown_at.setdefault((tg, attempt), time.monotonic())
+        await desk.shown(attempt, keep=True)
         await m.answer(t.FIX_WRONG.format(error=escape(str(error))), reply_markup=_cancel(attempt))
         return
     except NotAnnotator:
-        _fixing.pop(tg, None)
+        await desk.set_fixing(None)
         raise SkipHandler from None
-    _fixing.pop(tg, None)
-    _self_corrected.discard((tg, attempt))
+    await desk.set_fixing(None)
     await m.answer(t.SAVED if saved else t.GONE)
-    await _show_next(bot, m.chat.id, learner, uc, library)
+    await _show_next(bot, m.chat.id, learner, desk, uc, library)
 
 
 async def _toggle_self_correction(
     message: Message,
-    tg: int,
+    desk: Desk,
     attempt: UUID,
     submit: SubmitAnnotation,
     library: ReferenceAudioLibrary,
 ) -> None:
     """«🔁 Сам исправился» — переключатель до ответа; галочка на кнопке показывает состояние."""
-    key = (tg, attempt)
-    _self_corrected.symmetric_difference_update({key})
+    marked = await desk.toggle_self_corrected(attempt)
     task = await submit.tasks.get(attempt)
     if task is not None:
-        markup = _keyboard(task, library.has(task.item_id), key in _self_corrected)
+        markup = _keyboard(task, library.has(task.item_id), marked)
         with suppress(TelegramBadRequest):
             await message.edit_reply_markup(reply_markup=markup)
 
@@ -209,6 +294,7 @@ async def act(
     cb: CallbackQuery,
     bot: Bot,
     callback_data: AnnotateAct,
+    state: FSMContext,
     learner: FromDishka[Learner],
     access: FromDishka[AnnotatorAccess],
     submit: FromDishka[SubmitAnnotation],
@@ -225,18 +311,19 @@ async def act(
         await cb.answer()  # посторонний или старая кнопка: молча ничего
         return
     chat_id = cb.message.chat.id
+    desk = Desk(state)
     match callback_data.act:
         case "fix":
-            _fixing[tg] = attempt
+            await desk.set_fixing(attempt)
             task = await submit.tasks.get(attempt)
             await cb.message.answer(
                 t.FIX_ASK.format(bot_heard=escape(task.bot_heard if task else "")),
                 reply_markup=_cancel(attempt),
             )
         case "self":
-            await _toggle_self_correction(cb.message, tg, attempt, submit, library)
+            await _toggle_self_correction(cb.message, desk, attempt, submit, library)
         case "cancel":
-            _fixing.pop(tg, None)
+            await desk.set_fixing(None)
             await _drop_buttons(cb)
         case "ref":
             task = await submit.tasks.get(attempt)
@@ -247,29 +334,25 @@ async def act(
             name = "reference.ogg" if audio[:4] == b"OggS" else "reference.mp3"
             await bot.send_audio(chat_id, BufferedInputFile(audio, filename=name))
         case "skip":
-            _self_corrected.discard((tg, attempt))
-            _skipped.setdefault(tg, set()).add(attempt)
-            _shown_at.pop((tg, attempt), None)
+            await desk.forget_self_corrected(attempt)
+            await desk.skip(attempt)
+            await desk.seconds(attempt)  # снять отметку времени показа
             await _drop_buttons(cb)
-            await _show_next(bot, chat_id, learner, uc, library)
+            await _show_next(bot, chat_id, learner, desk, uc, library)
         case "stop":
-            _fixing.pop(tg, None)
+            await desk.set_fixing(None)
             await _drop_buttons(cb)
             await cb.message.answer(t.STOPPED)
         case act_name if act_name in _STATUS:
             try:
-                saved = await submit.execute(
-                    learner, attempt, _STATUS[act_name], seconds_spent=_seconds(tg, attempt),
-                    self_corrected=(tg, attempt) in _self_corrected,
-                )  # fmt: skip
+                saved = await _submit(learner, desk, submit, attempt, _STATUS[act_name])
             except NotAnnotator:  # доступ отозвали, пока запись была на экране
                 await cb.answer()
                 return
             except LabelError as error:  # «сам исправился» у плохой записи или чужого текста
                 await cb.answer(str(error), show_alert=True)
                 return
-            _self_corrected.discard((tg, attempt))
             await _drop_buttons(cb)
             await cb.message.answer(t.SAVED if saved else t.GONE)
-            await _show_next(bot, chat_id, learner, uc, library)
+            await _show_next(bot, chat_id, learner, desk, uc, library)
     await cb.answer()
