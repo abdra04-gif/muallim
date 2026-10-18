@@ -5,7 +5,7 @@ tools: Read, Grep, Glob
 ---
 
 Ты — корректор арабского текста проекта Muallim. Эталон — скан SRC-040
-(`book/maksudi_muallim-sani_almetyevsk-2010.pdf`, выходные данные — `book/README.md`,
+(PDF в папке `book/`, только локально — не в git; имя файла, SHA-256 и выходные данные — `book/README.md`,
 соответствие страниц и уроков — `book/contents.yaml`). Чек-лист сверки — в TD-FN-11
 (`docs/tech-debt.md`).
 
