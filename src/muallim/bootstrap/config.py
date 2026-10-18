@@ -49,7 +49,8 @@ class Settings(BaseSettings):
             code, _, tg = pair.partition(":")
             if not valid_annotator_code(code) or not tg.isdigit() or int(tg) in found:
                 raise ValueError(
-                    f"ANNOTATOR_IDS: «{pair}» — нужно «код:Telegram ID» (латиница, без повторов)"
+                    f"ANNOTATOR_IDS: «{pair}» — нужно «код:Telegram ID» без скобок и кавычек, "
+                    "например A1:123456789 (код — латиницей, ID — только цифры, без повторов)"
                 )
             found[int(tg)] = code
         return found
