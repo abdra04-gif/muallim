@@ -3,6 +3,7 @@
 import importlib.util
 
 import pytest
+
 from muallim.infrastructure.asr.reading import QuranReadingGuide
 
 pytestmark = pytest.mark.integration

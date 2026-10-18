@@ -17,8 +17,8 @@ setup: ## Установить зависимости и pre-commit
 check: lint test ## Все проверки, как в CI
 
 lint: ## ruff + mypy + архитектура
-	uv run ruff format --check .
-	uv run ruff check .
+	uv run ruff format --no-cache --check .
+	uv run ruff check --no-cache .
 	uv run mypy
 	uv run lint-imports
 
