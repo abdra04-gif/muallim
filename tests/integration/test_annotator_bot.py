@@ -33,6 +33,7 @@ from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
 from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
 from muallim.infrastructure.db.tables import annotations, metadata
 from muallim.infrastructure.db.views import create_views
+from muallim.infrastructure.system import SystemClock
 from muallim.presentation.telegram.callbacks import AnnotateAct
 from muallim.research import annotators
 from tests.fakes import FixedClock
@@ -227,7 +228,9 @@ async def test_invited_annotator_gets_in_with_code_once(
     _, container = app
     async with container() as request:
         session = await request.get(AsyncSession)
-        code = await annotators.create_invite(session, "A2", FixedClock())
+        # бот проверяет срок по настоящим часам — приглашение создаётся по ним же
+        # (с FixedClock тест ломался сам через сутки после даты часов, 2026-10-18)
+        code = await annotators.create_invite(session, "A2", SystemClock())
         await session.commit()
     invited, tg = person(INVITED_TG)
     await invited.write(f"/annotate {code}")
