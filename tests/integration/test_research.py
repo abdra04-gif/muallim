@@ -6,7 +6,7 @@ from uuid import UUID
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
@@ -20,6 +20,11 @@ from tests.fakes import FixedClock
 
 ROOT = Path(__file__).resolve().parents[2]
 pytestmark = pytest.mark.integration
+
+
+def _engine(session: AsyncSession) -> AsyncEngine:
+    assert isinstance(session.bind, AsyncEngine)
+    return session.bind
 
 
 async def _seed(session: AsyncSession) -> None:
@@ -60,9 +65,9 @@ async def _seed(session: AsyncSession) -> None:
 async def test_report_runs_every_sql_file(session: AsyncSession) -> None:
     await _seed(session)
     md = await reports.build_report(
-        session.bind,
+        _engine(session),
         ROOT / "analytics" / "sql",
-        FixedClock().now(),  # type: ignore[arg-type]
+        FixedClock().now(),
     )
     sql_files = sorted((ROOT / "analytics" / "sql").glob("*.sql"))
     assert md.count("\n## ") == len(sql_files)

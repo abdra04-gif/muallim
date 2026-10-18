@@ -17,6 +17,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.session.base import BaseSession
 from aiogram.filters.callback_data import CallbackData
 from aiogram.methods import (
+    AnswerCallbackQuery,
     EditMessageMedia,
     EditMessageText,
     GetFile,
@@ -143,9 +144,7 @@ class FakeTelegram(BaseSession):
         return [m.text or m.caption or "" for m in self.shown]
 
     def alerts(self) -> list[str]:
-        return [
-            str(c.text) for c in self.calls if type(c).__name__ == "AnswerCallbackQuery" and c.text
-        ]
+        return [str(c.text) for c in self.calls if isinstance(c, AnswerCallbackQuery) and c.text]
 
 
 @dataclass

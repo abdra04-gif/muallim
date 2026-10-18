@@ -103,7 +103,7 @@ ignore = [
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["muallim"]
+packages = ["muallim", "tests"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]

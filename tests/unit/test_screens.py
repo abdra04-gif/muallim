@@ -1,5 +1,6 @@
 """Экраны бота без Telegram: подписи и кнопки (ADR-0024, ADR-0025)."""
 
+from collections.abc import Set as AbstractSet
 from dataclasses import replace
 from typing import Any
 from uuid import UUID
@@ -17,7 +18,7 @@ from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.policy import GradingPolicy
 from muallim.domain.quiz import make_question
 from muallim.presentation.telegram import callbacks as cb
-from muallim.presentation.telegram import screens
+from muallim.presentation.telegram import render, screens, texts
 from tests.fakes import FixedClock
 
 
@@ -34,8 +35,12 @@ def _head(lesson: Lesson) -> LessonItem:
     return next(i for i in lesson.items if i.kind is ItemKind.LETTER)
 
 
-def _progress(c: Curriculum, done: set[str] = frozenset(), started: set[str] = frozenset(),
-              current: str | None = None) -> Progress:  # fmt: skip
+def _progress(
+    c: Curriculum,
+    done: AbstractSet[str] = frozenset(),
+    started: AbstractSet[str] = frozenset(),
+    current: str | None = None,
+) -> Progress:
     lessons = []
     for lesson in c.lessons:
         n = len(lesson.practice_items)
@@ -73,9 +78,9 @@ def test_lessons_screen_lists_book_parts_with_progress(curriculum: Curriculum) -
     s = screens.lessons(
         curriculum, _progress(curriculum, done={first_letter.id}), part=None, page=0
     )
-    texts = [t for t, d in _buttons(s.keyboard) if d.startswith("lessons:")]
-    assert len(texts) == 9 and "1. Знакомство" in texts[0]
-    assert "1/28" in texts[1]  # «Буквы»: пройден 1 урок из 28
+    labels = [t for t, d in _buttons(s.keyboard) if d.startswith("lessons:")]
+    assert len(labels) == 9 and "1. Знакомство" in labels[0]
+    assert "1/28" in labels[1]  # «Буквы»: пройден 1 урок из 28
     assert _has_home(s.keyboard)
 
 
@@ -85,9 +90,9 @@ def test_part_screen_shows_lesson_status_and_paginates(curriculum: Curriculum) -
         curriculum, done={letters[1].id}, started={letters[2].id}, current=letters[2].items[0].id
     )
     s = screens.lessons(curriculum, p, part=1, page=0)
-    texts = [t for t, _ in _buttons(s.keyboard)]
-    assert any(t.startswith("✅") and "ر" in t for t in texts)
-    assert any(t.startswith("🟡") and "ز" in t for t in texts)
+    labels = [t for t, _ in _buttons(s.keyboard)]
+    assert any(t.startswith("✅") and "ر" in t for t in labels)
+    assert any(t.startswith("🟡") and "ز" in t for t in labels)
     assert (
         sum(1 for _, d in _buttons(s.keyboard) if d.startswith("go:")) == screens.LESSONS_PER_PAGE
     )
@@ -137,7 +142,7 @@ def test_quran_card_shows_reference_and_listen(curriculum: Curriculum) -> None:
     item = next(i for les in curriculum.lessons for i in les.items if i.quran == "112:1")
     s = screens.card(curriculum, item, has_audio=True, is_teacher=False)
     assert "112:1" in s.caption
-    assert (screens.texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
+    assert (texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
 
 
 def test_only_teacher_sees_record_button(curriculum: Curriculum) -> None:
@@ -249,7 +254,7 @@ def test_result_on_first_line_has_no_back(curriculum: Curriculum) -> None:
 def test_every_card_caption_fits_telegram_photo_limit(
     curriculum: Curriculum, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(screens.render, "available", lambda: False)  # подписи без рисования
+    monkeypatch.setattr(render, "available", lambda: False)  # подписи без рисования
     for lesson in curriculum.lessons:
         for item in lesson.items:
             s = screens.card(curriculum, item, has_audio=True, is_teacher=True)
@@ -363,11 +368,11 @@ def test_syllable_card_says_how_to_read_and_offers_listen(curriculum: Curriculum
     item = next(i for les in _letters(curriculum) for i in les.items if i.kind is ItemKind.SYLLABLE)
     s = screens.card(curriculum, item, has_audio=True, is_teacher=False)
     assert item.sound in s.caption and item.tip in s.caption and "послушай" in s.caption
-    assert (screens.texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
+    assert (texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
 
 
 def test_rule_card_offers_listen_when_there_is_sound(curriculum: Curriculum) -> None:
     rule = next(i for les in _letters(curriculum) for i in les.items if i.kind is ItemKind.RULE)
-    listen = (screens.texts.LISTEN_BUTTON, cb.Listen(item_id=rule.id).pack())
+    listen = (texts.LISTEN_BUTTON, cb.Listen(item_id=rule.id).pack())
     assert listen in _buttons(screens.card(curriculum, rule, True, False).keyboard)
     assert listen not in _buttons(screens.card(curriculum, rule, False, False).keyboard)

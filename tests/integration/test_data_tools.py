@@ -7,12 +7,19 @@ from uuid import UUID
 
 import pytest
 from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from muallim.application.ports.repositories import CurriculumVersionError
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
-from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem, SourceRef
+from muallim.domain.curriculum import (
+    Curriculum,
+    ItemKind,
+    Lesson,
+    LessonItem,
+    Lexicon,
+    SourceRef,
+)
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
@@ -24,6 +31,11 @@ from tests.fakes import FixedClock
 
 ROOT = Path(__file__).resolve().parents[2]
 pytestmark = pytest.mark.integration
+
+
+def _engine(session: AsyncSession) -> AsyncEngine:
+    assert isinstance(session.bind, AsyncEngine)
+    return session.bind
 
 
 def _course(version: str = "v1", text_l02: str = "صَرَفَ صَبَرَ") -> Curriculum:
@@ -43,7 +55,7 @@ def _course(version: str = "v1", text_l02: str = "صَرَفَ صَبَرَ") ->
     return base
 
 
-def _lexicon():  # type: ignore[no-untyped-def]
+def _lexicon() -> Lexicon:
     from muallim.infrastructure.curriculum.yaml_loader import load_lexicon  # noqa: PLC0415
 
     return load_lexicon(ROOT / "curriculum" / "lexicon.ru.yaml")
@@ -168,9 +180,9 @@ async def test_unannotated_filter_and_csv(session: AsyncSession, tmp_path: Path)
 async def test_book_reports_show_pages_lines_and_minimal_pairs(session: AsyncSession) -> None:
     await _seed(session)
     md = await reports.build_report(
-        session.bind,
+        _engine(session),
         ROOT / "analytics" / "sql",
-        FixedClock().now(),  # type: ignore[arg-type]
+        FixedClock().now(),
     )
     book = md.split("## Трудные строки книги")[1].split("\n## ")[0]
     assert "| 18 | 8 |" in book and "| 19 | 1 |" in book

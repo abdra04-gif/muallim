@@ -337,7 +337,8 @@ async def test_continue_from_where_learner_left(w: World) -> None:
     learner = await w.learner()
     assert (await w.progress().execute(learner)).continue_item == w.curriculum.first_item()
     await w.cards().execute(learner, "L02-02")
-    assert (await w.progress().execute(learner)).continue_item.id == "L02-02"
+    item = (await w.progress().execute(learner)).continue_item
+    assert item is not None and item.id == "L02-02"
 
 
 async def test_streak_counts_consecutive_days(w: World) -> None:
