@@ -4,6 +4,7 @@
 Любое изменение схемы — только через миграцию Alembic (migrations/versions).
 """
 
+from collections.abc import Iterable
 from datetime import UTC, datetime
 
 from sqlalchemy import (
@@ -21,10 +22,23 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    UniqueConstraint,
     Uuid,
 )
 from sqlalchemy.engine import Dialect
 from sqlalchemy.types import TypeDecorator
+
+from muallim.domain.annotation import AnnotationSource, AnnotationStatus
+from muallim.domain.policy import Verdict
+from muallim.domain.report import ReportReason
+
+# Метки руководства 1.0 (ADR-0040): больше не ставятся, но могли остаться в БД — CHECK их пускает.
+LEGACY_LABELS = ("correct", "false_alarm", "missed_error", "wrong_error")
+
+
+def _one_of(column: str, values: Iterable[object]) -> str:
+    """CHECK «значение из списка» (TD-DB-02): новое значение — только вместе с миграцией."""
+    return f"{column} IN ({', '.join(repr(str(v)) for v in values)})"
 
 
 class UtcDateTime(TypeDecorator[datetime]):
@@ -126,6 +140,7 @@ attempts = Table(
     Column("app_version", String(64)),
     Column("feedback_language", String(8)),
     CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
+    CheckConstraint(_one_of("verdict", Verdict), name="verdict_values"),
 )
 
 curriculum_items = Table(
@@ -167,6 +182,7 @@ detected_errors = Table(
     Column("expected", String(16), nullable=False),
     Column("heard", String(16), nullable=False),
     Column("message", Text, nullable=False),  # что именно увидел ученик
+    UniqueConstraint("attempt_id", "ordinal"),  # один номер ошибки на попытку
 )
 
 annotations = Table(
@@ -180,7 +196,6 @@ annotations = Table(
         nullable=False,
         index=True,
     ),
-    Column("detected_error_id", Integer, ForeignKey("detected_errors.id", ondelete="CASCADE")),
     Column("annotator", String(64), nullable=False),  # код разметчика, не имя
     Column("label", String(32), nullable=False, index=True),
     Column("corrected_phonemes", Text),  # что на самом деле прочитано (эталон разметчика)
@@ -191,6 +206,10 @@ annotations = Table(
     Column("seconds_spent", Integer),  # от показа записи до ответа; только Telegram
     # ученик ошибся и сам перечитал верно — отдельная категория; NULL — до руководства 2.1
     Column("self_corrected", Boolean),
+    CheckConstraint(_one_of("label", [*AnnotationStatus, *LEGACY_LABELS]), name="label_values"),
+    CheckConstraint(
+        "source IS NULL OR " + _one_of("source", AnnotationSource), name="source_values"
+    ),
 )
 
 # Разметчики по приглашению и отозванные (FR-17). Разметчики из ANNOTATOR_IDS живут в настройках;
@@ -235,6 +254,8 @@ learner_reports = Table(
     ),
     Column("reason", String(32), nullable=False),
     Column("created_at", UtcDateTime(), nullable=False),
+    CheckConstraint(_one_of("reason", ReportReason), name="reason_values"),
+    UniqueConstraint("attempt_id", "learner_id"),  # «Бот ошибся» — одна жалоба на попытку
 )
 
 interaction_events = Table(

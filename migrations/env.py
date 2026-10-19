@@ -39,6 +39,16 @@ def _render_item(type_: str, obj: Any, autogen_context: AutogenContext) -> str |
 
 
 def _configure(connection: Connection) -> None:
+    sqlite = connection.dialect.name == "sqlite"
+    if sqlite:
+        # Batch-режим пересоздаёт таблицу (DROP старой): при включённых внешних ключах каскад стёр
+        # бы строки, которые на неё ссылаются (жалобы, ошибки, разметку). PRAGMA действует только вне
+        # транзакции — поэтому до begin_transaction; после миграций — проверка ссылок.
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        connection.commit()
+        if connection.exec_driver_sql("PRAGMA foreign_keys").scalar() != 0:
+            raise RuntimeError("SQLite не выключил внешние ключи — миграция стёрла бы данные")
+        connection.commit()
     context.configure(
         connection=connection,
         target_metadata=metadata,
@@ -46,8 +56,18 @@ def _configure(connection: Connection) -> None:
         render_as_batch=connection.dialect.name == "sqlite",
         compare_type=True,
     )
-    with context.begin_transaction():
-        context.run_migrations()
+    try:
+        with context.begin_transaction():
+            context.run_migrations()
+            if sqlite:  # внутри транзакции: при битых ссылках миграция откатится
+                broken = connection.exec_driver_sql("PRAGMA foreign_key_check").all()
+                if broken:
+                    raise RuntimeError(f"После миграции нарушены внешние ключи: {broken[:5]}")
+    finally:
+        if sqlite:
+            connection.rollback()  # PRAGMA действует только вне транзакции
+            connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+            connection.commit()
 
 
 async def _run_online() -> None:

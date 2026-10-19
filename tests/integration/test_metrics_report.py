@@ -59,7 +59,7 @@ async def _seed(session: AsyncSession) -> None:
         guide: str = "2.0",
     ) -> dict[str, object]:
         return {
-            "attempt_id": UUID(int=n), "detected_error_id": None, "annotator": annotator,
+            "attempt_id": UUID(int=n), "annotator": annotator,
             "label": status, "corrected_phonemes": actual, "guide_version": guide,
             "comment": "", "created_at": _at(day),
         }  # fmt: skip
@@ -163,7 +163,7 @@ async def test_self_corrections_are_counted_separately(session: AsyncSession) ->
                 GradingPolicy().verdict(result), None, 900, 1200, _at(16)),
         tuple("msg" for _ in result.errors),
     )  # fmt: skip
-    mark = {"detected_error_id": None, "comment": "", "guide_version": "2.1", "created_at": _at(17)}
+    mark = {"comment": "", "guide_version": "2.1", "created_at": _at(17)}
     await session.execute(
         insert(annotations),
         [

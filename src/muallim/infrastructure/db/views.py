@@ -1,8 +1,8 @@
 """Представления для просмотра данных в DBeaver/psql и для отчётов (ADR-0023).
 
 SQL переносимый (PostgreSQL и SQLite). Telegram ID в представления не попадает — только псевдоним.
-Миграция 0003 хранит замороженную копию этих строк; тест сверяет их. Изменили SQL здесь —
-добавьте миграцию, которая пересоздаёт представление.
+Последняя миграция с представлениями (сейчас 0007) хранит их замороженную копию; тест сверяет.
+Изменили SQL здесь — добавьте миграцию, которая пересоздаёт представление.
 """
 
 from sqlalchemy import Connection
@@ -66,8 +66,7 @@ SELECT
     (
         SELECT an.label FROM annotations an
         WHERE an.attempt_id = a.id
-            AND (an.detected_error_id = e.id OR an.detected_error_id IS NULL)
-        ORDER BY an.created_at DESC
+        ORDER BY an.created_at DESC, an.id DESC
         LIMIT 1
     ) AS label
 FROM detected_errors e

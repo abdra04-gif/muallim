@@ -80,8 +80,12 @@ class InMemoryAttempts:
     async def owner(self, attempt_id: UUID) -> UUID | None:
         return next((a.learner_id for a, _ in self.items if a.id == attempt_id), None)
 
-    async def add_report(self, report: LearnerReport) -> None:
+    async def add_report(self, report: LearnerReport) -> bool:
+        seen = {(r.attempt_id, r.learner_id) for r in self.reports}
+        if (report.attempt_id, report.learner_id) in seen:
+            return False
         self.reports.append(report)
+        return True
 
     async def add(self, attempt: Attempt, feedback: tuple[str, ...]) -> None:
         # как в БД: у каждой ошибки — свой текст (detected_errors, zip strict)

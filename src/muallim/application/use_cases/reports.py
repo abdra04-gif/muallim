@@ -20,9 +20,11 @@ class ReportMistake:
         """False — попытка чужая или не существует (кнопку могли подделать)."""
         if await self.attempts.owner(attempt_id) != learner.id:
             return False
-        await self.attempts.add_report(
+        added = await self.attempts.add_report(
             LearnerReport(attempt_id, learner.id, reason, self.clock.now())
         )
+        if not added:
+            return True  # второе нажатие: жалоба уже принята, считать её дважды нельзя
         await self.events.record(
             "attempt_disputed", learner.id, {"attempt_id": str(attempt_id), "reason": reason}
         )

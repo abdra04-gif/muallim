@@ -6,7 +6,6 @@ erDiagram
     learners |o--o{ interaction_events : "действия"
     attempts ||--o{ detected_errors : "найдено моделью"
     attempts ||--o{ annotations : "размечено человеком"
-    detected_errors |o--o{ annotations : "метка ошибки"
     attempts ||--o{ learner_reports : "«бот ошибся»"
     learners ||--o{ learner_reports : "оспаривает"
     curriculum_items |o--o{ attempts : "строка книги (item_id + curriculum_version)"
@@ -63,7 +62,7 @@ erDiagram
     }
     learner_reports {
         int id PK
-        uuid attempt_id FK
+        uuid attempt_id FK "UNIQUE с learner_id"
         uuid learner_id FK
         string reason
     }
@@ -79,7 +78,6 @@ erDiagram
     annotations {
         int id PK
         uuid attempt_id FK
-        int detected_error_id FK
         string annotator
         string label
         text corrected_phonemes

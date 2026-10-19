@@ -242,7 +242,7 @@ async def test_forget_audio_clears_hashes_and_labels_but_keeps_attempts(
     await repo.add(_attempt(learner, 1, "سَ", clock), ("msg",))
     await session.execute(
         insert(annotations).values(
-            attempt_id=UUID(int=101), annotator="A1", label="ok", corrected_phonemes="سَ",
+            attempt_id=UUID(int=101), annotator="A1", label="fix", corrected_phonemes="سَ",
             comment="", guide_version="2.0", created_at=clock.now(),
         )
     )  # fmt: skip

@@ -595,6 +595,17 @@ async def test_learner_can_dispute_own_attempt(w: World) -> None:
     assert w.events.events[-1][0] == "attempt_disputed"
 
 
+async def test_second_dispute_of_same_attempt_is_not_counted_twice(w: World) -> None:
+    """Ученик нажал «Бот ошибся» дважды — одна жалоба, одно событие (TD-DB-02)."""
+    learner = await w.learner()
+    result = await w.assess().execute(learner, b"ogg")
+    uc = ReportMistake(w.attempts, w.uow, w.clock, w.events)
+    assert await uc.execute(learner, result.attempt.id, ReportReason.READ_CORRECTLY) is True
+    assert await uc.execute(learner, result.attempt.id, ReportReason.OTHER) is True
+    assert len(w.attempts.reports) == 1
+    assert [e for e, *_ in w.events.events].count("attempt_disputed") == 1
+
+
 async def test_cannot_dispute_someone_elses_attempt(w: World) -> None:
     learner = await w.learner()
     result = await w.assess().execute(learner, b"ogg")

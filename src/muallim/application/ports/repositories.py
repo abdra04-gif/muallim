@@ -59,7 +59,8 @@ class AttemptRepository(Protocol):
     async def owner(self, attempt_id: UUID) -> UUID | None:
         """Чья попытка (learner_id) или None, если такой нет."""
 
-    async def add_report(self, report: LearnerReport) -> None: ...
+    async def add_report(self, report: LearnerReport) -> bool:
+        """False — жалоба этого ученика на эту попытку уже есть (повторное нажатие)."""
 
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
         """Сколько попыток в каждый день (UTC) — для серии дней подряд."""

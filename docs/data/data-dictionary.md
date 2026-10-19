@@ -95,7 +95,7 @@
 | Представление | Строка = | Главные поля |
 |---|---|---|
 | `v_attempts` | попытка | `pseudonym`, `item_id`, `lesson_id`, `page`, `line`, `item_text`, `item_note`, `score`, `verdict`, `errors`, `disputed`, `annotations`, `audio_sha256`, `model_version` |
-| `v_errors` | найденная ошибка | `pseudonym`, `item_id`, `page`, `line`, `item_text`, `kind`, `expected`, `heard`, `position`, `syllable`, `message`, `score`, `label` (последняя разметка), `disputed`, `audio_sha256` |
+| `v_errors` | найденная ошибка | `pseudonym`, `item_id`, `page`, `line`, `item_text`, `kind`, `expected`, `heard`, `position`, `syllable`, `message`, `score`, `label` (последняя метка попытки, не этой ошибки; ADR-0055), `disputed`, `audio_sha256` |
 
 ## `detected_errors` — ошибки, найденные системой
 | Поле | Тип | Описание |
@@ -114,7 +114,6 @@
 |---|---|---|
 | `id` | int, PK | |
 | `attempt_id` | UUID → attempts, CASCADE | |
-| `detected_error_id` | int → detected_errors, null | не заполняется с руководства 2.0: ошибки по фонемам выводятся из `corrected_phonemes`; кандидат на удаление миграцией (TD-DB-04) |
 | `annotator` | varchar(64) | **код** разметчика (A1, T2), не имя; латиница, цифры, `-`, `_` |
 | `label` | varchar(32) | с 2.0: `agree` (бот услышал верно), `fix` (исправлено), `audio_unusable`, `off_task`; метки 1.0 (`correct`, `false_alarm`, …) в метрики не входят |
 | `corrected_phonemes` | text, null | что прозвучало на самом деле (Quran Phonetic Script): при `agree` — то, что услышал бот, при `fix` — исправленное; `null` — `audio_unusable` / `off_task` |
@@ -147,6 +146,11 @@
 | `annotator` | varchar(64) | для какого кода разметчика |
 | `created_at`, `expires_at` | timestamptz | действует сутки |
 | `used_at` | timestamptz, null | погашено при входе (один раз); неиспользованные удаляются при отзыве |
+
+## Ограничения в самой БД (ADR-0055)
+- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `learner_reports.reason` ∈ read_correctly / wrong_error / other.
+- Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
+- `annotations.detected_error_id` удалено миграцией 0007.
 
 ## `learner_reports` — жалобы «бот ошибся» (ADR-0020)
 | Поле | Тип | Описание |

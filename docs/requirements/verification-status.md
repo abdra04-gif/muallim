@@ -1,16 +1,16 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-19T20:02:57+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-19T23:09:07+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `47458495b7a291e4` | 95 |
+| код | `f3bc175797c91190` | 95 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
-| миграции | `556a14013df1972c` | 6 |
+| миграции | `109281850d3134be` | 7 |
 | зависимости | `a9f76fc0b602ab89` | 1 |
 | предрегистрация | `dd14f532dd71f045` | 1 |
 
@@ -37,7 +37,7 @@
 | FR-20 | `tests/integration/test_reference_audio.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-21 | `tests/unit/test_transcription.py` | ✅ |
 | FR-22 | `tests/unit/test_feedback_languages.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-23 | `tests/integration/test_bot_flow.py`, `tests/integration/test_research.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-23 | `tests/integration/test_bot_flow.py`, `tests/integration/test_constraints.py`, `tests/integration/test_research.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-24 | `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-25 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-26 | `tests/integration/test_data_tools.py`, `tests/integration/test_di.py` | ✅ |

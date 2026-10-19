@@ -4,6 +4,7 @@ from datetime import date, datetime
 from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.repositories import AttemptRepository
@@ -147,12 +148,27 @@ class SqlAttemptRepository(AttemptRepository):
         query = select(attempts.c.learner_id).where(attempts.c.id == attempt_id)
         return await self.session.scalar(query)
 
-    async def add_report(self, report: LearnerReport) -> None:
-        await self.session.execute(
-            insert(learner_reports).values(
-                attempt_id=report.attempt_id,
-                learner_id=report.learner_id,
-                reason=report.reason,
-                created_at=report.at,
+    async def add_report(self, report: LearnerReport) -> bool:
+        exists = await self.session.scalar(
+            select(learner_reports.c.id)
+            .where(
+                learner_reports.c.attempt_id == report.attempt_id,
+                learner_reports.c.learner_id == report.learner_id,
             )
+            .limit(1)
         )
+        if exists is not None:
+            return False
+        try:
+            async with self.session.begin_nested():  # двойное нажатие: две проверки разом
+                await self.session.execute(
+                    insert(learner_reports).values(
+                        attempt_id=report.attempt_id,
+                        learner_id=report.learner_id,
+                        reason=report.reason,
+                        created_at=report.at,
+                    )
+                )
+        except IntegrityError:
+            return False  # вторую остановил UNIQUE в БД
+        return True
