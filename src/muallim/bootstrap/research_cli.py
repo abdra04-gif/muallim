@@ -95,6 +95,7 @@ async def _run(args: argparse.Namespace) -> str:
                     shutil.copy2(store.path_for(row["audio_sha256"]), out_dir / row["audio"])
                 dataset.write_jsonl(rows, out_dir / "manifest.jsonl")
                 dataset.write_iqraeval(rows, out_dir)
+                dataset.write_phonemes(rows, out_dir / "phonemes.csv")
                 agreed = sum(r["consensus_phonemes"] is not None for r in rows)
                 return f"Датасет: {len(rows)} записей, согласованная разметка: {agreed} → {out_dir}"
     finally:

@@ -12,6 +12,7 @@ from collections import Counter, defaultdict
 from collections.abc import Hashable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
@@ -29,6 +30,9 @@ USABLE = frozenset({AGREE, FIX})  # попытку можно оценить
 UNUSABLE = frozenset({"audio_unusable", "off_task"})
 STATUSES = USABLE | UNUSABLE  # метки руководства 2.x; старые (1.0, без фонем) в метрики не входят
 RETURN_DAYS = 7
+# Версия правила сравнения по фонемам (phoneme_errors / phoneme_outcomes). Менять вместе с
+# правилом: выгрузка «по звукам» её пишет, чтобы итоги разных версий не смешивались.
+COMPARISON_VERSION = "1"
 
 
 # ---------- формулы: по фонемам ----------
@@ -64,21 +68,89 @@ def phoneme_errors(reference: str, heard: str) -> dict[int, tuple[ErrorKind, str
     return marks
 
 
-def phoneme_decisions(reference: str, model: str, human: str) -> PhonemeCounts:
-    """Сравнение по каждой фонеме эталона: что услышала модель и что записал разметчик."""
+class Outcome(StrEnum):
+    """Итог по фонеме — схема MDD (SRC-064); значения пишутся в phonemes.csv."""
+
+    CORRECT_ACCEPT = "correct_accept"  # TA: прочитано верно, модель приняла
+    FALSE_REJECTION = "false_rejection"  # FR: прочитано верно, модель забраковала (ложная тревога)
+    FALSE_ACCEPT = "false_accept"  # FA: ошибка, модель её пропустила
+    TRUE_REJECTION = "true_rejection"  # TR: ошибка, модель её нашла
+
+
+@dataclass(frozen=True, slots=True)
+class PhonemeOutcome:
+    """Одна фонема эталона: что ждали, что услышала модель, что — разметчик, и итог.
+    ``same_diagnosis`` — только для TR: модель услышала то же, что разметчик."""
+
+    position: int
+    expected: str
+    model_heard: str
+    human_heard: str
+    outcome: Outcome
+    same_diagnosis: bool | None
+    model_kind: ErrorKind | None
+    human_kind: ErrorKind | None
+
+
+def _heard_at(reference: str, heard: str) -> list[str]:
+    """Что прозвучало на месте каждой фонемы эталона — для показа (итоги считает
+    ``phoneme_errors``). Вставка — перед фонемой, в конце строки — после последней; несколько
+    вставок у одной фонемы видны все. Замена нескольких звуков — весь фрагмент у каждой фонемы."""
+    before, after = [""] * len(reference), [""] * len(reference)
+    core = list(reference)
+    replaced: set[int] = set()
+    for error in assess(reference, heard).errors:
+        if error.expected:
+            for pos in range(error.position, error.position + len(error.expected)):
+                if pos not in replaced:
+                    core[pos] = error.heard
+                    replaced.add(pos)
+        elif error.position < len(reference):
+            before[error.position] += error.heard
+        elif reference:
+            after[-1] += error.heard
+    return [b + c + a for b, c, a in zip(before, core, after, strict=True)]
+
+
+def phoneme_outcomes(reference: str, model: str, human: str) -> tuple[PhonemeOutcome, ...]:
+    """Сравнение по каждой фонеме эталона: где и как модель права или ошиблась."""
     by_model, by_human = phoneme_errors(reference, model), phoneme_errors(reference, human)
-    ta = fr = fa = tr = diagnosed = 0
+    model_heard, human_heard = _heard_at(reference, model), _heard_at(reference, human)
+    rows = []
     for pos in range(len(reference)):
-        if pos in by_model and pos in by_human:
-            tr += 1
-            diagnosed += by_model[pos][1] == by_human[pos][1]
-        elif pos in by_model:
-            fr += 1
-        elif pos in by_human:
-            fa += 1
+        m, h = by_model.get(pos), by_human.get(pos)
+        if m and h:
+            outcome = Outcome.TRUE_REJECTION
+        elif m:
+            outcome = Outcome.FALSE_REJECTION
+        elif h:
+            outcome = Outcome.FALSE_ACCEPT
         else:
-            ta += 1
-    return PhonemeCounts(ta, fr, fa, tr, diagnosed)
+            outcome = Outcome.CORRECT_ACCEPT
+        rows.append(
+            PhonemeOutcome(
+                position=pos,
+                expected=reference[pos],
+                model_heard=model_heard[pos],
+                human_heard=human_heard[pos],
+                outcome=outcome,
+                same_diagnosis=m[1] == h[1] if m and h else None,
+                model_kind=m[0] if m else None,
+                human_kind=h[0] if h else None,
+            )
+        )
+    return tuple(rows)
+
+
+def phoneme_decisions(reference: str, model: str, human: str) -> PhonemeCounts:
+    """Сумма по фонемам — из того же разбора, что файл «по звукам» (не могут разойтись)."""
+    rows = phoneme_outcomes(reference, model, human)
+    count = Counter(r.outcome for r in rows)
+    return PhonemeCounts(
+        count[Outcome.CORRECT_ACCEPT], count[Outcome.FALSE_REJECTION],
+        count[Outcome.FALSE_ACCEPT], count[Outcome.TRUE_REJECTION],
+        sum(r.same_diagnosis is True for r in rows),
+    )  # fmt: skip
 
 
 @dataclass(frozen=True, slots=True)

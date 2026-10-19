@@ -396,3 +396,58 @@ async def test_dataset_has_no_consensus_when_annotators_disagree(
     assert all(r["consensus_phonemes"] is None for r in rows)
     dataset.write_iqraeval(rows, tmp_path)
     assert _read(tmp_path / "truth.csv") == []  # спорные — только после разбора, не в эталон
+
+
+async def test_dataset_has_per_sound_file_for_every_annotator(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """phonemes.csv: где именно и как модель была права или ошиблась — по оценке каждого учителя."""
+    from muallim.research.metrics import COMPARISON_VERSION  # noqa: PLC0415
+
+    await _seed(session)
+    clock = FixedClock()
+    for annotator, status in (("A1", "agree"), ("A2", "fix")):
+        rows = _read(await _package(session, tmp_path, annotator) / "tasks.csv")
+        for row in rows:
+            row["status"] = status
+            if status == "fix":  # A2 слышит обратное тому, что услышал бот
+                row["actual_phonemes"] = "صَ" if row["bot_heard"] == "سَ" else "سَ"
+        await annotation.import_package(
+            session, _save_like_excel(rows, tmp_path / f"{annotator}.csv"), annotator, clock
+        )
+    dataset.write_phonemes(await dataset.dataset_rows(session), tmp_path / "phonemes.csv")
+    sounds = _read(tmp_path / "phonemes.csv")
+    first = {
+        (r["attempt_id"][-2:], r["annotator"]): r["outcome"] for r in sounds if r["position"] == "0"
+    }
+    assert first == {
+        ("0a", "A1"): "true_rejection",  # бот услышал س, A1 тоже — ошибка найдена
+        ("0a", "A2"): "false_rejection",  # A2: ученик прочитал верно — ложная тревога
+        ("0b", "A1"): "correct_accept",
+        ("0b", "A2"): "false_accept",  # A2 слышит ошибку, бот её пропустил
+    }
+    row = next(r for r in sounds if r["attempt_id"].endswith("0a") and r["annotator"] == "A1")
+    assert (row["expected"], row["model_heard"], row["human_heard"]) == ("ص", "س", "س")
+    assert row["same_diagnosis"] == "true" and row["item_id"] == "L01-14"
+    assert {r["comparison_version"] for r in sounds} == {COMPARISON_VERSION}
+    assert {r["self_corrected"] for r in sounds} == {"false"}
+    assert (tmp_path / "phonemes.csv").read_bytes().startswith(b"\xef\xbb\xbf")  # Excel: BOM
+    assert len(sounds) == 2 * 2 * 2  # 2 попытки × 2 звука × 2 учителя; без согласия — нет
+    assert all("telegram" not in key for key in sounds[0])
+
+
+async def test_per_sound_file_marks_self_corrected_attempts(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """Самоисправление (ADR-0044) не входит в главные цифры — в файле его можно отфильтровать."""
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    for row in rows:
+        row["status"] = "agree"
+    _row(rows, 10)["self_corrected"] = "да"
+    await annotation.import_package(
+        session, _save_like_excel(rows, tmp_path / "A1.csv"), "A1", FixedClock()
+    )
+    dataset.write_phonemes(await dataset.dataset_rows(session), tmp_path / "phonemes.csv")
+    marked = {r["attempt_id"][-2:]: r["self_corrected"] for r in _read(tmp_path / "phonemes.csv")}
+    assert marked == {"0a": "true", "0b": "false"}

@@ -21,7 +21,7 @@
 | FR-11 | `analytics/sql/`, `src/muallim/research/reports.py` | `tests/integration/test_research.py` | `docs/data/reports.md` | ✅ |
 | FR-12 | `src/muallim/infrastructure/db/repositories/events.py` | `tests/unit/test_use_cases.py` | `docs/data/data-dictionary.md` | ✅ |
 | FR-13 | `src/muallim/research/annotation.py` | `tests/integration/test_research.py` | `docs/data/annotation-guide.md` | ✅ |
-| FR-14 | `src/muallim/research/dataset.py` | `tests/integration/test_research.py` | `docs/data/data-lifecycle.md` | ✅ |
+| FR-14 | `src/muallim/research/dataset.py`, `src/muallim/research/metrics.py` | `tests/integration/test_research.py`, `tests/unit/test_metrics.py` | `docs/data/data-lifecycle.md` | ✅ |
 | FR-17 | `src/muallim/application/use_cases/annotation.py`, `src/muallim/presentation/telegram/annotation.py`, `src/muallim/infrastructure/db/repositories/annotation.py`, `src/muallim/research/annotators.py` | `tests/unit/test_annotation.py`, `tests/integration/test_annotators_sql.py`, `tests/integration/test_annotator_bot.py` | ADR-0041, `docs/data/annotation-guide.md` | ✅ |
 | FR-20 | `src/muallim/application/use_cases/reference.py`, `src/muallim/infrastructure/audio/reference_library.py`, `curriculum/audio/` | `tests/unit/test_use_cases.py`, `tests/integration/test_reference_audio.py` | ADR-0018 | ✅ |
 | FR-21 | `src/muallim/application/transcription.py`, `curriculum/lexicon.ru.yaml` | `tests/unit/test_transcription.py` | `docs/pedagogy/methodology.md` (M-09, M-10) | ✅ |

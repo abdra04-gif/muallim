@@ -8,6 +8,9 @@ Telegram ID не выгружается никогда — только псев
 и все записали одно и то же; иначе None — такие попытки сначала разбирают вместе
 (docs/data/annotation-guide.md).
 Для оценки по протоколу Iqra'Eval (``mdd_eval``) — ``truth.csv`` и ``predictions.csv``.
+``phonemes.csv`` — разбор по каждому звуку для каждого разметчика: где модель права, где подняла
+ложную тревогу, где пропустила ошибку (``metrics.phoneme_outcomes``, версия правила в столбце
+``comparison_version``).
 """
 
 import csv
@@ -22,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.infrastructure.db.tables import annotations, attempts, learners
 from muallim.research.annotation import USABLE, AttemptStatus
+from muallim.research.metrics import COMPARISON_VERSION, phoneme_outcomes
 
 _STATUSES = [str(s) for s in AttemptStatus]  # метки руководства 2.0; старые (без фонем) — нет
 
@@ -122,6 +126,42 @@ def write_iqraeval(rows: list[dict[str, Any]], out_dir: Path) -> None:
             writer = csv.writer(f)
             writer.writerow(header)
             writer.writerows(values)
+
+
+PHONEME_COLUMNS = (
+    "attempt_id", "item_id", "pseudonym", "model_version", "annotator", "position", "expected",
+    "model_heard", "human_heard", "outcome", "same_diagnosis", "model_kind", "human_kind",
+    "agrees_with_consensus", "self_corrected", "comparison_version",
+)  # fmt: skip
+
+
+def write_phonemes(rows: list[dict[str, Any]], path: Path) -> None:
+    """По строке на каждый звук эталона для каждого разметчика, записавшего, что прозвучало.
+    ``self_corrected`` — по попытке (отметил хоть один): такие попытки не входят в главные цифры
+    отчёта (ADR-0044). BOM — чтобы Excel показал арабский текст."""
+    with path.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(PHONEME_COLUMNS)
+        for r in rows:
+            for mark in r["annotations"]:
+                actual = mark["actual_phonemes"]
+                if mark["status"] not in USABLE or actual is None:
+                    continue
+                consensus = r["consensus_phonemes"]
+                marked = [m["self_corrected"] for m in r["annotations"]]
+                self_corrected = True if True in marked else None if None in marked else False
+                for o in phoneme_outcomes(r["reference_phonemes"], r["heard_phonemes"], actual):
+                    writer.writerow((
+                        r["attempt_id"], r["item_id"], r["pseudonym"], r["model_version"],
+                        mark["annotator"], o.position, o.expected, o.model_heard, o.human_heard,
+                        o.outcome, _flag(o.same_diagnosis), o.model_kind or "", o.human_kind or "",
+                        _flag(None if consensus is None else actual == consensus),
+                        _flag(self_corrected), COMPARISON_VERSION,
+                    ))  # fmt: skip
+
+
+def _flag(value: bool | None) -> str:
+    return "" if value is None else str(value).lower()
 
 
 def _spaced(phonemes: str) -> str:

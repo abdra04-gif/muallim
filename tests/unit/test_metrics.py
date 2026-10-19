@@ -4,14 +4,19 @@ from datetime import date
 
 import pytest
 
+from muallim.domain.assessment import ErrorKind
 from muallim.research.metrics import (
+    COMPARISON_VERSION,
+    Outcome,
     PhonemeCounts,
+    PhonemeOutcome,
     Retention,
     cohen_kappa,
     krippendorff_alpha_nominal,
     mdd_quality,
     nearest_rank,
     phoneme_decisions,
+    phoneme_outcomes,
     retention,
 )
 
@@ -34,6 +39,86 @@ from muallim.research.metrics import (
 )
 def test_phoneme_decisions(model: str, human: str, expected: PhonemeCounts) -> None:
     assert phoneme_decisions("صَ", model, human) == expected
+
+
+def test_phoneme_outcomes_say_where_and_how_the_model_was_wrong() -> None:
+    """Разбор по каждому звуку эталона: что ждали, что услышала модель, что — учитель."""
+    assert phoneme_outcomes("صَ", "سَ", "صَ") == (
+        PhonemeOutcome(
+            0, "ص", "س", "ص", Outcome.FALSE_REJECTION, None, ErrorKind.LETTER_SUBSTITUTION, None
+        ),  # ученик прав
+        PhonemeOutcome(1, "َ", "َ", "َ", Outcome.CORRECT_ACCEPT, None, None, None),
+    )
+    assert phoneme_outcomes("صَ", "صَ", "سَ")[0] == PhonemeOutcome(
+        0,
+        "ص",
+        "ص",
+        "س",
+        Outcome.FALSE_ACCEPT,
+        None,
+        None,
+        ErrorKind.LETTER_SUBSTITUTION,  # модель пропустила ошибку
+    )
+    assert phoneme_outcomes("صَ", "ثَ", "سَ")[0] == PhonemeOutcome(
+        0,
+        "ص",
+        "ث",
+        "س",
+        Outcome.TRUE_REJECTION,
+        False,
+        ErrorKind.LETTER_SUBSTITUTION,
+        ErrorKind.LETTER_SUBSTITUTION,  # нашла, но не ту букву
+    )
+    assert phoneme_outcomes("صَ", "سَ", "سَ")[0].same_diagnosis is True
+
+
+def test_phoneme_outcomes_mark_a_missing_sound_as_empty() -> None:
+    first = phoneme_outcomes("صَ", "صَ", "ص")[1]  # учитель: огласовка не прозвучала
+    assert (first.expected, first.model_heard, first.human_heard) == ("َ", "َ", "")
+    assert first.outcome is Outcome.FALSE_ACCEPT and first.human_kind is ErrorKind.VOWEL_MISSING
+
+
+def test_phoneme_outcomes_show_extra_sound_after_the_phoneme() -> None:
+    last = phoneme_outcomes("صَ", "صَا", "صَ")[1]  # лишний мадд в конце
+    assert (last.model_heard, last.outcome) == ("َا", Outcome.FALSE_REJECTION)
+
+
+@pytest.mark.parametrize(
+    ("reference", "human", "position", "shown"),
+    [
+        ("بَتَ", "بَاتَ", 2, "ات"),  # вставка внутри — перед фонемой, к которой отнесена
+        ("بَ", "ءبَ", 0, "ءب"),  # вставка в начале строки
+        ("بَتَ", "بَتءَا", 3, "ءَا"),  # две вставки у последней фонемы: перед и после — обе видны
+    ],
+)
+def test_phoneme_outcomes_show_inserted_sounds_where_they_were_heard(
+    reference: str, human: str, position: int, shown: str
+) -> None:
+    assert phoneme_outcomes(reference, reference, human)[position].human_heard == shown
+
+
+def test_phoneme_outcomes_of_empty_reference_are_empty() -> None:
+    assert phoneme_outcomes("", "بَ", "بَ") == ()
+
+
+@pytest.mark.parametrize(
+    ("model", "human"),
+    [("صَ", "صَ"), ("سَ", "سَ"), ("ثَ", "سَ"), ("سَ", "صَ"), ("صَ", "سَ"), ("ص", "ص"), ("صَا", "صَ")],
+)
+def test_phoneme_outcomes_add_up_to_the_metric(model: str, human: str) -> None:
+    """Файл «по звукам» и цифры метрики считаются одним правилом — не могут разойтись."""
+    rows = phoneme_outcomes("صَ", model, human)
+    counts = phoneme_decisions("صَ", model, human)
+    by_kind = {kind: sum(r.outcome is kind for r in rows) for kind in Outcome}
+    assert (counts.ta, counts.fr, counts.fa, counts.tr) == (
+        by_kind[Outcome.CORRECT_ACCEPT], by_kind[Outcome.FALSE_REJECTION],
+        by_kind[Outcome.FALSE_ACCEPT], by_kind[Outcome.TRUE_REJECTION],
+    )  # fmt: skip
+    assert counts.correct_diagnosis == sum(r.same_diagnosis is True for r in rows)
+
+
+def test_comparison_version_is_declared() -> None:
+    assert COMPARISON_VERSION  # меняется вместе с правилом сравнения — видно в выгрузке
 
 
 def test_phoneme_counts_add_up() -> None:
