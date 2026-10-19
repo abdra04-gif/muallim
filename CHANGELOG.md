@@ -4,6 +4,10 @@
 В каждой записи — ID требований.
 
 ## [Не выпущено]
+### Изменено (план ВКР, roadmap 1.9a)
+- **Сроки программы Иннополиса** (лекция «Thesis Project», 25.09.2026): руководитель и тема — 19.10.2026,
+  главы 1–2 в Moodle — до 10.12.2026; внесены в roadmap (шаг 1.9a), `docs/thesis/university-requirements.md`,
+  план работ предложения (ru/en) и диаграмму `fig-gantt`.
 ### Добавлено (ADR-0054)
 - **Три входа в БД**: `muallim_owner` (миграции), `muallim_app` (бот — строки без прав на схему),
   `muallim_reader` (DBeaver — только чтение, Telegram ID скрыт); `make db-roles` (TD-DB-01, NFR-SEC-08).
