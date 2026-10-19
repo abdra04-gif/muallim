@@ -16,6 +16,12 @@ class Settings(BaseSettings):
 
     bot_token: SecretStr
     database_url: SecretStr = SecretStr("sqlite+aiosqlite:///data/dev.sqlite3")
+    # Вход владельца схемы для миграций (роль muallim_owner, ADR-0054); нет — как у бота
+    migration_database_url: SecretStr | None = None
+    # Журнал удалений — вне БД: повторяется после восстановления копии (TD-DB-05). По умолчанию
+    # рядом с записями (data/erasures/): тесты и консольный режим со своим audio_dir не трогают
+    # настоящий журнал.
+    erasure_log: Path | None = None
     asr_backend: Literal["muaalem", "stub"] = "muaalem"
     # auto: видеочип Mac (mps) или NVIDIA (cuda), если есть, иначе cpu (mps быстрее в ~10 раз)
     asr_device: Literal["auto", "cpu", "mps", "cuda"] = "auto"
@@ -43,6 +49,14 @@ class Settings(BaseSettings):
     # Разметчики в Telegram (FR-17): «код:Telegram ID» через запятую, например «A1:123,A2:456».
     # Отдельно от учителей. Второй путь — приглашение: muallim-research annotator-invite A2
     annotator_ids: str = ""
+
+    @property
+    def erasure_log_path(self) -> Path:
+        return self.erasure_log or self.audio_dir.parent / "erasures" / "erasures.jsonl"
+
+    def migration_url(self) -> str:
+        url = self.migration_database_url or self.database_url
+        return url.get_secret_value()
 
     @property
     def teachers(self) -> frozenset[int]:

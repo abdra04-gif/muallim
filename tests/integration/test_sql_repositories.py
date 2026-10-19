@@ -256,6 +256,22 @@ async def test_forget_audio_clears_hashes_and_labels_but_keeps_attempts(
     assert not await repo.audio_in_use("a" * 64)
 
 
+async def test_forget_audio_until_keeps_later_recordings(session: AsyncSession) -> None:
+    """Повтор старого «отзыва» после восстановления не трогает записей после нового «да»."""
+    clock = FixedClock()
+    await SqlLearnerRepository(session).add(learner := _learner(clock))
+    repo = SqlAttemptRepository(session)
+    early = _attempt(learner, 1, "صَ", clock)
+    withdrawn_at = clock.now()
+    late = replace(_attempt(learner, 2, "صَ", clock), audio_sha256="b" * 64)
+    await repo.add(early, ())
+    await repo.add(late, ())
+    await session.commit()
+    assert await repo.forget_audio(learner.id, until=withdrawn_at) == ["a" * 64]
+    await session.commit()
+    assert await repo.audio_hashes(learner.id) == ["b" * 64]
+
+
 async def test_audio_in_use_sees_other_learners(session: AsyncSession) -> None:
     clock = FixedClock()
     learners = SqlLearnerRepository(session)

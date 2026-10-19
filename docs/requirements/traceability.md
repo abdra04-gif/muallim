@@ -17,7 +17,7 @@
 | FR-07 | `src/muallim/application/use_cases/progress.py` | `tests/unit/test_use_cases.py` | — | ✅ |
 | FR-08 | `src/muallim/application/use_cases/learners.py` | `tests/unit/test_use_cases.py` | ADR-0010 | ✅ |
 | FR-09 | `src/muallim/application/use_cases/learners.py`, `src/muallim/application/use_cases/recitation.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py` | ADR-0010, ADR-0040, `docs/security/privacy.md` | ✅ |
-| FR-10 | `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py` | ADR-0010, ADR-0040 | ✅ |
+| FR-10 | `src/muallim/application/use_cases/learners.py`, `src/muallim/infrastructure/db/repositories/learners.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_bot_flow.py`, `tests/integration/test_erasures.py` | ADR-0010, ADR-0040, ADR-0054 | ✅ |
 | FR-11 | `analytics/sql/`, `src/muallim/research/reports.py` | `tests/integration/test_research.py` | `docs/data/reports.md` | ✅ |
 | FR-12 | `src/muallim/infrastructure/db/repositories/events.py` | `tests/unit/test_use_cases.py` | `docs/data/data-dictionary.md` | ✅ |
 | FR-13 | `src/muallim/research/annotation.py` | `tests/integration/test_research.py` | `docs/data/annotation-guide.md` | ✅ |
@@ -58,6 +58,7 @@
 | NFR-REL-02 | `src/muallim/application/use_cases/recitation.py`, `src/muallim/infrastructure/audio/ffmpeg.py`, `src/muallim/research/metrics.py`, `src/muallim/presentation/telegram/handlers/voice.py`, `src/muallim/presentation/telegram/errors.py` | `tests/unit/test_use_cases.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/architecture/test_logging.py` | `docs/requirements/quality-scenarios.md` (QAS-04) | ✅ |
 | NFR-ACC-01 | `src/muallim/research/metrics.py`, `src/muallim/bootstrap/research_cli.py` | `tests/unit/test_metrics.py`, `tests/integration/test_metrics_report.py` | ADR-0026, `docs/research/metrics-gqm.md` | 🟡 |
 | NFR-SEC-01 | `.claude/hooks/guard.py`, `.gitignore` | `tests/architecture/test_hooks.py` | `docs/security/threat-model.md` | ✅ |
+| NFR-SEC-08 | `scripts/db/roles.sql`, `scripts/db/roles.sh`, `docker-compose.yml` | `tests/integration/test_postgres_roles.py`, `tests/architecture/test_db_scripts.py` | ADR-0054 | ✅ |
 | NFR-SEC-02 | `src/muallim/research/dataset.py` | `tests/integration/test_research.py` | `docs/security/privacy.md` | ✅ |
 | NFR-SEC-03 | `src/muallim/infrastructure/audio/file_store.py` | `tests/integration/test_audio_store.py` | `docs/security/threat-model.md` | ✅ |
 | NFR-SEC-04 | `src/muallim/infrastructure/db/tables.py` | `tests/integration/test_sql_repositories.py` | ADR-0010 | ✅ |

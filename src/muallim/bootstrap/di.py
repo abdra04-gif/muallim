@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from muallim import __version__
 from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
+from muallim.application.ports.erasures import ErasureLog
 from muallim.application.ports.reading import ReadingGuide
 from muallim.application.ports.recognition import PronunciationRecognizer
 from muallim.application.ports.repositories import (
@@ -68,6 +69,7 @@ from muallim.infrastructure.db.repositories.learners import (
     SqlLearnerRepository,
 )
 from muallim.infrastructure.db.uow import SqlUnitOfWork
+from muallim.infrastructure.erasures import FileErasureLog
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.learner import LearnerProvider
@@ -139,6 +141,10 @@ class AppProvider(Provider):
     @provide
     def audio_store(self) -> AudioStore:
         return FileAudioStore(self.settings.audio_dir)
+
+    @provide
+    def erasure_log(self, clock: Clock) -> ErasureLog:
+        return FileErasureLog(self.settings.erasure_log_path, clock)
 
     @provide
     async def engine(self) -> AsyncIterator[AsyncEngine]:

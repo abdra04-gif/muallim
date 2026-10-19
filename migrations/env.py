@@ -18,11 +18,16 @@ if config.config_file_name is not None and config.attributes.get("configure_logg
 
 
 def _url() -> str:
-    url = config.attributes.get("url") or os.environ.get("DATABASE_URL")
+    """Миграции — входом владельца схемы (muallim_owner, ADR-0054), если он задан."""
+    url = (
+        config.attributes.get("url")
+        or os.environ.get("MIGRATION_DATABASE_URL")
+        or os.environ.get("DATABASE_URL")
+    )
     if not url:
         from muallim.bootstrap.config import Settings  # noqa: PLC0415
 
-        url = Settings().database_url.get_secret_value()  # type: ignore[call-arg]
+        url = Settings().migration_url()  # type: ignore[call-arg]
     return str(url)
 
 

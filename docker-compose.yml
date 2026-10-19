@@ -35,13 +35,20 @@ services:
     logging: *logging
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Бот — входом muallim_app: только строки, без прав на схему (ADR-0054; пароль — make db-roles)
+      DATABASE_URL: postgresql+asyncpg://muallim_app:${APP_DB_PASSWORD:?запустите make db-roles}@postgres:5432/${POSTGRES_DB}
+      # Остальное из файла настроек боту не нужно: пароли суперпользователя, владельца схемы и
+      # просмотра обнуляем — взломанный бот не войдёт в базу с большими правами (ADR-0054).
+      POSTGRES_PASSWORD: ""
+      MIGRATION_DATABASE_URL: ""
+      READER_DB_PASSWORD: ""
       LOG_FILE: ""   # в Docker логи только в docker logs (ADR-0048): /app не принадлежит пользователю бота
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./data/audio:/app/data/audio
+      - ./data/erasures:/app/data/erasures   # журнал удалений — вне БД (TD-DB-05)
     profiles: ["bot"]
 
 volumes:

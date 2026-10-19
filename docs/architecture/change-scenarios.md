@@ -29,7 +29,7 @@
 ## Другие сценарии (по коду, без пробной замены)
 | Замена | Что трогать | Почему так мало | Риск |
 |---|---|---|---|
-| PostgreSQL ↔ SQLite | только `DATABASE_URL` | тесты идут на SQLite, прод — на PostgreSQL, репозитории общие (SQLAlchemy Core) | различия диалектов: `tests/integration/test_postgres.py` пропускается без `TEST_POSTGRES_URL` |
+| PostgreSQL ↔ SQLite | только `DATABASE_URL` | тесты идут на SQLite, прод — на PostgreSQL, репозитории общие (SQLAlchemy Core) | весь интеграционный набор — и на PostgreSQL при `TEST_POSTGRES_URL` (в CI всегда), роли — `test_postgres_roles.py` (ADR-0054) |
 | Telegram → веб или другой мессенджер | новая папка `presentation/<канал>/` + точка входа | сценарии в `application/use_cases/` не знают об aiogram (контракт) | экраны (`screens.py`, `render.py`) придётся повторить |
 | Язык объяснений | `curriculum/lexicon.<код>.yaml`, `feedback.<код>.yaml` | тексты ошибок — данные, а не код | только человек (контент) |
 | Пороги «засчитано / отлично» | `domain/policy.py` или `PASS_THRESHOLD` | одно место, пишется в каждую попытку | только человек (методика) |

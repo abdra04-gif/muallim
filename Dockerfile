@@ -18,7 +18,9 @@ RUN uv sync --frozen --no-dev $EXTRAS
 
 # Непривилегированный пользователь (docs/security/threat-model.md)
 RUN useradd --system --uid 10001 --home /app muallim \
-    && mkdir -p /app/data/audio && chown -R muallim /app/data
+    && mkdir -p /app/data/audio /app/data/erasures && chown -R muallim /app/data
 USER muallim
 ENV PATH="/app/.venv/bin:$PATH"
-CMD ["sh", "-c", "alembic upgrade head && muallim"]
+# Миграции — не при старте: бот входит ролью muallim_app без прав на схему; их применяет человек
+# командой make migrate (сначала копия БД), ADR-0054, TD-DB-03.
+CMD ["muallim"]

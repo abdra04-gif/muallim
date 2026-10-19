@@ -10,7 +10,9 @@ from uuid import UUID
 
 import pytest
 from alembic import command
+from alembic.autogenerate import compare_metadata
 from alembic.config import Config
+from alembic.migration import MigrationContext
 
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
@@ -19,6 +21,7 @@ from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
 from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
+from muallim.infrastructure.db.tables import metadata
 from muallim.research import dataset, reports
 from tests.fakes import FixedClock
 
@@ -72,6 +75,17 @@ def test_full_cycle_on_postgres(migrated: object) -> None:
         await engine.dispose()
         return md, rows
 
+    async def schema_diff() -> list[object]:
+        engine = create_engine(URL)
+        async with engine.connect() as conn:
+            diff = await conn.run_sync(
+                lambda c: compare_metadata(MigrationContext.configure(c), metadata)
+            )
+        await engine.dispose()
+        return list(diff)
+
+    # схема в коде и миграции совпадают и на PostgreSQL, а не только на SQLite
+    assert asyncio.run(schema_diff()) == []
     md, rows = asyncio.run(scenario())
     assert "| ص | س | 1 | 1 |" in md
     assert len(rows) == 1 and rows[0]["pseudonym"] == "L-00000001"

@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
@@ -81,7 +81,7 @@ class SqlAttemptRepository(AttemptRepository):
             .where(attempts.c.learner_id == learner_id)
             .group_by(attempts.c.item_id)
         )
-        return dict((await self.session.execute(query)).tuples().all())
+        return dict((await self.session.execute(query)).all())
 
     async def last_assessment(self, learner_id: UUID, item_id: str) -> Assessment | None:
         query = (
@@ -117,15 +117,19 @@ class SqlAttemptRepository(AttemptRepository):
         )
         return list((await self.session.scalars(query)).all())
 
-    async def forget_audio(self, learner_id: UUID) -> list[str]:
-        hashes = await self.audio_hashes(learner_id)
-        own = select(attempts.c.id).where(attempts.c.learner_id == learner_id)
+    async def forget_audio(self, learner_id: UUID, until: datetime | None = None) -> list[str]:
+        scope = attempts.c.learner_id == learner_id
+        if until is not None:
+            scope = scope & (attempts.c.created_at <= until)
+        hashes = await self.session.scalars(
+            select(attempts.c.audio_sha256).where(scope, attempts.c.audio_sha256.is_not(None))
+        )
+        found = sorted(set(hashes.all()))
+        own = select(attempts.c.id).where(scope)
         # Разметка — производная от голоса (метки ставились, слушая запись): удаляется с ней.
         await self.session.execute(delete(annotations).where(annotations.c.attempt_id.in_(own)))
-        await self.session.execute(
-            update(attempts).where(attempts.c.learner_id == learner_id).values(audio_sha256=None)
-        )
-        return sorted(set(hashes))
+        await self.session.execute(update(attempts).where(scope).values(audio_sha256=None))
+        return found
 
     async def audio_in_use(self, sha256: str) -> bool:
         query = select(attempts.c.id).where(attempts.c.audio_sha256 == sha256).limit(1)

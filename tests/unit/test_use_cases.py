@@ -36,6 +36,7 @@ from tests.fakes import (
     InMemoryLearners,
     InMemoryProfiles,
     InMemoryReferenceAudio,
+    ListErasureLog,
     ListEventLog,
     ScriptedReadingGuide,
     ScriptedRecognizer,
@@ -56,13 +57,20 @@ class World:
     events: ListEventLog
     clock: FixedClock
     ids: SequentialIds
+    erasures: ListErasureLog
 
     def ensure(self) -> EnsureLearner:
         return EnsureLearner(self.learners, self.uow, self.clock, self.ids, self.events)
 
     def consent(self) -> SetResearchConsent:
         return SetResearchConsent(
-            self.learners, self.attempts, self.audio, self.uow, self.clock, self.events
+            self.learners, self.attempts, self.audio, self.uow, self.clock, self.events,
+            self.erasures,
+        )  # fmt: skip
+
+    def delete(self) -> DeleteMyData:
+        return DeleteMyData(
+            self.learners, self.attempts, self.audio, self.uow, self.events, self.erasures
         )
 
     def cards(self) -> OpenItem:
@@ -111,7 +119,7 @@ def w(course: Curriculum, catalog: FeedbackCatalog) -> World:
         course, catalog, InMemoryLearners(cascade_to=attempts), attempts,
         InMemoryAudio(journal=journal),
         ScriptedRecognizer(), SpyUoW(journal=journal), ListEventLog(), FixedClock(),
-        SequentialIds(),
+        SequentialIds(), ListErasureLog(journal=journal),
     )  # fmt: skip
 
 
@@ -156,7 +164,8 @@ async def test_withdrawn_consent_deletes_recordings_after_commit(w: World) -> No
     assert w.audio.files == {}
     assert [a.audio_sha256 for a, _ in w.attempts.items] == [None]
     # файл удаляется только после фиксации в БД: иначе при сбое БД ссылается на пустоту
-    assert w.audio.journal == ["commit", f"delete:{sha}"]
+    files = [e for e in w.audio.journal if not e.startswith("erase:")]
+    assert files == ["commit", f"delete:{sha}"]
 
 
 async def test_withdrawn_consent_keeps_recording_shared_with_another_learner(w: World) -> None:
@@ -168,6 +177,23 @@ async def test_withdrawn_consent_keeps_recording_shared_with_another_learner(w: 
         await w.assess().execute(learner, b"same voice")
     await w.consent().execute(first, False)
     assert len(w.audio.files) == 1  # запись второго ученика на месте
+
+
+async def test_erasure_is_logged_before_commit(w: World) -> None:
+    """Журнал удалений — вне БД: после восстановления старой копии удаление повторяется (TD-DB-05).
+
+    Удаление и отзыв — до commit: сбой commit не теряет намерение ученика, повтор безвреден.
+    Согласие — после commit: журнал не должен утверждать согласие, которого нет в БД.
+    """
+    learner = await w.learner()
+    w.audio.journal.clear()
+    await w.consent().execute(learner, True)
+    await w.consent().execute(learner, False)
+    await w.delete().execute(learner)
+    assert [a for a, _ in w.erasures.entries] == ["grant", "withdraw", "delete"]
+    assert all(lid == learner.id for _, lid in w.erasures.entries)
+    order = [e for e in w.audio.journal if e.startswith(("erase:", "commit"))]
+    assert order == ["commit", "erase:grant", "erase:withdraw", "commit", "erase:delete", "commit"]
 
 
 async def test_granting_consent_deletes_nothing(w: World) -> None:
@@ -400,7 +426,7 @@ async def test_delete_my_data_removes_learner_attempts_and_audio(w: World) -> No
     learner = await w.learner()
     learner.research_consent = True
     await w.assess().execute(learner, b"ogg")
-    await DeleteMyData(w.learners, w.attempts, w.audio, w.uow, w.events).execute(learner)
+    await w.delete().execute(learner)
     assert await w.learners.get_by_telegram_id(42) is None
     assert w.audio.files == {}
     assert w.events.events[-1] == ("learner_deleted", None, {})
@@ -412,8 +438,9 @@ async def test_delete_my_data_removes_files_only_after_commit(w: World) -> None:
     await w.assess().execute(learner, b"ogg")
     sha = w.attempts.items[0][0].audio_sha256
     w.audio.journal.clear()
-    await DeleteMyData(w.learners, w.attempts, w.audio, w.uow, w.events).execute(learner)
-    assert w.audio.journal == ["commit", f"delete:{sha}"]
+    await w.delete().execute(learner)
+    files = [e for e in w.audio.journal if not e.startswith("erase:")]
+    assert files == ["commit", f"delete:{sha}"]
 
 
 async def test_delete_my_data_keeps_recording_shared_with_another_learner(w: World) -> None:
@@ -422,7 +449,7 @@ async def test_delete_my_data_keeps_recording_shared_with_another_learner(w: Wor
     for learner in (first, second):
         learner.research_consent = True
         await w.assess().execute(learner, b"same voice")
-    await DeleteMyData(w.learners, w.attempts, w.audio, w.uow, w.events).execute(first)
+    await w.delete().execute(first)
     assert len(w.audio.files) == 1
 
 

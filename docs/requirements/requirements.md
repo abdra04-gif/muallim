@@ -82,6 +82,7 @@
 | NFR-SEC-04 | Удаление данных ученика полное (каскад + файлы) | M | ✅ | `test_delete_learner_cascades`, `test_delete_my_data_*` |
 | NFR-SEC-05 | Ограничение входных данных: аудио ≤ 60 с, только голосовые | M | ✅ | `infrastructure/audio/ffmpeg.py` |
 | NFR-SEC-06 | Зависимости проверяются на уязвимости; используемые — объявлены; GitHub Actions закреплены по SHA | S | ✅ | `pip-audit`, `make hygiene` (deptry, zizmor) в CI, ADR-0042 |
+| NFR-SEC-08 | Бот и просмотр входят в БД с минимальными правами: бот — без изменения схемы, просмотр — только чтение без Telegram ID; схему меняет только владелец | M | ✅ | `scripts/db/roles.sql`, `tests/integration/test_postgres_roles.py`, ADR-0054 |
 | NFR-SEC-07 | В логах нет Telegram ID, текста сообщений, голоса и секретов; объём логов ограничен ротацией | M | ✅ | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py`, ADR-0027 |
 | NFR-MNT-01 | Слои и направления зависимостей соблюдаются автоматически | M | ✅ | import-linter, `test_layers.py` |
 | NFR-MNT-02 | Модель, БД и мессенджер заменяемы без правки домена | M | ✅ | порты в `application/ports` |

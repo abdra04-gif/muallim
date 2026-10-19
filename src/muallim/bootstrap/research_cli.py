@@ -12,6 +12,7 @@
   dataset-export                 manifest.jsonl + truth.csv/predictions.csv (Iqra'Eval) + аудио
                                  в data/exports/<дата>/
   verify [--delete-orphans]      сверка БД и файлов записей: потери, лишние, повреждённые
+  reapply-erasures               повторить журнал удалений после восстановления копии (TD-DB-05)
   errors [фильтры]               каталог ошибок: таблица на экран + CSV в data/errors/
                                  (muallim-research errors --help — все фильтры)
 """
@@ -33,6 +34,7 @@ from muallim.research import (
     annotation,
     annotators,
     dataset,
+    erasures,
     errors,
     integrity,
     metrics,
@@ -58,9 +60,20 @@ async def _run(args: argparse.Namespace) -> str:
         async with create_session_factory(engine)() as session:
             if args.command.startswith("annotat"):
                 return await _annotation(session, args, settings, clock, stamp)
+            if args.command == "reapply-erasures":
+                done = await erasures.reapply(
+                    session, settings.erasure_log_path, settings.audio_dir
+                )
+                return (
+                    f"Журнал удалений применён: удалено учеников {done.deleted}, отзывов согласия "
+                    f"{done.withdrawn}, согласий {done.granted}, "
+                    f"удалено файлов {done.files_deleted}"
+                )
             if args.command == "verify":
                 copies = [PROJECT_ROOT / "data" / "annotation", PROJECT_ROOT / "data" / "exports"]
-                report = await integrity.check(session, settings.audio_dir, copies)
+                report = await integrity.check(
+                    session, settings.audio_dir, copies, settings.erasure_log_path
+                )
                 text = integrity.render(report)
                 if args.delete_orphans and report.orphans:
                     deleted = await integrity.delete_orphans(session, report, settings.audio_dir)
@@ -162,6 +175,7 @@ def main() -> None:
         sub.add_parser(name).add_argument("annotator", help="код разметчика, например A2")
     sub.add_parser("annotators")
     sub.add_parser("dataset-export")
+    sub.add_parser("reapply-erasures", help="повторить журнал удалений после восстановления копии")
     ver = sub.add_parser("verify", help="сверка БД и файлов записей")
     ver.add_argument(
         "--delete-orphans", action="store_true", help="удалить файлы, на которые нет попыток"

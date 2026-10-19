@@ -5,6 +5,7 @@ from dataclasses import dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
+from muallim.application.ports.erasures import ErasureAction
 from muallim.application.ports.recognition import Recognition, RecognitionError
 from muallim.domain.annotation import AnnotationTask, Label
 from muallim.domain.assessment import Assessment
@@ -112,13 +113,13 @@ class InMemoryAttempts:
             a.audio_sha256 for a, _ in self.items if a.learner_id == learner_id and a.audio_sha256
         ]
 
-    async def forget_audio(self, learner_id: UUID) -> list[str]:
-        hashes = await self.audio_hashes(learner_id)
-        self.items = [
-            (replace(a, audio_sha256=None) if a.learner_id == learner_id else a, f)
-            for a, f in self.items
-        ]
-        return sorted(set(hashes))
+    async def forget_audio(self, learner_id: UUID, until: datetime | None = None) -> list[str]:
+        def hit(a: Attempt) -> bool:
+            return a.learner_id == learner_id and (until is None or a.created_at <= until)
+
+        hashes = sorted({a.audio_sha256 for a, _ in self.items if hit(a) and a.audio_sha256})
+        self.items = [(replace(a, audio_sha256=None) if hit(a) else a, f) for a, f in self.items]
+        return hashes
 
     async def audio_in_use(self, sha256: str) -> bool:
         return any(a.audio_sha256 == sha256 for a, _ in self.items)
@@ -171,6 +172,18 @@ class ScriptedRecognizer:
             audio_duration_ms=1500,
             raw={"phonemes": heard},
         )
+
+
+@dataclass
+class ListErasureLog:
+    """Журнал удалений в памяти; пишет в общий журнал «erase:<действие>» — проверяем порядок."""
+
+    entries: list[tuple[ErasureAction, UUID]] = field(default_factory=list)
+    journal: list[str] = field(default_factory=list)
+
+    async def record(self, action: ErasureAction, learner_id: UUID) -> None:
+        self.entries.append((action, learner_id))
+        self.journal.append(f"erase:{action}")
 
 
 @dataclass

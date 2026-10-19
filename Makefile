@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -35,6 +35,7 @@ run-stub: db-sync ## Бот с заглушкой распознавания
 	$(LIBS) ASR_BACKEND=stub uv run muallim
 
 db-up: ## PostgreSQL в Docker
+	@mkdir -p data/audio data/erasures  # иначе Docker создаст их от root, и бот не сможет писать
 	docker compose up -d postgres
 
 db-down: ## Остановить PostgreSQL
@@ -50,8 +51,14 @@ restore: ## Восстановить из копии: make restore d=data/backup
 	@test -n "$(d)" || (echo "укажите d=data/backups/<дата>" && exit 1)
 	sh scripts/db/restore.sh "$(d)"
 
-migrate: backup ## Применить миграции (сначала — проверенная копия)
+backup-db: ## Копия только БД (секунды) — её делает make migrate
+	sh scripts/db/backup.sh --db-only
+
+migrate: backup-db ## Применить миграции входом владельца схемы (сначала — копия БД)
 	uv run alembic upgrade head
+
+db-roles: ## Три входа в БД (владелец, бот, просмотр) и пароли в .env — запускает человек
+	sh scripts/db/roles.sh
 
 db-sync: ## Если в БД не все миграции — копия и upgrade; иначе ничего
 	@if uv run alembic current 2>/dev/null | grep -q '(head)'; then :; else \

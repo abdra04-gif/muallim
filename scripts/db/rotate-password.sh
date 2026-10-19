@@ -21,7 +21,12 @@ env = Path(".env")
 new = os.environ["NEW"]
 text = env.read_text()
 text = re.sub(r"(?m)^POSTGRES_PASSWORD=.*$", f"POSTGRES_PASSWORD={new}", text)
-text = re.sub(r"(?m)^(DATABASE_URL=[^:]+://[^:]+:)[^@]*@", rf"\g<1>{new}@", text)
+# DATABASE_URL меняем, только если бот всё ещё входит суперпользователем (до make db-roles).
+user = re.search(r"(?m)^POSTGRES_USER=(.*)$", text)
+if user:
+    text = re.sub(
+        rf"(?m)^(DATABASE_URL=[^:]+://{re.escape(user.group(1))}:)[^@]*@", rf"\g<1>{new}@", text
+    )
 env.write_text(text)
 env.chmod(0o600)  # читать .env может только владелец
 EOF

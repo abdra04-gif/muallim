@@ -33,9 +33,10 @@
 | `make setup` | зависимости + pre-commit |
 | `make check` | все проверки как в CI |
 | `make test` | только тесты |
-| `make db-up` / `make migrate` | поднять PostgreSQL в Docker / применить миграции |
+| `make db-up` / `make migrate` | поднять PostgreSQL в Docker / применить миграции (копия БД + upgrade входом владельца) |
+| `make db-roles` | три входа в БД (владелец, бот, просмотр), пароли в .env — только человек, ADR-0054 |
 | `make run-stub` | бот без модели (заглушка распознавания); перед стартом `db-sync` |
 | `make run` | бот с моделью (нужно `uv sync --extra ml`); перед стартом `db-sync` |
-| `make db-sync` | БД не на последней миграции → `make migrate` (копия + upgrade); иначе ничего |
+| `make db-sync` | БД не на последней миграции → `make migrate` (копия БД + upgrade входом владельца); иначе ничего |
 | `make report` | отчёт по данным |
 | `make diagrams` | перерисовать схемы |

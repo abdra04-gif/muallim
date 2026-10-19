@@ -1,7 +1,7 @@
 """Хранилища данных исследования."""
 
 from collections.abc import Mapping
-from datetime import date
+from datetime import date, datetime
 from typing import Protocol
 from uuid import UUID
 
@@ -46,10 +46,11 @@ class AttemptRepository(Protocol):
 
     async def audio_hashes(self, learner_id: UUID) -> list[str]: ...
 
-    async def forget_audio(self, learner_id: UUID) -> list[str]:
+    async def forget_audio(self, learner_id: UUID, until: datetime | None = None) -> list[str]:
         """Отзыв согласия: убирает ссылки на записи и разметку по ним; возвращает их SHA-256.
 
-        Попытки (фонемы, баллы) остаются — по ним считается прогресс ученика.
+        Попытки (фонемы, баллы) остаются — по ним считается прогресс ученика. ``until`` — только
+        попытки не позже этого момента (повтор журнала удалений после восстановления копии).
         """
 
     async def audio_in_use(self, sha256: str) -> bool:

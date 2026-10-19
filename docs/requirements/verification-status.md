@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-19T13:48:11+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-19T20:02:57+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `ecd12a744914a3b6` | 92 |
+| код | `47458495b7a291e4` | 95 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `556a14013df1972c` | 6 |
 | зависимости | `a9f76fc0b602ab89` | 1 |
-| предрегистрация | `5d58160c9181f249` | 1 |
+| предрегистрация | `dd14f532dd71f045` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **59 из 60**.
+Проверено зелёными тестами: **60 из 61**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -28,7 +28,7 @@
 | FR-07 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-08 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-09 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-10 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-10 | `tests/integration/test_bot_flow.py`, `tests/integration/test_erasures.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-11 | `tests/integration/test_research.py` | ✅ |
 | FR-12 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-13 | `tests/integration/test_research.py` | ✅ |
@@ -69,6 +69,7 @@
 | NFR-REL-02 | `tests/architecture/test_logging.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
 | NFR-ACC-01 | `tests/integration/test_metrics_report.py`, `tests/unit/test_metrics.py` | ✅ |
 | NFR-SEC-01 | `tests/architecture/test_hooks.py` | ✅ |
+| NFR-SEC-08 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_postgres_roles.py` | ✅ |
 | NFR-SEC-02 | `tests/integration/test_research.py` | ✅ |
 | NFR-SEC-03 | `tests/integration/test_audio_store.py` | ✅ |
 | NFR-SEC-04 | `tests/integration/test_sql_repositories.py` | ✅ |

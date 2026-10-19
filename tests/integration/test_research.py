@@ -194,7 +194,7 @@ async def test_self_correction_column_is_a_separate_category(
     assert (await annotation.import_package(session, path, "A1", clock)).imported == 2
     stored = dict((await session.execute(
         select(annotations.c.attempt_id, annotations.c.self_corrected)
-    )).tuples().all())  # fmt: skip
+    )).all())  # fmt: skip
     assert stored == {UUID(int=10): True, UUID(int=11): False}
 
     _row(rows, 10)["self_corrected"] = ""  # разметчик передумал — это новая метка

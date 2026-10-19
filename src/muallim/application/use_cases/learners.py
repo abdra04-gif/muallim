@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from muallim.application.feedback import FeedbackCatalog
+from muallim.application.ports.erasures import ErasureAction, ErasureLog
 from muallim.application.ports.repositories import (
     AttemptRepository,
     LearnerProfileRepository,
@@ -64,8 +65,13 @@ class SetResearchConsent:
     uow: UnitOfWork
     clock: Clock
     events: EventLog
+    erasures: ErasureLog
 
     async def execute(self, learner: Learner, granted: bool) -> None:
+        # Отзыв — в журнал до commit (намерение не теряется); согласие — после (журнал не должен
+        # утверждать согласие, которого нет в БД). ADR-0054.
+        if not granted:
+            await self.erasures.record(ErasureAction.WITHDRAW, learner.id)
         learner.research_consent = granted
         await self.learners.save(learner)
         released = [] if granted else await self.attempts.forget_audio(learner.id)
@@ -82,6 +88,8 @@ class SetResearchConsent:
             "consent_changed", learner.id, {"granted": int(granted), "audio_deleted": len(released)}
         )
         await self.uow.commit()
+        if granted:
+            await self.erasures.record(ErasureAction.GRANT, learner.id)
         await delete_unused_audio(released, self.attempts, self.audio)
 
 
@@ -137,8 +145,10 @@ class DeleteMyData:
     audio: AudioStore
     uow: UnitOfWork
     events: EventLog
+    erasures: ErasureLog
 
     async def execute(self, learner: Learner) -> None:
+        await self.erasures.record(ErasureAction.DELETE, learner.id)
         hashes = await self.attempts.audio_hashes(learner.id)
         await self.learners.delete(learner.id)
         # Факт удаления фиксируем без привязки к ученику: его записи больше нет.
@@ -149,15 +159,18 @@ class DeleteMyData:
 
 async def delete_unused_audio(
     hashes: Iterable[str], attempts: AttemptRepository, audio: AudioStore
-) -> None:
+) -> int:
     """Файлы — только после commit: при сбое БД не останется ссылок на удалённые записи.
 
     Ту же запись (тот же SHA-256) мог прислать другой ученик — её не трогаем. Если удаление
     файла сорвётся, `muallim-research verify` покажет его как лишний.
     """
+    deleted = 0
     for sha in sorted(set(hashes)):
         if not await attempts.audio_in_use(sha):
             await audio.delete(sha)
+            deleted += 1
+    return deleted
 
 
 @dataclass(frozen=True, slots=True)

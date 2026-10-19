@@ -224,7 +224,7 @@ async def import_package(
             learners.c.research_consent.is_(True),
         )
     )
-    heard = dict(found.tuples().all())
+    heard = dict(found.all())
     for label in labels:
         if label.attempt_id in heard:
             _check_against_bot(label, heard[label.attempt_id])

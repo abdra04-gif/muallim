@@ -6,7 +6,9 @@
 - ``corrupted`` — SHA-256 файла не совпадает с именем (файл повреждён или подменён);
 - ``without_consent`` — у ученика без согласия остались записи (так быть не должно, privacy.md);
 - ``stale_copies`` — копии в пакетах разметки и выгрузках, которые больше нельзя хранить: попытки
-  нет (ученик удалил данные) или ученик отозвал согласие. Удаляет исследователь.
+  нет (ученик удалил данные) или ученик отозвал согласие. Удаляет исследователь;
+- ``pending_erasures`` — журнал удалений говорит «удалить» или «согласие отозвано», а в БД это не
+  так (восстановили старую копию): ``muallim-research reapply-erasures``.
 
 Выводятся только SHA-256 — без псевдонимов и Telegram ID.
 """
@@ -21,8 +23,10 @@ from pathlib import Path
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.application.ports.erasures import ErasureAction
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.tables import attempts, learners
+from muallim.infrastructure.erasures import read_erasures
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,11 +37,12 @@ class IntegrityReport:
     without_consent: int
     checked: int  # файлов проверено
     stale_copies: list[str] = field(default_factory=list)
+    pending_erasures: int = 0
 
     @property
     def ok(self) -> bool:
         problems = (self.missing, self.orphans, self.corrupted, self.stale_copies)
-        return not (any(problems) or self.without_consent)
+        return not (any(problems) or self.without_consent or self.pending_erasures)
 
 
 _SHA = re.compile(r"[0-9a-f]{64}")
@@ -59,7 +64,10 @@ def _sha256(path: Path) -> str:
 
 
 async def check(
-    session: AsyncSession, audio_root: Path, copies: Iterable[Path] = ()
+    session: AsyncSession,
+    audio_root: Path,
+    copies: Iterable[Path] = (),
+    erasure_log: Path | None = None,
 ) -> IntegrityReport:
     """``copies`` — папки с копиями записей (data/annotation, data/exports)."""
     consented = set(
@@ -99,7 +107,35 @@ async def check(
         without_consent=int(without_consent or 0),
         checked=len(files),
         stale_copies=stale,
+        pending_erasures=await _pending(session, erasure_log) if erasure_log else 0,
     )
+
+
+async def _pending(session: AsyncSession, erasure_log: Path) -> int:
+    """Ученики, чьё последнее действие в журнале — удаление или отзыв, а в БД это не так."""
+    last = {e.learner_id: e for e in read_erasures(erasure_log)}
+    if not last:
+        return 0
+    rows = await session.execute(
+        select(learners.c.id, learners.c.research_consent).where(learners.c.id.in_(last))
+    )
+    pending = 0
+    for learner_id, consent in rows.all():
+        entry = last[learner_id]
+        if entry.action is ErasureAction.DELETE:
+            pending += 1
+        elif entry.action is ErasureAction.WITHDRAW:
+            kept = await session.scalar(
+                select(func.count())
+                .select_from(attempts)
+                .where(
+                    attempts.c.learner_id == learner_id,
+                    attempts.c.audio_sha256.is_not(None),
+                    attempts.c.created_at <= entry.at,
+                )
+            )
+            pending += bool(consent or kept)
+    return pending
 
 
 async def delete_orphans(
@@ -141,6 +177,11 @@ def render(report: IntegrityReport) -> str:
             lines += [f"{title}: {len(items)}", *(f"  {sha}" for sha in items)]
     if report.without_consent:
         lines.append(f"Записей у учеников без согласия: {report.without_consent}")
+    if report.pending_erasures:
+        lines.append(
+            f"Не применены удаления из журнала: {report.pending_erasures} "
+            "(восстановлена старая копия?) — muallim-research reapply-erasures"
+        )
     if report.stale_copies:
         lines += [
             f"Копии, которые больше нельзя хранить (удалить вручную): {len(report.stale_copies)}",

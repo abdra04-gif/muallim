@@ -13,7 +13,7 @@ Quran Muaalem, находит ошибки и объясняет их по-ру�
 ```bash
 make setup                         # зависимости + pre-commit
 cp .env.example .env               # вписать BOT_TOKEN и пароль БД
-make db-up && make migrate         # PostgreSQL в Docker + схема
+make db-up && make migrate && make db-roles   # PostgreSQL + схема + три входа (ADR-0054)
 make run-stub                      # бот без модели; отставшую схему БД обновит сам (с копией)
 make try a='"/start" "✅ Да, разрешаю"'  # проверка бота в терминале: без Telegram, .env и базы учеников
 uv sync --extra ml && make run     # бот с моделью (~2 ГБ, нужен ffmpeg)
