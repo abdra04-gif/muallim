@@ -2,7 +2,7 @@
 % docs/research/preregistration.md (v0.4), reports/ (SRC-038). Topic and RQs — ADR-0052.
 \chapter{Introduction}\label{ch:intro}
 
-\section{Context}
+\section{Context and relevance}
 
 Reading the Qur'an aloud is a daily practice for many Muslims, and correct pronunciation is part of the
 practice itself. For Arabic speakers the main task is to learn the rules of recitation; for everyone else
@@ -27,6 +27,20 @@ phonemes together with ten articulatory attributes and reports a phoneme error r
 on expert recitations \cite{SRC-002}. And tutors that listen to reading aloud already work for children
 learning to read their native language \cite{SRC-125,SRC-130,SRC-132}; automatic pronunciation feedback has a
 medium positive effect, largest when it targets individual sounds \cite{SRC-025}.
+
+The topic is relevant for research, for practice and for industry. For research, open phoneme-level models
+for Qur'anic Arabic appeared only recently \cite{SRC-002}, and public benchmarks contain no learners of Arabic as
+a second language; the benchmark authors themselves name collecting such data as future work
+\cite{SRC-004,SRC-031}. For practice, the primer is still printed and officially distributed
+\cite{SRC-040,SRC-020}, so a tool built around it serves an existing teaching tradition instead of asking it to
+change. For the speech-technology and educational-software industry, the thesis addresses a problem every team
+faces when it deploys speech recognition for a group the model was not trained on: how to adapt an open model on
+small data collected inside a working product and how to evaluate it without leakage.
+
+The thesis belongs to the field of study 09.04.01 ``Computer Science'', profile Software Engineering: its
+artefacts are a dataset, a model and the software that collects and processes the data; requirements are written
+as quality-attribute scenarios, the architecture is checked mechanically, and the training and evaluation
+pipeline is built to be reproducible.
 
 \section{Problem}
 
@@ -125,6 +139,29 @@ that protect both the code and the experiments \cite{SRC-067}.
 
 The engineering result is a reproducible ``collect $\to$ annotate $\to$ train $\to$ evaluate'' pipeline with
 replaceable model, database and messenger.
+
+\section{Object of research and novelty}\label{sec:novelty}
+% Требование Положения о ГИА (п. 6.9): во введении — объект исследования и новизна.
+% Формулировки — из вкладов C1--C4 и обзора (глава 2); [утвердить] с руководителем.
+
+The \emph{object of research} is a dataset of primer-level reading by Russian-speaking adult beginners and an
+AI model that detects reading errors in it and estimates skill mastery; the Telegram tutor is the instrument
+that collects the data, not the object. The \emph{subject of research} is how adapting the model on teacher
+corrections changes the agreement of its error detection and mastery estimates with teachers.
+
+The novelty of the thesis, as far as the review in Chapter~\ref{ch:review} shows, is as follows:
+\begin{enumerate}
+  \item the dataset (C1) is the first collection of reading by adult Russian-speaking beginners tied to the
+    skills of a primer, and its annotation separates reading errors from pronunciation errors;
+  \item the mastery model (C3) takes into account the recogniser's errors measured against teachers;
+    knowledge tracing on noisy recogniser output exists, but not with errors measured this way and not for
+    adults learning to read Arabic script;
+  \item the open Qur'anic phoneme model is adapted to a population it was not trained on (C2) using
+    teacher corrections and the book's minimal pairs as data sources, with the contribution of each source
+    measured on a learning curve;
+  \item the learning curves (C4) are the first description of how Russian-speaking adults progress through
+    the skills of \emph{al-Muallim al-Thani}.
+\end{enumerate}
 
 \section{Scope and limitations}
 

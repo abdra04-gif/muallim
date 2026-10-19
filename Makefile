@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs try thesis thesis-ru proposal research papers thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -82,13 +82,16 @@ thesis: ## Диссертация LaTeX, английская версия → t
 thesis-ru: ## Диссертация LaTeX, русская версия → thesis/build/main-ru.pdf
 	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build main-ru.tex
 
+annotation: ## Аннотация к ВКР на русском (4–5 с., Положение о ГИА п. 6.10) → thesis/build/annotation-ru.pdf
+	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build annotation-ru.tex
+
 proposal: ## Предложение темы (en, ru) → thesis/build/proposal-en.pdf, proposal-ru.pdf
 	cd thesis && for f in proposal-en proposal-ru; do latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build $$f.tex || exit 1; done
 
 research: ## Исследовательский обзор (en, ru) → thesis/build/research-en.pdf, research-ru.pdf
 	cd thesis && for f in research-en research-ru; do latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build $$f.tex || exit 1; done
 
-papers: thesis thesis-ru proposal research ## Все документы диссертации на двух языках
+papers: thesis thesis-ru annotation proposal research ## Все документы диссертации на двух языках
 
 thesis-check: ## Проверка вёрстки: арабский, кириллица, ссылки, рисунки → thesis/build/check.pdf
 	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build check.tex

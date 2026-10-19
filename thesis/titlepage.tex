@@ -1,20 +1,20 @@
-% Двуязычный титульный лист ВКР — по образцу открытых работ выпускников Иннополиса.
-% Формулировки шапки сверить с официальным образцом вуза (thesis/README.md).
+% Двуязычный титульный лист ВКР — по Приложению 8 к Положению о ГИА Университета Иннополис (2026).
+% Официальный вариант — docx из учебного офиса, переведённый в PDF; этот повторяет его поля.
 \begin{titlepage}
 \thispagestyle{empty}
 \newgeometry{left=2.5cm,right=2cm,top=2cm,bottom=2cm}
-\setstretch{1.1}
+\setstretch{1.0}
 \newcommand{\tpbox}[2]{\fcolorbox{black}{softgray}{\parbox[c][#1][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\centering\bfseries #2}}}
 \begin{center}
 \textrussian{\textbf{Автономная некоммерческая организация высшего образования\\
 «Университет Иннополис»\\(АНО ВО «Университет Иннополис»)}}
 
-\vspace{1.2cm}
+\vspace{0.6cm}
 \textrussian{\textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА\\(МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ)\\
 по направлению подготовки\\ \thesisProgramCode{} «\thesisProgramRu»}}
 
 \vspace{0.5cm}
-\textenglish{\textbf{FINAL QUALIFICATION WORK\\(MASTER GRADUATE THESIS)\\Academic Program\\
+\textenglish{\textbf{FINAL QUALIFICATION WORK\\(MASTER'S THESIS)\\Academic Program\\
 \thesisProgramCode{} \textquotedblleft\thesisProgramEn\textquotedblright}}
 
 \vspace{0.5cm}
@@ -28,12 +28,12 @@
 \textenglish{\textbf{Topic}} & \tpbox{1.9cm}{\textenglish{\thesisTopicEn}}\\
 \end{tabularx}
 
-\vspace{0.8cm}
-\noindent\begin{tabularx}{\linewidth}{@{}P{4.2cm}XP{3.2cm}@{}}
+\vspace{0.4cm}
+\noindent\begin{tabularx}{\linewidth}{@{}P{4.6cm}XP{3.2cm}@{}}
 \textrussian{Работу выполнил} / \textenglish{\emph{Prepared by}} &
   \tpbox{1.7cm}{\textrussian{\thesisAuthorRu} / \textenglish{\thesisAuthorEnFull}} &
   \fcolorbox{black}{softgray}{\parbox[b][1.7cm][b]{2.9cm}{\centering\tiny подпись / signature}}\\[8pt]
-\textrussian{Руководитель выпускной квалификационной работы} / \textenglish{\emph{Supervisor}} &
+\textrussian{Руководитель выпускной квалификационной работы} / \textenglish{\emph{Final Qualification Work Supervisor}} &
   \tpbox{1.7cm}{\textrussian{\thesisSupervisorRu} / \textenglish{\thesisSupervisorEn}} &
   \fcolorbox{black}{softgray}{\parbox[b][1.7cm][b]{2.9cm}{\centering\tiny подпись / signature}}\\
 \end{tabularx}

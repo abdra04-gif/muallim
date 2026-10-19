@@ -1,26 +1,27 @@
 % Исследовательский обзор (русский). Сборка: make research → thesis/build/research-ru.pdf
 % Синтез reports/, research_notes/, docs/pedagogy/, docs/research/. Источники — SRC-NNN.
-\documentclass[a4paper,11pt]{article}
+% Оформление — как у ВКР (Положение о ГИА Университета Иннополис, п. 6.8): 14 pt, чёрный Times, поля 25/20 мм.
+\documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{russian}
-\newcommand{\docstyle}{article}
+\newcommand{\docstyle}{thesis}
 \input{preamble}
 \input{meta}
 \hypersetup{pdftitle={Научить машину слушать, как учитель букваря},pdfauthor={\thesisAuthorRu}}
-\fancyhead[R]{\small\sffamily\color{inkgray}Исследовательский обзор · А.\,Е.~Исмаилов}
+\fancyhead[R]{\small\headfamily\color{textmuted}Исследовательский обзор · А.\,Е.~Исмаилов}
 \setcounter{secnumdepth}{2}
 
 \begin{document}
 \thispagestyle{plain}
 \begin{center}
-{\sffamily\small\color{inkgray}\thesisUniversityRu{} · магистратура «\thesisSpecialtyRu» · исследовательский обзор к ВКР}\\[10pt]
-{\sffamily\LARGE\bfseries\color{accent}Научить машину слушать, как учитель букваря\par}
+{\headfamily\small\color{textmuted}\thesisUniversityRu{} · магистратура «\thesisSpecialtyRu» · исследовательский обзор к ВКР}\\[10pt]
+{\headfamily\LARGE\bfseries\color{textaccent}Научить машину слушать, как учитель букваря\par}
 \vspace{4pt}
-{\sffamily\large\color{accent}Распознавание ошибок чтения, адаптация модели и оценка усвоения у начинающих читать Коран по «Муаллим ас-Сани»: состояние исследований и пробелы\par}
+{\headfamily\large\color{textaccent}Распознавание ошибок чтения, адаптация модели и оценка усвоения у начинающих читать Коран по «Муаллим ас-Сани»: состояние исследований и пробелы\par}
 \vspace{10pt}
-{\color{gold}\rule{0.35\linewidth}{1pt}}\\[8pt]
+{\color{textrule}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorRu}\\[2pt]
 {\small Научный руководитель: \thesisSupervisorRu}\\[2pt]
-{\small\color{inkgray} Версия 1.0 · октябрь 2026}
+{\small\color{textmuted} Версия 1.0 · октябрь 2026}
 \end{center}
 
 \begin{keybox}[Аннотация]
@@ -421,7 +422,7 @@ OBER хранит результаты обучения в схеме данны
 русскоязычные взрослые (RQ-4).
 \end{keybox}
 
-\section{Разработка исследовательского ПО с ИИ-агентами}
+\section[Разработка исследовательского ПО с ИИ-агентами]{Разработка исследовательского ПО\newline с~ИИ-агентами}
 
 \subsection{От цикла агента к обвязке}
 
@@ -489,7 +490,7 @@ SWE-agent показал, что важен интерфейс между аге
 \centering\small
 \caption{Карта доказательств и пробелов.}
 \label{tab:gaps-ru}
-\begin{tabularx}{\linewidth}{@{}P{2.4cm}LLP{1.5cm}@{}}
+\begin{tabularx}{\linewidth}{@{}P{2.6cm}LLP{2.6cm}@{}}
 \toprule
 Область & Известно & Не хватает & В работе \\
 \midrule

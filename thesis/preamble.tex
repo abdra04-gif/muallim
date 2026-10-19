@@ -39,7 +39,7 @@
 
 % ---------------------------------------------------------------- страница
 \ifdefstring{\docstyle}{thesis}{%
-  \usepackage[left=3cm,right=1.5cm,top=2cm,bottom=2cm]{geometry} % [утвердить] по требованиям вуза
+  \usepackage[left=2.5cm,right=2cm,top=2cm,bottom=2cm]{geometry} % Положение о ГИА, п. 6.8
   \usepackage{setspace}\onehalfspacing
 }{%
   \usepackage[left=2.4cm,right=2.4cm,top=2.3cm,bottom=2.3cm]{geometry}
@@ -58,24 +58,34 @@
 \definecolor{paper}{HTML}{FAF6EC}      % фон карточки
 \definecolor{softgray}{HTML}{F2F2F0}
 \definecolor{inkgray}{HTML}{555555}
+% Цвет и гарнитура текста: в ВКР — чёрный Times New Roman (Положение о ГИА, п. 6.8), цвета остаются
+% только в рисунках; в предложении и обзоре — фирменный бирюзовый и PT Sans.
+\ifdefstring{\docstyle}{thesis}{%
+  \colorlet{textaccent}{black}\colorlet{textrule}{black}\colorlet{textmuted}{black}
+  \newcommand{\headfamily}{\rmfamily}%
+}{%
+  \colorlet{textaccent}{accent}\colorlet{textrule}{gold}\colorlet{textmuted}{inkgray}
+  \newcommand{\headfamily}{\sffamily}%
+}
 
 % ---------------------------------------------------------------- заголовки
 \usepackage{titlesec}
 % Стиль глав — после \begin{document}: bidi (его загружает арабский) переопределяет главы при старте.
+% \ifdefined\chapter: тот же стиль thesis используют и статьи (предложение, обзор), где глав нет.
 \ifdefstring{\docstyle}{thesis}{%
-  \AtBeginDocument{%
+  \AtBeginDocument{\ifdefined\chapter
     \titleformat{\chapter}[display]
-      {\normalfont\sffamily\bfseries\color{accent}}
-      {\LARGE\chaptertitlename\ \thechapter}{0.5em}{\Huge}
-      [{\color{gold}\titlerule[1.2pt]}]
+      {\normalfont\headfamily\bfseries\color{textaccent}}
+      {\Large\chaptertitlename\ \thechapter}{0.5em}{\huge}
+      [{\color{textrule}\titlerule[1.2pt]}]
     \titleformat{name=\chapter,numberless}[display]
-      {\normalfont\sffamily\bfseries\color{accent}}{}{0pt}{\Huge}
-      [{\color{gold}\titlerule[1.2pt]}]
-    \titlespacing*{\chapter}{0pt}{0pt}{1.6em}}%
+      {\normalfont\headfamily\bfseries\color{textaccent}}{}{0pt}{\huge}
+      [{\color{textrule}\titlerule[1.2pt]}]
+    \titlespacing*{\chapter}{0pt}{0pt}{1.6em}\fi}%
 }{}
-\titleformat{\section}{\normalfont\sffamily\Large\bfseries\color{accent}}{\thesection}{0.8em}{}
-\titleformat{\subsection}{\normalfont\sffamily\large\bfseries\color{accent}}{\thesubsection}{0.7em}{}
-\titleformat{\subsubsection}{\normalfont\sffamily\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+\titleformat{\section}{\normalfont\headfamily\Large\bfseries\color{textaccent}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\headfamily\large\bfseries\color{textaccent}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalfont\headfamily\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
 \titleformat{\paragraph}[runin]{\normalfont\bfseries}{}{0pt}{}[.]
 
 % ---------------------------------------------------------------- колонтитулы
@@ -83,10 +93,10 @@
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\headrule}{{\color{gold}\hrule height\headrulewidth}}
-\fancyhead[R]{\small\sffamily\color{inkgray}\nouppercase{\leftmark}}
-\fancyfoot[C]{\small\sffamily\thepage}
-\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\small\sffamily\thepage}}
+\renewcommand{\headrule}{{\color{textrule}\hrule height\headrulewidth}}
+\fancyhead[R]{\small\headfamily\color{textmuted}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\headfamily\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\small\headfamily\thepage}}
 \setlength{\headheight}{15pt}
 
 % ---------------------------------------------------------------- таблицы, списки, рисунки
@@ -98,7 +108,7 @@
 \newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
 \usepackage{enumitem}
 \setlist{itemsep=0.25em,topsep=0.4em,leftmargin=1.6em}
-\usepackage[font=small,labelfont={bf,sf,color=accent},labelsep=period,skip=6pt]{caption}
+\usepackage[font=small,labelfont={bf,color=textaccent},labelsep=period,skip=6pt]{caption}
 \usepackage{subcaption}
 \usepackage{amsmath,amssymb}
 \usepackage{csquotes}
@@ -125,10 +135,10 @@
 
 % Выделенные блоки: исследовательские вопросы, главная мысль, примечание.
 \usepackage[most]{tcolorbox}
-\newtcolorbox{keybox}[1][]{enhanced,breakable,colback=paper,colframe=gold,boxrule=0.6pt,arc=3pt,
-  left=8pt,right=8pt,top=6pt,bottom=6pt,fonttitle=\sffamily\bfseries,coltitle=accent,
+\newtcolorbox{keybox}[1][]{enhanced,breakable,colback=paper,colframe=textrule,boxrule=0.6pt,arc=3pt,
+  left=8pt,right=8pt,top=6pt,bottom=6pt,fonttitle=\headfamily\bfseries,coltitle=textaccent,
   colbacktitle=paper,title={#1},attach title to upper={\ \ },before skip=10pt,after skip=10pt}
-\newtcolorbox{rqbox}{enhanced,breakable,colback=accent!4,colframe=accent,boxrule=0.6pt,arc=3pt,
+\newtcolorbox{rqbox}{enhanced,breakable,colback=textaccent!4,colframe=textaccent,boxrule=0.6pt,arc=3pt,
   left=8pt,right=8pt,top=6pt,bottom=6pt,before skip=10pt,after skip=10pt}
 \newtcolorbox{notebox}{enhanced,breakable,colback=softgray,colframe=softgray,arc=2pt,
   left=8pt,right=8pt,top=5pt,bottom=5pt,fontupper=\small,before skip=8pt,after skip=8pt}
@@ -139,8 +149,12 @@
   {\usepackage[backend=biber,style=ieee,sorting=none,doi=true,url=true]{biblatex}}
   {\usepackage[backend=biber,style=gost-numeric,sorting=none,language=auto,autolang=other]{biblatex}}
 \addbibresource{../docs/research/sources.bib}
+% Длинные URL переносятся по любому символу, иначе при 14 pt они вылезают за поле.
+\setcounter{biburlnumpenalty}{9000}\setcounter{biburlucpenalty}{9000}\setcounter{biburllcpenalty}{9000}
+% Русские названия в английской версии не переносятся (нет langid) — разреженный набор вместо вылета за поле.
+\AtBeginBibliography{\sloppy}
 
-\usepackage[colorlinks=true,linkcolor=accent,citecolor=accent,urlcolor=accent!80!black,
+\usepackage[colorlinks=true,linkcolor=textaccent,citecolor=textaccent,urlcolor=textaccent,
   pdfdisplaydoctitle=true]{hyperref}
 \urlstyle{same}
 

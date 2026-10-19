@@ -1,25 +1,26 @@
 % Master's thesis proposal (English). Build: make proposal → thesis/build/proposal-en.pdf
 % Facts and numbers come from the project repository (docs/, src/); sources — SRC-NNN in sources.bib.
 % Topic and RQs — ADR-0052 (approved by the author 2026-10-19); hypotheses — preregistration.md v0.4.
-\documentclass[a4paper,11pt]{article}
+% Оформление — как у ВКР (Положение о ГИА Университета Иннополис, п. 6.8): 14 pt, чёрный Times, поля 25/20 мм.
+\documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{english}
-\newcommand{\docstyle}{article}
+\newcommand{\docstyle}{thesis}
 \input{preamble}
 \input{meta}
 \hypersetup{pdftitle={Thesis Proposal: \thesisShortEn},pdfauthor={\thesisAuthorEn}}
-\fancyhead[R]{\small\sffamily\color{inkgray}Thesis proposal · \thesisAuthorEn}
+\fancyhead[R]{\small\headfamily\color{textmuted}Thesis proposal · \thesisAuthorEn}
 \setcounter{secnumdepth}{2}
 
 \begin{document}
 \thispagestyle{plain}
 \begin{center}
-{\sffamily\small\color{inkgray}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Master's Thesis Proposal}\\[10pt]
-{\sffamily\LARGE\bfseries\color{accent}\thesisTopicEn\par}
+{\headfamily\small\color{textmuted}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Master's Thesis Proposal}\\[10pt]
+{\headfamily\LARGE\bfseries\color{textaccent}\thesisTopicEn\par}
 \vspace{10pt}
-{\color{gold}\rule{0.35\linewidth}{1pt}}\\[8pt]
+{\color{textrule}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorEn}\\[2pt]
 {\small Supervisor: \thesisSupervisorEn}\\[2pt]
-{\small\color{inkgray} Draft for supervisor review · October 2026 · defence planned for June 2027}
+{\small\color{textmuted} Draft for supervisor review · October 2026 · defence planned for June 2027}
 \end{center}
 
 \begin{keybox}[Summary]

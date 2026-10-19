@@ -1,25 +1,26 @@
 % Предложение темы магистерской диссертации (русский). Сборка: make proposal → thesis/build/proposal-ru.pdf
 % Факты и числа — из репозитория проекта (docs/, src/); источники — SRC-NNN в sources.bib.
 % Тема и RQ — ADR-0052 (утверждены автором 2026-10-19); гипотезы — preregistration.md v0.4.
-\documentclass[a4paper,11pt]{article}
+% Оформление — как у ВКР (Положение о ГИА Университета Иннополис, п. 6.8): 14 pt, чёрный Times, поля 25/20 мм.
+\documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{russian}
-\newcommand{\docstyle}{article}
+\newcommand{\docstyle}{thesis}
 \input{preamble}
 \input{meta}
 \hypersetup{pdftitle={Предложение темы: \thesisShortRu},pdfauthor={\thesisAuthorRu}}
-\fancyhead[R]{\small\sffamily\color{inkgray}Предложение темы · А.\,Е.~Исмаилов}
+\fancyhead[R]{\small\headfamily\color{textmuted}Предложение темы · А.\,Е.~Исмаилов}
 \setcounter{secnumdepth}{2}
 
 \begin{document}
 \thispagestyle{plain}
 \begin{center}
-{\sffamily\small\color{inkgray}\thesisUniversityRu{} · магистратура «\thesisSpecialtyRu» · предложение темы ВКР}\\[10pt]
-{\sffamily\LARGE\bfseries\color{accent}\thesisTopicRu\par}
+{\headfamily\small\color{textmuted}\thesisUniversityRu{} · магистратура «\thesisSpecialtyRu» · предложение темы ВКР}\\[10pt]
+{\headfamily\LARGE\bfseries\color{textaccent}\thesisTopicRu\par}
 \vspace{10pt}
-{\color{gold}\rule{0.35\linewidth}{1pt}}\\[8pt]
+{\color{textrule}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorRu}\\[2pt]
 {\small Научный руководитель: \thesisSupervisorRu}\\[2pt]
-{\small\color{inkgray} Черновик для обсуждения с руководителем · октябрь 2026 · защита — июнь 2027}
+{\small\color{textmuted} Черновик для обсуждения с руководителем · октябрь 2026 · защита — июнь 2027}
 \end{center}
 
 \begin{keybox}[Кратко]

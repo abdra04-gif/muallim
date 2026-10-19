@@ -1,26 +1,27 @@
 % Research review (English). Build: make research → thesis/build/research-en.pdf
 % Synthesis of reports/, research_notes/, docs/pedagogy/, docs/research/. Sources — SRC-NNN.
-\documentclass[a4paper,11pt]{article}
+% Оформление — как у ВКР (Положение о ГИА Университета Иннополис, п. 6.8): 14 pt, чёрный Times, поля 25/20 мм.
+\documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{english}
-\newcommand{\docstyle}{article}
+\newcommand{\docstyle}{thesis}
 \input{preamble}
 \input{meta}
 \hypersetup{pdftitle={Teaching Machines to Listen Like a Primer Teacher},pdfauthor={\thesisAuthorEn}}
-\fancyhead[R]{\small\sffamily\color{inkgray}Research review · \thesisAuthorEn}
+\fancyhead[R]{\small\headfamily\color{textmuted}Research review · \thesisAuthorEn}
 \setcounter{secnumdepth}{2}
 
 \begin{document}
 \thispagestyle{plain}
 \begin{center}
-{\sffamily\small\color{inkgray}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Research review for the master's thesis}\\[10pt]
-{\sffamily\LARGE\bfseries\color{accent}Teaching Machines to Listen Like a Primer Teacher\par}
+{\headfamily\small\color{textmuted}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Research review for the master's thesis}\\[10pt]
+{\headfamily\LARGE\bfseries\color{textaccent}Teaching Machines to Listen Like a Primer Teacher\par}
 \vspace{4pt}
-{\sffamily\large\color{accent}Reading-error detection, model adaptation and mastery estimation for beginners reading Qur'anic Arabic with \emph{al-Muallim al-Thani}: state of the art and research gaps\par}
+{\headfamily\large\color{textaccent}Reading-error detection, model adaptation and mastery estimation for beginners reading Qur'anic Arabic with \emph{al-Muallim al-Thani}: state of the art and research gaps\par}
 \vspace{10pt}
-{\color{gold}\rule{0.35\linewidth}{1pt}}\\[8pt]
+{\color{textrule}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorEn}\\[2pt]
 {\small Supervisor: \thesisSupervisorEn}\\[2pt]
-{\small\color{inkgray} Version 1.0 · October 2026}
+{\small\color{textmuted} Version 1.0 · October 2026}
 \end{center}
 
 \begin{keybox}[Abstract]
@@ -491,7 +492,7 @@ Table~\ref{tab:gaps} sets out what is known, what is missing and how the thesis 
 \centering\small
 \caption{Map of evidence and gaps.}
 \label{tab:gaps}
-\begin{tabularx}{\linewidth}{@{}P{2.6cm}LLP{1.4cm}@{}}
+\begin{tabularx}{\linewidth}{@{}P{2.6cm}LLP{2.6cm}@{}}
 \toprule
 Area & Known & Missing & Thesis \\
 \midrule

@@ -1,7 +1,9 @@
 % Master's thesis, English version — entry point. Build: make thesis (→ thesis/build/main.pdf).
-% Russian version: main-ru.tex (same structure, chapters/ru/). Innopolis formatting rules are not yet
-% confirmed — see thesis/README.md.
-\documentclass[a4paper,12pt,oneside]{report}
+% Russian version: main-ru.tex (same structure, chapters/ru/). Formatting follows the Innopolis
+% regulations on the final qualification work (2026), see thesis/README.md.
+% 14 pt, Times New Roman, 1,5 интервала, поля 25/20 мм, чёрный текст, сквозная нумерация —
+% Положение о ГИА Университета Иннополис (приказ от 26.01.2026), п. 6.8.
+\documentclass[a4paper,14pt,oneside]{extreport}
 
 \newcommand{\mainlang}{english}
 \newcommand{\docstyle}{thesis}
@@ -12,16 +14,16 @@
 
 \begin{document}
 \input{titlepage}
-
-\pagenumbering{roman}
-\input{chapters/en/00-abstract}
+% Нумерация сквозная: титул — страница 1 без номера (titlepage сбрасывает счётчик в 1).
+\setcounter{page}{2}
 
 \tableofcontents
 \listoffigures
 \listoftables
 
-\cleardoublepage
-\pagenumbering{arabic}
+\input{chapters/en/00-abstract}
+
+\clearpage
 \input{chapters/en/01-introduction}
 \input{chapters/en/02-literature-review}
 \input{chapters/en/03-methodology}

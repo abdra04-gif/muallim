@@ -1,7 +1,9 @@
 % Магистерская диссертация, русская версия — точка входа. Сборка: make thesis-ru (→ thesis/build/main-ru.pdf).
-% Английская версия — main.tex (та же структура, chapters/en/). Требования Иннополиса к оформлению
-% не подтверждены — thesis/README.md.
-\documentclass[a4paper,12pt,oneside]{report}
+% Английская версия — main.tex (та же структура, chapters/en/). Оформление — по Положению о ГИА
+% Университета Иннополис (2026), см. thesis/README.md.
+% 14 pt, Times New Roman, 1,5 интервала, поля 25/20 мм, чёрный текст, сквозная нумерация —
+% Положение о ГИА Университета Иннополис (приказ от 26.01.2026), п. 6.8.
+\documentclass[a4paper,14pt,oneside]{extreport}
 
 \newcommand{\mainlang}{russian}
 \newcommand{\docstyle}{thesis}
@@ -12,16 +14,16 @@
 
 \begin{document}
 \input{titlepage}
-
-\pagenumbering{roman}
-\input{chapters/ru/00-abstract}
+% Нумерация сквозная: титул — страница 1 без номера (titlepage сбрасывает счётчик в 1).
+\setcounter{page}{2}
 
 \tableofcontents
 \listoffigures
 \listoftables
 
-\cleardoublepage
-\pagenumbering{arabic}
+\input{chapters/ru/00-abstract}
+
+\clearpage
 \input{chapters/ru/01-introduction}
 \input{chapters/ru/02-literature-review}
 \input{chapters/ru/03-methodology}
