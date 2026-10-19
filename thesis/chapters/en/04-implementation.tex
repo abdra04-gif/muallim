@@ -6,7 +6,8 @@
 This chapter describes the artefacts as built in version 0.6.0. Sections~\ref{sec:impl-overview}--%
 \ref{sec:impl-privacy} cover the tutor: its context, the curriculum, the architecture, the assessment
 pipeline, the learner interface, the research data, the training pipeline of the adapted model
-(Section~\ref{sec:impl-training}, still a design) and privacy. Section~\ref{sec:impl-harness} describes
+(Section~\ref{sec:impl-training}, still a design), the mastery models (Section~\ref{sec:impl-mastery}, still a
+design) and privacy. Section~\ref{sec:impl-harness} describes
 the development harness, and Section~\ref{sec:impl-verification} the verification of both.
 
 \section{Overview}\label{sec:impl-overview}
@@ -100,6 +101,12 @@ transcription. Each version is published into the database as a snapshot, so eve
 exact text the learner saw even if the curriculum later changes; the bot refuses to start if the content
 changed without a new version. Lines transcribed from the scan carry a \texttt{verified: false} flag until the
 author has checked them against the scan; content changes are a human-only zone.
+
+\paragraph{Skill map (design, TD-FN-78)} The same curriculum yields the skill map for the mastery model
+(Section~\ref{sec:method-s3}): a skill is a ``letter + vowel or sign $\to$ sound'' correspondence in the order the
+book introduces it, and the matrix $Q$ marks which skills each line exercises. The map is derived automatically
+from the lines' canonical phonemes and lessons, so it changes together with the curriculum and carries its
+version; manual editing of skills is a human zone, like the content itself.
 
 \section{Architecture}\label{sec:impl-architecture}
 
@@ -266,7 +273,9 @@ audio). In Telegram, access is limited to a list of annotators or a one-time inv
 and revocable at once; rights are checked on every button press, recordings are sent so that they cannot be
 forwarded or saved, and the annotator never sees who the learner is. Imports are strict: one invalid row
 rejects the file, repeats add nothing, and a corrected label is added with history. Each label stores the
-annotator code, the guide version, its source and the time spent.
+annotator code, the guide version, its source and the time spent. The error type --- reading, pronunciation or
+``unclear'' (Section~\ref{sec:method-s1}) --- is added to the corrected phoneme; the rule with examples from the
+book is approved by a human, and the annotation field is a schema change (TD-FN-76).
 
 \paragraph{Metrics and exports} The metrics module computes phoneme-level TA/TR/FA/FR, precision, recall, F1,
 diagnosis accuracy, FAR and FRR, Cohen's $\kappa$, Krippendorff's $\alpha$ (tested against the worked example
@@ -313,6 +322,30 @@ trained on.
 in shadow mode: their verdicts are stored next to B0's and are not shown to the learner. Storing shadow
 verdicts is a schema change and is approved by a human. The protected evaluator compares the systems on the
 test set with one command and writes a report with a passport for the tables in Chapter~\ref{ch:eval}.
+
+\section{Mastery models}\label{sec:impl-mastery}
+
+\begin{notebox}
+This section describes a design (technical debt TD-FN-78); the code is written in November--December 2026 and
+debugged on simulation and open data before the pilot.
+\end{notebox}
+
+\paragraph{Data} The mastery models work on what is already stored: the learner's attempts with time, the book
+line, the phoneme-level errors found and the verdict; for test learners, the gold annotation. Through the skill
+map each attempt becomes outcomes per skill: a skill of the line is correct if its syllables contain no confirmed
+error.
+
+\paragraph{K1 and K2} Bayesian knowledge tracing is implemented as a small pure-Python model in the research
+layer: a forward pass over the learner's attempts in time order, parameters per skill, estimation by EM or grid
+search on training learners. K2 differs only in its observation model, into which the chosen recogniser's
+$\mathrm{FAR}_p$ and $\mathrm{FRR}_p$, computed by the protected evaluator on the training part, are plugged.
+Each recogniser (B0, B1, B2) therefore gets its own K2, and the RQ-3 comparison comes down to one call with
+different error tables.
+
+\paragraph{Checking before the data} Before the models run on the pilot they are checked on simulated learners
+with known parameters: a generator sets the true mastery and the recogniser noise, and the model must recover the
+parameters and keep its AUC as the noise grows. The mastery report is produced by the same command as the other
+reports, with a passport and a code fingerprint.
 
 \section{Privacy and security}\label{sec:impl-privacy}
 
@@ -364,7 +397,7 @@ implementation phase, changing the phase directly, bypassing checks, force pushe
 pipeline (TD-FN-72) it will also block reading test-set labels. \\
 human\_zones & before a tool call & Asks for approval with a reason before changes to content, learner
 texts, thresholds, reading parameters, schema, dependencies, the checks themselves and the RQ-1
-evaluator (with TD-FN-72, also RQ-2). \\
+evaluator (with TD-FN-72 and TD-FN-78, also RQ-2 and RQ-3). \\
 dep\_check & before a tool call & Blocks packages that do not exist on PyPI; shows version, age,
 repository, known vulnerabilities and name similarity for the rest. \\
 git\_guard & before a tool call & Forbids forced adds, forbidden paths and secrets in commits; push only

@@ -15,7 +15,7 @@
 {\sffamily\small\color{inkgray}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Research review for the master's thesis}\\[10pt]
 {\sffamily\LARGE\bfseries\color{accent}Teaching Machines to Listen Like a Primer Teacher\par}
 \vspace{4pt}
-{\sffamily\large\color{accent}Automatic pronunciation feedback for beginners reading Qur'anic Arabic with \emph{Muallim al-Sani}: state of the art, gaps and design implications\par}
+{\sffamily\large\color{accent}Reading-error detection, model adaptation and mastery estimation for beginners reading Qur'anic Arabic with \emph{al-Muallim al-Thani}: state of the art and research gaps\par}
 \vspace{10pt}
 {\color{gold}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorEn}\\[2pt]
@@ -24,17 +24,21 @@
 \end{center}
 
 \begin{keybox}[Abstract]
-This review brings together six bodies of knowledge that a reading tutor for the primer
-\emph{Muallim al-Sani} has to respect: the history and method of the book, the phonetic difficulties of
+This review brings together seven bodies of knowledge underlying the thesis ``Development of a Dataset and an
+AI Model for Reading Error Detection and Mastery Estimation in Russian-Speaking Beginners Learning with
+\emph{al-Muallim al-Thani}'': the history and method of the book, the phonetic difficulties of
 Russian-speaking beginners, research on computer-assisted pronunciation training, the state of automatic
-assessment of Qur'anic recitation, ways to adapt a speech model to a new population with little data, and
-the emerging practice of building software with AI coding agents.
+assessment of Qur'anic recitation, ways to adapt a speech model to a new population with little data,
+tutors that listen to reading together with models of learner mastery, and the emerging practice of building
+software with AI coding agents.
 It also summarises the legal and ethical constraints on collecting voice data. The evidence supports a
 narrow claim: automatic feedback can multiply practice and first-line correction for beginners, but it
 cannot yet replace a teacher. The best open model, Quran Muaalem, was trained on expert male reciters, and
 no study has measured it on primer-level reading by second-language beginners or tried to adapt it to
 them, although the methods --- low-rank fine-tuning, calibration, abstention with guarantees --- exist and
-work with little data, provided that the evaluation is not spoiled by leakage. Explicit,
+work with little data, provided that the evaluation is not spoiled by leakage. Knowledge tracing can estimate
+skill mastery from noisy recogniser output, but recogniser errors measured against teachers have not yet been
+built into such models. Explicit,
 segment-level feedback is the condition under which pronunciation training works best, and it is what a
 primer requires. Development with AI agents is productive but prone to gaming its own tests, which argues
 for mechanical guard-rails rather than written rules. The review ends with a map of gaps and the research
@@ -43,23 +47,23 @@ questions they generate for the thesis.
 \smallskip
 \textbf{Keywords:} computer-assisted pronunciation training; mispronunciation detection and diagnosis;
 Qur'anic recitation; Arabic as a second language; model adaptation; LoRA; calibration; conformal
-prediction; Telegram bot; design science; AI coding agents; harness engineering.
+prediction; knowledge tracing; reading tutor; speech dataset; design science; AI coding agents.
 \end{keybox}
 
 \section{Introduction}
 
 A child in a Tatar school at the end of the nineteenth century learned to read with a primer, and a
-teacher who heard every syllable. Ahmad Hadi Maksudi's \emph{Muallim al-Sani} (``The Second Teacher'')
+teacher who heard every syllable. Ahmad Hadi Maksudi's \emph{al-Muallim al-Thani} (``The Second Teacher'')
 belongs to that tradition and is still in use: it is reprinted in Tatarstan and distributed by the
 Muslim board of Kazakhstan \cite{SRC-020,SRC-040}. The adults who open it today are often
 Russian-speaking, start from zero, and practise alone between lessons. What they lack is the listening
 half of the method.
 
 This review asks whether that half can be supplied by a machine, and under what conditions. It is the
-research background for a master's thesis that builds a Telegram tutor following the book page by page,
-recognises the learner's phonemes with an open model, explains errors in Russian, and adapts the model
-to Russian-speaking beginners using the consented recordings it collects. Five questions guide the
-review:
+research background for a master's thesis whose object is a dataset and an AI model. A tutor that follows the
+book page by page serves as the collection tool: with consent it gathers primer-level reading, teachers
+annotate it, an open model is adapted on these data to Russian-speaking beginners, and on top of it a mastery
+model estimates which skills of the book the learner has already acquired. Six questions guide the review:
 
 \begin{enumerate}[label=\textbf{Q\arabic*.}]
   \item What do the book and its teaching tradition require from a tutor?
@@ -68,9 +72,10 @@ review:
   \item How good are current models for Qur'anic pronunciation assessment, and where are they untested?
   \item How can such a model be adapted to a new population when data are scarce, and how can the gain
     be measured honestly?
+  \item How can the attempts a machine listens to be turned into an estimate of what the learner has mastered?
 \end{enumerate}
 
-A sixth, methodological question concerns the way the tutor itself is built: what is known about
+A seventh, methodological question concerns the way the tutor itself is built: what is known about
 developing research software with AI coding agents, and how to keep such development honest.
 
 \paragraph{Method of the review} The review is narrative and scoping rather than systematic. Searches
@@ -89,7 +94,7 @@ in the code, is kept in the project repository \cite{SRC-038}.
 Maksudi (1868--1941) wrote two primers that are often confused online. \emph{Mögallim äwwäl} (``The First
 Teacher'', 1892) taught Tatar literacy in Arabic script; its sound-syllabic method and about thirty
 editions before 1918 made it one of the most printed Tatar books of its time \cite{SRC-015,SRC-019}.
-\emph{Muallim al-Sani} continued it: from knowing the letters to reading the Qur'an correctly, with the
+\emph{al-Muallim al-Thani} continued it: from knowing the letters to reading the Qur'an correctly, with the
 basics of \emph{tajwid}. It is usually dated to the mid-1890s, but the year of the first edition has not
 been confirmed by a primary bibliographic source \cite{SRC-018}. Modern texts descend from the Kazan
 edition of 1917 \cite{SRC-024}. Because editions differ in length and content, the thesis fixes one
@@ -311,7 +316,7 @@ will need.
 Tarteel, the market leader, focuses on memorisation and flags word-level mistakes; it highlights them in
 the text, a practice worth borrowing \cite{SRC-046}. A new wave of applications advertises AI checking
 at the level of the primer, but their claims come from store descriptions and have not been evaluated
-independently. Digital versions of \emph{Muallim al-Sani} exist as an app and an open web platform
+independently. Digital versions of \emph{al-Muallim al-Thani} exist as an app and an open web platform
 \cite{SRC-005,SRC-006}, and the supervisor's course follows the same letter order while training
 listening rather than speaking \cite{SRC-070}. No Russian-, Kazakh- or Uzbek-language tool that checks
 primer-level reading by voice was found.
@@ -365,6 +370,60 @@ set, and a single run on it. The supervisor's group formulated the same requirem
 which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
 following Gebru and colleagues \cite{SRC-123}.
 
+\section{Tutors that listen to reading, and measuring mastery}
+
+\subsection{Learning to read, not only pronunciation}
+
+\emph{al-Muallim al-Thani} is a primer: the learner learns to see a letter with its vowel sign and turn it into
+a sound. The systems closest to this work are therefore not foreign-language pronunciation trainers but
+reading tutors that listen to a child reading aloud. Project LISTEN at Carnegie Mellon spent twenty-five years
+developing a tutor that used speech recognition to decide whether a word was read correctly, helped on hard
+words and tracked progress \cite{SRC-125}. The Dutch DART project built a tutor for first-graders and kept two
+questions apart: how well recognition agrees with people ($\kappa$, MCC) and how children learn --- feedback
+experiments with 525 and 752 children and reading progress from the logs \cite{SRC-130,SRC-131}. The French
+Lalilo adapts self-supervised models to beginning readers' phonemes and simulates reading errors to give the
+model something to learn from; Gelin's doctoral thesis is devoted to this \cite{SRC-132,SRC-133}. All three
+work with children reading their native script; none covers adults learning to read a foreign script.
+
+A beginning reader makes two kinds of errors. They may read the wrong sign --- another vowel, the wrong one of
+two look-alike letters --- or read the sign correctly but produce the sound wrongly. Studies of early Arabic
+readers find more errors on vowels than on consonants and confusions between letters that differ only in
+dots, but these are native-speaking children. No dataset makes this distinction for adult non-Arabs.
+
+\subsection{Knowledge tracing}
+
+Bayesian knowledge tracing (BKT) models each skill as a hidden ``mastered / not mastered'' state and updates
+the probability of mastery after every attempt; guess and slip parameters allow a learner who has mastered a
+skill to err sometimes and one who has not to guess \cite{SRC-124}. Pel\'anek's review compares BKT with
+logistic models and recommends evaluating learner models by how well they predict the next attempt (AUC) and
+by calibration \cite{SRC-126}. Deep knowledge tracing \cite{SRC-127} is more accurate on large data but on a
+few dozen learners is justified only as exploration. The additive factors model draws learning curves per
+skill and checks whether the skills themselves are well chosen \cite{SRC-128}; half-life regression models
+forgetting from logs \cite{SRC-129}.
+
+The closest publication is Beck and Sison \cite{SRC-125}: they estimated children's mastery of 80
+letter--sound correspondences from the output of a speech recogniser that itself errs. The recogniser's noise
+was absorbed into the guess and slip parameters; it was not measured against teachers. If the recogniser's
+per-phoneme false acceptances and rejections are measured on annotated data, they can be built into the model
+explicitly, and adapting the recogniser should make the mastery estimate more accurate. This has not been
+tested.
+
+\subsection{Evaluating by mastery}
+
+A systematic review of educational recommender systems found that they are usually evaluated by clicks and
+ratings, and by learning outcomes in only about a third of studies \cite{SRC-135}. The OBER recommender stores
+learning outcomes in its data schema and compares algorithms by mastery; in a randomised trial with 5{,}700
+learners, the algorithm that kept learners engaged longest did not produce the best mastery \cite{SRC-134}.
+For a tutor this means judging by what the learner has mastered, not by how much they practised.
+
+\begin{keybox}[Implication]
+Tutors that listen to reading exist, but for children and their native script. Knowledge tracing can work with
+noisy recognition but does not account for recogniser errors measured against teachers. The lessons of
+\emph{al-Muallim al-Thani} provide a ready-made skill map. Hence two questions of the thesis: can mastery of
+each skill of the book be estimated from speech, and does adapting the AI improve the estimate (RQ-3); and how
+do Russian-speaking adults progress through these skills (RQ-4).
+\end{keybox}
+
 \section{Building research software with AI coding agents}
 
 \subsection{From agent loops to harnesses}
@@ -406,7 +465,8 @@ cannot replace a pilot.
 \begin{keybox}[Implication]
 Rules that matter should become checks that the environment enforces: frozen tests during
 implementation, architecture contracts, type checks, protected human zones and a logged record of every
-block. This is the principle the thesis applies to its own development and evaluates as RQ-4.
+block. The thesis applies this principle to its own development and to protecting its experiments; it is
+described in the methodology as a means of validity.
 \end{keybox}
 
 \section{Legal and ethical constraints}
@@ -437,41 +497,46 @@ Area & Known & Missing & Thesis \\
 \midrule
 Primer & Sound method, principles, letter order \cite{SRC-015,SRC-016,SRC-017} & Study of \emph{Muallim
 al-Sani} as a Qur'an primer; any digital adaptation with checking & Artefact A \\
-Learners & Difficult sounds from other L1 \cite{SRC-034,SRC-035} & Measured errors of Russian/Kazakh
-speakers & RQ-1 \\
-Feedback & Medium effect; explicit and segmental works best \cite{SRC-025,SRC-026} & Effect for Arabic
-letters; trials of primer methods & RQ-3 \\
+Data & Fluent expert verse recitation \cite{SRC-004,SRC-043}; non-Arabs but no Russians \cite{SRC-032} &
+Reading by adult Russian-speaking beginners; reading errors separated from pronunciation errors & RQ-1,
+Artefact A \\
 Models & Strong on experts; F1 0.72 on benchmark \cite{SRC-002,SRC-031} & Accuracy on beginners,
 false-rejection rate, agreement with teachers & RQ-1 \\
 Adaptation & LoRA, calibration, conformal guarantees \cite{SRC-111,SRC-112,SRC-114} & Adapting a
-Qur'anic model to L2 beginners with honest evaluation on unseen learners & RQ-2 \\
+Qur'anic model to adult beginners with honest evaluation on unseen learners and a learning curve & RQ-2 \\
+Mastery & BKT with noisy recognition for children \cite{SRC-124,SRC-125} & Accounting for recogniser errors
+measured against teachers; a primer's skill map & RQ-3 \\
+Learners & Difficult sounds from other L1 \cite{SRC-034,SRC-035} & How Russian-speaking adults acquire the
+book's skills, what they forget & RQ-4 \\
+Feedback & Medium effect; explicit and segmental works best \cite{SRC-025,SRC-026} & Effect for Arabic
+letters; trials of primer methods & exploratory, PhD \\
 Agents & Test gaming; rules decay; checks help \cite{SRC-027,SRC-076,SRC-078} & Whole-project evidence
-on guarded harnesses & RQ-4 \\
+on guarded harnesses & methodology \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-From this map follow the four research questions of the thesis. RQ-1 asks how closely the
-off-the-shelf model agrees with teachers on beginners reading the primer, and which reported errors
-belong to the learner rather than the model. RQ-2, the central question, asks how much adapting the model
-on the collected dataset --- a calibrated verifier with ``not sure'' and LoRA fine-tuning --- closes the gap
-to a teacher on unseen learners without degrading expert recitation. RQ-3 asks whether explanations in
-Russian improve the next attempt and retention compared with a bare correct/incorrect signal. RQ-4 asks
-what a mechanically enforced harness prevents in AI-agent development and ML experimentation, and at
-what human cost.
+From this map follow the four research questions of the thesis. RQ-1 (data): how reliably can teachers
+and the model distinguish reading errors from pronunciation errors in beginners reading the book? RQ-2 (how
+the AI learns): how much does adaptation on teacher corrections and the book's minimal pairs improve
+recognition for new learners, and how does this depend on the amount of data? RQ-3 (measuring mastery): can
+recognition be used to estimate whether a learner has mastered each skill of the book, and does adapting the
+AI improve the estimate? RQ-4 (how people learn): how do Russian-speaking adults progress through the book's
+skills --- what comes quickly, what slowly, what is forgotten? The effect of explanations remains exploratory
+and a PhD question, and the agent harness a means of validity.
 
 \section{Conclusion}
 
-The literature leaves a clear and modest space for this work. The method of \emph{Muallim al-Sani} is
+The literature leaves a clear and modest space for this work. The method of \emph{al-Muallim al-Thani} is
 compatible with automatic feedback: it is sound-based, incremental and built on immediate correction.
 The conditions under which pronunciation training works best, segmental targets and explicit feedback,
 are exactly those of a primer. The model exists and is open. What is missing is measurement: how often the
-model is right about a Russian-speaking adult reading a syllable for the first time, how often it rejects
-a correct reading, whether its explanations help --- and how far it can be improved on the new
-population's own data. A small, honestly annotated dataset, a frozen test set and a transparent table of
+model is right about a Russian-speaking adult reading a syllable for the first time and how often it rejects
+a correct reading; how far it can be improved on the new population's own data; and what its listening can
+tell us about the mastery of each skill of the book. A small, honestly annotated dataset, a frozen test set and a transparent table of
 precision and recall against teachers before and after adaptation would be worth more than another claim
-of ``AI checking''. The same dataset and test set become the starting point of doctoral work on
-human-in-the-loop adaptation. In the same spirit, the development method should be judged by what its logs show, not
+of ``AI checking''. The same dataset, test set and skill map become the starting point of doctoral work on
+teaching the AI and learning with it. In the same spirit, the development method should be judged by what its logs show, not
 by how fast it felt.
 
 \printbibliography[heading=bibintoc,title={References}]

@@ -1,81 +1,78 @@
-% Chapter 6. Answers to RQs (after the pilot), contributions, doctoral directions (docs/roadmap.md, stage 2; ADR-0051).
+% Chapter 6. Answers to RQs (after the pilot), contributions, doctoral directions (docs/roadmap.md, stage 2; ADR-0051, ADR-0052).
 \chapter{Conclusion}\label{ch:concl}
 
 \section{Summary}
 
-The thesis set out to build a reading tutor that follows \emph{Muallim al-Sani}, to collect with it an
-annotated dataset of Russian-speaking beginners, and to adapt an open phoneme-level model on that dataset
-so that it acts as the listening teacher more reliably. The literature review showed that the primer's
-sound-based, incremental method fits automatic feedback, that explicit and segment-level feedback is the
-condition under which pronunciation training works best, and that the best open model for Qur'anic Arabic
-has never been measured on, or adapted to, primer-level reading by second-language beginners, although
-small-data methods for doing so exist. It also showed that AI coding agents tend to game their own tests and
-that written rules decay, while checks enforced by the environment help.
+The thesis set out to develop a dataset of primer-level reading by Russian-speaking beginners and an AI model
+that detects reading errors in it and estimates from speech the mastery of each skill of \emph{al-Muallim
+al-Thani}, and to measure how close the model comes to a teacher and what it reveals about how people learn.
+The literature review showed that the primer's sound-based, incremental method suits automatic feedback and
+provides a ready-made skill map; that nobody had measured the best open model for Qur'anic Arabic on
+primer-level reading by second-language beginners or adapted it to them, although small-data methods for this
+exist; and that tutors that listen to reading and mastery models work for children but neither account for
+recogniser errors measured against teachers nor have been applied to adults learning to read a foreign script.
 
-The tutor built in response turns the whole book into 125 lessons and 800 cards traceable to page and line;
-assesses each voice message at phoneme level with a full decision trace; explains errors in Russian in a
-short format grounded in feedback research; and stores consented, pseudonymised data ready for teacher
-annotation, evaluation and training. The adaptation is designed as a controlled experiment: a frozen,
-learner-disjoint and blindly annotated test set, a calibrated verifier with a ``not sure'' outcome and a
-guarantee on false rejections, and LoRA fine-tuning with augmentation from the book's minimal pairs. The
-harness that produced the system enforces frozen tests and test set, protected human zones, layer contracts
-and green checks, and keeps journals that make the development auditable.
+The collection tool built in response turns the whole book into 125 lessons and 800 cards traceable to page and
+line; grades every voice message at the phoneme level with a full decision trace; explains errors in Russian;
+and stores consented, pseudonymised data ready for teacher annotation that separates reading from pronunciation
+errors. Model adaptation is designed as a controlled experiment: a frozen learner-disjoint test set with blind
+annotation, a calibrated verifier with a ``not sure'' outcome and a guarantee on false rejections, LoRA
+fine-tuning with augmentation from the book's minimal pairs, a learning curve and the contribution of each data
+source. The mastery model is built over the book's skill map and accounts for the recogniser's measured errors;
+it is validated on next attempts and against a blind teacher test. All of this was built under mechanical checks
+that protect both the code and the experiments.
 
 \section{Answers to the research questions}
 
-\paragraph{RQ-1} \pending{answer after the pilot}.
-\paragraph{RQ-2} \pending{answer after training and the single test run}.
-\paragraph{RQ-3} \pending{answer after the pilot}.
-\paragraph{RQ-4} The evidence collected so far shows that the harness blocked or exposed the classic failure
-modes of agent development --- test gaming, architecture erosion, leakage of secrets --- and that several
-failures passed every automatic check and were caught only by a second-level review or by the human.
-\pending{quantitative answer at the end of the project}.
+\paragraph{RQ-1 (data)} \pending{answer after the pilot and double annotation}.
+\paragraph{RQ-2 (how the AI learns)} \pending{answer after training and the single test run}.
+\paragraph{RQ-3 (measuring mastery)} \pending{answer after fitting the mastery models and the teacher test}.
+\paragraph{RQ-4 (how people learn)} \pending{answer after the pilot and the delayed test}.
 
 \section{Contributions}
 
 \begin{enumerate}
-  \item A teacher-referenced evaluation of an open Qur'anic phoneme model on primer-level reading by
-    beginners, with preregistered hypotheses and standard MDD metrics.
-  \item A small-data adaptation of that model to a new population --- a calibrated verifier with a conformal
-    bound on false rejections and LoRA fine-tuning with minimal-pair augmentation --- with an evaluation
-    protocol that excludes leakage and checks for forgetting.
-  \item A consented, teacher-annotated dataset with a blind gold test set and a datasheet, and a reproducible
-    training pipeline.
-  \item A digital curriculum of \emph{Muallim al-Sani} in the book's order, with every line traceable to a
-    concrete edition, and a mapping of Maksudi's principles to tutor features.
-  \item An open-architecture tutor whose verdicts are reproducible and contestable, and in which models can be
-    compared in shadow mode.
-  \item A documented harness for building research software and ML experiments with AI agents, with
-    incidents that show its value and its blind spots.
+  \item[\textbf{C1.}] A corpus of reading by adult Russian-speaking beginners tied to the skills of
+    \emph{al-Muallim al-Thani}, collected with consent, with phoneme-level and error-type annotation by teachers,
+    measured reliability, a blind gold test set and a datasheet.
+  \item[\textbf{C2.}] Small-data adaptation of an open model to the new population --- a calibrated verifier with
+    a conformal bound on false rejections and LoRA fine-tuning with minimal-pair augmentation --- with a learning
+    curve, the contribution of data sources and a leakage-free evaluation protocol.
+  \item[\textbf{C3.}] A mastery model of the book's skills that accounts for recogniser errors measured against
+    teachers, validated on next attempts and against a blind teacher test.
+  \item[\textbf{C4.}] Learning curves of Russian-speaking adults over the skills of a primer: what comes quickly,
+    what slowly, what is forgotten.
 \end{enumerate}
+
+The engineering result is a reproducible ``collect $\to$ annotate $\to$ train $\to$ evaluate'' pipeline, a
+digital curriculum of the book traceable to an edition and a tutor with an open architecture in which models can
+be compared in shadow mode; the methodological result is a documented harness for AI-agent development and ML
+experiments.
 
 \section{Future work}
 
-The master's thesis is planned as the first stage of doctoral research, and it hands over instruments, not
-only questions: the frozen test set, which remains the test set so that later results are comparable; the
-training pipeline; the learning curve, which shows how much data a population needs; and shadow mode for
-comparing models on live attempts. The data model keeps what later studies need: stable learner, card and
-attempt identifiers; versions of code, curriculum, model, training set and annotation guide in every
-record; raw model outputs; disputes; and the learner's first language. The main doctoral line is
-\emph{human-in-the-loop adaptation of pronunciation assessment for second-language beginners}; it splits
-into the following directions.
+The master's thesis is designed as the first stage of a doctoral project and hands it its tools: the dataset; a
+frozen test set that stays a test set, so that future results remain comparable; the skill map and the mastery
+model; the training pipeline and the learning curve; and shadow mode for comparing models on live attempts. The
+main doctoral line is \emph{teaching the AI and learning with it}; it splits into the following directions.
 \begin{enumerate}
-  \item \textbf{Active learning.} Choose which attempts teachers should annotate so that the model improves
-    fastest per hour of teacher time; the learning curve of this thesis is the baseline.
-  \item \textbf{Weak labels and continual adaptation.} Use ``the bot was wrong'' reports and self-corrections
-    as weak labels and update the model safely as data accumulate, without losing earlier skills.
-  \item \textbf{Guarantees under dependence and shift.} Extend conformal guarantees to dependent attempts of
-    one learner and to shifts towards new lessons and new first languages.
-  \item \textbf{Personalisation and transfer.} Adapt the model per learner, and transfer it to Kazakh, Uzbek
-    and Tatar speakers.
-  \item \textbf{Tajwid rules and adaptive learning.} Extend checking to \emph{ikhfa}, \emph{idgham},
-    \emph{madd} and \emph{qalqala}, and model each learner's knowledge of letters to schedule review.
-  \item \textbf{Longitudinal studies and an open benchmark.} Compare learning with the tutor, with a teacher
-    and mixed; publish the dataset and test set as a benchmark the field currently lacks.
+  \item \textbf{Choosing the next card from mastery.} Use the mastery estimate to choose what the learner reads
+    next and what to review, and evaluate this by mastery rather than engagement (an extension of OBER
+    \cite{SRC-134}).
+  \item \textbf{Active learning.} Choose which attempts to send to a teacher so that the model improves fastest
+    per hour of the teacher's time; this thesis's learning curve is the baseline.
+  \item \textbf{Weak labels and continual adaptation.} Use ``the bot was wrong'' disputes and self-corrections as
+    weak labels and update the model safely as data accumulate.
+  \item \textbf{The effect of feedback.} A controlled experiment: full explanation versus correct/incorrect, with
+    skill mastery as the outcome.
+  \item \textbf{Transfer and tajweed.} Transfer the dataset, the model and the skill map to speakers of Kazakh,
+    Uzbek and Tatar and to the rules of \emph{ikhfa}, \emph{idgham}, \emph{madd} and \emph{qalqala}.
+  \item \textbf{An open benchmark.} Release the dataset and the test set as a benchmark of reading by adult
+    non-Arab beginners, which does not yet exist.
 \end{enumerate}
 
 \section{Closing remark}
 
-Maksudi wrote a book for learners who had a teacher. This thesis does not try to remove the teacher; it tries
-to give learners a careful listener for the hours when the teacher is not there, to make that listener
-better at hearing them, and to be honest about how careful it is.
+Maksudi wrote a book for learners who had a teacher. This thesis does not try to remove the teacher; it gives the
+teacher and the learner a careful listener that learns from the teacher to hear better and can say honestly what
+the learner has already mastered.

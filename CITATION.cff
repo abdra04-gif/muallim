@@ -9,6 +9,9 @@ version: 0.1.0
 date-released: "2026-10-17"
 keywords:
   - pronunciation assessment
+  - reading error detection
+  - knowledge tracing
+  - speech dataset
   - Quranic recitation
   - Arabic literacy
   - Telegram bot

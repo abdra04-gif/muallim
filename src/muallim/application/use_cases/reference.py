@@ -17,7 +17,7 @@ class GetReferenceAudio:
     async def execute(self, learner: Learner, item_id: str) -> bytes | None:
         audio = await self.library.get(item_id)
         if audio is not None:
-            # Слушал ли ученик образец перед попыткой — данные для RQ-3.
+            # Слушал ли ученик образец перед попыткой — данные для разведки E-7 (ADR-0052).
             await self.events.record("reference_played", learner.id, {"item_id": item_id})
             await self.uow.commit()
         return audio

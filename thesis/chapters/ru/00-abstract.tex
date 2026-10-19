@@ -1,83 +1,84 @@
 % Аннотация (русская и английская) и заявление об использовании ИИ. Дописать после пилота:
-% предложение о результатах помечено \pending, пока у RQ-1…RQ-3 нет чисел с паспортом (docs/thesis/figures.md).
-% С ADR-0051 цель включает адаптацию модели на собственном наборе (RQ-2).
+% предложение о результатах помечено \pending, пока у RQ-1…RQ-4 нет чисел с паспортом (docs/thesis/figures.md).
+% Тема и RQ — ADR-0052: объект работы — набор данных и ИИ-модель.
 \chapter*{Аннотация}
 \addcontentsline{toc}{chapter}{Аннотация}
 \thispagestyle{plain}
 
-Взрослые, которые учатся читать Коран, обычно начинают с букваря и учителя, слушающего каждый слог.
-В диссертации исследуется, какую часть этого слушания может взять на себя машина для русскоязычных
-начинающих, и создаётся инструмент для ответа на этот вопрос. Инструмент --- Telegram-тренажёр, который
-ведёт ученика по классическому букварю Ахмад-Хади Максуди «Муаллим ас-Сани» в порядке самой книги:
-125 уроков и 800 карточек, каждая прослеживается до страницы и строки издания 2010~г. Ученик присылает
-голосовое; открытая модель Quran Muaalem распознаёт фонемы; выравнивание по правилам относит расхождения
-к десяти типам ошибок с привязкой к слогам; ученик получает короткое объяснение на русском и эталонную
-запись. По каждой попытке сохраняется полный след решения, поэтому любой вердикт можно пересчитать.
-Собранные с согласия записи с разметкой преподавателей образуют набор данных, на котором модель
-адаптируется к русскоязычным начинающим: калиброванный верификатор с исходом «не уверен» и
-дообучение низкого ранга (LoRA) с пополнением данных по минимальным парам книги.
+Взрослые, которые учатся читать Коран, начинают с букваря и учителя, слушающего каждый слог, но учитель
+не может выслушать каждого ученика. Открытые модели распознавания чтения Корана обучены на чтецах-экспертах:
+на начинающих они ошибаются и не знают, что ученик уже усвоил. Объект диссертации --- набор данных и
+ИИ-модель для русскоязычных начинающих, которые учатся по букварю Ахмад-Хади Максуди «Муаллим ас-Сани».
+Инструмент сбора --- Telegram-тренажёр, который ведёт ученика по книге в её порядке: 125 уроков и 800
+карточек, каждая прослеживается до страницы и строки издания 2010~г. Ученик присылает голосовое, модель
+Quran Muaalem распознаёт фонемы, ученик получает объяснение на русском, а попытка с полным следом решения
+попадает в набор данных. Два преподавателя размечают попытки по фонемам и различают ошибки чтения
+(прочитан не тот знак) и ошибки произношения (знак верный, звук неверный). На этом наборе модель
+распознавания учится у преподавателей --- калиброванный верификатор с исходом «не уверен» и дообучение
+низкого ранга (LoRA) с пополнением данных по минимальным парам книги, --- а поверх неё модель усвоения
+по навыкам книги (байесовское отслеживание знаний с учётом измеренных ошибок распознавателя) оценивает,
+что ученик уже освоил.
 
-Работа выполнена в парадигме design science и оценивает три артефакта. Тренажёр оценивается
-измерением согласия готовой модели с двумя преподавателями с отделением ошибок ученика от ошибок модели
-(RQ-1) и внутрисубъектным пилотным экспериментом, сравнивающим полные объяснения с сигналом
-«верно / неверно» (RQ-3). Адаптированная модель оценивается контролируемым экспериментом на
-замороженном тесте из учеников, не участвовавших в обучении, со слепой разметкой: насколько она
-уменьшает ложные отклонения и закрывает разрыв с учителем, не ухудшая чтение экспертов (RQ-2). Обвязка
-разработки --- хуки, которые замораживают тесты и тестовую выборку, защищают зоны человека и не дают агенту
-закончить при красных проверках, вместе с субагентами-ревьюерами и журналами --- оценивается как встроенное
-кейс-стади (RQ-4). Гипотезы, разбиение данных и план анализа предрегистрированы.
+Работа выполнена в парадигме design science и отвечает на четыре вопроса: насколько надёжно учителя и
+модель различают ошибки чтения и произношения (RQ-1); насколько адаптация на поправках учителей и
+минимальных парах книги улучшает распознавание на новых учениках и как это зависит от объёма данных
+(RQ-2); можно ли по распознаванию оценить усвоение каждого навыка книги и улучшает ли адаптация ИИ эту
+оценку (RQ-3); как русскоязычные взрослые продвигаются по навыкам книги (RQ-4). Модели сравниваются на
+замороженном тесте из учеников, не участвовавших в обучении, со слепой разметкой; оценка усвоения
+проверяется по следующим попыткам и по слепому тесту учителя. Гипотезы, разбиение данных и план анализа
+предрегистрированы.
 
 Предварительные проверки показывают, что конвейер отличает верное чтение эксперта от неверного
-(99--100 против 40--67 баллов) и отвечает быстрее 10 секунд. \pending{результаты пилота и адаптации по RQ-1--RQ-3}.
-Вклад работы --- первая оценка открытой модели проверки чтения Корана на букварном чтении начинающих,
-для которых арабский не родной, относительно оценки преподавателей; адаптация этой модели к новой
-аудитории на малых данных с честной оценкой на новых учениках; набор данных с разметкой преподавателей
-и воспроизводимый конвейер обучения как основа докторского исследования; доказательное описание
-разработки исследовательского ПО ИИ-агентами под механическим контролем.
+(99--100 против 40--67 баллов) и отвечает быстрее 10 секунд. \pending{результаты пилота, адаптации и
+оценки усвоения по RQ-1--RQ-4}. Вклад работы --- первый набор чтения взрослых русскоязычных начинающих,
+привязанный к навыкам букваря, с разделением ошибок чтения и произношения; адаптация открытой модели с
+учителем в контуре, с кривой обучения и вкладом каждого источника данных; оценка усвоения по речи с учётом
+ошибок распознавателя, измеренных против учителей; первые кривые обучения взрослых русскоязычных по
+навыкам букваря.
 
 \medskip
-\noindent\textbf{Ключевые слова:} компьютерное обучение произношению; обнаружение ошибок произношения;
-чтение Корана; адаптация модели; LoRA; калибровка; Telegram-бот; design science; ИИ-агенты;
-обвязка агента.
+\noindent\textbf{Ключевые слова:} набор данных; распознавание ошибок чтения; обнаружение ошибок
+произношения; чтение Корана; адаптация модели; LoRA; калибровка; отслеживание знаний; design science;
+ИИ-агенты.
 
 \chapter*{\textenglish{Abstract}}
 \addcontentsline{toc}{chapter}{Abstract (аннотация на английском)}
 \thispagestyle{plain}
 \begin{otherlanguage}{english}
-Adults who learn to read the Qur'an usually start with a primer and a teacher who listens to every
-syllable. This thesis asks how much of that listening can be done by a machine for Russian-speaking
-beginners, and how much better the machine becomes when it is adapted to them. The instrument is a
-Telegram tutor that follows the classical primer \emph{Muallim al-Sani} by Ahmad Hadi Maksudi in the
-book's own order: 125 lessons and 800 cards, each traceable to a page and line of the 2010 edition. The
-learner sends a voice message; the open model Quran Muaalem recognises phonemes; a rule-based alignment
-classifies differences into ten error kinds tied to syllables; and the learner receives a short
-explanation in Russian with a reference recording. Every attempt keeps a full decision trace, so that
-verdicts can be recomputed later. The consented, teacher-annotated recordings form a dataset on which
-the model is adapted to Russian-speaking beginners: a calibrated verifier that can answer ``not sure'',
-and low-rank fine-tuning (LoRA) with augmentation from the book's minimal pairs.
+Adults who learn to read the Qur'an start with a primer and a teacher who listens to every syllable, but no
+teacher can listen to every learner. Open Qur'anic recitation models are trained on expert reciters: they err on
+beginners and do not know what a learner has already mastered. The object of this thesis is a dataset and an AI
+model for Russian-speaking beginners learning with Ahmad-Hadi Maksudi's primer \emph{al-Muallim al-Thani}. The
+collection tool is a Telegram tutor that follows the book in its own order: 125 lessons and 800 cards, each
+traceable to a page and line of the 2010 edition. The learner sends a voice message, the Quran Muaalem model
+recognises phonemes, the learner receives an explanation in Russian, and the attempt, with its full decision
+trace, enters the dataset. Two teachers annotate attempts at the phoneme level, separating reading errors (the
+wrong sign was read) from pronunciation errors (the sign was right, the sound was wrong). On this dataset the
+recognition model learns from the teachers --- a calibrated verifier that can answer ``not sure'' and low-rank
+fine-tuning (LoRA) with augmentation from the book's minimal pairs --- and on top of it a mastery model over the
+book's skills (Bayesian knowledge tracing that accounts for the recogniser's measured errors) estimates what
+the learner has acquired.
 
-The thesis follows design science research and evaluates three artefacts. The tutor is evaluated by a
-measurement study of the off-the-shelf model's agreement with two teachers that separates learner errors
-from model errors (RQ-1), and by a within-subject pilot experiment comparing full explanations with a
-bare correct/incorrect signal (RQ-3). The adapted model is evaluated by a controlled experiment on a
-frozen, blindly annotated test set of learners unseen in training: how much it reduces false rejections
-and closes the gap to a teacher without degrading expert recitation (RQ-2). The development harness ---
-hooks that freeze tests and the test set, protect human-owned zones and stop the agent while checks fail,
-together with reviewer sub-agents and journals --- is evaluated as an embedded case study (RQ-4).
-Hypotheses, the data split and the analysis plan are preregistered.
+The thesis follows design science research and answers four questions: how reliably teachers and the model
+distinguish reading from pronunciation errors (RQ-1); how much adaptation on teacher corrections and the
+book's minimal pairs improves recognition for new learners, and how this depends on the amount of data
+(RQ-2); whether recognition can estimate the mastery of each skill of the book, and whether adapting the AI
+improves the estimate (RQ-3); and how Russian-speaking adults progress through the book's skills (RQ-4). The
+models are compared on a frozen, blindly annotated test set of learners unseen in training; the mastery
+estimate is validated on next attempts and against a blind teacher test. Hypotheses, the data split and the
+analysis plan are preregistered.
 
-Preliminary checks show that the pipeline separates correct from incorrect expert recitation (99--100
-versus 40--67 points) and answers within the 10-second target. \pending{pilot and adaptation results for
-RQ-1--RQ-3}. The contribution is the first teacher-referenced evaluation of an open Qur'anic
-pronunciation model on primer-level reading by second-language beginners; the small-data adaptation of
-this model to the new population, honestly evaluated on unseen learners; a consented, teacher-annotated
-dataset and a reproducible training pipeline that found the doctoral project; and an evidence-based
-account of building research software with AI coding agents under mechanical guard-rails.
+Preliminary checks show that the pipeline separates correct from incorrect expert recitation (99--100 versus
+40--67 points) and answers within the 10-second target. \pending{pilot, adaptation and mastery results for
+RQ-1--RQ-4}. The contribution is the first corpus of reading by adult Russian-speaking beginners tied to the
+skills of a primer, separating reading from pronunciation errors; teacher-in-the-loop adaptation of an open
+model with a learning curve and the contribution of each data source; mastery estimation from speech that
+accounts for recogniser errors measured against teachers; and the first learning curves of Russian-speaking
+adults over the skills of a primer.
 
 \medskip
-\noindent\textbf{Keywords:} computer-assisted pronunciation training; mispronunciation detection;
-Qur'anic Arabic; model adaptation; LoRA; calibration; Telegram bot; design science; AI coding agents;
-harness engineering.
+\noindent\textbf{Keywords:} speech dataset; reading error detection; mispronunciation detection; Qur'anic
+Arabic; model adaptation; LoRA; calibration; knowledge tracing; design science; AI coding agents.
 \end{otherlanguage}
 
 \chapter*{Заявление об использовании ИИ-инструментов}

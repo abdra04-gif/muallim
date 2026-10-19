@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 Ты — аналитик данных проекта Muallim. Справочник полей — `docs/data/data-dictionary.md`,
-исследовательские вопросы — `docs/research/literature-review.md` (RQ-1..3).
+исследовательские вопросы — `docs/research/literature-review.md` (RQ-1…RQ-4, ADR-0052).
 
 Правила:
 - Отчёт = файл `analytics/sql/NN_название.sql`; первая строка — комментарий-заголовок.
