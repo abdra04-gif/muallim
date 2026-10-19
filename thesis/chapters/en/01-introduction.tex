@@ -11,12 +11,12 @@ path has a long and specific history. At the end of the nineteenth century the J
 the old method, in which pupils memorised the names of letters for years, with a sound-based method that
 taught a letter as a sound and built syllables from it in small steps \cite{SRC-016,SRC-017}. Ahmad Hadi
 Maksudi's primer \emph{al-Muallim al-Thani} (``The Second Teacher'') brought this method to the reading of the
-Qur'an \cite{SRC-015}. More than a century later it is still printed by the Muslim board of Tatarstan and
+Qur'an \cite{SRC-015,SRC-018}. More than a century later it is still printed by the Muslim board of Tatarstan and
 officially distributed in Kazakhstan \cite{SRC-040,SRC-020}.
 
 The primer has never been used without a teacher. A lesson follows the cycle of \emph{talaqqi}: the
 teacher reads, the learner repeats, the teacher corrects every slip, and the learner moves on only after an
-error-free reading \cite{SRC-021,SRC-058}. The cycle is effective, but it ties every learner to a teacher's
+error-free reading \cite{SRC-021,SRC-058}. The cycle is established in the teaching tradition, but it ties every learner to a teacher's
 time. Adults who study after work, live far from a mosque school or feel shy reading in front of others
 practise alone between lessons, and nobody tells them when a \ar{ح} has turned into a Russian [x] or a long
 vowel has become short.
@@ -116,7 +116,7 @@ annotation reliability. The recognition model (Artefact B) is evaluated by a con
 test set of new learners. The mastery model (Artefact C) is evaluated by how well it predicts next attempts and
 how well it agrees with a blind teacher test, and learners' progress is described longitudinally. Requirements
 are written as quality-attribute scenarios \cite{SRC-047}, metrics are derived with the Goal--Question--Metric
-method \cite{SRC-048}, and the analysis plan and data split are preregistered and fingerprinted before data
+method \cite{SRC-048}, and the analysis plan and data split will be preregistered and fingerprinted before research data
 collection and before any training. The system is built by the author with an AI agent under mechanical checks
 that protect both the code and the experiments \cite{SRC-067}.
 
@@ -128,7 +128,7 @@ that protect both the code and the experiments \cite{SRC-067}.
     annotation by two teachers, measured reliability, a blind gold test set and a datasheet; released together
     with the fine-tuned weights if ethics and consent allow.
   \item[\textbf{C2.}] \textbf{A model that learns from teachers.} Small-data adaptation of an open model to the
-    new population --- a calibrated verifier with a guarantee on the false-rejection rate and LoRA fine-tuning
+    new population --- a calibrated verifier whose false-rejection rate is controlled and checked on held-out learners, and LoRA fine-tuning
     with augmentation from the book's minimal pairs --- with a learning curve and the measured contribution of
     each data source.
   \item[\textbf{C3.}] \textbf{Mastery estimation from speech.} A mastery model that accounts for recogniser

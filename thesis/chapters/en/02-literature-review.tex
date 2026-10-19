@@ -154,8 +154,8 @@ consent \cite{SRC-033}; its rate limits and file limits also constrain the desig
 \subsection{Task and metrics}
 
 Mispronunciation detection and diagnosis (MDD) compares a learner's phonemes with the canonical phonemes
-of the text. The standard protocol, used for L2-ARCTIC \cite{SRC-063} and adopted by the Qur'anic
-benchmarks \cite{SRC-064,SRC-066}, aligns three sequences --- canonical, annotated and recognised ---
+of the text. The standard protocol, adopted by the Qur'anic
+benchmarks \cite{SRC-004,SRC-031,SRC-066}, aligns three sequences --- canonical, annotated and recognised ---
 and labels each canonical phoneme as a true acceptance (TA), true rejection (TR, a real error detected), false
 acceptance (FA, a missed error) or false rejection (FR, a false alarm). Precision, recall and F1 follow:
 \begin{equation}
@@ -170,7 +170,7 @@ reading undermines trust.
 QuranMB.v1, presented at Interspeech 2025, was the first open benchmark for Arabic mispronunciation
 detection on Qur'anic material; its baselines achieved high recall but very low precision
 \cite{SRC-004}. The Iqra'Eval shared task at ArabicNLP 2025 gave the field a common evaluation, with
-systems around F1 0.40--0.44 \cite{SRC-043}. In IQRA 2026 at Interspeech, on QuranMB.v2, nineteen teams
+baselines around F1 0.40--0.44 and the best participant system at 0.47 \cite{SRC-043}. In IQRA 2026 at Interspeech, on QuranMB.v2, nineteen teams
 took part; the best system reached a phoneme-level F1 of 0.72 against a baseline of 0.44
 \cite{SRC-031,SRC-086}. The strongest systems are CTC phoneme recognisers on self-supervised encoders.
 The organisers note that the data contain no second-language learners and name their collection as a
@@ -198,8 +198,8 @@ the training distribution.
 \subsection{Learner data and neighbouring work}
 
 The closest public dataset of non-Arab learners contains about seven thousand crowdsourced recitations from
-speakers in more than eleven countries, collected at Innopolis University \cite{SRC-032}; it has no
-Russian or Kazakh speakers. Work from the same group is the nearest neighbour of this thesis. One study
+speakers in more than eleven countries, collected at Innopolis University \cite{SRC-032}; it records
+the speaker's country but not native language. Work from the same group is the nearest neighbour of this thesis. One study
 lets coding agents improve a memorisation checker built on transcripts of a Telegram bot, freezes the data
 and the evaluator with SHA-256 hashes, and formulates rules against leakage and metric gaming
 \cite{SRC-067,SRC-069}. Another proposes a taxonomy of recitation events that separates uncorrected mistakes
@@ -263,11 +263,11 @@ following Gebru and colleagues \cite{SRC-123}.
 
 \emph{al-Muallim al-Thani} is a primer: the learner learns to see a letter with its vowel sign and turn it into
 a sound. The systems closest to this work are therefore not foreign-language pronunciation trainers but
-reading tutors that listen to a child reading aloud. Project LISTEN at Carnegie Mellon spent twenty-five years
-developing a tutor that used speech recognition to decide whether a word was read correctly, helped on hard
+reading tutors that listen to a child reading aloud. Project LISTEN at Carnegie Mellon
+developed a tutor that used speech recognition to decide whether a word was read correctly, helped on hard
 words and tracked progress \cite{SRC-125}. The Dutch DART project built a tutor for first-graders and kept two
 questions apart: how well recognition agrees with people ($\kappa$, MCC) and how children learn --- feedback
-experiments with 525 and 752 children and reading progress from the logs \cite{SRC-130,SRC-131}. The French
+experiments with 525 children and reading progress from the logs \cite{SRC-130,SRC-131}. The French
 Lalilo adapts self-supervised models to beginning readers' phonemes and simulates reading errors to give the
 model something to learn from; Gelin's doctoral thesis is devoted to this \cite{SRC-132,SRC-133}. All three
 work with children reading their native script; none covers adults learning to read a foreign script.
@@ -356,7 +356,7 @@ behaviour \cite{SRC-029}. Anthropic's engineering notes recommend external progr
 session, end-to-end verification and an explicit ban on editing or deleting tests \cite{SRC-028}.
 LLM assistance in architecture design follows the same pattern: it produces reasonable decisions but
 covers architectural drivers only partially and needs human control \cite{SRC-050}. An exploratory study
-of 2\,853 repositories found that context files dominate current practice, while hooks, skills and
+of 2\,853 repositories found that context files dominate current practice, while skills and
 sub-agents remain rare \cite{SRC-073}. No peer-reviewed definition of ``harness engineering'' exists yet,
 and the practitioner sources are used here for concepts, not for numbers.
 

@@ -16,7 +16,7 @@ The collection tool built in response turns the whole book into 125 lessons and 
 line; grades every voice message at the phoneme level with a full decision trace; explains errors in Russian;
 and stores consented, pseudonymised data ready for teacher annotation that separates reading from pronunciation
 errors. Model adaptation is designed as a controlled experiment: a frozen learner-disjoint test set with blind
-annotation, a calibrated verifier with a ``not sure'' outcome and a guarantee on false rejections, LoRA
+annotation, a calibrated verifier with a ``not sure'' outcome and a controlled false-rejection rate, LoRA
 fine-tuning with augmentation from the book's minimal pairs, a learning curve and the contribution of each data
 source. The mastery model is built over the book's skill map and accounts for the recogniser's measured errors;
 it is validated on next attempts and against a blind teacher test. All of this was built under mechanical checks
