@@ -8,7 +8,7 @@
 
 import random
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 
@@ -27,6 +27,9 @@ class Question:
     prompt: str  # слог арабскими буквами
     options: tuple[str, ...]  # варианты чтения кириллицей
     answer: int  # индекс верного варианта
+    # начатые уроки букв на момент вопроса (битовая маска, ``started_mask``); -1 — все. Идёт в
+    # кнопку, чтобы ответ показал те же варианты, даже если с тех пор начат новый урок (TD-FN-90)
+    started: int = field(default=-1, compare=False)
 
     @property
     def correct(self) -> str:
@@ -88,9 +91,25 @@ def question_from(
         if len(options) == OPTIONS:
             break
     rng.shuffle(options)
+    mask = started_mask(curriculum, started) if started is not None else -1
     return Question(
-        item.id, vowel, seed, item.text.split()[vowel], tuple(options), options.index(right)
+        item.id, vowel, seed, item.text.split()[vowel], tuple(options), options.index(right), mask
     )
+
+
+def started_mask(curriculum: Curriculum, lessons: Sequence[Lesson]) -> int:
+    """Начатые уроки букв одним числом: бит k — k-й урок буквы программы (для кнопки ≤ 64 байт)."""
+    ids = {les.id for les in lessons}
+    return sum(1 << k for k, les in enumerate(_letter_lessons(curriculum)) if les.id in ids)
+
+
+def started_lessons(curriculum: Curriculum, mask: int) -> list[Lesson]:
+    """Обратно к ``started_mask``: уроки букв, чьи биты стоят в маске."""
+    return [les for k, les in enumerate(_letter_lessons(curriculum)) if mask >> k & 1]
+
+
+def _letter_lessons(curriculum: Curriculum) -> list[Lesson]:
+    return [les for les in curriculum.lessons if les.section == "letter"]
 
 
 def _heads(lessons: Sequence[Lesson]) -> list[LessonItem]:

@@ -6,7 +6,13 @@ from muallim.application.ports.repositories import AttemptRepository, UnitOfWork
 from muallim.application.ports.system import EventLog
 from muallim.domain.curriculum import Curriculum, Lesson
 from muallim.domain.learner import Learner
-from muallim.domain.quiz import Question, QuizError, make_question, question_from
+from muallim.domain.quiz import (
+    Question,
+    QuizError,
+    make_question,
+    question_from,
+    started_lessons,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,9 +31,26 @@ class PracticeQuiz:
             return None
 
     async def answer(
-        self, learner: Learner, item_id: str, vowel: int, seed: int, picked: int
+        self,
+        learner: Learner,
+        item_id: str,
+        vowel: int,
+        seed: int,
+        picked: int,
+        *,
+        started: int = -1,
     ) -> Question:
-        q = question_from(self.curriculum, item_id, vowel, seed, await self._started(learner))
+        """``started`` — маска начатых уроков на момент вопроса (из кнопки); -1 — как сейчас."""
+        lessons = (
+            started_lessons(self.curriculum, started)
+            if started >= 0
+            else await self._started(learner)
+        )
+        if vowel not in range(3):  # подделанная кнопка: в данные исследования не пишем
+            raise IndexError(vowel)
+        q = question_from(self.curriculum, item_id, vowel, seed, lessons)
+        if picked not in range(len(q.options)):
+            raise IndexError(picked)
         await self.events.record(
             "quiz_answered",
             learner.id,

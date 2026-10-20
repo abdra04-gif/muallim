@@ -136,7 +136,7 @@ async def cb_quiz_answer(
     await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     data = callback_data
     try:
-        q = await uc.answer(learner, data.i, data.v, data.s, data.p)
+        q = await uc.answer(learner, data.i, data.v, data.s, data.p, started=data.k)
     except (KeyError, IndexError):
         await cb.answer(texts.STALE_BUTTON, show_alert=True)
         return
@@ -161,8 +161,13 @@ async def cb_go(
 ) -> None:
     try:
         # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
-        # переход к обычной карточке его завершает
+        # переход к обычной карточке его завершает. Карточка, выбранная с экрана меню
+        # («📚 Уроки»), — сознательный выбор: начало занятия завершается и курсор двигается.
         in_opening = await opening.active(state, clock.now().date())
+        shown = await on_screen.shown(state)
+        if in_opening and shown is not None and shown.item_id is None:
+            await opening.finish(state)
+            in_opening = False
         item = await uc.execute(learner, callback_data.item_id, move=not in_opening)
         step = in_opening and item.id in opening.OPENING_ITEMS
         if in_opening and not step:

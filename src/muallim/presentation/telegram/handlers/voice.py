@@ -10,7 +10,7 @@ from typing import Final
 
 from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from dishka import FromDishka
 
 from muallim.application.ports.recognition import RecognitionError
@@ -53,13 +53,13 @@ async def on_voice(
         await m.reply(texts.VOICE_TOO_SHORT)
         return
     buf = io.BytesIO()
-    await bot.download(m.voice, destination=buf)
-
     item_id = await take_recording(state)
-    if item_id is not None and await recorder.execute(learner, item_id, buf.getvalue()):
-        logger.info("Эталон для %s записал учитель %s", item_id, learner.pseudonym)
-        await m.reply(texts.RECORD_SAVED.format(item=item_id))
-        return
+    if item_id is not None:  # эталон учителя — с любого экрана
+        await bot.download(m.voice, destination=buf)
+        if await recorder.execute(learner, item_id, buf.getvalue()):
+            logger.info("Эталон для %s записал учитель %s", item_id, learner.pseudonym)
+            await m.reply(texts.RECORD_SAVED.format(item=item_id))
+            return
 
     shown = await on_screen.shown(state)
     in_opening = await opening.active(state, clock.now().date())
@@ -82,6 +82,8 @@ async def on_voice(
     if not item.is_practice:  # таблица алфавита — только посмотреть
         await m.reply(texts.NOT_PRACTICE)
         return
+    if not buf.getbuffer().nbytes:  # скачиваем только то, что будем оценивать (TD-FN-90)
+        await bot.download(m.voice, destination=buf)
     wait = await m.reply(texts.LISTENING.format(item=item.text))
     try:
         result = await uc.execute(learner, buf.getvalue(), item.id)
@@ -121,6 +123,7 @@ async def on_voice(
 async def fallback(
     m: Message,
     bot: Bot,
+    state: FSMContext,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
@@ -132,6 +135,13 @@ async def fallback(
     голосового», и ученику нужны кнопки.
     """
     if (m.text or "").startswith("/"):  # неизвестная команда — просто главная с кнопками
+        await on_screen.menu(state)  # на экране меню: голосовое не оценивается (FR-50)
         await display.send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
         return
     await m.answer(texts.SEND_VOICE)
+
+
+@router.callback_query()
+async def stale_button(cb: CallbackQuery) -> None:
+    """Кнопка, которую не узнал ни один обработчик (старый формат после выкладки), — не молчать."""
+    await cb.answer(texts.STALE_BUTTON, show_alert=True)

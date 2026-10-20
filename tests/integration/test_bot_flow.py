@@ -40,6 +40,8 @@ from aiogram.types import (
 from dishka import AsyncContainer
 from dishka.integrations.aiogram import setup_dishka
 from pydantic import SecretStr
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.repositories import (
     AttemptRepository,
@@ -49,9 +51,9 @@ from muallim.application.ports.repositories import (
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.bootstrap.config import Settings
 from muallim.bootstrap.di import create_container
-from muallim.domain.curriculum import Curriculum
+from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.infrastructure.db.engine import create_engine
-from muallim.infrastructure.db.tables import metadata
+from muallim.infrastructure.db.tables import interaction_events, metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.presentation.telegram import texts
 from muallim.presentation.telegram.callbacks import (
@@ -61,6 +63,7 @@ from muallim.presentation.telegram.callbacks import (
     DisputeReason,
     GoItem,
     Profile,
+    QuizAnswer,
 )
 from muallim.presentation.telegram.handlers import router
 
@@ -390,3 +393,52 @@ async def test_declined_consent_skips_questionnaire(
     await ali.press(Consent(granted=False))
     assert texts.PROFILE_ADULT not in ali.tg.texts()
     assert ali.button(GoItem)
+
+
+# ---------- устаревшие и подделанные кнопки «Закрепления» (ревью пакета Б, круг 1) ----------
+def _letter_item(curriculum: Curriculum) -> str:
+    return next(
+        i.id for lesson in curriculum.lessons for i in lesson.items if i.kind is ItemKind.LETTER
+    )
+
+
+async def _quiz_events(container: AsyncContainer) -> int:
+    async with container() as request:
+        session = await request.get(AsyncSession)
+        rows = await session.execute(
+            select(func.count()).where(interaction_events.c.event == "quiz_answered")
+        )
+        return int(rows.scalar_one())
+
+
+async def test_old_quiz_button_gets_stale_alert(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    """Кнопка ответа из сообщения до выкладки (без поля k) не молчит, а говорит «устарела»."""
+    _, container = bot_app
+    async with container() as request:
+        item = _letter_item(await request.get(Curriculum))
+    ali = learner_factory(5101)
+    await ali.write("/start")
+    await ali.press(Consent(granted=False))
+    await ali.press(f"qa:{item}:0:5:1")
+    assert texts.STALE_BUTTON in ali.tg.alerts()
+
+
+@pytest.mark.parametrize(("vowel", "picked"), [(-1, 0), (3, 0), (0, -1), (0, 4)])
+async def test_forged_quiz_answer_is_rejected_and_not_logged(
+    bot_app: tuple[Dispatcher, AsyncContainer],
+    learner_factory: Callable[[int], Learner],
+    vowel: int,
+    picked: int,
+) -> None:
+    """Огласовка вне 0..2 или вариант вне 0..3 — «устарела», в данные исследования не пишется."""
+    _, container = bot_app
+    async with container() as request:
+        item = _letter_item(await request.get(Curriculum))
+    ali = learner_factory(5102)
+    await ali.write("/start")
+    await ali.press(Consent(granted=False))
+    await ali.press(QuizAnswer(i=item, v=vowel, s=5, p=picked, k=-1))
+    assert texts.STALE_BUTTON in ali.tg.alerts()
+    assert await _quiz_events(container) == 0

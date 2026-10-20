@@ -366,3 +366,128 @@ async def test_yesterdays_unfinished_opening_does_not_take_todays_voice(
     await ali.voice()  # на следующий день, карточка истиазы всё ещё на экране
     assert len(await _opening_attempts(container)) == 2  # только вчерашние из _seed
     assert await _current_item(container) == RESUME
+
+
+# ---------- TD-FN-90 без изменения схемы (пакет Б, круг 1; ADR-0061, ADR-0058) ----------
+async def _attempt_count(container: AsyncContainer) -> int:
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(TG)
+        assert learner is not None
+        count: int = await (await request.get(AttemptRepository)).count(learner.id)
+    return count
+
+
+async def test_unknown_command_marks_menu_so_voice_is_not_assessed(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """TD-FN-90 п. 2 (FR-50): «/abc» показывает главную — на экране меню, голосовое не в зачёт."""
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="skip"))
+    await ali.press(GoItem(item_id="L006-02"))  # карточка открыта
+    await ali.write("/abc")  # неизвестная команда — главная
+    before = await _attempt_count(container)
+    await ali.voice()
+    assert texts.VOICE_ON_HOME in ali.tg.texts()
+    assert await _attempt_count(container) == before
+
+
+async def test_lesson_chosen_from_list_during_opening_moves_cursor(
+    app: tuple[Dispatcher, AsyncContainer], curriculum: Curriculum
+) -> None:
+    """TD-FN-90 п. 3 (FR-49): выбор урока из «📚 Уроки» посреди начала занятия — сознательный.
+
+    Он завершает начало занятия, и карточка урока двигает «Продолжить».
+    """
+    from muallim.presentation.telegram.callbacks import Lessons  # noqa: PLC0415
+    from muallim.presentation.telegram.screens import LESSONS_PER_PAGE  # noqa: PLC0415
+
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))  # истиаза на экране, начало занятия идёт
+    part = next(
+        k for k, (_, ls) in enumerate(curriculum.parts()) if any(x.id == "L007" for x in ls)
+    )
+    index = [x.id for x in curriculum.parts()[part][1]].index("L007")
+    await ali.press(Lessons(part=part, page=index // LESSONS_PER_PAGE))
+    target = GoItem(item_id="L007-01").pack()
+    assert target in [data for _, data in _labels(ali)], _labels(ali)
+    await ali.press(target)
+    assert await _current_item(container) == "L007-01"
+    assert await _home_continue(ali) == target
+
+
+# басмала — последний шаг: «Продолжить» ведёт в урок 2 (FR-49), круга нет
+@pytest.mark.parametrize("cursor", [OPENING_ITEMS[0]])
+async def test_no_opening_when_cursor_is_on_opening_card(
+    app: tuple[Dispatcher, AsyncContainer], cursor: str
+) -> None:
+    """TD-FN-90 п. 5 (ADR-0050, ADR-0058): урок 1 пройден, ученик вернулся повторить истиазу или
+    басмалу — курсор на L001-02/03. Начало занятия не предлагается: иначе «Продолжить» после
+    басмалы снова открывает его по кругу."""
+    dp, container = app
+    async with container() as request:
+        session = await request.get(AsyncSession)
+        repo = SqlLearnerRepository(session)
+        learner = await repo.get_by_telegram_id(TG)
+        assert learner is not None
+        learner.current_item_id = cursor
+        await repo.save(learner)
+        await session.commit()
+    ali = _person(dp)
+    await ali.write("/start")  # новый день: сегодня ещё не занимался
+    assert texts.OPENING_TITLE not in ali.tg.texts()[-1]
+    assert ali.button(GoItem) == GoItem(item_id=cursor).pack()
+
+
+async def test_voice_on_menu_is_not_downloaded(app: tuple[Dispatcher, AsyncContainer]) -> None:
+    """TD-FN-90 п. 6 (FR-50): на экране меню голосовое не оценивается — и не скачивается."""
+    from aiogram.methods import GetFile  # noqa: PLC0415
+
+    dp, _ = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="skip"))  # главная
+    await ali.voice()
+    assert texts.VOICE_ON_HOME in ali.tg.texts()
+    assert not [c for c in ali.tg.calls if isinstance(c, GetFile)], "запись с главной скачана"
+
+
+async def test_quiz_answer_shows_the_options_the_learner_saw(
+    app: tuple[Dispatcher, AsyncContainer],
+    curriculum: Curriculum,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """TD-FN-90 п. 4 (ADR-0025, FR-49): ответ закрепления показывает ровно те варианты, что были
+    на кнопках, даже если между вопросом и ответом ученик начал новый урок буквы."""
+    import random  # noqa: PLC0415
+
+    from muallim.domain.quiz import make_question, question_from  # noqa: PLC0415
+    from muallim.presentation.telegram.callbacks import Quiz, QuizAnswer  # noqa: PLC0415
+
+    seed = 0
+    lessons = {les.id: les for les in curriculum.lessons}
+    before = [lessons["L003"], lessons["L005"]]
+    shown = make_question(curriculum, before, seed)
+    after = question_from(curriculum, shown.item_id, shown.vowel, seed, [*before, lessons["L004"]])
+    assert after.options != shown.options, "предусловие: новый урок меняет отвлекающие варианты"
+
+    dp, _ = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="skip"))
+    for lesson in ("L003", "L005"):  # начаты уроки букв: по попытке в каждом
+        practice = next(i for i in lessons[lesson].items if i.is_practice)
+        await ali.press(GoItem(item_id=practice.id))
+        await ali.voice()
+    monkeypatch.setattr(random, "randrange", lambda *_: seed)
+    await ali.press(Quiz())
+    asked = [(text, data) for text, data in _labels(ali) if data.startswith(QuizAnswer.__prefix__)]
+    assert [text for text, _ in asked] == list(shown.options)
+
+    await ali.press(GoItem(item_id="L004-02"))  # начал новый урок буквы (курсор — урок 4)
+    await ali.press(asked[0][1])  # ответил кнопкой со старого экрана вопроса
+    answered = [text for text, data in _labels(ali) if data == "noop"]
+    assert answered == list(shown.options), "на экране ответа — те же варианты, что на кнопках"

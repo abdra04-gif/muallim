@@ -687,7 +687,10 @@ def signs() -> Screen:
 def quiz(q: Question) -> Screen:
     kb = InlineKeyboardBuilder()
     for k, option in enumerate(q.options):
-        kb.button(text=option, callback_data=QuizAnswer(i=q.item_id, v=q.vowel, s=q.seed, p=k))
+        kb.button(
+            text=option,
+            callback_data=QuizAnswer(i=q.item_id, v=q.vowel, s=q.seed, p=k, k=q.started),
+        )
     _home_row(kb)
     kb.adjust(2, 2, 1)
     image = render.card(q.prompt, set(), (0, 1)) if render.available() else None

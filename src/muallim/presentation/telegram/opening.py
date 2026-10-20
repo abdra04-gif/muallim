@@ -22,8 +22,14 @@ _DAY: Final = "opening_day"  # дата начала занятия по час�
 
 
 def needs_opening(progress: Progress, skipped_on: date | None) -> bool:
-    """Предложить, если урок 1 пройден, сегодня ещё не занимался и сегодня не пропускал."""
+    """Предложить, если урок 1 пройден, сегодня ещё не занимался и сегодня не пропускал.
+
+    Курсор на истиазе или басмале (вернулся повторить) — не предлагать: иначе «Продолжить»
+    после басмалы снова открывает начало занятия по кругу (TD-FN-90).
+    """
     if progress.today is None or progress.today_attempts:
+        return False
+    if progress.continue_item is not None and progress.continue_item.id in OPENING_ITEMS:
         return False
     try:
         if progress.of(FIRST_LESSON).status is not LessonStatus.DONE:

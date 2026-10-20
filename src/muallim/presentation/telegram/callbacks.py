@@ -31,6 +31,7 @@ class QuizAnswer(CallbackData, prefix="qa"):
     v: int  # огласовка
     s: int  # seed вопроса
     p: int  # выбранный вариант
+    k: int = -1  # начатые уроки букв на момент вопроса (маска); -1 — пересчитать
 
 
 class Help(CallbackData, prefix="help"):
