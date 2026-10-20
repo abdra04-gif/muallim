@@ -107,7 +107,7 @@ def test_item_is_syllable_as_needed_and_as_heard_plus_short_hint(
     first, hint = m.text.split("\n")
     assert first == "«с̣а» → у тебя «са»"
     assert "с̣" in hint and len(hint) < 60
-    assert "(Сод" not in m.text and "+" not in m.text and HOW not in m.text
+    assert "(Сад" not in m.text and "+" not in m.text and HOW not in m.text
     assert curriculum.lexicon.pair_tips[frozenset("صس")] in m.more
 
 

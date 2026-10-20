@@ -8,7 +8,7 @@
 # Огласовки строк с. 10–37 перенесены агентом со скана — verified: false до сверки человеком.
 # Меняет ТОЛЬКО ЧЕЛОВЕК (CLAUDE.md). При любой правке увеличьте version.
 id: al-muallim-al-thani-ru
-version: 2026.10.18-book-4
+version: 2026.10.21-book-5
 title: Муаллим сани — вся книга Максуди
 source:
   source_id: SRC-040
@@ -114,7 +114,7 @@ lessons:
   - id: L002-05
     kind: alphabet
     text: ل م ن و ه ء ي
-    name: лэм · мим · нун · уау · hэ · хэмзэ · йэ
+    name: лэм · мим · нун · уау · һэ · хэмзэ · йэ
     source:
       source_id: SRC-040
       page: 10
@@ -122,7 +122,7 @@ lessons:
       verified: false
 - id: L003
   number: 3
-  title: 3. ء · Хамза
+  title: 3. أَ إِ أُ · Хэмзэ
   kind: line
   accent: ءأإؤئآ
   section: letter
@@ -150,12 +150,12 @@ lessons:
   - id: L003-02
     kind: rule
     text: ء
-    name: Хамза ء — смычка в горле
-    tip: 'Хамза — звук из самой глубины горла. Голосовые связки на миг смыкаются и резко размыкаются, как в начале
+    name: Хэмзэ ء — смычка в горле
+    tip: 'Хэмзэ — звук из самой глубины горла. Голосовые связки на миг смыкаются и резко размыкаются, как в начале
       «а!» после паузы или в «не-а». В русском этот звук есть, но мы его не замечаем.
 
-      В арабском хамзу произносят всегда, даже в середине слова. Её огласовка — над ней или под ней: أَ — «а», إِ
-      — «и», أُ — «у».'
+      В арабском хэмзэ произносят всегда, даже в середине слова. Её огласовка — над ней или под ней: أَ — «а», إِ
+      — «и», أُ — «у». Палочка ا под ней — элиф: здесь он только подставка для хэмзэ и сам не читается.'
     source:
       source_id: SRC-040
       page: 10
@@ -172,7 +172,7 @@ lessons:
 
       Частые ошибки: «э» или «я» вместо «а»; растянутое «аа» — фатха короткая, на один счёт.
 
-      Начни с хамзы: короткая смычка в горле — и сразу «а».'
+      Начни с хэмзэ: короткая смычка в горле — и сразу «а».'
     source:
       source_id: SRC-040
       page: 10
@@ -182,7 +182,7 @@ lessons:
   - id: L003-04
     kind: syllable
     text: أَ
-    name: Хамза
+    name: Хэмзэ
     sound: а
     tip: Смычка в горле — и сразу короткое «а», рот открыт. Не «я».
     source:
@@ -210,7 +210,7 @@ lessons:
   - id: L003-06
     kind: syllable
     text: إِ
-    name: Хамза
+    name: Хэмзэ
     sound: и
     tip: Смычка в горле — и сразу короткое «и», губы в улыбке. Не «йи» и не «е».
     source:
@@ -237,7 +237,7 @@ lessons:
   - id: L003-08
     kind: syllable
     text: أُ
-    name: Хамза
+    name: Хэмзэ
     sound: у
     tip: Смычка в горле — и сразу короткое «у», губы кружком. Не «о».
     source:
@@ -266,9 +266,10 @@ lessons:
   - id: L003-10
     kind: letter
     text: أَ إِ أُ
-    name: Хамза
+    name: Хэмзэ
     sound: а · и · у
-    tip: Короткое «а» с лёгкой смычкой в горле, как «а» после паузы.
+    tip: 'Каждый слог начни с лёгкой смычки в горле, как после паузы: «а» — рот открыт, «и» — губы в улыбке, «у»
+      — губы кружком. Все три коротко, на один счёт.'
     source:
       source_id: SRC-040
       page: 10
@@ -276,7 +277,7 @@ lessons:
       verified: false
 - id: L004
   number: 4
-  title: 4. ر · Ро
+  title: 4. ر · Ра
   kind: line
   accent: ر
   section: letter
@@ -289,12 +290,13 @@ lessons:
   - id: L004-01
     kind: rule
     text: ر
-    name: Как произносить ر · Ро
+    name: Как произносить ر · Ра
     tip: 'Кончик языка у бугорка за верхними зубами, чуть глубже, чем для «н».
 
       Как сказать: один лёгкий удар языком — «р». Не раскатывай «ррр»: в таджвиде дрожание языка сводят к минимуму.
 
-      С фатхой и даммой ر твёрдая — «ро», «ру»; с кясрой мягкая — «ри».'
+      С фатхой и даммой ر твёрдая: «а» в «ра» звучит глубже, ближе к «о», но губы не округляй; с кясрой мягкая —
+      «ри».'
     source:
       source_id: SRC-040
       page: 11
@@ -304,9 +306,9 @@ lessons:
   - id: L004-02
     kind: syllable
     text: رَ
-    name: Ро
-    sound: ро
-    tip: 'Фатха: рот открыт, ر твёрдая — «ро».'
+    name: Ра
+    sound: ра
+    tip: 'Фатха: ر твёрдая — «а» звучит глубже, ближе к «о». Рот открыт, губы не округляй.'
     source:
       source_id: SRC-040
       page: 11
@@ -316,7 +318,7 @@ lessons:
   - id: L004-03
     kind: syllable
     text: رِ
-    name: Ро
+    name: Ра
     sound: ри
     tip: 'Кясра: губы в улыбке, ر мягкая — «ри».'
     source:
@@ -328,7 +330,7 @@ lessons:
   - id: L004-04
     kind: syllable
     text: رُ
-    name: Ро
+    name: Ра
     sound: ру
     tip: 'Дамма: губы кружком, ر твёрдая — «ру».'
     source:
@@ -340,9 +342,10 @@ lessons:
   - id: L004-05
     kind: letter
     text: رَ رِ رُ
-    name: Ро
-    sound: ро · ри · ру
-    tip: Раскатистое «р». С фатхой буква твёрдая — «ро».
+    name: Ра
+    sound: ра · ри · ру
+    tip: Один лёгкий удар кончиком языка — не «ррр». С фатхой и даммой ر твёрдая («а» глубже, ближе к «о», губы
+      не округляй), с кясрой — мягкая «ри».
     source:
       source_id: SRC-040
       page: 11
@@ -358,7 +361,7 @@ lessons:
       verified: false
 - id: L005
   number: 5
-  title: 5. ز · Зай
+  title: 5. ز · Зэй
   kind: line
   accent: ز
   section: letter
@@ -371,7 +374,7 @@ lessons:
   - id: L005-01
     kind: rule
     text: ز
-    name: Как произносить ز · Зай
+    name: Как произносить ز · Зэй
     tip: 'Кончик языка у нижних передних зубов, воздух проходит со свистом.
 
       Как сказать: звонкое «з», как в «зима». Не оглушай его в «с».'
@@ -384,7 +387,7 @@ lessons:
   - id: L005-02
     kind: syllable
     text: زَ
-    name: Зай
+    name: Зэй
     sound: за
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -396,7 +399,7 @@ lessons:
   - id: L005-03
     kind: syllable
     text: زِ
-    name: Зай
+    name: Зэй
     sound: зи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -408,7 +411,7 @@ lessons:
   - id: L005-04
     kind: syllable
     text: زُ
-    name: Зай
+    name: Зэй
     sound: зу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -420,7 +423,7 @@ lessons:
   - id: L005-05
     kind: letter
     text: زَ زِ زُ
-    name: Зай
+    name: Зэй
     sound: за · зи · зу
     tip: Обычное «з».
     source:
@@ -534,7 +537,7 @@ lessons:
       verified: false
 - id: L007
   number: 7
-  title: 7. ت · Та
+  title: 7. ت · Тэ
   kind: line
   accent: ت
   section: letter
@@ -547,7 +550,7 @@ lessons:
   - id: L007-01
     kind: rule
     text: ت
-    name: Как произносить ت · Та
+    name: Как произносить ت · Тэ
     tip: 'Кончик языка у основания верхних передних зубов.
 
       Как сказать: лёгкое «т», язык не прижимай всей спинкой. Не путай с твёрдым ط — «то».
@@ -562,7 +565,7 @@ lessons:
   - id: L007-02
     kind: syllable
     text: تَ
-    name: Та
+    name: Тэ
     sound: та
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -574,7 +577,7 @@ lessons:
   - id: L007-03
     kind: syllable
     text: تِ
-    name: Та
+    name: Тэ
     sound: ти
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -586,7 +589,7 @@ lessons:
   - id: L007-04
     kind: syllable
     text: تُ
-    name: Та
+    name: Тэ
     sound: ту
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -598,7 +601,7 @@ lessons:
   - id: L007-05
     kind: letter
     text: تَ تِ تُ
-    name: Та
+    name: Тэ
     sound: та · ти · ту
     tip: 'Мягкое «т»: кончик языка у верхних зубов.'
     source:
@@ -728,7 +731,7 @@ lessons:
       verified: false
 - id: L009
   number: 9
-  title: 9. ي · Йа
+  title: 9. ي · Йэ
   kind: line
   accent: ي
   section: letter
@@ -741,7 +744,7 @@ lessons:
   - id: L009-01
     kind: rule
     text: ي
-    name: Как произносить ي · Йа
+    name: Как произносить ي · Йэ
     tip: 'Середина языка поднята к твёрдому нёбу.
 
       Как сказать: «й» плюс гласный — «йа», «йи», «йу». Не произноси «я» как одну русскую букву: «а» в «йа» должна
@@ -755,7 +758,7 @@ lessons:
   - id: L009-02
     kind: syllable
     text: يَ
-    name: Йа
+    name: Йэ
     sound: йа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -767,7 +770,7 @@ lessons:
   - id: L009-03
     kind: syllable
     text: يِ
-    name: Йа
+    name: Йэ
     sound: йи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -779,7 +782,7 @@ lessons:
   - id: L009-04
     kind: syllable
     text: يُ
-    name: Йа
+    name: Йэ
     sound: йу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -791,7 +794,7 @@ lessons:
   - id: L009-05
     kind: letter
     text: يَ يِ يُ
-    name: Йа
+    name: Йэ
     sound: йа · йи · йу
     tip: Как «я» — «йа».
     source:
@@ -825,7 +828,7 @@ lessons:
       verified: false
 - id: L010
   number: 10
-  title: 10. ب · Ба
+  title: 10. ب · Бэ
   kind: line
   accent: ب
   section: letter
@@ -838,7 +841,7 @@ lessons:
   - id: L010-01
     kind: rule
     text: ب
-    name: Как произносить ب · Ба
+    name: Как произносить ب · Бэ
     tip: 'Обе губы сомкнуты и резко размыкаются.
 
       Как сказать: звонкое «б». Не оглушай его в «п» — даже в конце слога.'
@@ -851,7 +854,7 @@ lessons:
   - id: L010-02
     kind: syllable
     text: بَ
-    name: Ба
+    name: Бэ
     sound: ба
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -863,7 +866,7 @@ lessons:
   - id: L010-03
     kind: syllable
     text: بِ
-    name: Ба
+    name: Бэ
     sound: би
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -875,7 +878,7 @@ lessons:
   - id: L010-04
     kind: syllable
     text: بُ
-    name: Ба
+    name: Бэ
     sound: бу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -887,7 +890,7 @@ lessons:
   - id: L010-05
     kind: letter
     text: بَ بِ بُ
-    name: Ба
+    name: Бэ
     sound: ба · би · бу
     tip: Обычное «б».
     source:
@@ -921,7 +924,7 @@ lessons:
       verified: false
 - id: L011
   number: 11
-  title: 11. ك · Каф
+  title: 11. ك · Кэф
   kind: line
   accent: ك
   section: letter
@@ -934,7 +937,7 @@ lessons:
   - id: L011-01
     kind: rule
     text: ك
-    name: Как произносить ك · Каф
+    name: Как произносить ك · Кэф
     tip: 'Задняя часть языка у нёба — чуть ближе к зубам, чем для ق.
 
       Как сказать: лёгкое «к» с выдохом. Не углубляй его в горло — это уже ق.'
@@ -947,7 +950,7 @@ lessons:
   - id: L011-02
     kind: syllable
     text: كَ
-    name: Каф
+    name: Кэф
     sound: ка
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -959,7 +962,7 @@ lessons:
   - id: L011-03
     kind: syllable
     text: كِ
-    name: Каф
+    name: Кэф
     sound: ки
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -971,7 +974,7 @@ lessons:
   - id: L011-04
     kind: syllable
     text: كُ
-    name: Каф
+    name: Кэф
     sound: ку
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -983,7 +986,7 @@ lessons:
   - id: L011-05
     kind: letter
     text: كَ كِ كُ
-    name: Каф
+    name: Кэф
     sound: ка · ки · ку
     tip: Обычное мягкое «к».
     source:
@@ -1025,7 +1028,7 @@ lessons:
       verified: false
 - id: L012
   number: 12
-  title: 12. ل · Лям
+  title: 12. ل · Лэм
   kind: line
   accent: ل
   section: letter
@@ -1038,7 +1041,7 @@ lessons:
   - id: L012-01
     kind: rule
     text: ل
-    name: Как произносить ل · Лям
+    name: Как произносить ل · Лэм
     tip: 'Края передней части языка у дёсен верхних зубов.
 
       Как сказать: светлое «ль», как в «лямка». Русское твёрдое «л» (как в «лапа») — ошибка, кроме слова Аллах после
@@ -1052,7 +1055,7 @@ lessons:
   - id: L012-02
     kind: syllable
     text: لَ
-    name: Лям
+    name: Лэм
     sound: ля
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -1064,7 +1067,7 @@ lessons:
   - id: L012-03
     kind: syllable
     text: لِ
-    name: Лям
+    name: Лэм
     sound: ли
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -1076,7 +1079,7 @@ lessons:
   - id: L012-04
     kind: syllable
     text: لُ
-    name: Лям
+    name: Лэм
     sound: лю
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -1088,7 +1091,7 @@ lessons:
   - id: L012-05
     kind: letter
     text: لَ لِ لُ
-    name: Лям
+    name: Лэм
     sound: ля · ли · лю
     tip: Мягкое «л», как в «ля».
     source:
@@ -1130,7 +1133,7 @@ lessons:
       verified: false
 - id: L013
   number: 13
-  title: 13. و · Вав
+  title: 13. و · Уау
   kind: line
   accent: و
   section: letter
@@ -1143,7 +1146,7 @@ lessons:
   - id: L013-01
     kind: rule
     text: و
-    name: Как произносить و · Вав
+    name: Как произносить و · Уау
     tip: 'Губы округлены, но не смыкаются.
 
       Как сказать: как английское w — «wа», «wи», «wу». Не русское «в»: зубы губы не касаются.'
@@ -1156,7 +1159,7 @@ lessons:
   - id: L013-02
     kind: syllable
     text: وَ
-    name: Вав
+    name: Уау
     sound: wа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -1168,7 +1171,7 @@ lessons:
   - id: L013-03
     kind: syllable
     text: وِ
-    name: Вав
+    name: Уау
     sound: wи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -1180,7 +1183,7 @@ lessons:
   - id: L013-04
     kind: syllable
     text: وُ
-    name: Вав
+    name: Уау
     sound: wу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -1192,7 +1195,7 @@ lessons:
   - id: L013-05
     kind: letter
     text: وَ وِ وُ
-    name: Вав
+    name: Уау
     sound: wа · wи · wу
     tip: Губы округлены, как английское w.
     source:
@@ -1234,7 +1237,7 @@ lessons:
       verified: false
 - id: L014
   number: 14
-  title: 14. ه · Ха (лёгкая)
+  title: 14. ه · Һэ
   kind: line
   accent: ه
   section: letter
@@ -1247,8 +1250,8 @@ lessons:
   - id: L014-01
     kind: rule
     text: ه
-    name: Как произносить ه · Ха (лёгкая)
-    tip: 'Самая глубина горла, там же, где хамза.
+    name: Как произносить ه · Һэ
+    tip: 'Самая глубина горла, там же, где хэмзэ.
 
       Как сказать: лёгкий выдох без шума — как английское h в «hello». Не «х» и не «г».'
     source:
@@ -1260,7 +1263,7 @@ lessons:
   - id: L014-02
     kind: syllable
     text: هَ
-    name: Ха (лёгкая)
+    name: Һэ
     sound: hа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -1272,7 +1275,7 @@ lessons:
   - id: L014-03
     kind: syllable
     text: هِ
-    name: Ха (лёгкая)
+    name: Һэ
     sound: hи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -1284,7 +1287,7 @@ lessons:
   - id: L014-04
     kind: syllable
     text: هُ
-    name: Ха (лёгкая)
+    name: Һэ
     sound: hу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -1296,7 +1299,7 @@ lessons:
   - id: L014-05
     kind: letter
     text: هَ هِ هُ
-    name: Ха (лёгкая)
+    name: Һэ
     sound: hа · hи · hу
     tip: Лёгкий выдох, как английское h в «hello».
     source:
@@ -1330,7 +1333,7 @@ lessons:
       verified: false
 - id: L015
   number: 15
-  title: 15. ف · Фа
+  title: 15. ف · Фэ
   kind: line
   accent: ف
   section: letter
@@ -1343,7 +1346,7 @@ lessons:
   - id: L015-01
     kind: rule
     text: ف
-    name: Как произносить ف · Фа
+    name: Как произносить ف · Фэ
     tip: 'Кончики верхних зубов касаются внутренней стороны нижней губы.
 
       Как сказать: обычное «ф».'
@@ -1356,7 +1359,7 @@ lessons:
   - id: L015-02
     kind: syllable
     text: فَ
-    name: Фа
+    name: Фэ
     sound: фа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -1368,7 +1371,7 @@ lessons:
   - id: L015-03
     kind: syllable
     text: فِ
-    name: Фа
+    name: Фэ
     sound: фи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -1380,7 +1383,7 @@ lessons:
   - id: L015-04
     kind: syllable
     text: فُ
-    name: Фа
+    name: Фэ
     sound: фу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -1392,7 +1395,7 @@ lessons:
   - id: L015-05
     kind: letter
     text: فَ فِ فُ
-    name: Фа
+    name: Фэ
     sound: фа · фи · фу
     tip: Обычное «ф».
     source:
@@ -1434,7 +1437,7 @@ lessons:
       verified: false
 - id: L016
   number: 16
-  title: 16. ق · Коф
+  title: 16. ق · Каф
   kind: line
   accent: ق
   section: letter
@@ -1447,7 +1450,7 @@ lessons:
   - id: L016-01
     kind: rule
     text: ق
-    name: Как произносить ق · Коф
+    name: Как произносить ق · Каф
     tip: 'Самый корень языка у мягкого нёба (язычка) — глубже, чем ك.
 
       Как сказать: глухое глубокое «к», будто из горла. Буква твёрдая: «ко», «кы», «ку».
@@ -1462,7 +1465,7 @@ lessons:
   - id: L016-02
     kind: syllable
     text: قَ
-    name: Коф
+    name: Каф
     sound: ко
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -1474,7 +1477,7 @@ lessons:
   - id: L016-03
     kind: syllable
     text: قِ
-    name: Коф
+    name: Каф
     sound: кы
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -1486,7 +1489,7 @@ lessons:
   - id: L016-04
     kind: syllable
     text: قُ
-    name: Коф
+    name: Каф
     sound: ку
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -1498,7 +1501,7 @@ lessons:
   - id: L016-05
     kind: letter
     text: قَ قِ قُ
-    name: Коф
+    name: Каф
     sound: ко · кы · ку
     tip: Глубокое «к» корнем языка у мягкого нёба — «ко». Не путать с обычным «к» (ك).
     source:
@@ -1749,7 +1752,7 @@ lessons:
       verified: false
 - id: L019
   number: 19
-  title: 19. ث · Са
+  title: 19. ث · Сэ
   kind: line
   accent: ث
   section: letter
@@ -1762,7 +1765,7 @@ lessons:
   - id: L019-01
     kind: rule
     text: ث
-    name: Как произносить ث · Са
+    name: Как произносить ث · Сэ
     tip: 'Кончик языка между передними зубами — слегка высунут.
 
       Как сказать: глухой межзубный звук, как th в английском «think». Не «с» и не «ф».'
@@ -1775,7 +1778,7 @@ lessons:
   - id: L019-02
     kind: syllable
     text: ثَ
-    name: Са
+    name: Сэ
     sound: θа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -1787,7 +1790,7 @@ lessons:
   - id: L019-03
     kind: syllable
     text: ثِ
-    name: Са
+    name: Сэ
     sound: θи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -1799,7 +1802,7 @@ lessons:
   - id: L019-04
     kind: syllable
     text: ثُ
-    name: Са
+    name: Сэ
     sound: θу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -1811,7 +1814,7 @@ lessons:
   - id: L019-05
     kind: letter
     text: ثَ ثِ ثُ
-    name: Са
+    name: Сэ
     sound: θа · θи · θу
     tip: 'Межзубный звук: кончик языка между зубами, как английское th в «think».'
     source:
@@ -1862,7 +1865,7 @@ lessons:
       verified: false
 - id: L020
   number: 20
-  title: 20. ص · Сод
+  title: 20. ص · Сад
   kind: line
   accent: ص
   section: letter
@@ -1875,7 +1878,7 @@ lessons:
   - id: L020-01
     kind: rule
     text: ص
-    name: Как произносить ص · Сод
+    name: Как произносить ص · Сад
     tip: 'Кончик языка у нижних передних зубов, как для س, но корень языка поднят к нёбу.
 
       Как сказать: твёрдое «с» со свистом, рот «полный»: «со», «сы», «су». Не путай с س.'
@@ -1888,7 +1891,7 @@ lessons:
   - id: L020-02
     kind: syllable
     text: صَ
-    name: Сод
+    name: Сад
     sound: со
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -1900,7 +1903,7 @@ lessons:
   - id: L020-03
     kind: syllable
     text: صِ
-    name: Сод
+    name: Сад
     sound: сы
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -1912,7 +1915,7 @@ lessons:
   - id: L020-04
     kind: syllable
     text: صُ
-    name: Сод
+    name: Сад
     sound: су
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -1924,7 +1927,7 @@ lessons:
   - id: L020-05
     kind: letter
     text: صَ صِ صُ
-    name: Сод
+    name: Сад
     sound: со · сы · су
     tip: 'Твёрдое «с»: корень языка поднят, рот слегка округлён — «со».'
     source:
@@ -1959,7 +1962,7 @@ lessons:
       verified: false
 - id: L021
   number: 21
-  title: 21. ط · То
+  title: 21. ط · Та
   kind: line
   accent: ط
   section: letter
@@ -1972,7 +1975,7 @@ lessons:
   - id: L021-01
     kind: rule
     text: ط
-    name: Как произносить ط · То
+    name: Как произносить ط · Та
     tip: 'Кончик языка у основания верхних зубов, спинка языка прижата к нёбу.
 
       Как сказать: сильное твёрдое «т»: «то», «ты», «ту». Не путай с лёгким ت.'
@@ -1985,7 +1988,7 @@ lessons:
   - id: L021-02
     kind: syllable
     text: طَ
-    name: То
+    name: Та
     sound: то
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -1997,7 +2000,7 @@ lessons:
   - id: L021-03
     kind: syllable
     text: طِ
-    name: То
+    name: Та
     sound: ты
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -2009,7 +2012,7 @@ lessons:
   - id: L021-04
     kind: syllable
     text: طُ
-    name: То
+    name: Та
     sound: ту
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -2021,7 +2024,7 @@ lessons:
   - id: L021-05
     kind: letter
     text: طَ طِ طُ
-    name: То
+    name: Та
     sound: то · ты · ту
     tip: 'Твёрдое «т»: язык прижат к нёбу всей спинкой — «то».'
     source:
@@ -2168,7 +2171,7 @@ lessons:
       verified: false
 - id: L023
   number: 23
-  title: 23. خ · Хо
+  title: 23. خ · Ха
   kind: line
   accent: خ
   section: letter
@@ -2181,7 +2184,7 @@ lessons:
   - id: L023-01
     kind: rule
     text: خ
-    name: Как произносить خ · Хо
+    name: Как произносить خ · Ха
     tip: 'Верх горла, у мягкого нёба — с хрипом.
 
       Как сказать: хриплое «х», как немецкое ch в «Bach». Буква твёрдая: «хо», «хы», «ху».'
@@ -2194,7 +2197,7 @@ lessons:
   - id: L023-02
     kind: syllable
     text: خَ
-    name: Хо
+    name: Ха
     sound: хо
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -2206,7 +2209,7 @@ lessons:
   - id: L023-03
     kind: syllable
     text: خِ
-    name: Хо
+    name: Ха
     sound: хы
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -2218,7 +2221,7 @@ lessons:
   - id: L023-04
     kind: syllable
     text: خُ
-    name: Хо
+    name: Ха
     sound: ху
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -2230,7 +2233,7 @@ lessons:
   - id: L023-05
     kind: letter
     text: خَ خِ خُ
-    name: Хо
+    name: Ха
     sound: хо · хы · ху
     tip: Хриплое «х» из задней части нёба, как немецкое ch в «Bach». Буква твёрдая — звучит «хо».
     source:
@@ -2272,7 +2275,7 @@ lessons:
       verified: false
 - id: L024
   number: 24
-  title: 24. ح · Ха
+  title: 24. ح · Хэ
   kind: line
   accent: ح
   section: letter
@@ -2285,7 +2288,7 @@ lessons:
   - id: L024-01
     kind: rule
     text: ح
-    name: Как произносить ح · Ха
+    name: Как произносить ح · Хэ
     tip: 'Середина горла — горло сужено, но без хрипа.
 
       Как сказать: сильный чистый выдох, как когда дышишь на стекло, чтобы оно запотело. Не русское «х» (у нас оно
@@ -2299,7 +2302,7 @@ lessons:
   - id: L024-02
     kind: syllable
     text: حَ
-    name: Ха
+    name: Хэ
     sound: ħа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -2311,7 +2314,7 @@ lessons:
   - id: L024-03
     kind: syllable
     text: حِ
-    name: Ха
+    name: Хэ
     sound: ħи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -2323,7 +2326,7 @@ lessons:
   - id: L024-04
     kind: syllable
     text: حُ
-    name: Ха
+    name: Хэ
     sound: ħу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -2335,7 +2338,7 @@ lessons:
   - id: L024-05
     kind: letter
     text: حَ حِ حُ
-    name: Ха
+    name: Хэ
     sound: ħа · ħи · ħу
     tip: 'Глубокое «х» из середины горла: сожми горло и выдохни сильно, без хрипа.'
     source:
@@ -2386,7 +2389,7 @@ lessons:
       verified: false
 - id: L025
   number: 25
-  title: 25. غ · Гойн
+  title: 25. غ · Гайн
   kind: line
   accent: غ
   section: letter
@@ -2399,7 +2402,7 @@ lessons:
   - id: L025-01
     kind: rule
     text: غ
-    name: Как произносить غ · Гойн
+    name: Как произносить غ · Гайн
     tip: 'Верх горла, у мягкого нёба — как خ, но с голосом.
 
       Как сказать: картавое «г», как французское r: «го», «гы», «гу». Не русское «г».'
@@ -2412,7 +2415,7 @@ lessons:
   - id: L025-02
     kind: syllable
     text: غَ
-    name: Гойн
+    name: Гайн
     sound: го
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -2424,7 +2427,7 @@ lessons:
   - id: L025-03
     kind: syllable
     text: غِ
-    name: Гойн
+    name: Гайн
     sound: гы
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -2436,7 +2439,7 @@ lessons:
   - id: L025-04
     kind: syllable
     text: غُ
-    name: Гойн
+    name: Гайн
     sound: гу
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -2448,7 +2451,7 @@ lessons:
   - id: L025-05
     kind: letter
     text: غَ غِ غُ
-    name: Гойн
+    name: Гайн
     sound: го · гы · гу
     tip: Картавое «г», как французское r. Буква твёрдая — «го».
     source:
@@ -2482,7 +2485,7 @@ lessons:
       verified: false
 - id: L026
   number: 26
-  title: 26. ع · Айн
+  title: 26. ع · Эйн
   kind: line
   accent: ع
   section: letter
@@ -2495,11 +2498,11 @@ lessons:
   - id: L026-01
     kind: rule
     text: ع
-    name: Как произносить ع · Айн
+    name: Как произносить ع · Эйн
     tip: 'Середина горла, там же, где ح, но с голосом.
 
       Как сказать: сожми горло и скажи «а» с напряжением, звук как будто «выдавливается». Для русскоговорящих это
-      самый трудный звук: не пропускай его и не заменяй хамзой.'
+      самый трудный звук: не пропускай его и не заменяй хэмзэ.'
     source:
       source_id: SRC-040
       page: 22
@@ -2509,7 +2512,7 @@ lessons:
   - id: L026-02
     kind: syllable
     text: عَ
-    name: Айн
+    name: Эйн
     sound: ʿа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -2521,7 +2524,7 @@ lessons:
   - id: L026-03
     kind: syllable
     text: عِ
-    name: Айн
+    name: Эйн
     sound: ʿи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -2533,7 +2536,7 @@ lessons:
   - id: L026-04
     kind: syllable
     text: عُ
-    name: Айн
+    name: Эйн
     sound: ʿу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -2545,7 +2548,7 @@ lessons:
   - id: L026-05
     kind: letter
     text: عَ عِ عُ
-    name: Айн
+    name: Эйн
     sound: ʿа · ʿи · ʿу
     tip: 'Звук из середины горла: сожми горло и скажи «а» с напряжением.'
     source:
@@ -2588,7 +2591,7 @@ lessons:
       verified: false
 - id: L027
   number: 27
-  title: 27. د · Даль
+  title: 27. د · Дэль
   kind: line
   accent: د
   section: letter
@@ -2601,7 +2604,7 @@ lessons:
   - id: L027-01
     kind: rule
     text: د
-    name: Как произносить د · Даль
+    name: Как произносить د · Дэль
     tip: 'Кончик языка у основания верхних передних зубов, как для ت, но с голосом.
 
       Как сказать: звонкое «д». Не оглушай в «т» и не прижимай язык всей спинкой — это ض.'
@@ -2614,7 +2617,7 @@ lessons:
   - id: L027-02
     kind: syllable
     text: دَ
-    name: Даль
+    name: Дэль
     sound: да
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -2626,7 +2629,7 @@ lessons:
   - id: L027-03
     kind: syllable
     text: دِ
-    name: Даль
+    name: Дэль
     sound: ди
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -2638,7 +2641,7 @@ lessons:
   - id: L027-04
     kind: syllable
     text: دُ
-    name: Даль
+    name: Дэль
     sound: ду
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -2650,7 +2653,7 @@ lessons:
   - id: L027-05
     kind: letter
     text: دَ دِ دُ
-    name: Даль
+    name: Дэль
     sound: да · ди · ду
     tip: Обычное «д».
     source:
@@ -2692,7 +2695,7 @@ lessons:
       verified: false
 - id: L028
   number: 28
-  title: 28. ض · Дод
+  title: 28. ض · Дад
   kind: line
   accent: ض
   section: letter
@@ -2705,7 +2708,7 @@ lessons:
   - id: L028-01
     kind: rule
     text: ض
-    name: Как произносить ض · Дод
+    name: Как произносить ض · Дад
     tip: 'Боковой край языка прижат к верхним коренным зубам, корень языка поднят.
 
       Как сказать: твёрдое звонкое «д», рот «полный»: «до», «ды», «ду». Самый особый звук арабского — послушай 🔊
@@ -2719,7 +2722,7 @@ lessons:
   - id: L028-02
     kind: syllable
     text: ضَ
-    name: Дод
+    name: Дад
     sound: до
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -2731,7 +2734,7 @@ lessons:
   - id: L028-03
     kind: syllable
     text: ضِ
-    name: Дод
+    name: Дад
     sound: ды
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -2743,7 +2746,7 @@ lessons:
   - id: L028-04
     kind: syllable
     text: ضُ
-    name: Дод
+    name: Дад
     sound: ду
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -2755,7 +2758,7 @@ lessons:
   - id: L028-05
     kind: letter
     text: ضَ ضِ ضُ
-    name: Дод
+    name: Дад
     sound: до · ды · ду
     tip: 'Твёрдое «д»: боковой край языка прижат к коренным зубам — «до».'
     source:
@@ -2806,7 +2809,7 @@ lessons:
       verified: false
 - id: L029
   number: 29
-  title: 29. ذ · Заль
+  title: 29. ذ · Зэль
   kind: line
   accent: ذ
   section: letter
@@ -2819,7 +2822,7 @@ lessons:
   - id: L029-01
     kind: rule
     text: ذ
-    name: Как произносить ذ · Заль
+    name: Как произносить ذ · Зэль
     tip: 'Кончик языка между передними зубами — слегка высунут.
 
       Как сказать: звонкий межзубный звук, как th в английском «this». Не «з».'
@@ -2832,7 +2835,7 @@ lessons:
   - id: L029-02
     kind: syllable
     text: ذَ
-    name: Заль
+    name: Зэль
     sound: ðа
     tip: 'Фатха: рот открыт, коротко «а» — не «э» и не «я».'
     source:
@@ -2844,7 +2847,7 @@ lessons:
   - id: L029-03
     kind: syllable
     text: ذِ
-    name: Заль
+    name: Зэль
     sound: ðи
     tip: 'Кясра: губы чуть в улыбке, коротко «и» — не «ы» и не «е».'
     source:
@@ -2856,7 +2859,7 @@ lessons:
   - id: L029-04
     kind: syllable
     text: ذُ
-    name: Заль
+    name: Зэль
     sound: ðу
     tip: 'Дамма: губы кружком вперёд, коротко «у» — не «о».'
     source:
@@ -2868,7 +2871,7 @@ lessons:
   - id: L029-05
     kind: letter
     text: ذَ ذِ ذُ
-    name: Заль
+    name: Зэль
     sound: ðа · ðи · ðу
     tip: 'Межзубный звонкий звук: язык между зубами, как английское th в «this».'
     source:
@@ -2911,7 +2914,7 @@ lessons:
       verified: false
 - id: L030
   number: 30
-  title: 30. ظ · Зо
+  title: 30. ظ · За
   kind: line
   accent: ظ
   section: letter
@@ -2924,7 +2927,7 @@ lessons:
   - id: L030-01
     kind: rule
     text: ظ
-    name: Как произносить ظ · Зо
+    name: Как произносить ظ · За
     tip: 'Кончик языка между передними зубами, как для ذ, но корень языка поднят.
 
       Как сказать: твёрдый звонкий межзубный: «ðо», «ðы», «ðу». Не «з» и не мягкое ذ.'
@@ -2937,7 +2940,7 @@ lessons:
   - id: L030-02
     kind: syllable
     text: ظَ
-    name: Зо
+    name: За
     sound: ðо
     tip: 'Фатха: рот открыт, корень языка поднят — «а» звучит глубоко, ближе к «о».'
     source:
@@ -2949,7 +2952,7 @@ lessons:
   - id: L030-03
     kind: syllable
     text: ظِ
-    name: Зо
+    name: За
     sound: ðы
     tip: 'Кясра: буква остаётся твёрдой — «и» звучит ближе к «ы».'
     source:
@@ -2961,7 +2964,7 @@ lessons:
   - id: L030-04
     kind: syllable
     text: ظُ
-    name: Зо
+    name: За
     sound: ðу
     tip: 'Дамма: губы кружком, звук глубокий и полный — «у».'
     source:
@@ -2973,7 +2976,7 @@ lessons:
   - id: L030-05
     kind: letter
     text: ظَ ظِ ظُ
-    name: Зо
+    name: За
     sound: ðо · ðы · ðу
     tip: 'Твёрдый межзубный звук: язык между зубами, рот округлён — «зо».'
     source:
@@ -3810,7 +3813,7 @@ lessons:
     name: Танвин — «н» на конце
     tip: 'Двойная огласовка на конце слова — танвин. Она добавляет звук «н»:
 
-      ً = «ан» (обычно с алифом: بًا = бан), ٍ = «ин» (بٍ = бин), ٌ = «ун» (بٌ = бун).
+      ً = «ан» (обычно с элифом: بًا = бан), ٍ = «ин» (بٍ = бин), ٌ = «ун» (بٌ = бун).
 
       Буква «н» при этом не пишется — её показывает значок.'
     source:
@@ -4042,11 +4045,11 @@ lessons:
       verified: false
 - id: L045
   number: 45
-  title: '45. Хамза: как пишется (1/2)'
+  title: '45. Хэмзэ: как пишется (1/2)'
   kind: line
   accent: ءأإؤئ
   section: hamza
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 35
@@ -4055,8 +4058,8 @@ lessons:
   - id: L045-01
     kind: rule
     text: أ إ ؤ ئ
-    name: Хамза пишется по-разному
-    tip: Хамза ء — всегда один и тот же звук (смычка в горле). Она может сидеть на алифе أ إ, на вав ؤ, на йа ئ
+    name: Хэмзэ пишется по-разному
+    tip: Хэмзэ ء — всегда один и тот же звук (смычка в горле). Она может сидеть на элифе أ إ, на уау ؤ, на йэ ئ
       или стоять отдельно ء. Читай её одинаково, огласовку смотри на ней самой.
     source:
       source_id: SRC-040
@@ -4115,11 +4118,11 @@ lessons:
       verified: false
 - id: L046
   number: 46
-  title: '46. Хамза: как пишется (2/2)'
+  title: '46. Хэмзэ: как пишется (2/2)'
   kind: line
   accent: ءأإؤئ
   section: hamza
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 35
@@ -4175,11 +4178,11 @@ lessons:
       verified: false
 - id: L047
   number: 47
-  title: 47. Хамза аль-васль ٱ
+  title: 47. Хэмзэ аль-васль ٱ
   kind: line
   accent: ٱ
   section: wasla
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 36
@@ -4188,8 +4191,8 @@ lessons:
   - id: L047-01
     kind: rule
     text: ٱ
-    name: Хамза аль-васль ٱ
-    tip: 'Значок ٱ (алиф с маленькой «головкой») в начале слова читается только если с этого слова начинаешь: тогда
+    name: Хэмзэ аль-васль ٱ
+    tip: 'Значок ٱ (элиф с маленькой «головкой») в начале слова читается только если с этого слова начинаешь: тогда
       это короткое «а», «и» или «у». Внутри фразы он пропадает: слова сливаются.'
     source:
       source_id: SRC-040
@@ -4260,7 +4263,7 @@ lessons:
   kind: line
   accent: ة
   section: ta_marbuta
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 37
@@ -4317,7 +4320,7 @@ lessons:
   kind: line
   accent: ''
   section: sukun
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 38
@@ -4411,7 +4414,7 @@ lessons:
   kind: line
   accent: ''
   section: sukun
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 38
@@ -4493,7 +4496,7 @@ lessons:
   kind: line
   accent: ''
   section: sukun
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 38
@@ -4575,7 +4578,7 @@ lessons:
   kind: line
   accent: ''
   section: sukun
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 40
@@ -4657,7 +4660,7 @@ lessons:
   kind: line
   accent: ''
   section: article
-  part: 5. Хамза, артикль, сукун
+  part: 5. Хэмзэ, артикль, сукун
   source:
     source_id: SRC-040
     page: 41
@@ -6115,7 +6118,7 @@ lessons:
     kind: rule
     text: ٰ ۦ ۥ
     name: Маленькие буквы
-    tip: 'Маленький алиф ٰ, маленькая йа ۦ и маленький вав ۥ читаются так же, как большие: они удлиняют гласный
+    tip: 'Маленький элиф ٰ, маленькая йэ ۦ и маленький уау ۥ читаются так же, как большие: они удлиняют гласный
       на два счёта. هَـٰذَا = хаазаа.'
     source:
       source_id: SRC-040
@@ -6349,7 +6352,7 @@ lessons:
       note: фраза 1 из 1 · Коран 52:37
 - id: L074
   number: 74
-  title: 74. ى читается как алиф
+  title: 74. ى читается как элиф
   kind: line
   accent: ى
   section: ya_alif
@@ -6363,7 +6366,7 @@ lessons:
     kind: rule
     text: عَلَى
     name: ى без точек = долгое «аа»
-    tip: 'Буква ى (йа без двух точек снизу) после фатхи читается как алиф — долгое «аа»: عَلَى = ''алаа.'
+    tip: 'Буква ى (йэ без двух точек снизу) после фатхи читается как элиф — долгое «аа»: عَلَى = ''алаа.'
     source:
       source_id: SRC-040
       page: 57
@@ -6472,7 +6475,7 @@ lessons:
       note: фраза 5 из 5 · Коран 2:51
 - id: L075
   number: 75
-  title: 75. و с маленьким алифом
+  title: 75. و с маленьким элифом
   kind: line
   accent: و
   section: waw_alif
@@ -6485,8 +6488,8 @@ lessons:
   - id: L075-01
     kind: rule
     text: ٱلصَّلَوٰةَ
-    name: و с маленьким алифом
-    tip: 'Если над و стоит маленький алиф — сама و не читается, читается долгое «аа»: ٱلصَّلَوٰةَ = ас-салаата.'
+    name: و с маленьким элифом
+    tip: 'Если над و стоит маленький элиф — сама و не читается, читается долгое «аа»: ٱلصَّلَوٰةَ = ас-салаата.'
     source:
       source_id: SRC-040
       page: 57
@@ -7776,7 +7779,7 @@ lessons:
     kind: rule
     text: '~'
     name: Сколько тянуть мадд
-    tip: 'Обычный мадд — 2 счёта. Волнистый знак ~ над буквой мадд говорит: тяни дольше — 4–5 счётов перед хамзой,
+    tip: 'Обычный мадд — 2 счёта. Волнистый знак ~ над буквой мадд говорит: тяни дольше — 4–5 счётов перед хэмзэ,
       6 счётов перед сукуном или ташдидом. При остановке на слове можно тянуть 2, 4 или 6.'
     source:
       source_id: SRC-040
@@ -8292,7 +8295,7 @@ lessons:
     text: ۪ ۫ ۬
     name: Редкие знаки
     tip: 'Чёрный кружок в трёх местах Корана подсказывает особое чтение: «ималя» (а ближе к «э»), «ишмам» (губы
-      округляются) и облегчённая хамза. Повтори за образцом 🔊.'
+      округляются) и облегчённая хэмзэ. Повтори за образцом 🔊.'
     source:
       source_id: SRC-040
       page: 73

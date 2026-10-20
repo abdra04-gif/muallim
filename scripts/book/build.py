@@ -172,7 +172,8 @@ def lessons() -> list[dict]:
             letter = key.split(":")[1]
             head = heads[cards[0]["text"]]
             cards[0].update(name=head["name"], sound=head["sound"], tip=head["tip"])
-            title = f"{letter} · {head['name']}"
+            shown = head["text"] if letter == "ء" else letter  # в книге с. 10 — أَ إِ أُ на элифе
+            title = f"{shown} · {head['name']}"
             accent = letters_accent(letter)
             cards = letter_lesson(letter, cards)
         elif base == "sura":
@@ -331,7 +332,7 @@ def write_contents(lessons_: list[dict]) -> None:
 def main() -> None:
     doc = {
         "id": "al-muallim-al-thani-ru",
-        "version": "2026.10.18-book-4",
+        "version": "2026.10.21-book-5",
         "title": "Муаллим сани — вся книга Максуди",
         "source": {
             "source_id": SRC,
