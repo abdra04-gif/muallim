@@ -685,3 +685,124 @@ async def test_progress_week_marks_days_with_attempts(w: World) -> None:
     progress = await w.progress().execute(learner)
     assert progress.week == (False,) * 6 + (True,)
     assert progress.today == w.clock.current.date()
+
+
+# ---------- «Продолжить» после последнего шага урока (FR-49, FR-50) ----------
+@pytest.fixture
+def steps(course: Curriculum, catalog: FeedbackCatalog) -> World:
+    """Уроки с правилом и таблицей алфавита: последний шаг бывает и без чтения."""
+    rule = ItemKind.RULE
+    lessons = (
+        Lesson("S01", 1, "Начало", (
+            LessonItem("S01-01", "بَ", rule, "x", name="x"),
+            LessonItem("S01-02", "رَرْ رِرْ", ItemKind.LINE, ""),
+            LessonItem("S01-03", "أَزْ إِزْ", ItemKind.LINE, ""),
+        )),
+        Lesson("S02", 2, "Алфавит", (
+            LessonItem("S02-01", "بَ", rule, "x", name="x"),
+            LessonItem("S02-02", "ا ب ت", ItemKind.ALPHABET, "", name="элиф · бэ · тэ"),
+        )),
+        Lesson("S03", 3, "Строки", (
+            LessonItem("S03-01", "مَرْمَرُ", ItemKind.LINE, ""),
+            LessonItem("S03-02", "رَرْ رِرْ", ItemKind.LINE, ""),
+        )),
+    )  # fmt: skip
+    cur = Curriculum("test", "steps-1", "Тест", lessons, course.lexicon)
+    attempts = InMemoryAttempts()
+    return World(
+        cur, catalog, InMemoryLearners(cascade_to=attempts), attempts, InMemoryAudio(),
+        ScriptedRecognizer(), SpyUoW(), ListEventLog(), FixedClock(), SequentialIds(),
+        ListErasureLog(),
+    )  # fmt: skip
+
+
+async def _read(w: World, learner: Learner, item_id: str, heard: str | None = None) -> None:
+    await w.cards().execute(learner, item_id)
+    w.recognizer.heard = heard
+    await w.assess().execute(learner, b"ogg")
+
+
+async def _continue(w: World, learner: Learner) -> str | None:
+    item = (await w.progress().execute(learner)).continue_item
+    return item.id if item else None
+
+
+async def test_continue_after_finished_lesson_is_next_lesson(steps: World) -> None:
+    learner = await steps.learner()
+    await _read(steps, learner, "S01-02")
+    await _read(steps, learner, "S01-03")
+    assert learner.current_item_id == "S01-03"
+    p = await steps.progress().execute(learner)
+    assert p.of("S01").status is LessonStatus.DONE
+    assert await _continue(steps, learner) == "S02-01"
+
+
+async def test_continue_after_failed_last_step_is_next_lesson(steps: World) -> None:
+    """Не получилось — можно идти дальше; строка вернётся в «повторить»."""
+    learner = await steps.learner()
+    await _read(steps, learner, "S01-03", heard="سَ")
+    p = await steps.progress().execute(learner)
+    assert p.of("S01").status is not LessonStatus.DONE
+    assert await _continue(steps, learner) == "S02-01"
+
+
+async def test_failed_line_stays_in_repeat_list(steps: World) -> None:
+    learner = await steps.learner()
+    await _read(steps, learner, "S01-03", heard="سَ")
+    p = await steps.progress().execute(learner)
+    assert [i.id for i in p.of("S01").weak] == ["S01-03"]
+
+
+async def test_continue_after_last_step_without_reading_is_next_lesson(steps: World) -> None:
+    """Последний шаг — таблица алфавита: читать нечего, дальше — следующий урок."""
+    learner = await steps.learner()
+    await steps.cards().execute(learner, "S02-02")
+    assert await _continue(steps, learner) == "S03-01"
+
+
+async def test_continue_stays_on_untried_last_step(steps: World) -> None:
+    learner = await steps.learner()
+    await steps.cards().execute(learner, "S01-03")
+    assert await _continue(steps, learner) == "S01-03"
+
+
+async def test_continue_stays_inside_lesson_if_not_on_last_step(steps: World) -> None:
+    learner = await steps.learner()
+    await _read(steps, learner, "S01-02")
+    await _read(steps, learner, "S01-03")
+    await steps.cards().execute(learner, "S01-02")  # вернулся повторить
+    assert await _continue(steps, learner) == "S01-02"
+
+
+async def test_continue_after_last_lesson_of_program_stays_on_it(steps: World) -> None:
+    """После последнего урока программы следующего нет — остаёмся, где были."""
+    learner = await steps.learner()
+    await _read(steps, learner, "S03-01")
+    await _read(steps, learner, "S03-02")
+    assert await _continue(steps, learner) == "S03-02"
+
+
+async def test_quiz_options_are_from_letters_the_learner_started(curriculum: Curriculum) -> None:
+    """Ответы-обманки — из начатых букв; тот же вопрос восстанавливается по кнопке."""
+    from muallim.application.use_cases.quiz import PracticeQuiz  # noqa: PLC0415
+
+    attempts, events, uow = InMemoryAttempts(), ListEventLog(), SpyUoW()
+    learner, _ = await EnsureLearner(
+        InMemoryLearners(), uow, FixedClock(), SequentialIds(), events
+    ).execute(2, "ru")
+    letters = [les for les in curriculum.lessons if les.section == "letter"][:3]  # ء ر ز
+    for les in letters:
+        await attempts.add(_attempt_for(learner, les.items[0].id), ())
+    allowed = {
+        s
+        for les in letters
+        for i in les.items
+        if i.kind is ItemKind.LETTER
+        for s in i.sound.split(" · ")
+    }
+    quiz = PracticeQuiz(curriculum, attempts, events, uow)
+    for seed in range(20):
+        q = await quiz.next(learner, seed=seed)
+        assert q is not None
+        assert set(q.options) <= allowed, (seed, q.options)
+        assert await quiz.answer(learner, q.item_id, q.vowel, q.seed, 0) == q

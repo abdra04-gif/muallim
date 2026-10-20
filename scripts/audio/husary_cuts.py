@@ -10,7 +10,8 @@
 если нашлись все её части; между частями — пауза.
 
 Результат: curriculum/audio/husary/<хэш>.ogg и cuts.yaml (откуда каждый кусок). Человек слушает
-review.html и ставит status: ok или bad (bad бот не даёт). Повторный запуск сохраняет статусы.
+review.html и ставит status: ok или bad (bad бот не даёт). Повторный запуск сохраняет статусы,
+ручные строки (manual: true) и отклонённые (scripts/audio/cuts_manifest.py).
 """
 
 import argparse
@@ -29,6 +30,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import yaml
+from cuts_manifest import is_manual, merge_manifest  # рядом: scripts/audio/cuts_manifest.py
 from quran_muaalem import Muaalem
 from quran_transcript import Aya, MoshafAttributes, quran_phonetizer
 
@@ -329,15 +331,12 @@ def main() -> None:
 
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = OUT / "cuts.yaml"
-    old = (
-        {r["text"]: r for r in yaml.safe_load(manifest.read_text("utf-8")) or []}
-        if manifest.is_file()
-        else {}
-    )
+    old_rows = yaml.safe_load(manifest.read_text("utf-8")) or [] if manifest.is_file() else []
+    old = {r["text"]: r for r in old_rows}
     rows = []
     for text in texts:
         parts = [cuts.get(t) for t in text.split()]
-        if not all(parts):
+        if not all(parts) or is_manual(old.get(text, {})):  # ручную нарезку не перезаписываем
             continue
         gap = np.zeros(int(GAP * SR), dtype=np.float32)
         wave = _padded(np.concatenate([x for p in parts for x in (p.wave, gap)][:-1]))  # type: ignore[union-attr]
@@ -353,9 +352,7 @@ def main() -> None:
         same = prev.get("parts") == source
         status = prev.get("status", "unchecked") if same else "unchecked"
         rows.append({"text": text, "file": name, "status": status, "parts": source})
-    for text, row in old.items():  # отклонённое человеком не теряем, даже если не нашлось заново
-        if row.get("status") == "bad" and text not in {r["text"] for r in rows}:
-            rows.append(row)
+    rows = merge_manifest(old_rows, rows)  # ручные и отклонённые человеком строки не теряем
     head = (
         "# Нарезки «как правильно» из учебного чтения Хусари (EveryAyah, SRC-042), ADR-0032.\n"
         "# Генерирует scripts/audio/husary_cuts.py. status: unchecked → человек слушает\n"
@@ -370,11 +367,16 @@ def main() -> None:
     print(f"Не нашлось ({len(missing)}): {' '.join(missing)}", file=sys.stderr)
 
 
+def _origin(row: dict) -> str:
+    """Откуда нарезка: аяты частей, у ручной строки (manual) — её source."""
+    return ", ".join(p["aya"] for p in row.get("parts", [])) or row.get("source", "")
+
+
 def write_review(rows: list[dict]) -> None:
     """Страница для прослушивания: открыть в браузере, отметить плохие в cuts.yaml."""
     items = "\n".join(
         f'<tr><td class="ar">{html.escape(r["text"])}</td><td><audio controls preload="none" '
-        f'src="{r["file"]}"></audio></td><td>{html.escape(", ".join(p["aya"] for p in r["parts"]))}'
+        f'src="{r["file"]}"></audio></td><td>{html.escape(_origin(r))}'
         f"</td><td>{r['status']}</td></tr>"
         for r in rows
     )

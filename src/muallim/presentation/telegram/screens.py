@@ -22,7 +22,7 @@ from muallim.domain.assessment import Assessment
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
-from muallim.domain.quiz import Question
+from muallim.domain.quiz import Question, first_quiz_lesson
 from muallim.presentation.telegram import render, texts, views
 from muallim.presentation.telegram.callbacks import (
     Consent,
@@ -145,6 +145,17 @@ def home(curriculum: Curriculum, progress: Progress) -> Screen:
     return Screen(caption, kb.as_markup(), image, key)
 
 
+def voice_on_home(curriculum: Curriculum, progress: Progress) -> Screen:
+    """Голосовое, когда урок не открыт: попытку не пишем, кнопка — на карточку курсора."""
+    item = progress.continue_item or curriculum.first_item()
+    kb = InlineKeyboardBuilder()
+    kb.button(
+        text=texts.CONTINUE_BUTTON.format(title=curriculum.locate(item.id)[0].title),
+        callback_data=GoItem(item_id=item.id),
+    )
+    return Screen(texts.VOICE_ON_HOME, kb.as_markup())
+
+
 def _days(n: int) -> str:
     one, few, many = texts.DAY_FORMS
     if n % 10 == 1 and n % 100 != 11:
@@ -164,9 +175,12 @@ def lessons(curriculum: Curriculum, progress: Progress, part: int | None, page: 
     kb = InlineKeyboardBuilder()
     if part is None or part < 0 or part >= len(parts):
         for k, (name, items) in enumerate(parts):
-            done = sum(1 for les in items if progress.of(les.id).status is LessonStatus.DONE)
-            icon = "✅" if done == len(items) else "🟡" if _started(progress, items) else "⚪"
-            kb.button(text=f"{icon} {name} · {done}/{len(items)}", callback_data=Lessons(part=k))
+            # как на главной и в прогрессе: считаются уроки с чтением вслух (FR-49)
+            counted = [les for les in items if les.practice_items]
+            done = sum(1 for les in counted if progress.of(les.id).status is LessonStatus.DONE)
+            full = bool(counted) and done == len(counted)
+            icon = "✅" if full else "🟡" if _started(progress, items) else "⚪"
+            kb.button(text=f"{icon} {name} · {done}/{len(counted)}", callback_data=Lessons(part=k))
         _home_row(kb)
         kb.adjust(1)
         return Screen(texts.PARTS, kb.as_markup(), image, key)
@@ -265,11 +279,12 @@ def card(
     if is_teacher and item.kind is not ItemKind.ALPHABET:  # учитель озвучивает и правило
         kb.button(text=texts.RECORD_BUTTON, callback_data=RecordReference(item_id=item.id))
         top += 1
-    _nav(kb, curriculum, item, f"{i + 1}/{len(lesson.items)}")
-    prev = _previous_lesson_button(kb, curriculum, lesson)
+    nav = _nav(kb, curriculum, item)
+    # первый шаг: назад — только «⬅️ Предыдущий урок», без «◀️ Назад» на шаг (FR-50)
+    prev = i == 0 and _previous_lesson_button(kb, curriculum, lesson)
     kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     _home_row(kb)
-    kb.adjust(*([1] * top), 3, *((1,) if prev else ()), 2)
+    kb.adjust(*([1] * top), *nav, *((1,) if prev else ()), 2)
     return Screen("\n\n".join(parts), kb.as_markup(), image, f"card:{item.id}:{curriculum.version}")
 
 
@@ -287,17 +302,31 @@ def _card_image(lesson: Lesson, item: LessonItem, i: int) -> bytes | None:
     return render.card(item.text, lesson.accent, (i, len(lesson.items)))
 
 
-def _nav(kb: InlineKeyboardBuilder, curriculum: Curriculum, item: LessonItem, label: str) -> None:
-    previous, following = curriculum.previous_item(item.id), curriculum.next_item(item.id)
-    kb.button(
-        text="◀️" if previous else "·",
-        callback_data=GoItem(item_id=previous.id) if previous else Noop(),
-    )
-    kb.button(text=label, callback_data=Noop())
-    kb.button(
-        text="▶️" if following else "·",
-        callback_data=GoItem(item_id=following.id) if following else Noop(),
-    )
+def _nav(kb: InlineKeyboardBuilder, curriculum: Curriculum, item: LessonItem) -> list[int]:
+    """Кнопки «◀️ Назад» и «▶️ Дальше» без пустышек: счёт шагов — в заголовке (FR-50).
+
+    На первом шаге урока «Назад» нет (там «⬅️ Предыдущий урок»); на последнем вперёд ведёт
+    «➡️ Следующий урок: …» отдельной строкой. Возвращает раскладку рядов.
+    """
+    lesson, i = curriculum.locate(item.id)
+    rows: list[int] = []
+    previous = curriculum.previous_item(item.id) if i > 0 else None
+    if previous:
+        kb.button(text=texts.BACK_BUTTON, callback_data=GoItem(item_id=previous.id))
+    following = curriculum.next_item(item.id)
+    if following is None:
+        return [1] if previous else []
+    next_lesson, _ = curriculum.locate(following.id)
+    if next_lesson != lesson:
+        if previous:
+            rows.append(1)
+        kb.button(
+            text=texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title),
+            callback_data=GoItem(item_id=following.id),
+        )
+        return [*rows, 1]
+    kb.button(text=texts.NEXT_BUTTON, callback_data=GoItem(item_id=following.id))
+    return [2 if previous else 1]
 
 
 def _previous_lesson_button(
@@ -328,8 +357,13 @@ def result(
     r: RecitationResult,
     has_audio: bool,
     resume: LessonItem | None = None,
+    staff: bool = False,
 ) -> Screen:
-    """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие»."""
+    """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие».
+
+    «Услышано» и блок «Для исследования» с номером попытки видят только учитель и разметчик
+    (``staff``): новичку они мешают, номер попытки ученик получает в «🚩 Бот ошибся» (FR-50).
+    """
     a = r.attempt.assessment
     lesson, _ = curriculum.locate(r.item.id)
     head = [_VERDICT[r.verdict], texts.RESULT_SCORE.format(bar=views.bar(a.score), score=a.score)]
@@ -350,20 +384,24 @@ def result(
         head.insert(1, f"<b>{escape(r.item.text)}</b>")
     head += [*_progress(r), *_praise(r)]
     parts: list[str] = []
-    if not r.feedback:
+    if staff and not r.feedback:
         parts.append(escape(texts.HEARD_LINE.format(text=r.heard_transcription)))
     if r.lesson_completed:
         parts.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
     if r.next_item is None:
         parts.append(texts.LAST_ITEM)
-    research = texts.RESEARCH_BLOCK.format(
-        code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
-        reference=escape(a.reference),
-        heard=escape(a.heard),
+    research = (
+        texts.RESEARCH_BLOCK.format(
+            code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
+            reference=escape(a.reference),
+            heard=escape(a.heard),
+        )
+        if staff
+        else ""
     )
     details = ""
     if r.feedback:
-        details = "\n\n".join([*_explanations(r, has_audio), research])
+        details = "\n\n".join(p for p in [*_explanations(r, has_audio), research] if p)
     else:
         parts.append(research)
     if r.feedback and r.expected_reading:  # «Нужно / У тебя» — сразу под вердиктом
@@ -382,22 +420,18 @@ def _swap(a: Assessment) -> tuple[str, str, str, str, str] | None:
 
 
 def _progress(r: RecitationResult) -> list[str]:
-    """«Было → стало» и исправленные слоги — со второй попытки этой строки."""
+    """«Было → стало» (только если балл изменился, FR-50) и исправленные слоги."""
     if r.previous_score is None:
         return []
     now = r.attempt.assessment.score
-    trend = (
-        texts.TREND_UP
-        if now > r.previous_score
-        else texts.TREND_SAME
-        if now == r.previous_score
-        else texts.TREND_DOWN
-    )
-    lines = [texts.RESULT_PROGRESS.format(trend=trend, before=r.previous_score, now=now)]
+    lines = []
+    if now != r.previous_score:
+        trend = texts.TREND_UP if now > r.previous_score else texts.TREND_DOWN
+        lines.append(texts.RESULT_PROGRESS.format(trend=trend, before=r.previous_score, now=now))
     if r.fixed:
         syllables = ", ".join(f"«{escape(s)}»" for s in r.fixed)
         lines.append(texts.RESULT_FIXED.format(syllables=syllables))
-    return ["\n".join(lines)]
+    return ["\n".join(lines)] if lines else []
 
 
 def _praise(r: RecitationResult) -> list[str]:
@@ -427,7 +461,8 @@ def _result_keyboard(
     # ряд «◀️ Назад · 🔁 Ещё раз · ▶️ Дальше»: обе крайние — на соседние строки, «Ещё раз» —
     # снова карточка этой строки (там видно, что читать, и можно послушать эталон)
     nav = 1
-    if previous := curriculum.previous_item(r.item.id):
+    first_step = curriculum.locate(r.item.id)[1] == 0  # назад — «⬅️ Предыдущий урок» (FR-50)
+    if not first_step and (previous := curriculum.previous_item(r.item.id)):
         kb.button(text=texts.BACK_BUTTON, callback_data=GoItem(item_id=previous.id))
         nav += 1
     kb.button(text=texts.AGAIN_BUTTON, callback_data=GoItem(item_id=r.item.id))
@@ -447,7 +482,7 @@ def _result_keyboard(
         kb.button(text=label, callback_data=GoItem(item_id=r.next_item.id))
     if r.lesson_completed:
         kb.button(text=texts.SHARE_BUTTON, callback_data=ShareLesson(lesson=lesson.id))
-    prev = _previous_lesson_button(kb, curriculum, lesson)
+    prev = first_step and _previous_lesson_button(kb, curriculum, lesson)
     kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
     _home_row(kb)
     rows: Sequence[int] = (
@@ -680,9 +715,16 @@ def quiz_answer(q: Question, picked: int) -> Screen:
     return Screen(caption, kb.as_markup(), image, f"quiz:{q.item_id}:{q.vowel}")
 
 
-def quiz_unavailable() -> Screen:
+def quiz_unavailable(curriculum: Curriculum, progress: Progress) -> Screen:
+    """Замок «Закрепления» (FR-49): до урока открытия — называет его; на нём и дальше урок назад
+    не называем — нужно начать больше уроков букв."""
     kb = InlineKeyboardBuilder()
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
     _home_row(kb)
     kb.adjust(2)
-    return Screen(texts.QUIZ_LOCKED, kb.as_markup())
+    opens = first_quiz_lesson(curriculum)
+    item = progress.continue_item or curriculum.first_item()
+    here = curriculum.locate(item.id)[0]
+    if opens is None or here.number >= opens.number:
+        return Screen(texts.QUIZ_LOCKED_MORE, kb.as_markup())
+    return Screen(texts.QUIZ_LOCKED.format(lesson=escape(opens.title)), kb.as_markup())

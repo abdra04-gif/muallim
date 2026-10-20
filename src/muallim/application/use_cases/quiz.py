@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from muallim.application.ports.repositories import AttemptRepository, UnitOfWork
 from muallim.application.ports.system import EventLog
-from muallim.domain.curriculum import Curriculum
+from muallim.domain.curriculum import Curriculum, Lesson
 from muallim.domain.learner import Learner
 from muallim.domain.quiz import Question, QuizError, make_question, question_from
 
@@ -18,13 +18,7 @@ class PracticeQuiz:
 
     async def next(self, learner: Learner, seed: int) -> Question | None:
         """Вопрос по буквам, которые ученик уже читал (или открыл); None — рано."""
-        tried = set(await self.attempts.best_scores(learner.id))
-        lessons = [
-            les
-            for les in self.curriculum.lessons
-            if les.section == "letter"
-            and any(i.id in tried or i.id == learner.current_item_id for i in les.items)
-        ]
+        lessons = await self._started(learner)
         try:
             return make_question(self.curriculum, lessons, seed)
         except QuizError:
@@ -33,7 +27,7 @@ class PracticeQuiz:
     async def answer(
         self, learner: Learner, item_id: str, vowel: int, seed: int, picked: int
     ) -> Question:
-        q = question_from(self.curriculum, item_id, vowel, seed)
+        q = question_from(self.curriculum, item_id, vowel, seed, await self._started(learner))
         await self.events.record(
             "quiz_answered",
             learner.id,
@@ -41,3 +35,13 @@ class PracticeQuiz:
         )
         await self.uow.commit()
         return q
+
+    async def _started(self, learner: Learner) -> list[Lesson]:
+        """Уроки букв, которые ученик читал (или открыл): из них вопрос и отвлекающие варианты."""
+        tried = set(await self.attempts.best_scores(learner.id))
+        return [
+            les
+            for les in self.curriculum.lessons
+            if les.section == "letter"
+            and any(i.id in tried or i.id == learner.current_item_id for i in les.items)
+        ]

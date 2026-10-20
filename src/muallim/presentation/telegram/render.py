@@ -31,9 +31,14 @@ HAMZA_FORMS = frozenset("ءأإؤئآ")
 MADD_LETTERS = frozenset("اىوي")  # без знаков — удлинение, а не согласный
 PHONEME_OF: Final = {"ة": "ت", "ى": "ي"}  # как буква текста записана в фонемах
 
-WIDTH = 1280
-PAD = 64
-ARABIC_SIZE = 104
+# Холст не шире 900 px (FR-48): Telegram сжимает картинку до ширины сообщения (~360 pt на
+# телефоне), и на широком холсте буквы и огласовки мельчают. Шрифт — крупнее относительно ширины,
+# длинная строка переносится, поля по бокам — только рамка.
+WIDTH = 900
+PAD = 40
+TEXT_WIDTH = WIDTH - 2 * PAD - 40  # ширина строки арабского текста внутри рамки
+ARABIC_SIZE = 112
+SHORT_SIZE = 168  # короткая строка (слог, слово) — ещё крупнее
 
 # Палитра «как в книге»: бумага, золотая рамка, чёрный текст, красная буква урока
 PAPER = (251, 247, 236)
@@ -230,7 +235,7 @@ def _png(img: Image.Image) -> bytes:
 def _dots(draw: ImageDraw.ImageDraw, y: int, current: int, total: int) -> None:
     if total <= 1:
         return
-    gap = 26
+    gap = min(26, TEXT_WIDTH // (total - 1))
     x0 = WIDTH // 2 + (total - 1) * gap // 2  # справа налево, как читается книга
     for i in range(total):
         x = x0 - i * gap
@@ -246,12 +251,12 @@ def _arabic_block(
     top: int = 120,
     text_color: tuple[int, int, int] = INK,
 ) -> tuple[Image.Image, ImageDraw.ImageDraw, int]:
-    size = ARABIC_SIZE if len(text) > 14 else int(ARABIC_SIZE * 1.6)  # короткое — крупнее
+    size = ARABIC_SIZE if len(text) > 14 else SHORT_SIZE  # короткое — крупнее
     font = _font(size)
     line_height = int(size * 1.9)
-    lines = _wrap(text.split(), font, WIDTH - 2 * PAD - 40)
+    lines = _wrap(text.split(), font, TEXT_WIDTH)
     height = top + line_height * len(lines) + 120
-    img = Image.new("RGB", (WIDTH, max(height, 520)), PAPER)
+    img = Image.new("RGB", (WIDTH, max(height, 440)), PAPER)
     draw = _frame(img)
     y = top + (img.height - top - 120 - line_height * len(lines)) // 2
     offset = 0  # номер первого кластера строки во всём тексте
@@ -307,9 +312,9 @@ def _arabic_block(
 
 # ---------- экраны ----------
 def card(text: str, accent: Collection[str], position: tuple[int, int]) -> bytes:
-    """Карточка урока: строка книги, буква урока красным, точки «карточка k из n»."""
+    """Карточка урока: строка книги, буква урока красным, точки «шаг k из n»."""
     color_of = dict.fromkeys(accent_clusters(text, accent), ACCENT)
-    img, draw, _ = _arabic_block(text, color_of)
+    img, draw, _ = _arabic_block(text, color_of, top=96)
     _dots(draw, img.height - 64, position[0], position[1])
     return _png(img)
 
@@ -328,25 +333,27 @@ def result(text: str, wrong: Collection[int], score: int, unread: Collection[int
 
 def alphabet(rows: Sequence[Sequence[tuple[str, Mark]]]) -> bytes:
     """Карта букв (с. 10 книги): пройдено — зелёные, начато — жёлтые, текущая — красная."""
-    size, cell = 92, 150
-    title_font = _font(64, bold=True)
-    height = 170 + cell * len(rows) + 60
+    widest = max((len(row) for row in rows), default=1)
+    cell = min(120, (WIDTH - 2 * PAD) // max(widest, 1))
+    size, r0 = cell * 2 // 3, cell * 2 // 5
+    title_font = _font(56, bold=True)
+    height = 150 + cell * len(rows) + 50
     img = Image.new("RGB", (WIDTH, height), PAPER)
     draw = _frame(img)
     draw.text(
-        (WIDTH // 2, 100), "مُعَلِّمٌ ثَانِي", font=title_font, fill=INK, anchor="mm", direction="rtl"
+        (WIDTH // 2, 88), "مُعَلِّمٌ ثَانِي", font=title_font, fill=INK, anchor="mm", direction="rtl"
     )
     font = _font(size)
     colors = {Mark.DONE: OK, Mark.STARTED: WARN, Mark.NEW: MUTED, Mark.CURRENT: ACCENT}
     for r, row in enumerate(rows):
-        y = 170 + r * cell + cell // 2
+        y = 150 + r * cell + cell // 2
         n = len(row)
         for i, (letter, mark) in enumerate(row):
             x = WIDTH // 2 + (n - 1) * cell // 2 - i * cell  # справа налево
             if mark is Mark.DONE:
-                draw.ellipse((x - 58, y - 58, x + 58, y + 58), fill=(225, 241, 226))
+                draw.ellipse((x - r0, y - r0, x + r0, y + r0), fill=GREEN_BG)
             if mark is Mark.CURRENT:
-                draw.ellipse((x - 58, y - 58, x + 58, y + 58), outline=ACCENT, width=4)
+                draw.ellipse((x - r0, y - r0, x + r0, y + r0), outline=ACCENT, width=4)
             draw.text((x, y), letter, font=font, fill=colors[mark], anchor="mm")
     return _png(img)
 
@@ -355,12 +362,12 @@ def letters(text: str) -> bytes:
     """Строка таблицы алфавита (с. 10): буквы по отдельности, крупно, справа налево."""
     row = text.split()
     cell = (WIDTH - 2 * PAD) // max(len(row), 1)
-    img = Image.new("RGB", (WIDTH, 420), PAPER)
+    img = Image.new("RGB", (WIDTH, 360), PAPER)
     draw = _frame(img)
-    font = _font(130)
+    font = _font(min(120, cell * 9 // 10))  # широкие буквы (ث ب) не слипаются
     for i, letter in enumerate(row):
         x = WIDTH - PAD - cell // 2 - i * cell
-        draw.text((x, 210), letter, font=font, fill=INK, anchor="mm")
+        draw.text((x, 180), letter, font=font, fill=INK, anchor="mm")
     return _png(img)
 
 
@@ -372,13 +379,13 @@ def signs() -> bytes:
     """Таблица знаков: 12 примеров в 3 ряда справа налево, под каждым — номер."""
     cols, cell_w, cell_h = 4, (WIDTH - 2 * PAD) // 4, 280
     rows = -(-len(SIGN_EXAMPLES) // cols)
-    img = Image.new("RGB", (WIDTH, 110 + rows * cell_h + 40), PAPER)
+    img = Image.new("RGB", (WIDTH, 100 + rows * cell_h + 30), PAPER)
     draw = _frame(img)
-    font, small = _font(120), _font(40, bold=True)
+    font, small = _font(116), _font(40, bold=True)
     for i, text in enumerate(SIGN_EXAMPLES):
         r, c = divmod(i, cols)
         x = WIDTH - PAD - cell_w // 2 - c * cell_w
-        y = 90 + r * cell_h
+        y = 70 + r * cell_h
         draw.text(
             (x, y + 95),
             text,
@@ -387,14 +394,14 @@ def signs() -> bytes:
             anchor="mm",
             direction="rtl",
         )
-        draw.ellipse((x - 22, y + 218, x + 22, y + 262), fill=FRAME)
-        draw.text((x, y + 239), str(i + 1), font=small, fill=PAPER, anchor="mm")
+        draw.ellipse((x - 22, y + 222, x + 22, y + 266), fill=FRAME)
+        draw.text((x, y + 243), str(i + 1), font=small, fill=PAPER, anchor="mm")
     return _png(img)
 
 
 def rule(text: str) -> bytes:
     """Карточка правила: пример крупно, без подсветки."""
-    img, _, _ = _arabic_block(text, {})
+    img, _, _ = _arabic_block(text, {}, top=96)
     return _png(img)
 
 
@@ -410,6 +417,13 @@ NON_JOINING = frozenset("اأإآدذرزوؤءة")  # не соединяютс
 def _ui_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     name = "PTSans-Bold.ttf" if bold else "PTSans-Regular.ttf"
     return ImageFont.truetype(str(FONTS / name), size, layout_engine=ImageFont.Layout.RAQM)
+
+
+def _fit(text: str, size: int, width: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    """Подпись PT Sans: шрифт уменьшается, пока строка не влезет в ``width`` (не мельче 18)."""
+    while size > 18 and _ui_font(size, bold).getlength(text) > width:
+        size -= 2
+    return _ui_font(size, bold)
 
 
 def letter_forms(
@@ -433,29 +447,30 @@ def letter_forms(
             (tatweel + letter + tatweel, labels[2]),
             (tatweel + letter, labels[3]),
         ]
-    img = Image.new("RGB", (WIDTH, 720), PAPER)
+    img = Image.new("RGB", (WIDTH, 680), PAPER)
     draw = _frame(img)
     cell = (WIDTH - 2 * PAD) // 4
     x0 = WIDTH // 2 + (len(forms) - 1) * cell // 2
-    font, small = _font(130), _ui_font(30)
+    font = _font(124)
+    small = _fit(max(labels, key=len), 30, cell - 12)
     for i, (form, label) in enumerate(forms):
         x = x0 - i * cell
-        draw.text((x, 150), form, font=font, fill=ACCENT, anchor="mm", direction="rtl")
-        draw.text((x, 330), label, font=small, fill=(107, 98, 88), anchor="mm")  # ниже хвостов букв
-    draw.line((PAD + 40, 375, WIDTH - PAD - 40, 375), fill=GREY_BG, width=2)
-    draw.text((WIDTH // 2, 480), vowels, font=_font(110), fill=INK, anchor="mm", direction="rtl")
+        draw.text((x, 140), form, font=font, fill=ACCENT, anchor="mm", direction="rtl")
+        draw.text((x, 312), label, font=small, fill=(107, 98, 88), anchor="mm")  # ниже хвостов букв
+    draw.line((PAD + 40, 352, WIDTH - PAD - 40, 352), fill=GREY_BG, width=2)
+    draw.text((WIDTH // 2, 452), vowels, font=_font(116), fill=INK, anchor="mm", direction="rtl")
     if zone_labels:
         pill_font = _ui_font(28, bold=True)
         widths = [int(pill_font.getlength(t)) + 44 for t, _ in zone_labels]
         x = (WIDTH - sum(widths) - 16 * (len(widths) - 1)) // 2
         for (text, on), w in zip(zone_labels, widths, strict=True):
-            box = (x, 625, x + w, 670)
+            box = (x, 590, x + w, 635)
             if on:
                 draw.rounded_rectangle(box, radius=22, fill=INK)
             else:
                 draw.rounded_rectangle(box, radius=22, outline=GREY_BG, width=2)
             draw.text(
-                (x + w // 2, 647), text, font=pill_font, fill=PAPER if on else MUTED, anchor="mm"
+                (x + w // 2, 612), text, font=pill_font, fill=PAPER if on else MUTED, anchor="mm"
             )
             x += w + 16
     return _png(img)
@@ -495,8 +510,8 @@ def result_words(
     """Разбор по словам: верные — зелёные плашки, неверное — красная с рамкой, непрочитанные —
     серые. ``swap`` — (нужная буква, прозвучавшая, «нужна», «вместо», «прозвучала»)."""
     words = text.split()
-    font = _font(84)
-    pad_x, gap, chip_h = 26, 18, 150
+    font = _font(88)
+    pad_x, gap, chip_h = 22, 14, 156
     widths = [int(font.getlength(w, direction="rtl")) + 2 * pad_x for w in words]
     rows: list[list[int]] = [[]]
     used = 0
@@ -510,7 +525,7 @@ def result_words(
     img = Image.new("RGB", (WIDTH, height), PAPER)
     draw = _frame(img)
     bar = OK if score >= 90 else WARN if score >= 80 else ACCENT  # цвет — по баллу, как в result()
-    label_font = _ui_font(30, bold=True)
+    label_font = _fit(score_label, 30, (WIDTH - 2 * PAD) // 2, bold=True)
     label_w = int(label_font.getlength(score_label)) + 30
     draw.text((PAD, 72), score_label, font=label_font, fill=INK, anchor="lm")
     left, right = PAD + label_w, WIDTH - PAD
@@ -544,17 +559,17 @@ def result_words(
         small, big = _ui_font(28), _font(90)
         cy = y + 85
         for cx, letter, label, color in (
-            (WIDTH // 2 - 190, need, need_label, OK),  # «нужна ص вместо прозвучала س» слева направо
-            (WIDTH // 2 + 190, heard, heard_label, ACCENT),
+            (WIDTH // 2 - 180, need, need_label, OK),  # «нужна ص вместо прозвучала س» слева направо
+            (WIDTH // 2 + 180, heard, heard_label, ACCENT),
         ):
             draw.rounded_rectangle(
-                (cx - 120, cy - 80, cx + 120, cy + 80), radius=18, fill=(255, 255, 255)
+                (cx - 110, cy - 80, cx + 110, cy + 80), radius=18, fill=(255, 255, 255)
             )
             draw.rounded_rectangle(
-                (cx - 120, cy - 80, cx + 120, cy + 80), radius=18, outline=GREY_BG, width=2
+                (cx - 110, cy - 80, cx + 110, cy + 80), radius=18, outline=GREY_BG, width=2
             )
-            draw.text((cx, cy - 15), letter, font=big, fill=color, anchor="mm")
-            draw.text((cx, cy + 55), label, font=small, fill=(107, 98, 88), anchor="mm")
+            draw.text((cx, cy - 24), letter, font=big, fill=color, anchor="mm")
+            draw.text((cx, cy + 58), label, font=small, fill=(107, 98, 88), anchor="mm")
         draw.text((WIDTH // 2, cy), instead, font=small, fill=INK, anchor="mm")
     return _png(img)
 
@@ -589,8 +604,9 @@ def postcard(
         fill=(122, 31, 31),
         direction=direction,
     )
-    draw.text((cx, 400), title, font=_ui_font(52, bold=True), fill=INK, anchor="mm")
-    draw.text((cx, 465), subtitle, font=_ui_font(32), fill=(107, 98, 88), anchor="mm")
+    inner = WIDTH - 2 * PAD - 40
+    draw.text((cx, 400), title, font=_fit(title, 52, inner, bold=True), fill=INK, anchor="mm")
+    draw.text((cx, 465), subtitle, font=_fit(subtitle, 32, inner), fill=(107, 98, 88), anchor="mm")
     if week:
         gap = 44
         x0 = cx - (len(week) - 1) * gap // 2
@@ -611,10 +627,11 @@ def book_progress(
     height = 90 + row_h * len(parts) + (200 if week else 40)
     img = Image.new("RGB", (WIDTH, height), PAPER)
     draw = _frame(img)
-    font, num = _ui_font(32), _ui_font(30)
-    name_w, num_w = 470, 110
+    num = _ui_font(30)
+    name_w, num_w = 400, 90  # название части — слева, полоса — посередине, «3/28» — справа
     for k, (name, done, total) in enumerate(parts):
         y = 90 + k * row_h
+        font = _fit(name, 32, name_w - 24)
         draw.text((PAD, y), name, font=font, fill=INK, anchor="lm")
         left, right = PAD + name_w, WIDTH - PAD - num_w
         draw.rounded_rectangle((left, y - 11, right, y + 11), radius=6, fill=GREY_BG)
@@ -640,11 +657,22 @@ def book_progress(
 
 
 def opening(lines: Sequence[str]) -> bytes:
-    """Начало занятия: истиаза и басмала, каждая отдельной строкой (остановка после каждой)."""
-    font, line_h = _font(92), 190
-    img = Image.new("RGB", (WIDTH, 120 + line_h * len(lines)), PAPER)
+    """Начало занятия: истиаза и басмала, каждая отдельной строкой (остановка после каждой).
+
+    Длинная фраза переносится; между фразами — промежуток шире, чем между строками фразы.
+    """
+    font, line_h, gap = _font(100), 180, 70
+    wrapped = [_wrap(line.split(), font, TEXT_WIDTH) for line in lines]
+    rows = sum(len(w) for w in wrapped)
+    img = Image.new("RGB", (WIDTH, 100 + line_h * rows + gap * (len(lines) - 1)), PAPER)
     draw = _frame(img)
-    for k, line in enumerate(lines):
-        y = 60 + line_h // 2 + k * line_h + 30
-        draw.text((WIDTH // 2, y), line, font=font, fill=INK, anchor="mm", direction="rtl")
+    y = 50 + line_h // 2
+    for k, phrase in enumerate(wrapped):
+        if k:  # черта между фразами: здесь остановка
+            mid = y - line_h // 2 - gap // 2
+            draw.line((WIDTH // 2 - 120, mid, WIDTH // 2 + 120, mid), fill=FRAME, width=2)
+        for line in phrase:
+            draw.text((WIDTH // 2, y), line, font=font, fill=INK, anchor="mm", direction="rtl")
+            y += line_h
+        y += gap
     return _png(img)

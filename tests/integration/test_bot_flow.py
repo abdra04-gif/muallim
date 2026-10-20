@@ -323,16 +323,16 @@ async def test_too_short_voice_is_rejected_without_attempt(
         assert await (await request.get(AttemptRepository)).count(saved.id) == 0
 
 
-async def test_text_instead_of_voice_shows_hint_and_home(
+async def test_text_instead_of_voice_is_only_a_hint(
     learner_factory: Callable[[int], Learner],
 ) -> None:
+    """Текст вместо голосового — одна подсказка; главная заново не присылается (FR-50)."""
     ali = learner_factory(5003)
     await ali.write("/start")
     await ali.press(Consent(granted=False))
+    before = len(ali.tg.shown)
     await ali.write("салам")
-    shown = ali.tg.texts()
-    assert texts.SEND_VOICE in shown
-    assert ali.button(GoItem)  # после подсказки — главный экран с кнопками
+    assert [m.text or m.caption for m in ali.tg.shown[before:]] == [texts.SEND_VOICE]
 
 
 async def test_questionnaire_is_asked_only_once(

@@ -11,11 +11,17 @@ from muallim.presentation.telegram.callbacks import (
     Profile,
 )
 
+CANCEL = "cancel"  # DisputeReason.reason: закрыть меню «Бот ошибся» без жалобы
+
 
 def dispute_reasons(attempt_hex: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for reason, title in texts.DISPUTE_REASONS.items():
         kb.button(text=title, callback_data=DisputeReason(attempt=attempt_hex, reason=reason))
+    # передумал — меню закрывается, экран результата остаётся выше (FR-50)
+    kb.button(
+        text=texts.CANCEL_BUTTON, callback_data=DisputeReason(attempt=attempt_hex, reason=CANCEL)
+    )
     kb.adjust(1)
     return kb.as_markup()
 

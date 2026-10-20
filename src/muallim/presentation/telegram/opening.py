@@ -18,6 +18,7 @@ OPENING_ITEMS: Final = ("L001-02", "L001-03")  # истиаза, басмала
 FIRST_LESSON: Final = "L001"
 _SKIPPED: Final = "opening_skipped"  # ключи FSM: дата пропуска, куда вернуться после басмалы
 _RESUME: Final = "opening_resume"
+_DAY: Final = "opening_day"  # дата начала занятия по часам бота: вчерашнее сегодня не действует
 
 
 def needs_opening(progress: Progress, skipped_on: date | None) -> bool:
@@ -41,14 +42,23 @@ async def skip(state: FSMContext, today: date) -> None:
     await state.update_data({_SKIPPED: today.isoformat()})
 
 
-async def begin(state: FSMContext, resume_item: str) -> None:
-    """Запомнить, куда вернуться после басмалы."""
-    await state.update_data({_RESUME: resume_item})
+async def begin(state: FSMContext, resume_item: str, today: date) -> None:
+    """Начать: запомнить, куда вернуться после басмалы, и дату (Clock, не date.today())."""
+    await state.update_data({_RESUME: resume_item, _DAY: today.isoformat()})
 
 
-async def finish(state: FSMContext) -> str | None:
-    """Куда вернуться (если начало занятия идёт); ожидание снимается."""
+async def active(state: FSMContext, today: date) -> bool:
+    """Идёт ли сегодняшнее начало занятия: пока идёт, кнопки не двигают «Продолжить» (FR-49)."""
+    data = await state.get_data()
+    return data.get(_RESUME) is not None and data.get(_DAY) == today.isoformat()
+
+
+async def resume_item(state: FSMContext) -> str | None:
+    """Куда вернуться после басмалы (начало занятия при этом продолжается)."""
     value = (await state.get_data()).get(_RESUME)
-    if value is not None:
-        await state.update_data({_RESUME: None})
     return value if isinstance(value, str) else None
+
+
+async def finish(state: FSMContext) -> None:
+    """Снять начало занятия: «Пропустить», 🏠, /start, переход к обычной карточке."""
+    await state.update_data({_RESUME: None, _DAY: None})

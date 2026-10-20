@@ -1317,3 +1317,8 @@
     end: 4.05
     pause_before: 0.32
     check: model
+- text: أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ
+  file: a865b4de5a62050f.ogg
+  status: unchecked
+  manual: true
+  source: SRC-136, EveryAyah Husary_128kbps/audhubillah.mp3 (муратталь, целиком; в наборе муаллим истиазы нет)

@@ -9,6 +9,7 @@ from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
 from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.system import Clock
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
@@ -16,7 +17,7 @@ from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.reference import RecordReference
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import screens, texts
+from muallim.presentation.telegram import on_screen, opening, screens, texts
 from muallim.presentation.telegram.callbacks import (
     Again,
     GoItem,
@@ -54,12 +55,14 @@ async def cb_home(
 @router.callback_query(Lessons.filter())
 async def cb_lessons(
     cb: CallbackQuery,
+    state: FSMContext,
     callback_data: Lessons,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         screen = screens.lessons(
             cur, await progress.execute(learner), callback_data.part, callback_data.page
@@ -71,25 +74,29 @@ async def cb_lessons(
 @router.callback_query(ShowProgress.filter())
 async def cb_progress(
     cb: CallbackQuery,
+    state: FSMContext,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await display.show(msg, screens.progress(cur, await progress.execute(learner)))
     await cb.answer()
 
 
 @router.callback_query(Help.filter())
-async def cb_help(cb: CallbackQuery, display: FromDishka[Display]) -> None:
+async def cb_help(cb: CallbackQuery, state: FSMContext, display: FromDishka[Display]) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await display.show(msg, screens.help_screen())
     await cb.answer()
 
 
 @router.callback_query(Signs.filter())
-async def cb_signs(cb: CallbackQuery, display: FromDishka[Display]) -> None:
+async def cb_signs(cb: CallbackQuery, state: FSMContext, display: FromDishka[Display]) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await display.show(msg, screens.signs())
     await cb.answer()
@@ -98,24 +105,35 @@ async def cb_signs(cb: CallbackQuery, display: FromDishka[Display]) -> None:
 @router.callback_query(Quiz.filter())
 async def cb_quiz(
     cb: CallbackQuery,
+    state: FSMContext,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     uc: FromDishka[PracticeQuiz],
+    cur: FromDishka[Curriculum],
+    progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     q = await uc.next(learner, random.randrange(10**6))  # noqa: S311
     if msg := message_of(cb):
-        await display.show(msg, screens.quiz(q) if q else screens.quiz_unavailable())
+        await display.show(
+            msg,
+            screens.quiz(q)
+            if q
+            else screens.quiz_unavailable(cur, await progress.execute(learner)),
+        )
     await cb.answer()
 
 
 @router.callback_query(QuizAnswer.filter())
 async def cb_quiz_answer(
     cb: CallbackQuery,
+    state: FSMContext,
     callback_data: QuizAnswer,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     uc: FromDishka[PracticeQuiz],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     data = callback_data
     try:
         q = await uc.answer(learner, data.i, data.v, data.s, data.p)
@@ -131,6 +149,8 @@ async def cb_quiz_answer(
 async def cb_go(
     cb: CallbackQuery,
     callback_data: GoItem,
+    state: FSMContext,
+    clock: FromDishka[Clock],
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     uc: FromDishka[OpenItem],
@@ -140,7 +160,14 @@ async def cb_go(
     reading: FromDishka[HowToRead],
 ) -> None:
     try:
-        item = await uc.execute(learner, callback_data.item_id)
+        # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
+        # переход к обычной карточке его завершает
+        in_opening = await opening.active(state, clock.now().date())
+        item = await uc.execute(learner, callback_data.item_id, move=not in_opening)
+        step = in_opening and item.id in opening.OPENING_ITEMS
+        if in_opening and not step:
+            await opening.finish(state)
+        await on_screen.card(state, item.id, opening=step)
     except KeyError:
         await cb.answer(texts.STALE_BUTTON, show_alert=True)
         return

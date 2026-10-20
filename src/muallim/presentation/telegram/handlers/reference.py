@@ -1,9 +1,11 @@
 """Эталон «как правильно» (послушать, учитель записывает) и жалоба «Бот ошибся» (FR-23)."""
 
+from contextlib import suppress
 from typing import Final
 from uuid import UUID
 
 from aiogram import Router
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile, CallbackQuery
 from dishka import FromDishka
@@ -92,6 +94,12 @@ async def cb_dispute_reason(
     learner: FromDishka[Learner],
     uc: FromDishka[ReportMistake],
 ) -> None:
+    if callback_data.reason == keyboards.CANCEL:  # «Отмена»: убрать меню, жалобы нет
+        if msg := message_of(cb):
+            with suppress(TelegramAPIError):
+                await msg.delete()
+        await cb.answer()
+        return
     try:
         attempt_id, reason = UUID(hex=callback_data.attempt), ReportReason(callback_data.reason)
     except ValueError:

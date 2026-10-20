@@ -1,13 +1,13 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-19T23:30:57+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-20T18:27:30+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `5056cec9d1f206c4` | 95 |
+| код | `746a57da98c7813f` | 97 |
 | программа (книга) | `65ad89963eb0aeee` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `109281850d3134be` | 7 |
@@ -15,7 +15,7 @@
 | предрегистрация | `dd14f532dd71f045` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **60 из 61**.
+Проверено зелёными тестами: **63 из 66**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -35,11 +35,11 @@
 | FR-14 | `tests/integration/test_research.py`, `tests/unit/test_metrics.py` | ✅ |
 | FR-17 | `tests/integration/test_annotator_bot.py`, `tests/integration/test_annotators_sql.py`, `tests/unit/test_annotation.py` | ✅ |
 | FR-20 | `tests/integration/test_reference_audio.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-21 | `tests/unit/test_transcription.py` | ✅ |
+| FR-21 | `tests/integration/test_console_beginner.py`, `tests/unit/test_transcription.py` | ✅ |
 | FR-22 | `tests/unit/test_feedback_languages.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-23 | `tests/integration/test_bot_flow.py`, `tests/integration/test_constraints.py`, `tests/integration/test_research.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-24 | `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-25 | `tests/unit/test_use_cases.py` | ✅ |
+| FR-25 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-26 | `tests/integration/test_data_tools.py`, `tests/integration/test_di.py` | ✅ |
 | FR-27 | `tests/architecture/test_migrations.py`, `tests/integration/test_data_tools.py` | ✅ |
 | FR-28 | `tests/integration/test_data_tools.py`, `tests/integration/test_postgres.py` | ✅ |
@@ -62,6 +62,11 @@
 | FR-45 | `tests/integration/test_opening_bot.py`, `tests/unit/test_new_screens.py` | ✅ |
 | FR-46 | `tests/unit/test_new_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-47 | `tests/unit/test_new_screens.py` | ✅ |
+| FR-48 | `tests/unit/test_readable_images.py` | ✅ |
+| FR-49 | `tests/integration/test_console_beginner.py`, `tests/integration/test_isti_adha_audio.py`, `tests/integration/test_opening_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-50 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_staff.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-51 | — | нет автотестов |
+| FR-52 | — | нет автотестов |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |

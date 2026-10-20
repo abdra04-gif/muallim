@@ -1,5 +1,6 @@
 """Прогресс ученика: уроки (пройден / начат / новый), серия дней подряд, «продолжить с места»."""
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import StrEnum
@@ -70,7 +71,7 @@ class GetProgress:
 
     async def execute(self, learner: Learner) -> Progress:
         best = await self.attempts.best_scores(learner.id)
-        lessons = []
+        lessons: list[LessonProgress] = []
         for lesson in self.curriculum.lessons:
             items = lesson.practice_items
             tried = [(item, best[item.id]) for item in items if item.id in best]
@@ -84,18 +85,33 @@ class GetProgress:
             attempts_total=await self.attempts.count(learner.id),
             streak_days=_streak(set(days), today),
             today_attempts=days.get(today, 0),
-            continue_item=self._continue(learner),
+            continue_item=self._continue(learner, best, lessons),
             today=today,
             week=tuple(days.get(today - timedelta(days=k), 0) > 0 for k in range(6, -1, -1)),
         )
 
-    def _continue(self, learner: Learner) -> LessonItem:
-        if learner.current_item_id is not None:
-            try:
-                return self.curriculum.item(learner.current_item_id)
-            except KeyError:
-                pass
-        return self.curriculum.first_item()
+    def _continue(
+        self, learner: Learner, best: Mapping[str, int], lessons: Sequence[LessonProgress]
+    ) -> LessonItem:
+        """Где остановился; с последнего шага урока — в следующий урок (FR-49, FR-50).
+
+        Последний шаг «пройден», если урок засчитан, по шагу есть попытка (даже неудачная —
+        строка остаётся в «повторить») или читать на нём нечего. Последний урок — остаёмся.
+        """
+        if learner.current_item_id is None:
+            return self.curriculum.first_item()
+        try:
+            item = self.curriculum.item(learner.current_item_id)
+        except KeyError:
+            return self.curriculum.first_item()
+        lesson, i = self.curriculum.locate(item.id)
+        if i != len(lesson.items) - 1:
+            return item
+        done = next(lp for lp in lessons if lp.lesson.id == lesson.id).status is LessonStatus.DONE
+        following = self.curriculum.next_lesson(lesson.id)
+        if following is not None and (done or item.id in best or not item.is_practice):
+            return following.items[0]
+        return item
 
 
 def _streak(days: set[date], today: date) -> int:

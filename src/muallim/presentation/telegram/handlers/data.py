@@ -3,6 +3,7 @@
 from typing import Final
 
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
@@ -10,7 +11,7 @@ from muallim.application.use_cases.learners import DeleteMyData, Questionnaire, 
 from muallim.application.use_cases.progress import GetProgress
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ArabicReading, Learner, NativeLanguage
-from muallim.presentation.telegram import keyboards, screens, texts
+from muallim.presentation.telegram import keyboards, on_screen, screens, texts
 from muallim.presentation.telegram.callbacks import Consent, DeleteData, Privacy, Profile
 from muallim.presentation.telegram.display import Display, message_of
 from muallim.presentation.telegram.handlers.commands import PROFILE_START
@@ -21,8 +22,9 @@ router: Final = Router(name="learner.data")
 
 @router.callback_query(Privacy.filter())
 async def cb_privacy(
-    cb: CallbackQuery, display: FromDishka[Display], learner: FromDishka[Learner]
+    cb: CallbackQuery, state: FSMContext, display: FromDishka[Display], learner: FromDishka[Learner]
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await display.show(msg, screens.privacy(learner.research_consent))
     await cb.answer()
@@ -31,6 +33,7 @@ async def cb_privacy(
 @router.callback_query(Consent.filter())
 async def cb_consent(
     cb: CallbackQuery,
+    state: FSMContext,
     callback_data: Consent,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
@@ -39,6 +42,7 @@ async def cb_consent(
     progress: FromDishka[GetProgress],
     questionnaire: FromDishka[Questionnaire],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     await uc.execute(learner, callback_data.granted)
     await cb.answer(texts.CONSENT_SAVED_YES if callback_data.granted else texts.CONSENT_SAVED_NO)
     if msg := message_of(cb):
@@ -54,6 +58,7 @@ async def cb_consent(
 @router.callback_query(Profile.filter())
 async def cb_profile(
     cb: CallbackQuery,
+    state: FSMContext,
     callback_data: Profile,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
@@ -62,6 +67,7 @@ async def cb_profile(
     progress: FromDishka[GetProgress],
 ) -> None:
     """Анкета по шагам: 18+ → родной язык → опыт чтения; ответы копятся в кнопке (FR-44)."""
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     msg = message_of(cb)
     if callback_data.adult and not callback_data.lang:
         await cb.answer()
@@ -92,7 +98,8 @@ async def cb_profile(
 
 
 @router.callback_query(DeleteData.filter(F.confirmed.is_(False)))
-async def cb_delete_ask(cb: CallbackQuery, display: FromDishka[Display]) -> None:
+async def cb_delete_ask(cb: CallbackQuery, state: FSMContext, display: FromDishka[Display]) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await display.show(msg, Screen(texts.DELETE_CONFIRM, keyboards.delete_confirm()))
     await cb.answer()
@@ -100,9 +107,13 @@ async def cb_delete_ask(cb: CallbackQuery, display: FromDishka[Display]) -> None
 
 @router.callback_query(DeleteData.filter(F.confirmed.is_(True)))
 async def cb_delete(
-    cb: CallbackQuery, learner: FromDishka[Learner], uc: FromDishka[DeleteMyData]
+    cb: CallbackQuery,
+    state: FSMContext,
+    learner: FromDishka[Learner],
+    uc: FromDishka[DeleteMyData],
 ) -> None:
     await uc.execute(learner)
+    await state.clear()  # начало занятия, экран, ожидание эталона — всё забыто
     if msg := message_of(cb):
         await msg.edit_text(texts.DELETE_DONE)
     await cb.answer()

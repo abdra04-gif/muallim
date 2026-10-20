@@ -4,7 +4,7 @@
 ученик читает две карточки урока 1 по очереди, а потом возвращается туда, где остановился.
 """
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import timedelta
 from pathlib import Path
 from uuid import UUID
@@ -17,11 +17,13 @@ from dishka.integrations.aiogram import setup_dishka
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.application.ports.repositories import AttemptRepository, LearnerRepository
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.bootstrap.config import Settings
 from muallim.bootstrap.di import create_container
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
+from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner as LearnerRecord
 from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.db.engine import create_engine
@@ -31,7 +33,7 @@ from muallim.infrastructure.db.tables import metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.infrastructure.system import SystemClock
 from muallim.presentation.telegram import texts
-from muallim.presentation.telegram.callbacks import GoItem, Opening
+from muallim.presentation.telegram.callbacks import DeleteData, GoItem, Home, Opening
 from muallim.presentation.telegram.handlers import router
 from muallim.presentation.telegram.opening import OPENING_ITEMS
 from tests.integration.test_bot_flow import FakeTelegram, Learner
@@ -127,3 +129,240 @@ async def test_opening_can_be_skipped(app: tuple[Dispatcher, AsyncContainer]) ->
     assert texts.OPENING_TITLE not in ali.tg.texts()[-1]
     await ali.write("/start")
     assert texts.OPENING_TITLE not in ali.tg.texts()[-1]
+
+
+# ---------- начало занятия не сдвигает «Продолжить» (FR-49, второй круг) ----------
+async def _current_item(container: AsyncContainer) -> str | None:
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(TG)
+    assert learner is not None
+    current: str | None = learner.current_item_id
+    return current
+
+
+async def test_opening_does_not_move_continue(app: tuple[Dispatcher, AsyncContainer]) -> None:
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))  # истиаза
+    await ali.voice()
+    await ali.press(GoItem(item_id=OPENING_ITEMS[1]))  # басмала
+    await ali.voice()
+    await ali.press(Home())
+    assert ali.button(GoItem) == GoItem(item_id=RESUME).pack(), "«Продолжить» — где остановился"
+    assert await _current_item(container) == RESUME
+
+
+@pytest.mark.parametrize("leave", ["/start", "home"])
+async def test_interrupted_opening_keeps_continue(
+    app: tuple[Dispatcher, AsyncContainer], leave: str
+) -> None:
+    """Прочитал истиазу и ушёл на главную — «Продолжить» ведёт туда же, а не в урок 1."""
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))
+    await ali.voice()
+    if leave == "home":
+        await ali.press(Home())
+    else:
+        await ali.write("/start")
+    assert texts.OPENING_TITLE not in ali.tg.texts()[-1]  # сегодня уже занимался — главная
+    assert ali.button(GoItem) == GoItem(item_id=RESUME).pack()
+    assert await _current_item(container) == RESUME
+
+
+# ---------- третий круг: начало занятия не сдвигает курсор и снимается (FR-49, FR-50) ----------
+# Решения автора 2026-10-20: кнопки на шагах начала занятия курсор не двигают; голосовое при
+# открытой главной не оценивается (VOICE_ON_HOME + «Продолжить»); начало занятия живёт один день.
+Steps = Callable[[Learner], Awaitable[None]]
+
+
+def _labels(ali: Learner) -> list[tuple[str, str]]:
+    markup = ali.last_screen().reply_markup
+    assert markup is not None
+    return [(b.text, b.callback_data or "") for row in markup.inline_keyboard for b in row]
+
+
+async def _press_label(ali: Learner, prefix: str) -> None:
+    """Нажать кнопку последнего экрана по началу надписи — как ученик."""
+    found = [data for text, data in _labels(ali) if text.startswith(prefix)]
+    assert found, f"нет кнопки «{prefix}…»: {_labels(ali)}"
+    await ali.press(found[0])
+
+
+async def _opening_attempts(container: AsyncContainer) -> list[str]:
+    """Попытки на истиазе и басмале (в _seed — две вчерашние)."""
+    from sqlalchemy import select  # noqa: PLC0415
+
+    from muallim.infrastructure.db.tables import attempts  # noqa: PLC0415
+
+    async with container() as request:
+        session = await request.get(AsyncSession)
+        rows = await session.execute(
+            select(attempts.c.item_id).where(attempts.c.item_id.in_(OPENING_ITEMS))
+        )
+        return [r[0] for r in rows]
+
+
+async def _home_continue(ali: Learner) -> str:
+    """🏠 → главная (если снова предложено начало занятия — «Пропустить») → «Продолжить»."""
+    await ali.press(Home())
+    if texts.OPENING_TITLE in ali.tg.texts()[-1]:
+        await ali.press(Opening(act="skip"))
+    head = texts.CONTINUE_BUTTON.split("{")[0]
+    found = [data for text, data in _labels(ali) if text.startswith(head)]
+    assert found, _labels(ali)
+    return found[0]
+
+
+async def _back_from_isti_adha_card(ali: Learner) -> None:
+    await ali.press(Opening(act="start"))
+    await _press_label(ali, texts.BACK_BUTTON)  # «◀️ Назад» → правило урока 1
+
+
+async def _basmala_read(ali: Learner) -> None:
+    await ali.press(Opening(act="start"))
+    await ali.voice()  # истиаза
+    await _press_label(ali, texts.NEXT_BUTTON)  # → басмала
+    await ali.voice()  # басмала
+
+
+async def _again_after_basmala(ali: Learner) -> None:
+    await _basmala_read(ali)
+    await _press_label(ali, texts.AGAIN_BUTTON)
+
+
+async def _back_from_basmala_result(ali: Learner) -> None:
+    await _basmala_read(ali)
+    await _press_label(ali, texts.BACK_BUTTON)
+
+
+async def _next_lesson_from_basmala_card(ali: Learner) -> None:
+    await ali.press(Opening(act="start"))
+    await ali.voice()
+    await _press_label(ali, texts.NEXT_BUTTON)  # → басмала
+    await _press_label(ali, texts.NEXT_LESSON_BUTTON.split("{")[0])  # «➡️ Следующий урок»
+
+
+@pytest.mark.parametrize(
+    "steps",
+    [
+        _back_from_isti_adha_card,
+        _again_after_basmala,
+        _back_from_basmala_result,
+        _next_lesson_from_basmala_card,
+    ],
+    ids=["back_from_isti_adha", "again_after_basmala", "back_from_basmala", "next_lesson"],
+)
+async def test_opening_buttons_do_not_move_cursor(
+    app: tuple[Dispatcher, AsyncContainer], steps: Steps
+) -> None:
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await steps(ali)
+    assert await _current_item(container) == RESUME
+    assert await _home_continue(ali) == GoItem(item_id=RESUME).pack()
+    assert await _current_item(container) == RESUME
+
+
+async def _leave_by_skip(ali: Learner) -> None:
+    await ali.press(Home())  # сегодня ещё не читал — снова «Начнём занятие»
+    await ali.press(Opening(act="skip"))
+
+
+async def _leave_by_home(ali: Learner) -> None:
+    await ali.press(Home())
+
+
+async def _leave_by_start(ali: Learner) -> None:
+    await ali.write("/start")
+
+
+@pytest.mark.parametrize(
+    "leave", [_leave_by_skip, _leave_by_home, _leave_by_start], ids=["skip", "home", "start"]
+)
+async def test_left_opening_does_not_take_voice(
+    app: tuple[Dispatcher, AsyncContainer], leave: Steps
+) -> None:
+    """Открыл истиазу и ушёл — следующее голосовое уже не попытка истиазы или басмалы."""
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))
+    await leave(ali)
+    await ali.voice()
+    assert len(await _opening_attempts(container)) == 2  # только вчерашние из _seed
+
+
+async def test_deleted_data_ends_opening(app: tuple[Dispatcher, AsyncContainer]) -> None:
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))
+    await ali.press(DeleteData(confirmed=True))
+    assert texts.DELETE_DONE in ali.tg.texts()[-1]
+    await ali.voice()
+    assert await _opening_attempts(container) == []  # вчерашние удалены, новых нет
+
+
+@pytest.mark.parametrize("leave", ["skip", "home"])
+async def test_voice_on_home_is_not_assessed(
+    app: tuple[Dispatcher, AsyncContainer], leave: str, curriculum: Curriculum
+) -> None:
+    """На экране главная — урок не открыт: попытку не пишем, предлагаем открыть урок."""
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    if leave == "skip":
+        await ali.press(Opening(act="skip"))
+    else:
+        await ali.press(Opening(act="skip"))
+        await ali.press(GoItem(item_id="L006-02"))
+        await ali.voice()  # урок открыт — оценивается
+        await ali.press(Home())
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(TG)
+        assert learner is not None
+        before = await (await request.get(AttemptRepository)).count(learner.id)
+    await ali.voice()
+    assert texts.VOICE_ON_HOME in ali.tg.texts()
+    reply = [m for m in ali.tg.shown if (m.text or "") == texts.VOICE_ON_HOME]
+    assert reply and reply[-1].reply_markup is not None
+    buttons = [
+        (b.text, b.callback_data) for row in reply[-1].reply_markup.inline_keyboard for b in row
+    ]
+    target = "L006-02" if leave == "home" else RESUME
+    title = curriculum.locate(target)[0].title
+    assert (texts.CONTINUE_BUTTON.format(title=title), GoItem(item_id=target).pack()) in buttons
+    async with container() as request:
+        assert await (await request.get(AttemptRepository)).count(learner.id) == before
+
+
+async def test_voice_after_opening_a_card_is_assessed(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    dp, _ = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="skip"))
+    await ali.press(GoItem(item_id="L006-02"))
+    await ali.voice()
+    assert texts.VERDICT_EXCELLENT in ali.tg.texts()[-1]
+    assert texts.VOICE_ON_HOME not in ali.tg.texts()
+
+
+async def test_yesterdays_unfinished_opening_does_not_take_todays_voice(
+    app: tuple[Dispatcher, AsyncContainer], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Начало занятия помнит дату (по часам бота, Clock): вчерашнее сегодня уже не действует."""
+    dp, container = app
+    ali = _person(dp)
+    await ali.write("/start")
+    await ali.press(Opening(act="start"))  # открыл истиазу и не прочитал
+    real_now = SystemClock.now
+    monkeypatch.setattr(SystemClock, "now", lambda self: real_now(self) + timedelta(days=1))
+    await ali.voice()  # на следующий день, карточка истиазы всё ещё на экране
+    assert len(await _opening_attempts(container)) == 2  # только вчерашние из _seed
+    assert await _current_item(container) == RESUME

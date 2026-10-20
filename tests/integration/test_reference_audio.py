@@ -136,4 +136,7 @@ def test_repository_cuts_point_to_existing_files() -> None:
     for row in yaml.safe_load(manifest.read_text(encoding="utf-8")) or []:
         assert row["status"] in ("unchecked", "ok", "bad"), row["text"]
         assert row["status"] == "bad" or (root / row["file"]).is_file(), row["text"]
+        if row.get("manual"):  # целый файл не из аята (истиаза, SRC-136): источник обязателен
+            assert row.get("source"), row["text"]
+            continue
         assert row["parts"] and all(":" in p["aya"] for p in row["parts"]), row["text"]

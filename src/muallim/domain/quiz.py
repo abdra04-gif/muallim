@@ -40,17 +40,46 @@ def make_question(curriculum: Curriculum, lessons: Sequence[Lesson], seed: int) 
         raise QuizError("Нужно пройти хотя бы две буквы")
     rng = random.Random(seed)  # noqa: S311 — не криптография
     item = rng.choice(heads)
-    return question_from(curriculum, item.id, rng.randrange(3), seed)
+    return question_from(curriculum, item.id, rng.randrange(3), seed, lessons)
 
 
-def question_from(curriculum: Curriculum, item_id: str, vowel: int, seed: int) -> Question:
-    """Тот же вопрос по данным кнопки: варианты зависят только от программы и seed."""
+def first_quiz_lesson(curriculum: Curriculum) -> Lesson | None:
+    """Урок буквы, на котором закрепление откроется (если начаты все уроки букв до него).
+
+    Первый урок, начиная с которого ``make_question`` строит вопрос; без уроков букв — None.
+    """
+    letters = [les for les in curriculum.lessons if les.section == "letter"]
+    for k, lesson in enumerate(letters):
+        if len(_heads(letters[: k + 1])) >= 2:  # то же условие, что в make_question
+            return lesson
+    return None
+
+
+def question_from(
+    curriculum: Curriculum,
+    item_id: str,
+    vowel: int,
+    seed: int,
+    started: Sequence[Lesson] | None = None,
+) -> Question:
+    """Тот же вопрос по данным кнопки: варианты зависят от программы, seed и начатых уроков.
+
+    Отвлекающие (решение автора 2026-10-20): та же буква с другими огласовками, затем буквы
+    начатых уроков (``started``; None — все), ближайшие к букве вопроса по книге (при равенстве —
+    более ранняя), и только если не хватает — остальные буквы так же по близости. Без случайности
+    в выборе, поэтому вопрос восстанавливается и без ``started``, если ближайшие буквы начаты.
+    """
     item = curriculum.item(item_id)
     rng = random.Random(seed * 31 + vowel)  # noqa: S311
     right = _sounds(item)[vowel]
-    others = [h for h in _heads(curriculum.lessons) if h.id != item.id]
-    rng.shuffle(others)
-    # отвлекающие: та же буква с другой огласовкой и другие буквы с той же огласовкой
+    heads = _heads(curriculum.lessons)
+    known = {h.id for h in _heads(started)} if started is not None else {h.id for h in heads}
+    at = next((k for k, h in enumerate(heads) if h.id == item.id), 0)
+
+    def rank(k: int) -> tuple[bool, int, int]:
+        return heads[k].id not in known, abs(k - at), k
+
+    others = [heads[k] for k in sorted(range(len(heads)), key=rank) if heads[k].id != item.id]
     pool = [s for s in _sounds(item) if s != right] + [_sounds(h)[vowel] for h in others]
     options = [right]
     for sound in pool:

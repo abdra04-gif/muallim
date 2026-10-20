@@ -15,10 +15,12 @@ class OpenItem:
     uow: UnitOfWork
     events: EventLog
 
-    async def execute(self, learner: Learner, item_id: str) -> LessonItem:
+    async def execute(self, learner: Learner, item_id: str, *, move: bool = True) -> LessonItem:
+        """Открыть карточку. ``move=False`` — «Продолжить» не сдвигается (начало занятия, FR-49)."""
         item = self.curriculum.item(item_id)  # KeyError — устаревшая кнопка, ловит presentation
-        learner.current_item_id = item.id
-        await self.learners.save(learner)
+        if move:
+            learner.current_item_id = item.id
+            await self.learners.save(learner)
         await self.events.record("item_opened", learner.id, {"item_id": item.id})
         await self.uow.commit()
         return item

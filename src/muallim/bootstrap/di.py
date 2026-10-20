@@ -43,6 +43,7 @@ from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
+from muallim.application.use_cases.staff import StaffAccess
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.policy import GradingPolicy
@@ -186,6 +187,10 @@ class RequestProvider(Provider):
         self, directory: AnnotatorDirectory, settings: Settings
     ) -> AnnotatorAccess:
         return AnnotatorAccess(directory, settings.annotators)
+
+    @provide
+    def staff_access(self, settings: Settings, annotators: AnnotatorAccess) -> StaffAccess:
+        return StaffAccess(settings.teachers, annotators)
 
     @provide
     def record_reference(

@@ -15,7 +15,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | domain | `src/muallim/domain/` | `assessment.py` (сравнение фонем, типы ошибок), `policy.py` (пороги), `curriculum.py`, `learner.py`, `attempt.py`, `phonetics.py` |
 | application | `src/muallim/application/` | `use_cases/*.py` (сценарии), `ports/*.py` (протоколы), `feedback.py` (тексты ошибок) |
 | infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (Muaalem, заглушка), `audio/` (ffmpeg, файлы), `curriculum/` (YAML), `erasures.py` (журнал удалений, ADR-0054) |
-| presentation | `src/muallim/presentation/telegram/` | `handlers/` (по темам: команды, навигация, данные, эталон и жалоба, голосовое), `annotation.py`, `errors.py` (перехват сбоев), `display.py` (показ экранов), `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
+| presentation | `src/muallim/presentation/telegram/` | `handlers/` (по темам: команды, навигация, данные, эталон и жалоба, голосовое), `annotation.py`, `errors.py` (перехват сбоев), `display.py` (показ экранов), `on_screen.py` (что на экране ученика — карточка или меню, ADR-0058), `opening.py` (начало занятия: истиаза и басмала, ADR-0050), `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
 | research | `src/muallim/research/` | `reports.py`, `annotation.py`, `dataset.py`, `integrity.py` (сверка БД и файлов), `erasures.py` (повтор журнала удалений) |
 | bootstrap | `src/muallim/bootstrap/` | `config.py`, `di.py` (вся «склейка»), `main.py`, `research_cli.py`, `console.py` (проверка в терминале `muallim --test`, ADR-0045) |
 

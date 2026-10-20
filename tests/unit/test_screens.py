@@ -107,7 +107,8 @@ def test_card_next_on_last_item_opens_next_lesson(curriculum: Curriculum) -> Non
     nxt = curriculum.next_lesson(lesson.id)
     assert nxt is not None
     s = screens.card(curriculum, lesson.items[-1], has_audio=False, is_teacher=False)
-    assert ("▶️", cb.GoItem(item_id=nxt.items[0].id).pack()) in _buttons(s.keyboard)
+    label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)  # последний шаг — следующий урок
+    assert (label, cb.GoItem(item_id=nxt.items[0].id).pack()) in _buttons(s.keyboard)
     assert _has_home(s.keyboard) and "с. 11" in s.caption
 
 
@@ -115,7 +116,7 @@ def test_card_offers_previous_lesson(curriculum: Curriculum) -> None:
     lesson = _letters(curriculum)[1]
     prev = curriculum.previous_lesson(lesson.id)
     assert prev is not None
-    s = screens.card(curriculum, lesson.items[-1], has_audio=False, is_teacher=False)
+    s = screens.card(curriculum, lesson.items[0], has_audio=False, is_teacher=False)  # FR-50
     label = f"⬅️ Предыдущий урок: {prev.title}"
     assert (label, cb.GoItem(item_id=prev.items[0].id).pack()) in _buttons(s.keyboard)
 
@@ -248,14 +249,16 @@ def test_result_celebrates_completed_lesson_and_offers_next(curriculum: Curricul
     assert _has_home(s.keyboard)
 
 
-def test_result_offers_previous_lesson(curriculum: Curriculum) -> None:
+def test_result_of_later_step_has_no_previous_lesson(curriculum: Curriculum) -> None:
+    """«Предыдущий урок» — только на первом шаге урока (FR-50)."""
     lesson = _letters(curriculum)[1]
     prev = curriculum.previous_lesson(lesson.id)
     assert prev is not None
     item = _head(lesson)
+    assert item != lesson.items[0]
     s = screens.result(curriculum, _result(curriculum, item.id, item.text, False), has_audio=True)
-    label = f"⬅️ Предыдущий урок: {prev.title}"
-    assert (label, cb.GoItem(item_id=prev.items[0].id).pack()) in _buttons(s.keyboard)
+    to_prev = {cb.GoItem(item_id=i.id).pack() for i in prev.items}
+    assert not [t for t, d in _buttons(s.keyboard) if d in to_prev]
 
 
 def test_result_on_first_lesson_has_no_previous_lesson(curriculum: Curriculum) -> None:

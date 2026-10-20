@@ -14,7 +14,7 @@ from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import keyboards, screens, texts, views
+from muallim.presentation.telegram import keyboards, on_screen, screens, texts, views
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.daily import home_or_opening
 from muallim.presentation.telegram.learner import NewLearner
@@ -51,12 +51,14 @@ async def start(
 @router.message(Command("lessons"))
 async def lessons(
     m: Message,
+    state: FSMContext,
     bot: Bot,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     screen = screens.lessons(cur, await progress.execute(learner), part=-1)
     await display.send(bot, m.chat.id, screen)
 
@@ -64,42 +66,59 @@ async def lessons(
 @router.message(Command("progress"))
 async def progress_cmd(
     m: Message,
+    state: FSMContext,
     bot: Bot,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     await display.send(bot, m.chat.id, screens.progress(cur, await progress.execute(learner)))
 
 
 @router.message(Command("help"))
-async def help_cmd(m: Message, bot: Bot, display: FromDishka[Display]) -> None:
+async def help_cmd(m: Message, state: FSMContext, bot: Bot, display: FromDishka[Display]) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     await display.send(bot, m.chat.id, screens.help_screen())
 
 
 @router.message(Command("privacy"))
 async def privacy(
-    m: Message, bot: Bot, display: FromDishka[Display], learner: FromDishka[Learner]
+    m: Message,
+    state: FSMContext,
+    bot: Bot,
+    display: FromDishka[Display],
+    learner: FromDishka[Learner],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     await display.send(bot, m.chat.id, screens.privacy(learner.research_consent))
 
 
 @router.message(Command("signs"))
-async def signs_cmd(m: Message, bot: Bot, display: FromDishka[Display]) -> None:
+async def signs_cmd(m: Message, state: FSMContext, bot: Bot, display: FromDishka[Display]) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     await display.send(bot, m.chat.id, screens.signs())
 
 
 @router.message(Command("quiz"))
 async def quiz_cmd(
     m: Message,
+    state: FSMContext,
     bot: Bot,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     uc: FromDishka[PracticeQuiz],
+    cur: FromDishka[Curriculum],
+    progress: FromDishka[GetProgress],
 ) -> None:
+    await on_screen.menu(state)  # не карточка: голосовое здесь не оценивается
     q = await uc.next(learner, random.randrange(10**6))  # noqa: S311
-    await display.send(bot, m.chat.id, screens.quiz(q) if q else screens.quiz_unavailable())
+    await display.send(
+        bot,
+        m.chat.id,
+        screens.quiz(q) if q else screens.quiz_unavailable(cur, await progress.execute(learner)),
+    )
 
 
 @router.message(Command("me"))

@@ -9,13 +9,14 @@ from aiogram.types import BufferedInputFile, CallbackQuery
 from dishka import FromDishka
 
 from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.system import Clock
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress, Progress
 from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.reference import RecordReference
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import opening, screens, texts
+from muallim.presentation.telegram import on_screen, opening, screens, texts
 from muallim.presentation.telegram.callbacks import Opening, ShareLesson
 from muallim.presentation.telegram.display import Display, message_of
 from muallim.presentation.telegram.screens import Screen
@@ -24,7 +25,12 @@ router: Final = Router(name="learner.daily")
 
 
 async def home_or_opening(cur: Curriculum, progress: Progress, state: FSMContext) -> Screen:
-    """Главная — или сначала «Начнём занятие», если сегодня его ещё не было."""
+    """Главная — или сначала «Начнём занятие», если сегодня его ещё не было.
+
+    Начатое начало занятия при этом снимается (🏠, /start), на экране — меню, не карточка.
+    """
+    await opening.finish(state)
+    await on_screen.menu(state)
     if opening.needs_opening(progress, await opening.skipped_on(state)):
         return screens.opening(cur)
     return screens.home(cur, progress)
@@ -43,19 +49,23 @@ async def cb_opening(
     library: FromDishka[ReferenceAudioLibrary],
     recorder: FromDishka[RecordReference],
     reading: FromDishka[HowToRead],
+    clock: FromDishka[Clock],
 ) -> None:
     p = await progress.execute(learner)
     msg = message_of(cb)
+    today = clock.now().date()
     if callback_data.act == "skip":
-        if p.today is not None:
-            await opening.skip(state, p.today)
+        await opening.skip(state, today)
+        await opening.finish(state)
+        await on_screen.menu(state)
         if msg:
             await display.show(msg, screens.home(cur, p))
         await cb.answer()
         return
     resume = p.continue_item or cur.first_item()
-    await opening.begin(state, resume.id)
-    item = await cards.execute(learner, opening.OPENING_ITEMS[0])
+    await opening.begin(state, resume.id, today)
+    item = await cards.execute(learner, opening.OPENING_ITEMS[0], move=False)  # FR-49
+    await on_screen.card(state, item.id, opening=True)
     if msg:
         screen = screens.card(
             cur,

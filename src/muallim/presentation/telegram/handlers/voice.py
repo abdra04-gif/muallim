@@ -5,6 +5,7 @@
 
 import io
 import logging
+from contextlib import suppress
 from typing import Final
 
 from aiogram import Bot, F, Router
@@ -14,14 +15,16 @@ from dishka import FromDishka
 
 from muallim.application.ports.recognition import RecognitionError
 from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.system import Clock
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import RecordReference
-from muallim.domain.curriculum import Curriculum
+from muallim.application.use_cases.staff import StaffAccess
+from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner
 from muallim.domain.policy import Verdict
-from muallim.presentation.telegram import opening, screens, texts
+from muallim.presentation.telegram import on_screen, opening, screens, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
 
@@ -41,6 +44,9 @@ async def on_voice(
     library: FromDishka[ReferenceAudioLibrary],
     recorder: FromDishka[RecordReference],
     cur: FromDishka[Curriculum],
+    staff_access: FromDishka[StaffAccess],
+    progress: FromDishka[GetProgress],
+    clock: FromDishka[Clock],
 ) -> None:
     assert m.voice is not None  # гарантирует фильтр F.voice  # noqa: S101
     if m.voice.duration < 1:
@@ -55,13 +61,30 @@ async def on_voice(
         await m.reply(texts.RECORD_SAVED.format(item=item_id))
         return
 
+    shown = await on_screen.shown(state)
+    in_opening = await opening.active(state, clock.now().date())
+    stale = shown is not None and shown.opening and not in_opening  # вчерашнее начало занятия
+    if shown is not None and (shown.item_id is None or stale):
+        # на экране меню, урок не открыт — не оцениваем, предлагаем открыть (решение автора)
+        if stale:
+            await opening.finish(state)
+            await on_screen.menu(state)
+        screen = screens.voice_on_home(cur, await progress.execute(learner))
+        await m.answer(screen.caption, reply_markup=screen.keyboard)
+        return
     item = cards.current(learner)
-    if not item.is_practice:
+    if shown is not None and shown.item_id is not None:
+        with suppress(KeyError):  # карточку убрали из программы — карточка курсора
+            item = cur.item(shown.item_id)
+    if item.kind is ItemKind.RULE:  # правило читают глазами, дальше — чтение (FR-49)
+        await m.reply(texts.VOICE_ON_RULE)
+        return
+    if not item.is_practice:  # таблица алфавита — только посмотреть
         await m.reply(texts.NOT_PRACTICE)
         return
     wait = await m.reply(texts.LISTENING.format(item=item.text))
     try:
-        result = await uc.execute(learner, buf.getvalue())
+        result = await uc.execute(learner, buf.getvalue(), item.id)
     except RecognitionError as error:
         logger.warning(
             "Не удалось распознать запись ученика %s, карточка %s, этап %s",
@@ -83,11 +106,14 @@ async def on_voice(
         attempt.processing_ms,
     )
     resume = None
-    if result.item.id == opening.OPENING_ITEMS[-1] and attempt.verdict is not Verdict.FAILED:
-        resume_id = await opening.finish(state)  # басмала прочитана — вернуть, где остановился
+    basmala = result.item.id == opening.OPENING_ITEMS[-1]
+    if in_opening and basmala and attempt.verdict is not Verdict.FAILED:
+        resume_id = await opening.resume_item(state)  # басмала прочитана — вернуть, где был
         resume = cur.item(resume_id) if resume_id else None
+    # «Для исследования» и номер попытки — только учителю и разметчику (FR-50)
+    staff = await staff_access.is_staff(learner)
     await wait.delete()
-    screen = screens.result(cur, result, library.has(result.item.id), resume)
+    screen = screens.result(cur, result, library.has(result.item.id), resume, staff=staff)
     await display.send(bot, m.chat.id, screen)
 
 
@@ -100,5 +126,12 @@ async def fallback(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
+    """Текст вместо голосового — одна подсказка; экран с кнопками остаётся выше (FR-50).
+
+    Неизвестная команда (в том числе /annotate постороннего) — главная: это не «текст вместо
+    голосового», и ученику нужны кнопки.
+    """
+    if (m.text or "").startswith("/"):  # неизвестная команда — просто главная с кнопками
+        await display.send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
+        return
     await m.answer(texts.SEND_VOICE)
-    await display.send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
