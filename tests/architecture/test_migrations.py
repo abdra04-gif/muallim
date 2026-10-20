@@ -101,3 +101,39 @@ def test_migration_0007_keeps_first_of_duplicate_reports(tmp_path: Path) -> None
     with create_engine(f"sqlite:///{db}").connect() as conn:
         rows = conn.exec_driver_sql("SELECT reason FROM learner_reports").all()
     assert rows == [("read_correctly",)]
+
+
+SETTINGS_COLUMNS = {
+    "learner_id", "how_to_read", "auto_reference", "daily_opening", "large_font",
+    "research_block", "reminder_minute", "utc_offset_min",
+    "screen_item_id", "screen_opening", "opening_resume_item", "opening_day",
+    "opening_skipped_on", "reminder_sent_on", "updated_at",
+}  # fmt: skip
+
+
+def test_migration_0008_adds_learner_settings_one_to_one(tmp_path: Path) -> None:
+    """ADR-0061: настройки и экран — строка на ученика, без Telegram ID, удаляется с ним."""
+    from sqlalchemy import inspect  # noqa: PLC0415
+
+    db = tmp_path / "s.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0008")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        info = inspect(conn)
+        columns = {c["name"]: c for c in info.get_columns("learner_settings")}
+        (fk,) = info.get_foreign_keys("learner_settings")
+        pk = info.get_pk_constraint("learner_settings")["constrained_columns"]
+    assert set(columns) == SETTINGS_COLUMNS
+    assert not [c for c in columns if "telegram" in c], "роль просмотра видит таблицу целиком"
+    assert pk == ["learner_id"]
+    assert (fk["referred_table"], fk["referred_columns"]) == ("learners", ["id"])
+    assert fk["options"].get("ondelete") == "CASCADE"
+    nullable = {name for name, c in columns.items() if c["nullable"]}
+    assert nullable == {
+        "reminder_minute", "screen_item_id", "opening_resume_item", "opening_day",
+        "opening_skipped_on", "reminder_sent_on",
+    }  # fmt: skip
+
+    command.downgrade(cfg, "0007")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        assert not inspect(conn).has_table("learner_settings")

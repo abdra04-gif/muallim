@@ -1,7 +1,8 @@
 """База сама не принимает неверных значений (TD-DB-02, ADR-0055).
 
 Защита на случай ошибки в коде или ручной правки: допустимые значения вердикта, метки разметки,
-её источника и причины жалобы проверяет PostgreSQL (и SQLite в тестах), а не только код.
+её источника, причины жалобы и настроек ученика (ADR-0061) проверяет PostgreSQL (и SQLite
+в тестах), а не только код.
 Идёт на SQLite и — при TEST_POSTGRES_URL — на PostgreSQL.
 """
 
@@ -93,3 +94,74 @@ async def test_one_report_per_learner_and_attempt(session: AsyncSession) -> None
     assert await repo.add_report(again) is False
     await session.commit()
     assert await session.scalar(select(func.count()).select_from(learner_reports)) == 1
+
+
+# ---------- настройки ученика (ADR-0061, миграция 0008) ----------
+async def _seed_settings(session: AsyncSession) -> None:
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
+    await _seed(session)
+    await session.execute(
+        insert(learner_settings).values(learner_id=LEARNER, updated_at=FixedClock().now())
+    )
+    await session.commit()
+
+
+async def test_learner_settings_row_gets_current_bot_defaults(session: AsyncSession) -> None:
+    """Строка без значений — как бот работает сейчас (ADR-0029, ADR-0050, ADR-0057; В3, В5)."""
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
+    await _seed_settings(session)
+    row = (await session.execute(select(learner_settings))).mappings().one()
+    assert row["how_to_read"] == "spoiler"
+    assert (row["auto_reference"], row["daily_opening"]) == (False, True)
+    assert (row["large_font"], row["research_block"], row["screen_opening"]) == (False,) * 3
+    assert (row["reminder_minute"], row["utc_offset_min"]) == (None, 180)
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        {"how_to_read": "audio"},
+        {"reminder_minute": -1},
+        {"reminder_minute": 1440},
+        {"utc_offset_min": -721},
+        {"utc_offset_min": 841},
+    ],
+    ids=["how_to_read", "minute_low", "minute_high", "offset_low", "offset_high"],
+)
+async def test_db_rejects_impossible_settings(
+    session: AsyncSession, values: dict[str, object]
+) -> None:
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
+    await _seed_settings(session)
+    with pytest.raises(IntegrityError):
+        await session.execute(update(learner_settings).values(**values))
+    await session.rollback()
+
+
+@pytest.mark.parametrize(
+    "values",
+    [{"reminder_minute": 0}, {"reminder_minute": 1439}, {"utc_offset_min": -720},
+     {"utc_offset_min": 840}, {"how_to_read": "shown"}, {"how_to_read": "hidden"}],
+)  # fmt: skip
+async def test_db_accepts_boundary_settings(
+    session: AsyncSession, values: dict[str, object]
+) -> None:
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
+    await _seed_settings(session)
+    await session.execute(update(learner_settings).values(**values))
+    await session.commit()
+
+
+async def test_one_settings_row_per_learner(session: AsyncSession) -> None:
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
+    await _seed_settings(session)
+    with pytest.raises(IntegrityError):
+        await session.execute(
+            insert(learner_settings).values(learner_id=LEARNER, updated_at=FixedClock().now())
+        )
+    await session.rollback()

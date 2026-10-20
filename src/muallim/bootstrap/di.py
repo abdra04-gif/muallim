@@ -18,6 +18,7 @@ from muallim.application.ports.repositories import (
     CurriculumSnapshots,
     LearnerProfileRepository,
     LearnerRepository,
+    LearnerSettingsRepository,
     UnitOfWork,
 )
 from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
@@ -43,6 +44,7 @@ from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
+from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.staff import StaffAccess
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
@@ -69,6 +71,7 @@ from muallim.infrastructure.db.repositories.learners import (
     SqlLearnerProfileRepository,
     SqlLearnerRepository,
 )
+from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRepository
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.erasures import FileErasureLog
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
@@ -176,6 +179,7 @@ class RequestProvider(Provider):
     uow = provide(SqlUnitOfWork, provides=UnitOfWork)
     learners = provide(SqlLearnerRepository, provides=LearnerRepository)
     profiles = provide(SqlLearnerProfileRepository, provides=LearnerProfileRepository)
+    learner_settings = provide(SqlLearnerSettingsRepository, provides=LearnerSettingsRepository)
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
     events = provide(SqlEventLog, provides=EventLog)
     snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
@@ -202,6 +206,18 @@ class RequestProvider(Provider):
     ) -> RecordReference:
         return RecordReference(library, settings.teachers, uow, events)
 
+    @provide
+    def progress(
+        self,
+        curriculum: Curriculum,
+        attempts: AttemptRepository,
+        policy: GradingPolicy,
+        clock: Clock,
+        learner_settings: LearnerSettingsRepository,
+    ) -> GetProgress:
+        """«Сегодня» и серия дней — по местной дате ученика (ADR-0061)."""
+        return GetProgress(curriculum, attempts, policy, clock, learner_settings)
+
     use_cases = provide_all(
         EnsureLearner,
         SetResearchConsent,
@@ -211,7 +227,7 @@ class RequestProvider(Provider):
         OpenItem,
         AssessRecitation,
         HowToRead,
-        GetProgress,
+        ScreenState,
         GetReferenceAudio,
         ReportMistake,
         PublishCurriculum,

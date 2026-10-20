@@ -10,7 +10,7 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     L->>H: голосовое (OGG/Opus)
-    alt на экране меню (главная, прогресс…) — on_screen.py
+    alt на экране меню (главная, прогресс…) — ScreenState (learner_settings)
         H-->>L: VOICE_ON_HOME + «▶️ Продолжить» (не проверяется)
     else на экране карточка-правило
         H-->>L: VOICE_ON_RULE «это правило, нажми ▶️ Дальше»

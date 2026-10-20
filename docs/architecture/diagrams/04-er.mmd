@@ -2,6 +2,7 @@
 erDiagram
     learners ||--o{ consents : "журнал согласий"
     learners ||--o| learner_profiles : "анкета один раз"
+    learners ||--o| learner_settings : "настройки и экран"
     learners ||--o{ attempts : "читает"
     learners |o--o{ interaction_events : "действия"
     attempts ||--o{ detected_errors : "найдено моделью"
@@ -31,6 +32,18 @@ erDiagram
         string native_language "родной язык"
         string arabic_reading "опыт чтения"
         string questionnaire_version
+    }
+    learner_settings {
+        uuid learner_id PK,FK
+        string how_to_read "spoiler / shown / hidden"
+        bool daily_opening
+        smallint reminder_minute "null — выкл."
+        smallint utc_offset_min "по умолч. 180"
+        string screen_item_id "null — меню"
+        bool screen_opening
+        string opening_resume_item
+        date opening_day "местная дата"
+        date opening_skipped_on
     }
     attempts {
         uuid id PK

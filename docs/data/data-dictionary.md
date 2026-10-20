@@ -31,6 +31,30 @@
 | `questionnaire_version` | varchar(16) | версия вопросов (`QUESTIONNAIRE_VERSION`) | 🟢 |
 | `answered_at` | timestamptz (UTC) | когда ответил | 🟢 |
 
+## `learner_settings` — настройки ученика и состояние экрана (FR-51, TD-FN-90, ADR-0061)
+Одна строка на ученика (миграция 0008); нет строки — умолчания, как бот работал до настроек.
+Удаляется вместе с учеником (CASCADE). Telegram ID нет — роль просмотра видит таблицу целиком.
+Данные работы сервиса, не исследования: согласие на исследование не нужно. Даты — **местные**
+(по `utc_offset_min`), время — минуты местных суток. Экрана настроек и рассылки напоминаний пока
+нет — поля выбора хранятся с умолчаниями.
+| Поле | Тип | Описание | Кат. |
+|---|---|---|---|
+| `learner_id` | UUID, PK → learners, CASCADE | чьи настройки | 🟡 |
+| `how_to_read` | varchar(16), CHECK, по умолч. `spoiler` | «🔤 Как читается»: `spoiler` «Закрыта» / `shown` «Видна сразу» / `hidden` «Не показывать» (ADR-0029) | 🟢 |
+| `auto_reference` | bool, по умолч. false | присылать эталон голосовым перед карточкой (В5) | 🟢 |
+| `daily_opening` | bool, по умолч. true | предлагать начало занятия — истиаза и басмала (ADR-0050) | 🟢 |
+| `large_font` | bool, по умолч. false | крупный шрифт картинок (ADR-0059) | 🟢 |
+| `research_block` | bool, по умолч. false | показывать блок «Для исследования» (ADR-0057) | 🟢 |
+| `reminder_minute` | smallint, null, CHECK 0…1439 | минута местных суток для напоминания; null — выключено | 🟢 |
+| `utc_offset_min` | smallint, CHECK −720…840, по умолч. 180 | смещение от UTC в минутах по ответу «который у тебя час?»; до ответа — UTC+3 (В3). Не город и не геопозиция | 🟡; 180 у ученика, который не отвечал, — умолчание, а не его часовой пояс. Не выгружается в датасет и отчёты (ADR-0061) |
+| `screen_item_id` | varchar(32), null | карточка на экране; null — меню (голосовое не оценивается, FR-50) | 🟢 |
+| `screen_opening` | bool, по умолч. false | карточка открыта как шаг начала занятия | 🟢 |
+| `opening_resume_item` | varchar(32), null | куда вернуться после басмалы; null — начала занятия нет | 🟢 |
+| `opening_day` | date, null | местная дата начала занятия: вчерашнее не действует | 🟢 |
+| `opening_skipped_on` | date, null | местная дата «Пропустить» — сегодня больше не предлагать | 🟢 |
+| `reminder_sent_on` | date, null | местная дата последнего напоминания (не больше одного в день) | 🟢 |
+| `updated_at` | timestamptz (UTC) | последнее сохранение | 🟢 |
+
 ## `consents` — журнал согласий
 Каждое «да»/«нет» — новая строка; ничего не перезаписывается.
 | Поле | Тип | Описание |
@@ -151,6 +175,7 @@
 - `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `learner_reports.reason` ∈ read_correctly / wrong_error / other.
 - Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
 - `annotations.detected_error_id` удалено миграцией 0007.
+- `learner_settings` (миграция 0008): `how_to_read` ∈ spoiler / shown / hidden; `reminder_minute` NULL или 0…1439; `utc_offset_min` −720…840; одна строка на ученика (PK `learner_id`).
 
 ## `learner_reports` — жалобы «бот ошибся» (ADR-0020)
 | Поле | Тип | Описание |

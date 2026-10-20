@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 from datetime import date, datetime
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID
 
 from muallim.domain.assessment import Assessment
@@ -10,6 +10,7 @@ from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
 from muallim.domain.report import LearnerReport
+from muallim.domain.settings import LearnerSettings
 
 
 class LearnerRepository(Protocol):
@@ -63,7 +64,23 @@ class AttemptRepository(Protocol):
         """False — жалоба этого ученика на эту попытку уже есть (повторное нажатие)."""
 
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
-        """Сколько попыток в каждый день (UTC) — для серии дней подряд."""
+        """Сколько попыток в каждый местный день ученика — для серии дней и начала занятия.
+
+        День — по смещению ученика (``learner_settings.utc_offset_min``, ADR-0061).
+        """
+
+
+class LearnerSettingsRepository(Protocol):
+    """Настройки ученика и состояние его экрана (ADR-0061). Удаляются вместе с учеником."""
+
+    async def get(self, learner_id: UUID) -> LearnerSettings:
+        """Нет записи — умолчания (``LearnerSettings()``)."""
+
+    async def save(self, learner_id: UUID, settings: LearnerSettings) -> None:
+        """Записать все поля целиком (None — это значение, а не «не менять»)."""
+
+    async def change(self, learner_id: UUID, fields: Mapping[str, Any]) -> None:
+        """Записать только эти поля: параллельный переход экрана не затрёт чужие."""
 
 
 class CurriculumVersionError(Exception):

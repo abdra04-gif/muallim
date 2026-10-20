@@ -11,11 +11,13 @@ from muallim.application.ports.repositories import AttemptRepository
 from muallim.domain.assessment import Assessment, ErrorKind, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.report import LearnerReport
+from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 from muallim.infrastructure.db.tables import (
     annotations,
     attempts,
     detected_errors,
     learner_reports,
+    learner_settings,
 )
 
 
@@ -137,11 +139,19 @@ class SqlAttemptRepository(AttemptRepository):
         return await self.session.scalar(query) is not None
 
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
-        # Дату считаем в Python: так одинаково в PostgreSQL и SQLite (UTC, ADR-0004).
+        # Дату считаем в Python: так одинаково в PostgreSQL и SQLite (ADR-0004); день — местный
+        # по смещению ученика, нет строки настроек — UTC+3 (ADR-0061).
+        offset = await self.session.scalar(
+            select(learner_settings.c.utc_offset_min).where(
+                learner_settings.c.learner_id == learner_id
+            )
+        )
+        shift = DEFAULT_UTC_OFFSET_MIN if offset is None else offset
         query = select(attempts.c.created_at).where(attempts.c.learner_id == learner_id)
         days: dict[date, int] = {}
         for created in (await self.session.scalars(query)).all():
-            days[created.date()] = days.get(created.date(), 0) + 1
+            day = local_date(created, shift)
+            days[day] = days.get(day, 0) + 1
         return days
 
     async def owner(self, attempt_id: UUID) -> UUID | None:

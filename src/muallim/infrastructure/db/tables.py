@@ -13,6 +13,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -26,11 +27,19 @@ from sqlalchemy import (
     Uuid,
 )
 from sqlalchemy.engine import Dialect
+from sqlalchemy.sql.expression import false, true
 from sqlalchemy.types import TypeDecorator
 
 from muallim.domain.annotation import AnnotationSource, AnnotationStatus
 from muallim.domain.policy import Verdict
 from muallim.domain.report import ReportReason
+from muallim.domain.settings import (
+    DEFAULT_UTC_OFFSET_MIN,
+    MAX_UTC_OFFSET_MIN,
+    MIN_UTC_OFFSET_MIN,
+    MINUTES_PER_DAY,
+    HowToRead,
+)
 
 # Метки руководства 1.0 (ADR-0040): больше не ставятся, но могли остаться в БД — CHECK их пускает.
 LEGACY_LABELS = ("correct", "false_alarm", "missed_error", "wrong_error")
@@ -256,6 +265,42 @@ learner_reports = Table(
     Column("created_at", UtcDateTime(), nullable=False),
     CheckConstraint(_one_of("reason", ReportReason), name="reason_values"),
     UniqueConstraint("attempt_id", "learner_id"),  # «Бот ошибся» — одна жалоба на попытку
+)
+
+# Настройки ученика и состояние его экрана (FR-51, TD-FN-90, ADR-0061): строка на ученика, нет
+# строки — умолчания. Telegram ID нет: роль просмотра видит таблицу целиком. Даты — местные.
+learner_settings = Table(
+    "learner_settings",
+    metadata,
+    Column("learner_id", Uuid, ForeignKey("learners.id", ondelete="CASCADE"), primary_key=True),
+    Column("how_to_read", String(16), nullable=False, server_default=str(HowToRead.SPOILER)),
+    Column("auto_reference", Boolean, nullable=False, server_default=false()),
+    Column("daily_opening", Boolean, nullable=False, server_default=true()),
+    Column("large_font", Boolean, nullable=False, server_default=false()),
+    Column("research_block", Boolean, nullable=False, server_default=false()),
+    Column("reminder_minute", SmallInteger),  # минута местных суток; NULL — выключено
+    Column(
+        "utc_offset_min",
+        SmallInteger,
+        nullable=False,
+        server_default=str(DEFAULT_UTC_OFFSET_MIN),
+    ),
+    Column("screen_item_id", String(32)),  # NULL — на экране меню
+    Column("screen_opening", Boolean, nullable=False, server_default=false()),
+    Column("opening_resume_item", String(32)),
+    Column("opening_day", Date),
+    Column("opening_skipped_on", Date),
+    Column("reminder_sent_on", Date),
+    Column("updated_at", UtcDateTime(), nullable=False),
+    CheckConstraint(_one_of("how_to_read", HowToRead), name="how_to_read_values"),
+    CheckConstraint(
+        f"reminder_minute IS NULL OR reminder_minute BETWEEN 0 AND {MINUTES_PER_DAY - 1}",
+        name="reminder_minute_range",
+    ),
+    CheckConstraint(
+        f"utc_offset_min BETWEEN {MIN_UTC_OFFSET_MIN} AND {MAX_UTC_OFFSET_MIN}",
+        name="utc_offset_range",
+    ),
 )
 
 interaction_events = Table(

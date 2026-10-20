@@ -4,7 +4,7 @@
 """
 
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -806,3 +806,20 @@ async def test_quiz_options_are_from_letters_the_learner_started(curriculum: Cur
         assert q is not None
         assert set(q.options) <= allowed, (seed, q.options)
         assert await quiz.answer(learner, q.item_id, q.vowel, q.seed, 0) == q
+
+
+async def test_today_without_settings_uses_default_offset(w: World) -> None:
+    """Без настроек «сегодня» — по UTC+3, как дни попыток в БД (ревью круга 2, ADR-0061)."""
+    from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date  # noqa: PLC0415
+
+    late = datetime(2026, 10, 21, 22, 0, tzinfo=UTC)  # 01:00 22.10 по Москве
+
+    class LateClock:
+        def now(self) -> datetime:
+            return late
+
+    learner = await w.learner()
+    progress = await GetProgress(w.curriculum, w.attempts, GradingPolicy(), LateClock()).execute(
+        learner
+    )
+    assert progress.today == local_date(late, DEFAULT_UTC_OFFSET_MIN) == date(2026, 10, 22)

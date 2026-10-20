@@ -5,11 +5,12 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import StrEnum
 
-from muallim.application.ports.repositories import AttemptRepository
+from muallim.application.ports.repositories import AttemptRepository, LearnerSettingsRepository
 from muallim.application.ports.system import Clock
 from muallim.domain.curriculum import Curriculum, Lesson, LessonItem
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
+from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 
 
 class LessonStatus(StrEnum):
@@ -47,7 +48,7 @@ class Progress:
     streak_days: int = 0  # сколько дней подряд занимается (сегодня или вчера — серия жива)
     today_attempts: int = 0
     continue_item: LessonItem | None = None  # где остановился
-    today: date | None = None  # «сегодня» по часам бота — для начала занятия (ADR-0050)
+    today: date | None = None  # местное «сегодня» ученика — для начала занятия (ADR-0061)
     week: tuple[bool, ...] = ()  # 7 дней, последний — сегодня: была ли хоть одна попытка
 
     def of(self, lesson_id: str) -> LessonProgress:
@@ -68,6 +69,7 @@ class GetProgress:
     attempts: AttemptRepository
     policy: GradingPolicy
     clock: Clock
+    settings: LearnerSettingsRepository | None = None  # нет — «сегодня» по UTC
 
     async def execute(self, learner: Learner) -> Progress:
         best = await self.attempts.best_scores(learner.id)
@@ -79,7 +81,7 @@ class GetProgress:
             weak = tuple(item for item, score in tried if not self.policy.is_mastered(score))
             lessons.append(LessonProgress(lesson, mastered, weak))
         days = await self.attempts.activity(learner.id)
-        today = self.clock.now().date()
+        today = await self._today(learner)
         return Progress(
             lessons=tuple(lessons),
             attempts_total=await self.attempts.count(learner.id),
@@ -89,6 +91,13 @@ class GetProgress:
             today=today,
             week=tuple(days.get(today - timedelta(days=k), 0) > 0 for k in range(6, -1, -1)),
         )
+
+    async def _today(self, learner: Learner) -> date:
+        """Местная дата ученика (смещение из настроек, ADR-0061); без настроек — UTC+3, как в БД."""
+        now = self.clock.now()
+        if self.settings is None:
+            return local_date(now, DEFAULT_UTC_OFFSET_MIN)
+        return local_date(now, (await self.settings.get(learner.id)).utc_offset_min)
 
     def _continue(
         self, learner: Learner, best: Mapping[str, int], lessons: Sequence[LessonProgress]

@@ -91,6 +91,12 @@ async def test_last_assessment_of_a_line_with_its_errors(session: AsyncSession) 
 
 
 async def test_delete_learner_cascades(session: AsyncSession) -> None:
+    from muallim.domain.settings import LearnerSettings  # noqa: PLC0415
+    from muallim.infrastructure.db.repositories.settings import (  # noqa: PLC0415
+        SqlLearnerSettingsRepository,
+    )
+    from muallim.infrastructure.db.tables import learner_settings  # noqa: PLC0415
+
     clock = FixedClock()
     learner = _learner(clock)
     learners = SqlLearnerRepository(session)
@@ -100,12 +106,14 @@ async def test_delete_learner_cascades(session: AsyncSession) -> None:
     )
     await SqlAttemptRepository(session).add(_attempt(learner, 1, "سَ", clock), ("m",))
     await SqlEventLog(session, clock).record("x", learner.id, {"k": 1})
+    settings = SqlLearnerSettingsRepository(session, clock)
+    await settings.save(learner.id, LearnerSettings(reminder_minute=540))  # ADR-0061
     await session.commit()
 
     await learners.delete(learner.id)
     await session.commit()
 
-    for table in (consents, detected_errors):
+    for table in (consents, detected_errors, learner_settings):
         assert await session.scalar(select(func.count()).select_from(table)) == 0
     event = (await session.execute(select(interaction_events))).mappings().one()
     assert event["learner_id"] is None and event["payload"] == {"k": 1}
