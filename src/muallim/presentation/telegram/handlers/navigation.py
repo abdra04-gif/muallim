@@ -12,8 +12,9 @@ from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.reading import HowToRead
-from muallim.application.use_cases.reference import RecordReference
+from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.screen import ScreenState
+from muallim.application.use_cases.settings import GetSettings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.presentation.telegram import opening, screens, texts
@@ -32,6 +33,7 @@ from muallim.presentation.telegram.callbacks import (
 )
 from muallim.presentation.telegram.display import Display, message_of
 from muallim.presentation.telegram.handlers.daily import home_or_opening
+from muallim.presentation.telegram.handlers.reference import show_card
 
 router: Final = Router(name="learner.navigation")
 
@@ -168,6 +170,8 @@ async def cb_go(
     library: FromDishka[ReferenceAudioLibrary],
     recorder: FromDishka[RecordReference],
     reading: FromDishka[HowToRead],
+    learner_settings: FromDishka[GetSettings],
+    reference: FromDishka[GetReferenceAudio],
 ) -> None:
     try:
         # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
@@ -184,14 +188,20 @@ async def cb_go(
         await cb.answer(texts.STALE_BUTTON, show_alert=True)
         return
     if msg := message_of(cb):
+        view = await learner_settings.execute(learner)
+        has_audio = library.has(item.id)
         screen = screens.card(
             cur,
             item,
-            library.has(item.id),
+            has_audio,
             recorder.allowed(learner),
             reading.execute(learner, item),
+            view=view,
         )
-        await display.show(msg, screen)
+        await show_card(
+            msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,
+            view=view, reference=reference,
+        )  # fmt: skip
     await cb.answer()
 
 

@@ -11,13 +11,15 @@ from muallim.application.ports.storage import ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress, Progress
 from muallim.application.use_cases.reading import HowToRead
-from muallim.application.use_cases.reference import RecordReference
+from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.screen import ScreenState
+from muallim.application.use_cases.settings import GetSettings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.presentation.telegram import opening, screens, texts
 from muallim.presentation.telegram.callbacks import Opening, ShareLesson
 from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.handlers.reference import show_card
 from muallim.presentation.telegram.screens import Screen
 
 router: Final = Router(name="learner.daily")
@@ -49,6 +51,8 @@ async def cb_opening(
     recorder: FromDishka[RecordReference],
     reading: FromDishka[HowToRead],
     screen_state: FromDishka[ScreenState],
+    learner_settings: FromDishka[GetSettings],
+    reference: FromDishka[GetReferenceAudio],
 ) -> None:
     p = await progress.execute(learner)
     msg = message_of(cb)
@@ -62,14 +66,20 @@ async def cb_opening(
     item = await cards.execute(learner, opening.OPENING_ITEMS[0], move=False)  # FR-49
     await screen_state.begin_opening(learner, resume.id, item.id)
     if msg:
+        view = await learner_settings.execute(learner)
+        has_audio = library.has(item.id)
         screen = screens.card(
             cur,
             item,
-            library.has(item.id),
+            has_audio,
             recorder.allowed(learner),
             reading.execute(learner, item),
+            view=view,
         )
-        await display.show(msg, screen)
+        await show_card(
+            msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,
+            view=view, reference=reference,
+        )  # fmt: skip
     await cb.answer()
 
 

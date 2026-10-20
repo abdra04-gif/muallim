@@ -23,8 +23,10 @@ from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import Question, first_quiz_lesson
+from muallim.domain.settings import HowToRead, LearnerSettings
 from muallim.presentation.telegram import render, texts, views
 from muallim.presentation.telegram.callbacks import (
+    ChangeSetting,
     Consent,
     DeleteData,
     Dispute,
@@ -33,6 +35,7 @@ from muallim.presentation.telegram.callbacks import (
     Home,
     Lessons,
     Listen,
+    Me,
     Noop,
     Opening,
     Privacy,
@@ -41,6 +44,7 @@ from muallim.presentation.telegram.callbacks import (
     RecordReference,
     ShareLesson,
     ShowProgress,
+    ShowSettings,
     Signs,
 )
 from muallim.presentation.telegram.opening import OPENING_ITEMS
@@ -138,9 +142,8 @@ def home(curriculum: Curriculum, progress: Progress) -> Screen:
     kb.button(text=texts.QUIZ_BUTTON, callback_data=Quiz())
     kb.button(text=texts.SIGNS_BUTTON, callback_data=Signs())
     kb.button(text=texts.PROGRESS_BUTTON, callback_data=ShowProgress())
-    kb.button(text=texts.HELP_BUTTON, callback_data=Help())
-    kb.button(text=texts.PRIVACY_BUTTON, callback_data=Privacy())
-    kb.adjust(1, 2, 2, 2)
+    kb.button(text=texts.SETTINGS_BUTTON, callback_data=ShowSettings())  # FR-51
+    kb.adjust(1, 2, 2, 1)
     image, key = _alphabet_map(curriculum, progress)
     return Screen(caption, kb.as_markup(), image, key)
 
@@ -227,10 +230,14 @@ def card(
     has_audio: bool,
     is_teacher: bool,
     reading: CardReading | None = None,
+    *,
+    view: LearnerSettings | None = None,
 ) -> Screen:
+    """``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51)."""
+    view = view or LearnerSettings()
     lesson, i = curriculum.locate(item.id)
     parts = [texts.CARD_HEAD.format(lesson=escape(lesson.title), n=i + 1, total=len(lesson.items))]
-    image = _card_image(lesson, item, i)
+    image = _card_image(lesson, item, i, view.large_font)
     if image is None:
         parts.append(f"<b>{escape(item.text)}</b>")
     if item.kind is ItemKind.RULE:
@@ -256,13 +263,14 @@ def card(
         parts.append(
             texts.CARD_READ_SYLLABLE if item.kind is ItemKind.SYLLABLE else texts.CARD_READ
         )
-        if reading is not None and reading.reading:
+        if reading is not None and reading.reading and view.how_to_read is not HowToRead.HIDDEN:
             legend = "".join(f"\n<i>{escape(line)}</i>" for line in reading.legend)
-            parts.append(
-                texts.CARD_HOW_TO_READ.format(
-                    reading=escape(as_text(reading.reading)), legend=legend
-                )
+            line = (
+                texts.CARD_HOW_TO_READ_SHOWN
+                if view.how_to_read is HowToRead.SHOWN
+                else texts.CARD_HOW_TO_READ
             )
+            parts.append(line.format(reading=escape(as_text(reading.reading)), legend=legend))
     ref = []
     if item.source is not None and item.source.page is not None:
         ref.append(texts.CARD_BOOK.format(page=item.source.page))
@@ -285,21 +293,24 @@ def card(
     kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     _home_row(kb)
     kb.adjust(*([1] * top), *nav, *((1,) if prev else ()), 2)
-    return Screen("\n\n".join(parts), kb.as_markup(), image, f"card:{item.id}:{curriculum.version}")
+    key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
+    return Screen("\n\n".join(parts), kb.as_markup(), image, key)
 
 
-def _card_image(lesson: Lesson, item: LessonItem, i: int) -> bytes | None:
+def _card_image(lesson: Lesson, item: LessonItem, i: int, large: bool = False) -> bytes | None:
+    """``large`` — «Крупный шрифт»: крупнее строка карточки и правила (ADR-0061)."""
     if not render.available():
         return None
+    scale = render.LARGE_SCALE if large else 1.0
     if item.kind is ItemKind.ALPHABET:
         return render.letters(item.text)
     if item.kind is ItemKind.RULE:
-        return render.rule(item.text)
+        return render.rule(item.text, scale)
     if item.kind is ItemKind.LETTER and (letter := _letter_of(lesson)):
         zone = articulation_zone(letter)
         zones = [(texts.ZONES[z.value], z is zone) for z in Zone] if zone else []
         return render.letter_forms(letter, item.text, texts.LETTER_FORMS, zones)
-    return render.card(item.text, lesson.accent, (i, len(lesson.items)))
+    return render.card(item.text, lesson.accent, (i, len(lesson.items)), scale)
 
 
 def _nav(kb: InlineKeyboardBuilder, curriculum: Curriculum, item: LessonItem) -> list[int]:
@@ -643,6 +654,36 @@ def opening(curriculum: Curriculum) -> Screen:
     kb.button(text=texts.OPENING_SKIP, callback_data=Opening(act="skip"))
     kb.adjust(1, 1)
     return Screen(caption, kb.as_markup(), image, f"opening:{curriculum.version}")
+
+
+def settings(s: LearnerSettings) -> Screen:
+    """⚙️ Настройки (FR-51): одно окно, нажатие ставит значение и перерисовывает экран."""
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.SETTING_HOW_TO_READ, callback_data=Noop())
+    for option in HowToRead:
+        label = texts.HOW_TO_READ_OPTIONS[option.value]
+        chosen = option is s.how_to_read
+        kb.button(
+            text=texts.SETTING_CHOSEN.format(label=label) if chosen else label,
+            callback_data=ChangeSetting(name="how_to_read", value=option.value),
+        )
+    toggles = (
+        ("auto_reference", texts.SETTING_AUTO_REFERENCE, s.auto_reference),
+        ("daily_opening", texts.SETTING_DAILY_OPENING, s.daily_opening),
+        ("large_font", texts.SETTING_LARGE_FONT, s.large_font),
+        ("research_block", texts.SETTING_RESEARCH_BLOCK, s.research_block),
+    )
+    for name, label, on in toggles:
+        kb.button(
+            text=(texts.SETTING_ON if on else texts.SETTING_OFF).format(label=label),
+            callback_data=ChangeSetting(name=name, value=str(not on).lower()),
+        )
+    kb.button(text=texts.HELP_BUTTON, callback_data=Help())
+    kb.button(text=texts.PRIVACY_BUTTON, callback_data=Privacy())
+    kb.button(text=texts.ME_BUTTON, callback_data=Me())
+    _home_row(kb)
+    kb.adjust(1, 3, 1, 1, 1, 1, 2, 2)
+    return Screen(texts.SETTINGS, kb.as_markup())
 
 
 def help_screen() -> Screen:

@@ -20,6 +20,7 @@ from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import RecordReference
 from muallim.application.use_cases.screen import ScreenState
+from muallim.application.use_cases.settings import GetSettings
 from muallim.application.use_cases.staff import StaffAccess
 from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner
@@ -47,6 +48,7 @@ async def on_voice(
     staff_access: FromDishka[StaffAccess],
     progress: FromDishka[GetProgress],
     screen_state: FromDishka[ScreenState],
+    learner_settings: FromDishka[GetSettings],
 ) -> None:
     assert m.voice is not None  # гарантирует фильтр F.voice  # noqa: S101
     if m.voice.duration < 1:
@@ -109,8 +111,11 @@ async def on_voice(
     if shown.opening_active and basmala and attempt.verdict is not Verdict.FAILED:
         with suppress(KeyError):  # басмала прочитана — вернуть, где был
             resume = cur.item(shown.resume_item) if shown.resume_item else None
-    # «Для исследования» и номер попытки — только учителю и разметчику (FR-50)
-    staff = await staff_access.is_staff(learner)
+    # «Для исследования» и номер попытки — учителю и разметчику (FR-50) и ученику, который
+    # включил их в ⚙️ Настройках (ADR-0061)
+    staff = (await learner_settings.execute(learner)).research_block or (
+        await staff_access.is_staff(learner)
+    )
     await wait.delete()
     screen = screens.result(cur, result, library.has(result.item.id), resume, staff=staff)
     await display.send(bot, m.chat.id, screen)

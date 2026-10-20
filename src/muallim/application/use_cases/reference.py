@@ -14,11 +14,15 @@ class GetReferenceAudio:
     uow: UnitOfWork
     events: EventLog
 
-    async def execute(self, learner: Learner, item_id: str) -> bytes | None:
+    async def execute(self, learner: Learner, item_id: str, *, auto: bool = False) -> bytes | None:
+        """``auto`` — прислан сам над карточкой (настройка «автозвук», ADR-0061), а не по 🔊."""
         audio = await self.library.get(item_id)
         if audio is not None:
             # Слушал ли ученик образец перед попыткой — данные для разведки E-7 (ADR-0052).
-            await self.events.record("reference_played", learner.id, {"item_id": item_id})
+            payload: dict[str, str | int | None] = {"item_id": item_id}
+            if auto:
+                payload["auto"] = True
+            await self.events.record("reference_played", learner.id, payload)
             await self.uow.commit()
         return audio
 

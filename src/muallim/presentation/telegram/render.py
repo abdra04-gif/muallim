@@ -39,6 +39,9 @@ PAD = 40
 TEXT_WIDTH = WIDTH - 2 * PAD - 40  # ширина строки арабского текста внутри рамки
 ARABIC_SIZE = 112
 SHORT_SIZE = 168  # короткая строка (слог, слово) — ещё крупнее
+# ⚙️ «Крупный шрифт» (FR-51, ADR-0061): буквы карточки крупнее, холст по-прежнему 900 px —
+# длинная строка просто переносится на большее число строк.
+LARGE_SCALE = 1.3
 
 # Палитра «как в книге»: бумага, золотая рамка, чёрный текст, красная буква урока
 PAPER = (251, 247, 236)
@@ -250,8 +253,10 @@ def _arabic_block(
     background_of: Collection[int] = (),
     top: int = 120,
     text_color: tuple[int, int, int] = INK,
+    *,
+    scale: float = 1.0,
 ) -> tuple[Image.Image, ImageDraw.ImageDraw, int]:
-    size = ARABIC_SIZE if len(text) > 14 else SHORT_SIZE  # короткое — крупнее
+    size = round((ARABIC_SIZE if len(text) > 14 else SHORT_SIZE) * scale)  # короткое — крупнее
     font = _font(size)
     line_height = int(size * 1.9)
     lines = _wrap(text.split(), font, TEXT_WIDTH)
@@ -311,10 +316,15 @@ def _arabic_block(
 
 
 # ---------- экраны ----------
-def card(text: str, accent: Collection[str], position: tuple[int, int]) -> bytes:
-    """Карточка урока: строка книги, буква урока красным, точки «шаг k из n»."""
+def card(
+    text: str, accent: Collection[str], position: tuple[int, int], scale: float = 1.0
+) -> bytes:
+    """Карточка урока: строка книги, буква урока красным, точки «шаг k из n».
+
+    ``scale`` — множитель шрифта (``LARGE_SCALE`` — «Крупный шрифт»), ширина та же.
+    """
     color_of = dict.fromkeys(accent_clusters(text, accent), ACCENT)
-    img, draw, _ = _arabic_block(text, color_of, top=96)
+    img, draw, _ = _arabic_block(text, color_of, top=96, scale=scale)
     _dots(draw, img.height - 64, position[0], position[1])
     return _png(img)
 
@@ -399,9 +409,9 @@ def signs() -> bytes:
     return _png(img)
 
 
-def rule(text: str) -> bytes:
+def rule(text: str, scale: float = 1.0) -> bytes:
     """Карточка правила: пример крупно, без подсветки."""
-    img, _, _ = _arabic_block(text, {}, top=96)
+    img, _, _ = _arabic_block(text, {}, top=96, scale=scale)
     return _png(img)
 
 

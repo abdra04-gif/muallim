@@ -15,6 +15,7 @@ from muallim.presentation.telegram.handlers import (
     data,
     navigation,
     reference,
+    settings,
     voice,
 )
 
@@ -25,6 +26,7 @@ router.include_routers(
     daily.router,
     data.router,
     reference.router,
+    settings.router,
     voice.router,
 )
 

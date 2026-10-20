@@ -138,3 +138,12 @@ def test_result_words_are_large_on_a_phone_screen() -> None:
 def test_opening_line_is_large_on_a_phone_screen() -> None:
     """Строка истиазы в начале занятия — не меньше 50 pt (сейчас ≈ 45, при 900 px ≈ 54)."""
     assert _on_phone(render.opening([ISTI_ADHA])) >= 50
+
+
+@needs_raqm
+def test_longest_word_fits_inside_frame_with_large_font() -> None:
+    """Самое длинное слово программы (L079-03) с крупным шрифтом не залезает на рамку."""
+    png = render.card("فَٱنۢبَجَسَتْ", (), (0, 1), scale=render.LARGE_SCALE)
+    img, (left, _, right, _) = _ink_box(png)
+    assert left > FRAME_MARGIN + 5, "слово вылезло влево за поле"
+    assert right < img.width - FRAME_MARGIN - 5, "слово вылезло вправо за поле"

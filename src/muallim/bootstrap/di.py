@@ -45,6 +45,7 @@ from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.application.use_cases.screen import ScreenState
+from muallim.application.use_cases.settings import ChangeSetting, GetSettings
 from muallim.application.use_cases.staff import StaffAccess
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
@@ -228,6 +229,8 @@ class RequestProvider(Provider):
         AssessRecitation,
         HowToRead,
         ScreenState,
+        GetSettings,
+        ChangeSetting,
         GetReferenceAudio,
         ReportMistake,
         PublishCurriculum,

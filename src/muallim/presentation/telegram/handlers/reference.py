@@ -1,13 +1,14 @@
 """Эталон «как правильно» (послушать, учитель записывает) и жалоба «Бот ошибся» (FR-23)."""
 
+import logging
 from contextlib import suppress
 from typing import Final
 from uuid import UUID
 
 from aiogram import Router
-from aiogram.exceptions import TelegramAPIError
+from aiogram.exceptions import TelegramAPIError, TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import BufferedInputFile, CallbackQuery
+from aiogram.types import BufferedInputFile, CallbackQuery, Message
 from dishka import FromDishka
 
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
@@ -15,11 +16,14 @@ from muallim.application.use_cases.reports import ReportMistake
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.domain.report import ReportReason
+from muallim.domain.settings import LearnerSettings
 from muallim.presentation.telegram import keyboards, texts, views
 from muallim.presentation.telegram.callbacks import Dispute, DisputeReason, Listen
 from muallim.presentation.telegram.callbacks import RecordReference as RecordCallback
-from muallim.presentation.telegram.display import message_of
+from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.screens import Screen
 
+logger: Final = logging.getLogger(__name__)
 router: Final = Router(name="learner.reference")
 
 RECORDING: Final = "recording"  # ключ FSM: карточка, для которой учитель записывает эталон
@@ -31,6 +35,53 @@ async def take_recording(state: FSMContext) -> str | None:
     if item_id is not None:
         await state.update_data({RECORDING: None})
     return item_id if isinstance(item_id, str) else None
+
+
+async def send_reference(msg: Message, item_id: str, audio: bytes) -> Message:
+    """Эталон отдельным сообщением: запись учителя — голосовое, чтение Хусари — аудио (mp3)."""
+    if audio[:4] == b"OggS":
+        return await msg.answer_voice(BufferedInputFile(audio, filename=f"{item_id}.ogg"))
+    return await msg.answer_audio(
+        BufferedInputFile(audio, filename=f"{item_id}.mp3"),
+        title=texts.RECITER_TITLE,
+        performer="EveryAyah",
+    )
+
+
+async def show_card(
+    msg: Message,
+    display: Display,
+    screen: Screen,
+    *,
+    learner: Learner,
+    item_id: str,
+    has_audio: bool,
+    view: LearnerSettings,
+    reference: GetReferenceAudio,
+) -> None:
+    """Показать карточку; с «автозвуком» эталон приходит сам — над карточкой (ADR-0061).
+
+    Telegram не собирает картинку, звук и кнопки в одно сообщение, поэтому со звуком карточка —
+    новым сообщением под голосовым, прежний экран убирается. Прошлое автоголосовое удаляется.
+    """
+    bot = msg.bot
+    assert bot is not None  # noqa: S101
+    await display.drop_sound(bot, msg.chat.id)
+    audio = None
+    if view.auto_reference and has_audio:
+        audio = await reference.execute(learner, item_id, auto=True)
+    if audio is None:
+        await display.show(msg, screen)
+        return
+    with suppress(TelegramBadRequest):
+        await msg.delete()
+    try:
+        sound = await send_reference(msg, item_id, audio)
+    except TelegramAPIError:  # звук не ушёл — карточка всё равно нужна (ревью круга 3)
+        logger.warning("Автозвук не отправлен", exc_info=True)
+    else:
+        display.keep_sound(msg.chat.id, sound.message_id)
+    await display.send(bot, msg.chat.id, screen)
 
 
 @router.callback_query(Listen.filter())
@@ -45,15 +96,7 @@ async def cb_listen(
         await cb.answer(texts.NO_REFERENCE, show_alert=True)
         return
     if msg := message_of(cb):
-        name = callback_data.item_id
-        if audio[:4] == b"OggS":  # запись учителя — голосовое
-            await msg.answer_voice(BufferedInputFile(audio, filename=f"{name}.ogg"))
-        else:  # чтение Хусари (mp3)
-            await msg.answer_audio(
-                BufferedInputFile(audio, filename=f"{name}.mp3"),
-                title=texts.RECITER_TITLE,
-                performer="EveryAyah",
-            )
+        await send_reference(msg, callback_data.item_id, audio)
     await cb.answer()
 
 

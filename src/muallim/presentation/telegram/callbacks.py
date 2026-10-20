@@ -108,3 +108,19 @@ class ShareLesson(CallbackData, prefix="share"):
     """«📤 Поделиться» — прислать открытку пройденного урока для пересылки (ADR-0050)."""
 
     lesson: str
+
+
+class ShowSettings(CallbackData, prefix="settings"):
+    """⚙️ Настройки ученика (FR-51, ADR-0061)."""
+
+
+class ChangeSetting(CallbackData, prefix="set"):
+    """Поставить настройке значение явно (не «переключить»): повторное нажатие старой кнопки
+    ничего не ломает. ``value`` — ``true``/``false`` или значение ``HowToRead``."""
+
+    name: str
+    value: str
+
+
+class Me(CallbackData, prefix="me"):
+    """«🪪 Мой ID» — псевдоним ученика, как /me."""

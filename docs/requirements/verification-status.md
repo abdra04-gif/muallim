@@ -1,13 +1,13 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-20T19:55:27+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-20T23:42:11+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `efc7a6e733edd2be` | 99 |
+| код | `f8d410eef636fbcb` | 101 |
 | программа (книга) | `125a24eb1ee7e973` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `5009ec6fb8d3cec0` | 8 |

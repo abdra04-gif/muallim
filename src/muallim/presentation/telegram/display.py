@@ -35,6 +35,19 @@ def message_of(cb: CallbackQuery) -> Message | None:
 class Display:
     file_ids: dict[str, str] = field(default_factory=dict)  # ключ картинки → Telegram file_id
     last_screen: dict[int, int] = field(default_factory=dict)  # чат → сообщение текущего экрана
+    # чат → автоголосовое эталона над карточкой (ADR-0061); после перезапуска забывается — и
+    # старое голосовое просто остаётся в чате
+    sounds: dict[int, int] = field(default_factory=dict)
+
+    def keep_sound(self, chat_id: int, message_id: int) -> None:
+        self.sounds[chat_id] = message_id
+
+    async def drop_sound(self, bot: Bot, chat_id: int) -> None:
+        """Убрать прошлое автоголосовое: ученик ушёл с карточки, над которой оно было."""
+        old = self.sounds.pop(chat_id, None)
+        if old is not None:
+            with suppress(TelegramBadRequest):
+                await bot.delete_message(chat_id, old)
 
     def _photo(self, screen: Screen) -> str | BufferedInputFile:
         assert screen.image is not None  # noqa: S101

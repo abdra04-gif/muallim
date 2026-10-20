@@ -14,6 +14,7 @@ import pytest
 from aiogram.filters.callback_data import CallbackData
 
 from muallim.domain.curriculum import Curriculum
+from muallim.domain.settings import HowToRead
 from muallim.presentation.telegram import callbacks, texts
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,6 +28,9 @@ NOT_SHOWN = {("screens.py", "фраза"), ("screens.py", "сура"), ("screens
              ("screens.py", "слог")}  # fmt: skip
 
 pytestmark = pytest.mark.architecture
+
+# настройки ученика, которые меняются кнопками экрана ⚙️ (FR-51)
+_SETTING_NAMES = ("how_to_read", "auto_reference", "daily_opening", "large_font", "research_block")
 
 
 def _shown_strings(path: Path) -> list[tuple[int, str]]:
@@ -71,6 +75,8 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
     attempt = "f" * 32  # UUID.hex
     reason = max(texts.DISPUTE_REASONS, key=len)
     big = 10**6  # seed вопроса: random.randrange(10**6)
+    setting = max(_SETTING_NAMES, key=len)
+    value = max([*(str(h) for h in HowToRead), "true", "false"], key=len)
     return {
         callbacks.GoItem: callbacks.GoItem(item_id=item),
         callbacks.Home: callbacks.Home(),
@@ -96,6 +102,10 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.ShareLesson: callbacks.ShareLesson(
             lesson=max((les.id for les in curriculum.lessons), key=len)
         ),
+        # ⚙️ Настройки (FR-51, ADR-0061): экран, смена значения, «🪪 Мой ID»
+        callbacks.ShowSettings: callbacks.ShowSettings(),
+        callbacks.ChangeSetting: callbacks.ChangeSetting(name=setting, value=value),
+        callbacks.Me: callbacks.Me(),
     }
 
 

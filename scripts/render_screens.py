@@ -19,6 +19,7 @@ from muallim.domain.attempt import Attempt
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.domain.quiz import make_question
+from muallim.domain.settings import LearnerSettings
 from muallim.infrastructure.asr.reading import QuranReadingGuide
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.presentation.telegram import render, screens
@@ -110,6 +111,7 @@ def main() -> None:
         "16_teacher": card(letters[4].items[0].id, has_audio=False, teacher=True),
         "17_opening": screens.opening(c),
         "18_postcard": screens.postcard(c, mim, p, bot_username="muallim_bot"),
+        "19_settings": screens.settings(LearnerSettings()),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     meta = {}
