@@ -25,10 +25,13 @@
 
 \begin{keybox}[Summary]
 Adult Russian-speaking Muslims learn to read the Qur'an with Ahmad-Hadi Maksudi's primer
-\emph{al-Muallim al-Thani} (``The Second Teacher''), and no teacher can listen to every syllable of every
-learner. Open Qur'anic recitation models are trained on expert reciters: they make mistakes on beginners and
-know nothing about what a learner has already mastered. This thesis builds a \textbf{dataset} and an
-\textbf{AI model}. A tutor that walks the learner through the primer page by page serves as the collection
+\emph{al-Muallim al-Thani} (``The Second Teacher''). Not everyone can study with a teacher: work, the distance
+to a madrasa and the cost of lessons get in the way, and a group lesson leaves no time for each learner's
+difficulties. Automatic reading feedback could give the learner an individual session between lessons: read as
+much as needed and work through their own mistakes. But open Qur'anic recitation models are trained on expert
+reciters, their accuracy on non-Arab beginners has not been measured, and they know nothing about what a
+learner has already mastered. This thesis collects a \textbf{dataset} and trains
+\textbf{models} on it. A tutor that walks the learner through the primer page by page serves as the collection
 tool: with consent it gathers the first corpus of primer-level reading by adult Russian-speaking beginners,
 and two teachers annotate it at the phoneme level, separating \emph{reading errors} (the wrong sign was read)
 from \emph{pronunciation errors} (the sign was right, the sound was wrong). On this corpus the open Quran
@@ -49,7 +52,7 @@ teacher corrects at once. This oral transmission, \emph{talaqqi}, works well but
 hears one learner at a time, and many learners live far from a madrasa or study after work.
 
 Automatic checking could be a listener between lessons, but off-the-shelf models do not fit a beginner for
-two reasons. First, they are trained on expert reciters and make mistakes on beginners' reading: they
+two reasons. First, they are trained on expert reciters and may err on beginners' reading:
 reject correct reading and miss real errors. Second, they score one attempt and do not answer the
 teacher's main question: \emph{what has the learner mastered, and what not yet}. Without a dataset of
 beginners' reading one can neither measure the first problem, nor fix it, nor build the second capability.
@@ -102,9 +105,9 @@ before the topic is approved.
 
 \section{Aim, objectives and research questions}
 
-\textbf{Aim.} To develop a dataset of primer-level reading by Russian-speaking beginners and an AI model that
-detects reading errors in it and estimates from speech the mastery of each skill of \emph{al-Muallim
-al-Thani}, and to measure how close the model comes to a teacher and what it reveals about how people learn.
+\textbf{Aim.} To collect a dataset of primer-level reading by Russian-speaking beginners and train models on it that
+detect reading errors and estimate from speech the mastery of each skill of \emph{al-Muallim
+al-Thani}, and to measure how close the models come to a teacher and what they reveal about how people learn.
 
 \textbf{Objectives.}
 \begin{enumerate}[label=O\arabic*.]
