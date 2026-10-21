@@ -109,3 +109,5 @@
 {"ts": "2026-10-21T00:03:01+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (тексты ученику и согласие): src/muallim/presentation/telegram/texts.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
 {"ts": "2026-10-21T00:41:00+00:00", "hook": "stop_gate", "kind": "block", "reason": "Нельзя завершать: исправь и проверь снова."}
 {"ts": "2026-10-21T00:46:22+00:00", "hook": "guard", "kind": "block", "reason": "Фаза impl: тесты заморожены. Если тест неверен — остановись и спроси человека."}
+{"ts": "2026-10-21T01:24:24+00:00", "hook": "guard", "kind": "block", "reason": "Фазу меняют только через scripts/phase."}
+{"ts": "2026-10-21T01:26:29+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (тексты ученику и согласие): src/muallim/presentation/telegram/texts.py. Подтвердите правку — CLAUDE.md, «Только человек»."}

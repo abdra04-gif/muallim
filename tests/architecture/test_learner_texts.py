@@ -109,6 +109,10 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.ShowSettings: callbacks.ShowSettings(),
         callbacks.ChangeSetting: callbacks.ChangeSetting(name=setting, value=value),
         callbacks.Me: callbacks.Me(),
+        # 📋 Шпаргалка букв (FR-52, ADR-0062)
+        callbacks.LettersSheet: callbacks.LettersSheet(
+            lesson_id=max((les.id for les in curriculum.lessons), key=len), item_id=item
+        ),
     }
 
 

@@ -5,7 +5,7 @@
 """
 
 import re
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from html import escape
@@ -19,8 +19,8 @@ from muallim.application.transcription import as_text
 from muallim.application.use_cases.progress import LessonStatus, Progress
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
-from muallim.domain.assessment import Assessment
-from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
+from muallim.domain.assessment import Assessment, ErrorKind
+from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem, letters_before
 from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import Question, first_quiz_lesson
@@ -41,6 +41,7 @@ from muallim.presentation.telegram.callbacks import (
     Help,
     Home,
     Lessons,
+    LettersSheet,
     Listen,
     Me,
     Noop,
@@ -244,6 +245,9 @@ def card(
     view = view or LearnerSettings()
     lesson, i = curriculum.locate(item.id)
     parts = [texts.CARD_HEAD.format(lesson=escape(lesson.title), n=i + 1, total=len(lesson.items))]
+    known = letters_before(curriculum, lesson.id)
+    if i == 0 and lesson.section == "letter":
+        parts.append(_new_letter(curriculum, lesson, known))
     image = _card_image(lesson, item, i, view.large_font)
     if image is None:
         parts.append(f"<b>{escape(item.text)}</b>")
@@ -286,6 +290,16 @@ def card(
     if ref:
         parts.append("<i>" + " · ".join(ref) + "</i>")
 
+    kb = _card_keyboard(curriculum, item, has_audio, is_teacher, bool(known))
+    key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
+    return Screen("\n\n".join(parts), kb, image, key)
+
+
+def _card_keyboard(
+    curriculum: Curriculum, item: LessonItem, has_audio: bool, is_teacher: bool, sheet: bool
+) -> InlineKeyboardMarkup:
+    """Кнопки карточки; ``sheet`` — есть буквы до урока, кнопка шпаргалки (FR-52)."""
+    lesson, i = curriculum.locate(item.id)
     kb = InlineKeyboardBuilder()
     top = 0
     if has_audio:  # послушать можно везде, где есть звук: и в правиле, и в слоге (ADR-0032)
@@ -294,14 +308,31 @@ def card(
     if is_teacher and item.kind is not ItemKind.ALPHABET:  # учитель озвучивает и правило
         kb.button(text=texts.RECORD_BUTTON, callback_data=RecordReference(item_id=item.id))
         top += 1
+    if sheet:  # шпаргалка букв, пройденных до урока (FR-52)
+        kb.button(
+            text=texts.SHEET_BUTTON,
+            callback_data=LettersSheet(lesson_id=lesson.id, item_id=item.id),
+        )
+        top += 1
     nav = _nav(kb, curriculum, item)
     # первый шаг: назад — только «⬅️ Предыдущий урок», без «◀️ Назад» на шаг (FR-50)
     prev = i == 0 and _previous_lesson_button(kb, curriculum, lesson)
     kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     _home_row(kb)
     kb.adjust(*([1] * top), *nav, *((1,) if prev else ()), 2)
-    key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
-    return Screen("\n\n".join(parts), kb.as_markup(), image, key)
+    return kb.as_markup()
+
+
+def _new_letter(curriculum: Curriculum, lesson: Lesson, known: Sequence[LessonItem]) -> str:
+    """«Новая буква: X · уже знаешь: …» на первом шаге урока буквы (ADR-0062 п. 7)."""
+    head = next((it for it in lesson.items if it.kind is ItemKind.LETTER), None)
+    line = texts.NEW_LETTER.format(
+        letter=_letter_of(lesson), name=escape(head.name if head else "")
+    )
+    if known:
+        letters = " ".join(_letter_of(curriculum.locate(it.id)[0]) for it in known)
+        line += "\n" + texts.ALREADY_KNOW.format(letters=letters)
+    return line
 
 
 def _card_image(lesson: Lesson, item: LessonItem, i: int, large: bool = False) -> bytes | None:
@@ -419,7 +450,8 @@ def result(
     )
     details = ""
     if r.feedback:
-        details = "\n\n".join(p for p in [*_explanations(r, has_audio), research] if p)
+        letter_line = _lesson_letter_line(lesson, r)  # буква урока — первой строкой (ADR-0062, В3)
+        details = "\n\n".join(p for p in [letter_line, *_explanations(r, has_audio), research] if p)
     else:
         parts.append(research)
     if r.feedback and r.expected_reading:  # «Нужно / У тебя» — сразу под вердиктом
@@ -427,6 +459,39 @@ def result(
         head.append(_comparison(r, CAPTION_LIMIT - rest))
     keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume)
     return Screen("\n\n".join(p for p in head + parts if p), keyboard, image, details=details)
+
+
+_LETTER_SWAPS: Final = frozenset(
+    {ErrorKind.LETTER_SUBSTITUTION, ErrorKind.SOUND_SUBSTITUTION, ErrorKind.FRAGMENT_SUBSTITUTION}
+)
+
+
+def _lesson_letter_line(lesson: Lesson, r: RecitationResult) -> str:
+    """В уроке буквы: вместо неё прозвучала другая или её нет — строка для начала разбора.
+
+    Только прочитанная часть строки (непрочитанный конец — не ошибки, как в разборе); огласовки
+    и удвоение — не «другая буква» (ADR-0062, В3 (а)). Вердикт и балл не меняются (OQ-14).
+    """
+    if lesson.section != "letter" or not (letter := _letter_of(lesson)):
+        return ""
+    a = r.attempt.assessment
+    cut = None
+    spans = syllables(a.reference) if r.unread_from is not None else []
+    if r.unread_from is not None and 0 < r.unread_from < len(spans):
+        cut = spans[r.unread_from][0]
+    for e in a.errors:
+        if letter not in e.expected or (cut is not None and e.position >= cut):
+            continue
+        if e.kind is ErrorKind.SOUND_MISSING:
+            return texts.LESSON_LETTER_MISSING.format(letter=letter)
+        if e.kind in _LETTER_SWAPS:
+            heard = [c for c in e.heard if c in CONSONANTS]
+            if letter in heard:  # согласная та же — ошибка в огласовке
+                continue
+            if not heard:
+                return texts.LESSON_LETTER_MISSING.format(letter=letter)
+            return texts.LESSON_LETTER_WRONG.format(letter=letter, heard=heard[0])
+    return ""
 
 
 def _swap(a: Assessment) -> tuple[str, str, str, str, str] | None:
@@ -791,15 +856,57 @@ def privacy(research_consent: bool) -> Screen:
     return Screen(views.privacy(research_consent), kb.as_markup())
 
 
-# ---------- знаки и закрепление ----------
-def signs() -> Screen:
-    """Что значат значки над буквой и под ней — по номерам на картинке."""
+# ---------- знаки, шпаргалка букв и закрепление ----------
+def signs(curriculum: Curriculum | None = None, progress: Progress | None = None) -> Screen:
+    """Что значат значки над буквой и под ней — по номерам на картинке.
+
+    С программой и прогрессом — ещё кнопка шпаргалки букв до урока, где ученик остановился
+    (FR-52); без них — как раньше.
+    """
     kb = InlineKeyboardBuilder()
+    sheet = False
+    if curriculum is not None and progress is not None:
+        item = progress.continue_item or curriculum.first_item()
+        lesson = curriculum.locate(item.id)[0]
+        if sheet := bool(letters_before(curriculum, lesson.id)):
+            kb.button(text=texts.SHEET_BUTTON, callback_data=LettersSheet(lesson_id=lesson.id))
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
     _home_row(kb)
-    kb.adjust(2)
+    kb.adjust(*((1,) if sheet else ()), 2)
     image = render.signs() if render.available() else None
     return Screen(texts.SIGNS, kb.as_markup(), image, "signs:v1")
+
+
+SHEET_LISTEN_PER_ROW = 4
+
+
+def letters_sheet(
+    curriculum: Curriculum, lesson_id: str, audio: Collection[str], back_item: str = ""
+) -> Screen:
+    """Шпаргалка «буква → название → звук → 🔊» по книге строго до урока (FR-52, ADR-0062 п. 7).
+
+    ``audio`` — id головных карточек, у которых есть эталон: 🔊 — существующий ``Listen``.
+    ``back_item`` — карточка, с которой открыли («◀️ Назад» на неё); пусто — назад на «Знаки».
+    """
+    known = letters_before(curriculum, lesson_id)
+    lines = []
+    kb = InlineKeyboardBuilder()
+    listen = 0
+    for head in known:
+        letter = _letter_of(curriculum.locate(head.id)[0])
+        lines.append(
+            texts.SHEET_LINE.format(letter=letter, name=escape(head.name), sound=escape(head.sound))
+        )
+        if head.id in audio:
+            kb.button(text=f"🔊 {letter}", callback_data=Listen(item_id=head.id))
+            listen += 1
+    back = GoItem(item_id=back_item) if back_item else Signs()
+    kb.button(text=texts.BACK_BUTTON, callback_data=back)
+    _home_row(kb)
+    full, rest = divmod(listen, SHEET_LISTEN_PER_ROW)
+    kb.adjust(*([SHEET_LISTEN_PER_ROW] * full), *((rest,) if rest else ()), 2)
+    caption = texts.LETTERS_SHEET + "\n" + "\n".join(lines)
+    return Screen(caption, kb.as_markup())
 
 
 def quiz(q: Question) -> Screen:

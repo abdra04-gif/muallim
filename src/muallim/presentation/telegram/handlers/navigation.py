@@ -112,11 +112,13 @@ async def cb_signs(
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     screen_state: FromDishka[ScreenState],
+    cur: FromDishka[Curriculum],
+    progress: FromDishka[GetProgress],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
-        await display.show(msg, screens.signs())
+        await display.show(msg, screens.signs(cur, await progress.execute(learner)))
     await cb.answer()
 
 

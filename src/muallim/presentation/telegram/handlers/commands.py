@@ -108,9 +108,11 @@ async def signs_cmd(
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     screen_state: FromDishka[ScreenState],
+    cur: FromDishka[Curriculum],
+    progress: FromDishka[GetProgress],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    await display.send(bot, m.chat.id, screens.signs())
+    await display.send(bot, m.chat.id, screens.signs(cur, await progress.execute(learner)))
 
 
 @router.message(Command("quiz"))

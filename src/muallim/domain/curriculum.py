@@ -145,3 +145,16 @@ class Curriculum:
     def _step(self, item_id: str, step: int) -> LessonItem | None:
         n = self._order.index(self.item(item_id)) + step
         return self._order[n] if 0 <= n < len(self._order) else None
+
+
+def letters_before(curriculum: Curriculum, lesson_id: str) -> tuple[LessonItem, ...]:
+    """Буквы, пройденные по книге строго до урока (ADR-0062 п. 7): головные карточки ``LETTER``
+    уроков букв (``section == "letter"``) в порядке книги; своя буква урока не входит."""
+    curriculum.lesson(lesson_id)  # неизвестный урок — KeyError, как у остальных поисков
+    out: list[LessonItem] = []
+    for lesson in curriculum.lessons:
+        if lesson.id == lesson_id:
+            break
+        if lesson.section == "letter":
+            out.extend(i for i in lesson.items if i.kind is ItemKind.LETTER)
+    return tuple(out)

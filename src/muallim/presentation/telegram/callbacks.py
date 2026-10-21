@@ -22,6 +22,14 @@ class Signs(CallbackData, prefix="signs"):
     """Знаки огласовки."""
 
 
+class LettersSheet(CallbackData, prefix="sheet"):
+    """Шпаргалка букв по книге до урока (FR-52, ADR-0062 п. 7). ``item_id`` — карточка, с которой
+    открыли («◀️ Назад» на неё); пусто — открыли с «🔤 Знаки»."""
+
+    lesson_id: str
+    item_id: str = ""
+
+
 class Quiz(CallbackData, prefix="quiz"):
     """Следующий вопрос закрепления."""
 

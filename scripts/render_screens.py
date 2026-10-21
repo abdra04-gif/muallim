@@ -16,6 +16,7 @@ from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import RecitationResult
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
+from muallim.domain.curriculum import letters_before
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.domain.quiz import make_question
@@ -105,13 +106,19 @@ def main() -> None:
         "10_result_done": screens.result(c, result(mim.items[-1].id, None, True), True),
         "11_quiz": screens.quiz(q),
         "12_quiz_answer": screens.quiz_answer(q, (q.answer + 1) % 4),
-        "13_signs": screens.signs(),
+        "13_signs": screens.signs(c, p),
         "14_progress": screens.progress(c, p),
         "15_help": screens.help_screen(),
         "16_teacher": card(letters[4].items[0].id, has_audio=False, teacher=True),
         "17_opening": screens.opening(c),
         "18_postcard": screens.postcard(c, mim, p, bot_username="muallim_bot"),
         "19_settings": screens.settings(LearnerSettings()),
+        "20_letters_sheet": screens.letters_sheet(
+            c,
+            mim.id,
+            audio=frozenset(h.id for h in letters_before(c, mim.id)),
+            back_item=mim.items[1].id,
+        ),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     meta = {}
