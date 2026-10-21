@@ -56,7 +56,15 @@ def test_traceability_paths_exist() -> None:
 
 
 # Документы проекта (без чужих отчётов и журнала запросов — там цитаты, а не ссылки)
-_SKIP_DIRS = {".venv", ".git", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules"}
+_SKIP_DIRS = {
+    ".venv",
+    ".git",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "node_modules",
+    "external",
+}
 _MARKDOWN = sorted(
     p
     for p in ROOT.rglob("*.md")

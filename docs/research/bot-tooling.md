@@ -23,7 +23,7 @@
 |---|---|---|
 | **Тестовая среда Telegram** (`aiogram.client.telegram.TEST`, SRC-061) | стенд перед пилотом: отдельные аккаунты и бот, настоящие ученики не затронуты | TD-FN-38 |
 | **Context7 MCP** (upstash/context7, ★63k, MIT) | агент читает документацию aiogram 3, SQLAlchemy, alembic нужной версии, а не по памяти | подключён: `.mcp.json`, версия 4.1.1 |
-| **chigwell/telegram-mcp** (★1,8k, Apache-2.0, Telethon) | агент сам пишет боту и шлёт голосовое — сквозная проверка настоящим клиентом | скачан в `../external/`; только с отдельным тестовым аккаунтом — TD-FN-41 |
+| **chigwell/telegram-mcp** (★1,8k, Apache-2.0, Telethon) | агент сам пишет боту и шлёт голосовое — сквозная проверка настоящим клиентом | скачан в `external/` (внутри проекта, вне git — ADR-0063); только с отдельным тестовым аккаунтом — TD-FN-41 |
 | **silero-vad** (snakers4, ★10k, MIT) | отсечь тишину и шум до модели (QAS-06), быстрый ответ «не слышно» | скачан; TD-FN-37 |
 | **CTC forced alignment** (`torchaudio.functional.forced_align`; MahmoudAshraf97/ctc-forced-aligner, ★570, BSD-2) | время каждой фонемы → точная подсветка (TD-FN-17), нарезка эталонов | скачан; TD-FN-40 |
 | **Healthchecks** (healthchecks/healthchecks, ★10k, BSD-3; или healthchecks.io) | узнать, что бот упал ночью | TD-FN-39 |

@@ -20,6 +20,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `curriculum/feedback.ru.yaml`, `lexicon.ru.yaml` | объяснения ошибок (пока только русский; kk/en — `curriculum/drafts/`, ADR-0022) |
 | `book/` | **книга** (скан SRC-040, вне git и бота), `README.md` — выходные данные, `contents.yaml` — оглавление ↔ уроки |
 | `curriculum/audio/` | эталонные записи «как правильно» — **только человек** |
+| `external/` | чужие репозитории-образцы (вне git, только читать, ADR-0063): IqraEval (оценка MDD), quran-transcript и prepare-quran-dataset (Muaalem), ctc-forced-aligner, silero-vad, fast-krippendorff, aiogram_tests, telegram-mcp, label-studio, шаблоны диссертации и ГОСТ (Russian-Phd-LaTeX, biblatex-gost, gostdown, CSL). **Смотри сюда прежде, чем писать своё.** Поиск Grep — с явным `path: external/…` (git её игнорирует) |
 | `docs/` | всё остальное — начни с `docs/README.md` |
 | `docs/tech-debt.md` | что отложено (в т. ч. безопасность) и когда закрыть |
 | `docs/roadmap.md` | план: магистратура → докторантура |

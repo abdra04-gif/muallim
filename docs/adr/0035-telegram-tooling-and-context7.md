@@ -19,7 +19,7 @@
    уходят в Context7 только с названиями библиотек и вопросами, без кода и данных.
 2. **Проектный скилл** `.claude/skills/telegram-bot/` — лимиты Bot API (SRC-060), тестовая среда
    (SRC-061), что отдаёт Muaalem (SRC-062), правила проекта для кода бота.
-3. Скачаны для справки в `../external/` (вне проекта): `chigwell/telegram-mcp`,
+3. Скачаны для справки в `../external/` (вне проекта; с 2026-10-22 — `external/` внутри проекта, вне git, ADR-0063): `chigwell/telegram-mcp`,
    `snakers4/silero-vad`, `MahmoudAshraf97/ctc-forced-aligner`.
 4. Изменения кода и зависимости не делаются: находки записаны в техдолг TD-FN-35…41 для `/feature`.
 

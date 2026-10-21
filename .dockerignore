@@ -10,3 +10,4 @@ analytics/reports
 **/__pycache__
 book
 logs/
+external
