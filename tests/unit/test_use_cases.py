@@ -823,3 +823,79 @@ async def test_today_without_settings_uses_default_offset(w: World) -> None:
         learner
     )
     assert progress.today == local_date(late, DEFAULT_UTC_OFFSET_MIN) == date(2026, 10, 22)
+
+
+# ---------- «🔁 Повторение» из истории попыток (FR-52 (б), ADR-0062 вариант A) ----------
+def _review(w: World):  # type: ignore[no-untyped-def]
+    from muallim.application.use_cases.review import GetReview  # noqa: PLC0415
+
+    return GetReview(
+        curriculum=w.curriculum, attempts=w.attempts, policy=GradingPolicy(), clock=w.clock
+    )
+
+
+async def _review_ids(w: World, learner: Learner) -> list[str]:
+    return [e.item_id for e in await _review(w).execute(learner)]
+
+
+async def test_line_failed_twice_is_due_for_review_the_next_day(w: World) -> None:
+    learner = await w.learner()
+    await _read(w, learner, "L01-14", heard="سَ")
+    await _read(w, learner, "L01-14", heard="سَ")
+    assert await _review_ids(w, learner) == []  # сегодня — ещё нет: срок — завтра
+    w.clock.current += timedelta(days=1)
+    (entry,) = await _review(w).execute(learner)
+    assert entry.item_id == "L01-14" and entry.reason == "due"
+
+
+async def test_line_failed_once_then_fixed_is_not_reviewed(w: World) -> None:
+    learner = await w.learner()
+    await _read(w, learner, "L01-14", heard="سَ")
+    await _read(w, learner, "L01-14")
+    w.clock.current += timedelta(days=1)
+    assert await _review_ids(w, learner) == []
+
+
+async def test_passed_review_returns_line_three_days_later(w: World) -> None:
+    learner = await w.learner()
+    await _read(w, learner, "L01-14", heard="سَ")
+    await _read(w, learner, "L01-14", heard="سَ")
+    w.clock.current += timedelta(days=1)
+    await _read(w, learner, "L01-14")  # повторил и засчитано — ступень 2, через 3 дня
+    w.clock.current += timedelta(days=2)
+    assert await _review_ids(w, learner) == []
+    w.clock.current += timedelta(days=1)
+    assert await _review_ids(w, learner) == ["L01-14"]
+
+
+async def test_review_day_is_learners_local_day(w: World) -> None:
+    """День — местный (UTC+3 без настроек, ADR-0061): после местной полуночи — уже «завтра»."""
+    learner = await w.learner()
+    w.clock.current = datetime(2026, 10, 17, 20, 30, tzinfo=UTC)  # 23:30 по Москве
+    await _read(w, learner, "L01-14", heard="سَ")
+    await _read(w, learner, "L01-14", heard="سَ")
+    w.clock.current = datetime(2026, 10, 17, 21, 30, tzinfo=UTC)  # 00:30 18.10 по Москве
+    assert await _review_ids(w, learner) == ["L01-14"]
+
+
+async def test_review_adds_passed_lines_with_letter_learner_often_misses(w: World) -> None:
+    """Свободные места — строки пройденных уроков с буквой, в которой ученик ошибается
+    (по его разборам): здесь ر, прочитанная как س."""
+    learner = await w.learner()
+    for item_id in ("L02-01", "L02-02", "L02-03"):  # урок L02 пройден
+        await _read(w, learner, item_id)
+    await _read(w, learner, "L01-10", heard="سَ")  # رَ → سَ
+    got = await _review(w).execute(learner)
+    from_passed = [(e.item_id, e.reason) for e in got if e.item_id.startswith("L02")]
+    assert from_passed == [("L02-01", "frequent_letter"), ("L02-03", "frequent_letter")]
+
+
+async def test_progress_counts_lines_for_review_today(w: World) -> None:
+    """Число строк на сегодня — для кнопки «🔁 Повторение · N» и напоминания (ADR-0062 п. 5–6)."""
+    learner = await w.learner()
+    assert (await w.progress().execute(learner)).review_due == 0
+    await _read(w, learner, "L01-14", heard="سَ")
+    await _read(w, learner, "L01-14", heard="سَ")
+    w.clock.current += timedelta(days=1)
+    progress = await w.progress().execute(learner)
+    assert progress.review_due == len(await _review(w).execute(learner)) == 1

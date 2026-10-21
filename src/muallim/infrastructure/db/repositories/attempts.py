@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from muallim.application.ports.repositories import AttemptRepository
 from muallim.domain.assessment import Assessment, ErrorKind, PronunciationError
 from muallim.domain.attempt import Attempt
+from muallim.domain.policy import Verdict
 from muallim.domain.report import LearnerReport
+from muallim.domain.review import Outcome
 from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 from muallim.infrastructure.db.tables import (
     annotations,
@@ -153,6 +155,53 @@ class SqlAttemptRepository(AttemptRepository):
             day = local_date(created, shift)
             days[day] = days.get(day, 0) + 1
         return days
+
+    async def outcomes(self, learner_id: UUID) -> list[Outcome]:
+        # Один запрос: смещение ученика — через LEFT JOIN настроек; дата — в Python, как в activity.
+        query = (
+            select(attempts.c.item_id, attempts.c.created_at, attempts.c.verdict,
+                   learner_settings.c.utc_offset_min)
+            .select_from(
+                attempts.outerjoin(
+                    learner_settings, learner_settings.c.learner_id == attempts.c.learner_id
+                )
+            )
+            .where(attempts.c.learner_id == learner_id)
+            .order_by(attempts.c.created_at, attempts.c.id)
+        )  # fmt: skip
+        return [
+            Outcome(
+                row.item_id,
+                local_date(
+                    row.created_at,
+                    DEFAULT_UTC_OFFSET_MIN if row.utc_offset_min is None else row.utc_offset_min,
+                ),
+                row.verdict != Verdict.FAILED,
+            )
+            for row in (await self.session.execute(query)).all()
+        ]
+
+    async def recent_errors(
+        self, learner_id: UUID, attempts_count: int
+    ) -> list[PronunciationError]:
+        if attempts_count <= 0:
+            return []
+        recent = (
+            select(attempts.c.id, attempts.c.created_at)
+            .where(attempts.c.learner_id == learner_id)
+            .order_by(attempts.c.created_at.desc(), attempts.c.id.desc())
+            .limit(attempts_count)
+            .subquery()
+        )
+        query = (
+            select(detected_errors)
+            .join(recent, recent.c.id == detected_errors.c.attempt_id)
+            .order_by(recent.c.created_at, recent.c.id, detected_errors.c.ordinal)
+        )
+        return [
+            PronunciationError(ErrorKind(e.kind), e.position, e.syllable, e.expected, e.heard)
+            for e in (await self.session.execute(query)).all()
+        ]
 
     async def owner(self, attempt_id: UUID) -> UUID | None:
         query = select(attempts.c.learner_id).where(attempts.c.id == attempt_id)

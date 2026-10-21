@@ -5,11 +5,12 @@ from datetime import date, datetime
 from typing import Any, Protocol
 from uuid import UUID
 
-from muallim.domain.assessment import Assessment
+from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
 from muallim.domain.report import LearnerReport
+from muallim.domain.review import Outcome
 from muallim.domain.settings import LearnerSettings
 
 
@@ -68,6 +69,16 @@ class AttemptRepository(Protocol):
 
         День — по смещению ученика (``learner_settings.utc_offset_min``, ADR-0061).
         """
+
+    async def outcomes(self, learner_id: UUID) -> list[Outcome]:
+        """История исходов для «🔁 Повторения» (ADR-0062): по порядку попыток, одним запросом.
+
+        День — местный по ``learner_settings.utc_offset_min`` (нет строки — UTC+3); засчитано —
+        вердикт не ``failed``.
+        """
+
+    async def recent_errors(self, learner_id: UUID, attempts: int, /) -> list[PronunciationError]:
+        """Ошибки последних ``attempts`` попыток ученика (по времени) — для частых букв."""
 
 
 class LearnerSettingsRepository(Protocol):

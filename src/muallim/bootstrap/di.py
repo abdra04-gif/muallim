@@ -46,6 +46,7 @@ from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reminders import DueReminders
 from muallim.application.use_cases.reports import ReportMistake
+from muallim.application.use_cases.review import GetReview
 from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.settings import ChangeSetting, GetSettings
 from muallim.application.use_cases.staff import StaffAccess
@@ -222,6 +223,18 @@ class RequestProvider(Provider):
     ) -> GetProgress:
         """«Сегодня» и серия дней — по местной дате ученика (ADR-0061)."""
         return GetProgress(curriculum, attempts, policy, clock, learner_settings)
+
+    @provide
+    def review(
+        self,
+        curriculum: Curriculum,
+        attempts: AttemptRepository,
+        policy: GradingPolicy,
+        clock: Clock,
+        learner_settings: LearnerSettingsRepository,
+    ) -> GetReview:
+        """«🔁 Повторение» на сегодня — по местной дате ученика (ADR-0062, ADR-0061)."""
+        return GetReview(curriculum, attempts, policy, clock, learner_settings)
 
     use_cases = provide_all(
         EnsureLearner,

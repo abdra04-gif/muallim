@@ -292,3 +292,72 @@ async def test_audio_in_use_sees_other_learners(session: AsyncSession) -> None:
     await repo.forget_audio(first.id)
     await session.commit()
     assert await repo.audio_in_use("a" * 64)  # та же запись у второго ученика
+
+
+# ---------- история исходов для «🔁 Повторения» (FR-52 (б), ADR-0062 вариант A) ----------
+async def test_outcomes_in_attempt_order_with_learners_local_day(session: AsyncSession) -> None:
+    """Исходы по строкам: по времени попытки, день — местный по ``utc_offset_min``, засчитано —
+    вердикт не ``failed``. Чужие попытки не попадают."""
+    from datetime import UTC, date, datetime  # noqa: PLC0415
+
+    from muallim.domain import review  # noqa: PLC0415
+    from muallim.domain.settings import LearnerSettings  # noqa: PLC0415
+    from muallim.infrastructure.db.repositories.settings import (  # noqa: PLC0415
+        SqlLearnerSettingsRepository,
+    )
+
+    clock = FixedClock()
+    learner = _learner(clock)
+    other = Learner(UUID(int=2), 4343, "L-00000002", "ru", clock.now())
+    learners = SqlLearnerRepository(session)
+    await learners.add(learner)
+    await learners.add(other)
+    await SqlLearnerSettingsRepository(session, clock).save(
+        learner.id, LearnerSettings(utc_offset_min=300)
+    )
+    repo = SqlAttemptRepository(session)
+    clock.current = datetime(2026, 10, 17, 20, 0, tzinfo=UTC)  # 01:00 18.10 при UTC+5
+    await repo.add(_attempt(learner, 3, "سَ", clock), ("сообщение",))  # вставлена первой
+    clock.current = datetime(2026, 10, 17, 10, 0, tzinfo=UTC)  # 15:00 17.10
+    await repo.add(_attempt(learner, 1, "سَ", clock), ("сообщение",))
+    await repo.add(replace(_attempt(learner, 2, "صَ", clock), verdict=Verdict.PASSED), ())
+    await repo.add(replace(_attempt(learner, 4, "سَ", clock), learner_id=other.id), ("с",))
+    await session.commit()
+    assert await repo.outcomes(learner.id) == [
+        review.Outcome("L01-14", date(2026, 10, 17), False),
+        review.Outcome("L01-14", date(2026, 10, 17), True),
+        review.Outcome("L01-14", date(2026, 10, 18), False),
+    ]
+
+
+async def test_outcomes_without_settings_use_utc_plus_3(session: AsyncSession) -> None:
+    from datetime import UTC, date, datetime  # noqa: PLC0415
+
+    from muallim.domain import review  # noqa: PLC0415
+
+    clock = FixedClock()
+    learner = _learner(clock)
+    await SqlLearnerRepository(session).add(learner)
+    repo = SqlAttemptRepository(session)
+    clock.current = datetime(2026, 10, 17, 22, 0, tzinfo=UTC)  # 01:00 18.10 по Москве
+    await repo.add(_attempt(learner, 1, "سَ", clock), ("сообщение",))
+    await session.commit()
+    assert await repo.outcomes(learner.id) == [review.Outcome("L01-14", date(2026, 10, 18), False)]
+
+
+async def test_recent_errors_come_from_last_attempts_only(session: AsyncSession) -> None:
+    """Ошибки последних N попыток ученика — из них считаются «буквы, где чаще ошибается»."""
+    from muallim.domain.assessment import ErrorKind, PronunciationError  # noqa: PLC0415
+
+    clock = FixedClock()
+    learner = _learner(clock)
+    await SqlLearnerRepository(session).add(learner)
+    repo = SqlAttemptRepository(session)
+    await repo.add(_attempt(learner, 1, "سَ", clock), ("сообщение",))
+    await repo.add(_attempt(learner, 2, "صَ", clock), ())
+    await repo.add(_attempt(learner, 3, "سَ", clock), ("сообщение",))
+    await session.commit()
+    substitution = PronunciationError(ErrorKind.LETTER_SUBSTITUTION, 0, None, "ص", "س")
+    assert await repo.recent_errors(learner.id, 2) == [substitution]
+    assert await repo.recent_errors(learner.id, 3) == [substitution, substitution]
+    assert await repo.recent_errors(UUID(int=99), 3) == []

@@ -18,6 +18,8 @@ from muallim.infrastructure.db.tables import metadata
 
 
 async def test_container_resolves_every_use_case(tmp_path: Path) -> None:
+    from muallim.application.use_cases.review import GetReview  # noqa: PLC0415
+
     url = f"sqlite+aiosqlite:///{tmp_path / 'di.sqlite3'}"
     engine = create_engine(url)
     async with engine.begin() as conn:
@@ -36,7 +38,7 @@ async def test_container_resolves_every_use_case(tmp_path: Path) -> None:
             for uc in (
                 EnsureLearner, SetResearchConsent, DeleteMyData, OpenItem, GetProgress,
                 AssessRecitation, PublishCurriculum, PracticeQuiz, NextAnnotation, RedeemInvite,
-                SubmitAnnotation,
+                SubmitAnnotation, GetReview,
             ):  # fmt: skip
                 assert isinstance(await request.get(uc), uc)
             published = await (await request.get(PublishCurriculum)).execute()

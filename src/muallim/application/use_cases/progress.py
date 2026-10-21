@@ -7,10 +7,10 @@ from enum import StrEnum
 
 from muallim.application.ports.repositories import AttemptRepository, LearnerSettingsRepository
 from muallim.application.ports.system import Clock
+from muallim.application.use_cases.review import GetReview
 from muallim.domain.curriculum import Curriculum, Lesson, LessonItem
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
-from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 
 
 class LessonStatus(StrEnum):
@@ -50,6 +50,7 @@ class Progress:
     continue_item: LessonItem | None = None  # где остановился
     today: date | None = None  # местное «сегодня» ученика — для начала занятия (ADR-0061)
     week: tuple[bool, ...] = ()  # 7 дней, последний — сегодня: была ли хоть одна попытка
+    review_due: int = 0  # строк в «🔁 Повторении» на сегодня (= длина списка GetReview, ADR-0062)
 
     def of(self, lesson_id: str) -> LessonProgress:
         return next(lp for lp in self.lessons if lp.lesson.id == lesson_id)
@@ -81,7 +82,9 @@ class GetProgress:
             weak = tuple(item for item, score in tried if not self.policy.is_mastered(score))
             lessons.append(LessonProgress(lesson, mastered, weak))
         days = await self.attempts.activity(learner.id)
-        today = await self._today(learner)
+        reviews = GetReview(self.curriculum, self.attempts, self.policy, self.clock, self.settings)
+        today = await reviews.today(learner)
+        passed = [lp.lesson.id for lp in lessons if lp.status is LessonStatus.DONE]
         return Progress(
             lessons=tuple(lessons),
             attempts_total=await self.attempts.count(learner.id),
@@ -90,14 +93,8 @@ class GetProgress:
             continue_item=self._continue(learner, best, lessons),
             today=today,
             week=tuple(days.get(today - timedelta(days=k), 0) > 0 for k in range(6, -1, -1)),
+            review_due=len(await reviews.for_day(learner, today, passed)),
         )
-
-    async def _today(self, learner: Learner) -> date:
-        """Местная дата ученика (смещение из настроек, ADR-0061); без настроек — UTC+3, как в БД."""
-        now = self.clock.now()
-        if self.settings is None:
-            return local_date(now, DEFAULT_UTC_OFFSET_MIN)
-        return local_date(now, (await self.settings.get(learner.id)).utc_offset_min)
 
     def _continue(
         self, learner: Learner, best: Mapping[str, int], lessons: Sequence[LessonProgress]

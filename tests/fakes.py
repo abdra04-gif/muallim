@@ -3,15 +3,21 @@
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from muallim.application.ports.erasures import ErasureAction
 from muallim.application.ports.recognition import Recognition, RecognitionError
 from muallim.domain.annotation import AnnotationTask, Label
-from muallim.domain.assessment import Assessment
+from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
+from muallim.domain.policy import Verdict
 from muallim.domain.report import LearnerReport
+from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
+
+if TYPE_CHECKING:
+    from muallim.domain import review
 
 
 class FixedClock:
@@ -135,6 +141,30 @@ class InMemoryAttempts:
                 day = a.created_at.date()
                 days[day] = days.get(day, 0) + 1
         return days
+
+    async def outcomes(self, learner_id: UUID) -> "list[review.Outcome]":
+        """История исходов (ADR-0062): по порядку попыток, местный день — UTC+3, как без
+        настроек в БД; засчитано — вердикт не ``failed``."""
+        from muallim.domain import review  # noqa: PLC0415
+
+        own = sorted(
+            (a for a, _ in self.items if a.learner_id == learner_id), key=lambda a: a.created_at
+        )
+        return [
+            review.Outcome(
+                a.item_id,
+                local_date(a.created_at, DEFAULT_UTC_OFFSET_MIN),
+                a.verdict is not Verdict.FAILED,
+            )
+            for a in own
+        ]
+
+    async def recent_errors(self, learner_id: UUID, attempts: int) -> list[PronunciationError]:
+        """Ошибки последних ``attempts`` попыток ученика (для «букв, где чаще ошибается»)."""
+        own = [a for a, _ in self.items if a.learner_id == learner_id]
+        own.sort(key=lambda a: a.created_at)
+        recent = own[-attempts:] if attempts > 0 else []
+        return [e for a in recent for e in a.assessment.errors]
 
 
 @dataclass
