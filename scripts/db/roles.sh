@@ -15,12 +15,15 @@ owner=$(openssl rand -hex 24)  # только 0-9a-f: не нужно экран
 app=$(openssl rand -hex 24)
 reader=$(openssl rand -hex 24)
 
+# Docker Compose проверяет APP_DB_PASSWORD сервиса bot даже для команды к postgres, а пароль
+# появляется только после этого скрипта — до первого запуска подставляем заглушку (бот её не видит).
 # Пароли — через stdin (\set), а не аргументами: аргументы видны в списке процессов (ps).
 {
   printf '\\set owner_password %s\n\\set app_password %s\n\\set reader_password %s\n' \
     "'$owner'" "'$app'" "'$reader'"
   cat scripts/db/roles.sql
-} | docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -q -U "$admin" -d "$db" -f -
+} | APP_DB_PASSWORD="${APP_DB_PASSWORD:-roles-not-created-yet}" \
+  docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -q -U "$admin" -d "$db" -f -
 
 DB="$db" OWNER="$owner" APP="$app" READER="$reader" python3 - <<'PY'
 import os, re
