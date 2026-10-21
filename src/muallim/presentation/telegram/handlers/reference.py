@@ -13,6 +13,7 @@ from dishka import FromDishka
 
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
+from muallim.application.use_cases.settings import GetSettings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.domain.report import ReportReason
@@ -20,7 +21,7 @@ from muallim.domain.settings import LearnerSettings
 from muallim.presentation.telegram import keyboards, texts, views
 from muallim.presentation.telegram.callbacks import Dispute, DisputeReason, Listen
 from muallim.presentation.telegram.callbacks import RecordReference as RecordCallback
-from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.display import Display, drop_sound, message_of
 from muallim.presentation.telegram.screens import Screen
 
 logger: Final = logging.getLogger(__name__)
@@ -90,13 +91,19 @@ async def cb_listen(
     callback_data: Listen,
     learner: FromDishka[Learner],
     uc: FromDishka[GetReferenceAudio],
+    display: FromDishka[Display],
+    learner_settings: FromDishka[GetSettings],
 ) -> None:
+    """С автозвуком эталон над карточкой — один: новый заменяет прежний (TD-FN-93 п. 2)."""
     audio = await uc.execute(learner, callback_data.item_id)
     if audio is None:
         await cb.answer(texts.NO_REFERENCE, show_alert=True)
         return
     if msg := message_of(cb):
-        await send_reference(msg, callback_data.item_id, audio)
+        sound = await send_reference(msg, callback_data.item_id, audio)
+        if (await learner_settings.execute(learner)).auto_reference:
+            await drop_sound(display, msg)
+            display.keep_sound(msg.chat.id, sound.message_id)
     await cb.answer()
 
 

@@ -14,7 +14,7 @@ from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ArabicReading, Learner, NativeLanguage
 from muallim.presentation.telegram import keyboards, screens, texts
 from muallim.presentation.telegram.callbacks import Consent, DeleteData, Privacy, Profile
-from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.display import Display, drop_sound, message_of
 from muallim.presentation.telegram.handlers.commands import PROFILE_START
 from muallim.presentation.telegram.screens import Screen
 
@@ -30,6 +30,7 @@ async def cb_privacy(
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.privacy(learner.research_consent))
     await cb.answer()
 

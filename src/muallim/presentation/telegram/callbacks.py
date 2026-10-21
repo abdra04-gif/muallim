@@ -111,12 +111,16 @@ class ShareLesson(CallbackData, prefix="share"):
 
 
 class ShowSettings(CallbackData, prefix="settings"):
-    """⚙️ Настройки ученика (FR-51, ADR-0061)."""
+    """⚙️ Настройки ученика (FR-51, ADR-0061): ``page`` пусто — экран настроек, ``reminder`` —
+    выбор часа напоминания, ``hint`` — подсказка к заголовку «Как читается» (TD-FN-93 п. 5)."""
+
+    page: str = ""
 
 
 class ChangeSetting(CallbackData, prefix="set"):
     """Поставить настройке значение явно (не «переключить»): повторное нажатие старой кнопки
-    ничего не ломает. ``value`` — ``true``/``false`` или значение ``HowToRead``."""
+    ничего не ломает. ``value`` — ``true``/``false``, значение ``HowToRead``, минута суток или
+    смещение от UTC в минутах (``off`` — выключить напоминание)."""
 
     name: str
     value: str

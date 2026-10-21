@@ -5,13 +5,18 @@
 значение в `learner_settings`, пишет `setting_changed` и перерисовывает экран на месте.
 Настройки действуют: «Как читается» (Закрыта / Видна сразу / Не показывать — подписи утвердил
 автор 2026-10-21), блок исследования (ADR-0057), начало занятия (ADR-0050), крупный шрифт
-(ADR-0059), автозвук эталона (В5: по умолчанию выключен). Напоминаний в этом круге нет.
+(ADR-0059), автозвук эталона (В5: по умолчанию выключен).
+
+Круг 4: напоминание (В1–В3: раз в день в выбранный час, по умолчанию выключено; при включении —
+«который у тебя час?» кнопками, хранится только смещение от UTC) и доводка TD-FN-93 пп. 1–5.
 
 Настоящие обработчики, DI и SQLite; распознавание — заглушка, фонетизатор «Как читается» —
 подменён (как ``ScriptedReadingGuide``): в CI нет extra ``ml``.
 """
 
+import re
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -20,6 +25,8 @@ import pytest
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.methods import (
+    AnswerCallbackQuery,
+    DeleteMessage,
     EditMessageMedia,
     SendAudio,
     SendMessage,
@@ -47,8 +54,18 @@ from muallim.infrastructure.asr.reading import QuranReadingGuide
 from muallim.infrastructure.db.engine import create_engine
 from muallim.infrastructure.db.tables import interaction_events, metadata
 from muallim.infrastructure.db.views import create_views
+from muallim.infrastructure.system import SystemClock
 from muallim.presentation.telegram import render, texts
-from muallim.presentation.telegram.callbacks import Consent, GoItem, Home, Opening
+from muallim.presentation.telegram.callbacks import ChangeSetting as ChangeSettingCallback
+from muallim.presentation.telegram.callbacks import (
+    Consent,
+    GoItem,
+    Home,
+    Lessons,
+    Listen,
+    Opening,
+    ShowSettings,
+)
 from muallim.presentation.telegram.handlers import router
 from tests.fakes import ScriptedReadingGuide
 from tests.integration.test_bot_flow import BOT_USER, NOW, FakeTelegram, Learner
@@ -63,6 +80,9 @@ WITH_REFERENCE = "L006-02"  # «مَ» — слог, не аят: эталон �
 WITHOUT_REFERENCE = "L006-03"  # «مِ» — эталона нет
 ISTI_ADHA = "L001-02"
 CALLBACK_LIMIT = 64  # байт, Telegram Bot API
+REMINDER_ICON = "🔔"  # «🔔 Напоминание: выкл.» / «🔔 Напоминание: 19:00»
+EVENING = 19 * 60  # 19:00 — минута местных суток
+UTC_PLUS_5 = 5 * 60  # Алматы
 
 HOW_TO_READ_LABELS = {  # подписи утвердил автор 2026-10-21
     HowToRead.SPOILER: "Закрыта",
@@ -83,6 +103,10 @@ class VoiceTelegram(FakeTelegram):
 
     fail_sound = False  # Telegram отказал в звуке (сеть, слишком большой файл)
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.sound_ids: list[int] = []  # номера сообщений со звуком — по порядку отправки
+
     async def make_request(
         self, bot: Bot, method: TelegramMethod[Any], timeout: int | None = None
     ) -> Any:
@@ -91,6 +115,7 @@ class VoiceTelegram(FakeTelegram):
                 raise TelegramBadRequest(method=method, message="Bad Request: file is too big")
             self.calls.append(method)
             self._next_id += 1
+            self.sound_ids.append(self._next_id)
             assert isinstance(method.chat_id, int)
             return Message(
                 message_id=self._next_id, date=NOW, chat=Chat(id=method.chat_id, type="private"),
@@ -248,15 +273,17 @@ async def test_settings_screen_offers_every_option_and_inner_screens(
     assert sum("🪪" in text for text in labels) == 1, labels
 
 
-async def test_settings_screen_has_no_reminder_this_round(
+async def test_settings_screen_shows_reminder_switched_off_by_default(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
-    dp, _ = app
+    """В1–В2: напоминание — в настройках, по умолчанию выключено (круг 3 его ещё не показывал)."""
+    dp, container = app
     ali = await _on_home(dp)
     await _open_settings(ali)
-    caption, labels = _view(ali)
-    seen = (caption + " ".join(labels)).casefold()
-    assert "напомин" not in seen and "⏰" not in seen
+    reminder = [text for text in _view(ali)[1] if REMINDER_ICON in text]
+    assert len(reminder) == 1, _view(ali)[1]
+    assert "выкл." in reminder[0], reminder
+    assert (await _settings(container)).reminder_minute is None
 
 
 async def test_settings_buttons_fit_telegram_callback_limit(
@@ -593,3 +620,257 @@ async def test_card_still_comes_when_auto_reference_fails(
     await ali.press(GoItem(item_id=WITH_REFERENCE))
     assert _sounds(ali) == []
     assert CARD_MARK in _card_caption(ali)
+
+
+# ---------- 4. напоминание: час и «который у тебя час?» (круг 4, В1–В3) ----------
+BOT_NOW = datetime(2026, 10, 21, 16, 5, tzinfo=UTC)  # часы бота; в UTC+8…+12 — уже завтра
+_TIME = re.compile(r"(?<!\d)(\d{1,2}):(\d{2})(?!\d)")
+
+
+@pytest.fixture
+def bot_clock(monkeypatch: pytest.MonkeyPatch) -> datetime:
+    """Часы бота стоят: подписи «который час» вычисляются от них, а не от настоящего времени."""
+    monkeypatch.setattr(SystemClock, "now", lambda self: BOT_NOW)
+    return BOT_NOW
+
+
+def _times(person: Learner) -> dict[tuple[int, int], str]:
+    """Кнопки-времена на экране: (часы, минуты) → callback_data."""
+    found: dict[tuple[int, int], str] = {}
+    for text, data in _buttons(person):
+        if m := _TIME.search(text):
+            key = (int(m[1]), int(m[2]))
+            assert key not in found, f"две кнопки с временем {key}: {_buttons(person)}"
+            found[key] = data
+    return found
+
+
+async def _open_reminder(person: Learner) -> None:
+    await _open_settings(person)
+    await _press_text(person, REMINDER_ICON)
+
+
+def _local(offset_hours: int) -> tuple[int, int]:
+    local = BOT_NOW.hour * 60 + BOT_NOW.minute + offset_hours * 60
+    return (local // 60) % 24, local % 60
+
+
+async def test_reminder_button_opens_hour_grid_in_place(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    dp, _ = app
+    ali = await _on_home(dp)
+    await _open_settings(ali)
+    screen_id = ali.last_screen().message_id
+    await _press_text(ali, REMINDER_ICON)
+    assert ali.last_screen().message_id == screen_id, "выбор часа — на месте экрана (ADR-0024)"
+    hours = _times(ali)
+    assert {(h, 0) for h in range(7, 23)} <= set(hours), sorted(hours)
+    assert all(minute == 0 for _, minute in hours), "сетка — целые часы"
+
+
+async def test_choosing_hour_asks_what_time_it_is_for_utc_plus_2_to_12(
+    app: tuple[Dispatcher, AsyncContainer], bot_clock: datetime
+) -> None:
+    """В3: «который у тебя час?» — кнопки с текущим временем для UTC+2…UTC+12."""
+    dp, _ = app
+    ali = await _on_home(dp)
+    await _open_reminder(ali)
+    await ali.press(_times(ali)[(19, 0)])
+    caption = _view(ali)[0].casefold()
+    assert "который" in caption and "час" in caption, caption
+    assert set(_times(ali)) == {_local(h) for h in range(2, 13)}, sorted(_times(ali))
+
+
+async def test_reminder_hour_and_offset_are_saved_and_shown_in_settings(
+    app: tuple[Dispatcher, AsyncContainer], bot_clock: datetime
+) -> None:
+    dp, container = app
+    ali = await _on_home(dp)
+    await _open_reminder(ali)
+    screen_id = ali.last_screen().message_id
+    await ali.press(_times(ali)[(19, 0)])
+    await ali.press(_times(ali)[_local(5)])  # у ученика 21:05 — Алматы, UTC+5
+    saved = await _settings(container)
+    assert (saved.reminder_minute, saved.utc_offset_min) == (EVENING, UTC_PLUS_5)
+    assert ali.last_screen().message_id == screen_id, "всё — в одном окне"
+    reminder = [text for text in _view(ali)[1] if REMINDER_ICON in text]
+    assert len(reminder) == 1 and "19:00" in reminder[0], _view(ali)[1]
+
+
+async def test_offset_is_logged_without_value_and_hour_with_value(
+    app: tuple[Dispatcher, AsyncContainer], bot_clock: datetime
+) -> None:
+    """Смещение — данные работы сервиса: в журнал без значения (ADR-0061, круг 2)."""
+    dp, container = app
+    ali = await _on_home(dp)
+    await _open_reminder(ali)
+    await ali.press(_times(ali)[(19, 0)])
+    await ali.press(_times(ali)[_local(5)])
+    assert await _events(container, "setting_changed") == [
+        {"name": "reminder_minute", "value": EVENING},
+        {"name": "utc_offset_min"},
+    ]
+
+
+async def test_reminder_can_be_switched_off(app: tuple[Dispatcher, AsyncContainer]) -> None:
+    dp, container = app
+    ali = await _on_home(dp)
+    await _set(container, PUPIL, reminder_minute=EVENING, utc_offset_min=UTC_PLUS_5)
+    await _open_reminder(ali)
+    await _press_text(ali, "ыключ")  # «Выключить» / «выключить»
+    saved = await _settings(container)
+    assert saved.reminder_minute is None
+    assert saved.utc_offset_min == UTC_PLUS_5, "смещение остаётся — спрашивать заново не нужно"
+    reminder = [text for text in _view(ali)[1] if REMINDER_ICON in text]
+    assert len(reminder) == 1 and "выкл." in reminder[0], _view(ali)[1]
+    assert await _events(container, "setting_changed") == [
+        {"name": "reminder_minute", "value": None}
+    ]
+
+
+async def test_reminder_screens_fit_telegram_callback_limit(
+    app: tuple[Dispatcher, AsyncContainer], bot_clock: datetime
+) -> None:
+    dp, _ = app
+    ali = await _on_home(dp)
+    await _open_reminder(ali)
+    hour_screen = _buttons(ali)
+    await ali.press(_times(ali)[(19, 0)])
+    for text, data in hour_screen + _buttons(ali):
+        assert data, f"у кнопки «{text}» нет callback_data"
+        assert len(data.encode()) <= CALLBACK_LIMIT, (text, data)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("reminder_minute", "1440"),  # вне CHECK 0…1439
+        ("reminder_minute", "-1"),
+        ("reminder_minute", "1145"),  # 19:05 — не на сетке целых часов
+        ("reminder_minute", "abc"),
+        ("utc_offset_min", "841"),  # вне CHECK −720…840
+        ("utc_offset_min", "-721"),
+        ("utc_offset_min", "330"),  # UTC+5:30 — не на сетке
+        ("utc_offset_min", "60"),  # UTC+1 — вне UTC+2…+12
+        ("utc_offset_min", "x"),
+    ],
+)
+async def test_forged_reminder_button_is_stale_and_changes_nothing(
+    app: tuple[Dispatcher, AsyncContainer], name: str, value: str
+) -> None:
+    dp, container = app
+    ali = await _on_home(dp)
+    await _open_settings(ali)
+    before = await _settings(container)
+    await ali.press(ChangeSettingCallback(name=name, value=value))
+    assert texts.STALE_BUTTON in ali.tg.alerts()
+    assert await _settings(container) == before
+    assert await _events(container, "setting_changed") == []
+
+
+# ---------- 5. доводка настроек (TD-FN-93 пп. 1–5) ----------
+def _deleted(person: Learner) -> set[int]:
+    return {c.message_id for c in person.tg.calls if isinstance(c, DeleteMessage)}
+
+
+def _sound_ids(person: Learner) -> list[int]:
+    assert isinstance(person.tg, VoiceTelegram)
+    return person.tg.sound_ids
+
+
+@pytest.mark.parametrize(
+    "away", [Home(), Lessons(part=-1), ShowSettings()], ids=["home", "lessons", "settings"]
+)
+async def test_auto_reference_is_removed_when_leaving_card_for_a_menu(
+    app: tuple[Dispatcher, AsyncContainer], away: Any
+) -> None:
+    """П. 1: автоголосовое не остаётся висеть над главной, уроками и настройками."""
+    dp, container = app
+    ali = await _on_home(dp)
+    await _set(container, PUPIL, auto_reference=True)
+    await ali.press(GoItem(item_id=WITH_REFERENCE))
+    [sound] = _sound_ids(ali)
+    await ali.press(away)
+    assert sound in _deleted(ali)
+
+
+async def test_manual_listen_replaces_auto_reference_instead_of_adding_second(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """П. 2: «🔊 Как правильно» при автозвуке — эталон в чате один (старый заменяется новым)."""
+    dp, container = app
+    ali = await _on_home(dp)
+    await _set(container, PUPIL, auto_reference=True)
+    await ali.press(GoItem(item_id=WITH_REFERENCE))
+    await ali.press(Listen(item_id=WITH_REFERENCE))
+    auto, manual = _sound_ids(ali)
+    assert auto in _deleted(ali), "автоэталон убран — второго эталона над карточкой нет"
+    await ali.press(Home())
+    assert manual in _deleted(ali), "и новый убирается, когда ученик уходит с карточки"
+
+
+@pytest.mark.parametrize("inner", [texts.HELP_BUTTON, texts.PRIVACY_BUTTON])
+async def test_help_and_privacy_from_settings_lead_back_to_settings(
+    app: tuple[Dispatcher, AsyncContainer], inner: str
+) -> None:
+    """П. 3: из «Как заниматься» и «Мои данные» — «◀️ Настройки», на месте экрана."""
+    dp, _ = app
+    ali = await _on_home(dp)
+    await _open_settings(ali)
+    screen_id = ali.last_screen().message_id
+    await _press_text(ali, inner)
+    assert texts.BACK_TO_SETTINGS in _view(ali)[1], _view(ali)[1]
+    await _press_text(ali, texts.BACK_TO_SETTINGS)
+    assert _view(ali)[0] == texts.SETTINGS
+    assert ali.last_screen().message_id == screen_id
+
+
+async def test_my_id_replaces_settings_screen_and_leads_back(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """П. 4: «🪪 Мой ID» — на месте экрана, не новым сообщением."""
+    dp, _ = app
+    ali = await _on_home(dp)
+    await _open_settings(ali)
+    screen_id = ali.last_screen().message_id
+    sent_before = sum(isinstance(c, SendMessage) for c in ali.tg.calls)
+    await _press_text(ali, "🪪")
+    caption, labels = _view(ali)
+    assert caption.startswith(texts.ME_TEXT.split("{")[0]), caption
+    assert ali.last_screen().message_id == screen_id
+    assert sum(isinstance(c, SendMessage) for c in ali.tg.calls) == sent_before
+    assert texts.BACK_TO_SETTINGS in labels, labels
+    await _press_text(ali, texts.BACK_TO_SETTINGS)
+    assert _view(ali)[0] == texts.SETTINGS
+
+
+async def test_how_to_read_header_explains_itself_in_a_popup(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """П. 5: заголовок «🔤 Как читается:» выглядит кнопкой — отвечает подсказкой."""
+    dp, container = app
+    ali = await _on_home(dp)
+    await _open_settings(ali)
+    before = _view(ali)
+    calls_before = len(ali.tg.calls)  # всплывающее «Понял…» из согласия — не в счёт
+    await _press_text(ali, texts.SETTING_HOW_TO_READ)
+    answers = [
+        c for c in ali.tg.calls[calls_before:] if isinstance(c, AnswerCallbackQuery) and c.text
+    ]
+    assert [c.text for c in answers] == [texts.HOW_TO_READ_HINT]
+    assert answers[0].show_alert, "всплывающее окно, а не исчезающая строка"
+    assert _view(ali) == before
+    assert await _events(container, "setting_changed") == []
+
+
+async def test_old_settings_button_without_page_opens_settings(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """Кнопка ⚙️ из сообщений до выкладки поля ``page`` — callback_data ровно «settings»."""
+    dp, _ = app
+    ali = await _on_home(dp)
+    assert ShowSettings().pack() != "settings"  # иначе проверка ничего не проверяет
+    await ali.press("settings")
+    assert texts.STALE_BUTTON not in ali.tg.alerts()
+    assert _view(ali)[0] == texts.SETTINGS

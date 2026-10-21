@@ -40,6 +40,10 @@ class EnsureLearner:
         """Возвращает ученика и признак «зарегистрирован только что»."""
         learner = await self.learners.get_by_telegram_id(telegram_user_id)
         if learner is not None:
+            if learner.blocked_bot:  # снова пишет боту — значит, разблокировал (ADR-0061 п. 4)
+                learner.blocked_bot = False
+                await self.learners.save(learner)
+                await self.uow.commit()
             return learner, False
         learner_id = self.ids.new_id()
         learner = Learner(

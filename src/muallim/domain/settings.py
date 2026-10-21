@@ -20,6 +20,10 @@ MAX_UTC_OFFSET_MIN: Final = 840  # UTC+14
 MINUTES_PER_DAY: Final = 24 * 60
 REMINDER_CATCH_UP_MIN: Final = 3 * 60  # бот был выключен — напомнит не позже 3 ч (В4)
 REMINDER_PAUSE_AFTER_DAYS: Final = 14  # молчит дольше — напоминания на паузе (В2)
+# Сетка кнопок экрана 🔔 (ADR-0061 п. 3): что ученик может выбрать. Сервер принимает только её —
+# кнопка от другой версии экрана или подделанная не сохранится.
+REMINDER_HOURS: Final = range(7, 23)  # 7:00 … 22:00 местного, целые часы
+ASK_OFFSET_HOURS: Final = range(2, 13)  # «который у тебя час?»: UTC+2 … UTC+12, целые часы
 
 OPENING_ITEMS: Final = ("L001-02", "L001-03")  # истиаза, басмала (ADR-0050)
 FIRST_LESSON: Final = "L001"
@@ -52,14 +56,25 @@ class LearnerSettings:
     reminder_sent_on: date | None = None  # местная дата последнего напоминания
 
 
+def reminder_on_grid(minute: int | None) -> bool:
+    """Час напоминания с экрана 🔔: целый час из ``REMINDER_HOURS`` или ``None`` (выключить)."""
+    return minute is None or (minute % 60 == 0 and minute // 60 in REMINDER_HOURS)
+
+
+def offset_on_grid(utc_offset_min: int) -> bool:
+    """Смещение из ответа «который у тебя час?»: целые часы из ``ASK_OFFSET_HOURS``."""
+    return utc_offset_min % 60 == 0 and utc_offset_min // 60 in ASK_OFFSET_HOURS
+
+
+def local_minute(now: datetime, utc_offset_min: int) -> int:
+    """Минута местных суток ученика в момент ``now``."""
+    local = now.astimezone(UTC) + timedelta(minutes=utc_offset_min)
+    return local.hour * 60 + local.minute
+
+
 def local_date(now: datetime, utc_offset_min: int) -> date:
     """Местная дата ученика в момент ``now`` (время с часовым поясом)."""
     return (now.astimezone(UTC) + timedelta(minutes=utc_offset_min)).date()
-
-
-def _local_minute(now: datetime, utc_offset_min: int) -> int:
-    local = now.astimezone(UTC) + timedelta(minutes=utc_offset_min)
-    return local.hour * 60 + local.minute
 
 
 def needs_opening(
@@ -100,5 +115,5 @@ def reminder_due(now: datetime, settings: LearnerSettings, last_practiced: date 
             return False
         if (today - last_practiced).days > REMINDER_PAUSE_AFTER_DAYS:
             return False
-    late = _local_minute(now, settings.utc_offset_min) - settings.reminder_minute
+    late = local_minute(now, settings.utc_offset_min) - settings.reminder_minute
     return 0 <= late < REMINDER_CATCH_UP_MIN

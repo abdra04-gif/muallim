@@ -30,7 +30,10 @@ NOT_SHOWN = {("screens.py", "фраза"), ("screens.py", "сура"), ("screens
 pytestmark = pytest.mark.architecture
 
 # настройки ученика, которые меняются кнопками экрана ⚙️ (FR-51)
-_SETTING_NAMES = ("how_to_read", "auto_reference", "daily_opening", "large_font", "research_block")
+_SETTING_NAMES = (
+    "how_to_read", "auto_reference", "daily_opening", "large_font", "research_block",
+    "reminder_minute", "utc_offset_min",  # круг 4: напоминание и «который у тебя час?»
+)  # fmt: skip
 
 
 def _shown_strings(path: Path) -> list[tuple[int, str]]:
@@ -76,7 +79,7 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
     reason = max(texts.DISPUTE_REASONS, key=len)
     big = 10**6  # seed вопроса: random.randrange(10**6)
     setting = max(_SETTING_NAMES, key=len)
-    value = max([*(str(h) for h in HowToRead), "true", "false"], key=len)
+    value = max([*(str(h) for h in HowToRead), "true", "false", "-720", "1439"], key=len)
     return {
         callbacks.GoItem: callbacks.GoItem(item_id=item),
         callbacks.Home: callbacks.Home(),

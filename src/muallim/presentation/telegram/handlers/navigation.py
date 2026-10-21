@@ -31,7 +31,7 @@ from muallim.presentation.telegram.callbacks import (
     ShowProgress,
     Signs,
 )
-from muallim.presentation.telegram.display import Display, message_of
+from muallim.presentation.telegram.display import Display, drop_sound, message_of
 from muallim.presentation.telegram.handlers.daily import home_or_opening
 from muallim.presentation.telegram.handlers.reference import show_card
 
@@ -49,6 +49,7 @@ async def cb_home(
     progress: FromDishka[GetProgress],
 ) -> None:
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(
             msg, await home_or_opening(cur, await progress.execute(learner), learner, screen_state)
         )
@@ -67,6 +68,7 @@ async def cb_lessons(
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         screen = screens.lessons(
             cur, await progress.execute(learner), callback_data.part, callback_data.page
         )
@@ -85,6 +87,7 @@ async def cb_progress(
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.progress(cur, await progress.execute(learner)))
     await cb.answer()
 
@@ -98,6 +101,7 @@ async def cb_help(
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.help_screen())
     await cb.answer()
 
@@ -111,6 +115,7 @@ async def cb_signs(
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.signs())
     await cb.answer()
 
@@ -128,6 +133,7 @@ async def cb_quiz(
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     q = await uc.next(learner, random.randrange(10**6))  # noqa: S311
     if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(
             msg,
             screens.quiz(q)

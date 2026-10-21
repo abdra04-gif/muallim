@@ -104,3 +104,8 @@
 {"ts": "2026-10-20T23:12:02+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (тексты ученику и согласие): src/muallim/presentation/telegram/texts.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
 {"ts": "2026-10-20T23:12:10+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (тексты ученику и согласие): src/muallim/presentation/telegram/texts.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
 {"ts": "2026-10-20T23:22:32+00:00", "hook": "doc_sync", "kind": "block", "reason": "Документация и код разошлись — исправь до завершения (doc_sync, ADR-0039):"}
+{"ts": "2026-10-20T23:53:53+00:00", "hook": "stop_gate", "kind": "block", "reason": "Нельзя завершать: исправь и проверь снова."}
+{"ts": "2026-10-20T23:57:54+00:00", "hook": "guard", "kind": "block", "reason": "Фазу меняют только через scripts/phase."}
+{"ts": "2026-10-21T00:03:01+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (тексты ученику и согласие): src/muallim/presentation/telegram/texts.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-10-21T00:41:00+00:00", "hook": "stop_gate", "kind": "block", "reason": "Нельзя завершать: исправь и проверь снова."}
+{"ts": "2026-10-21T00:46:22+00:00", "hook": "guard", "kind": "block", "reason": "Фаза impl: тесты заморожены. Если тест неверен — остановись и спроси человека."}

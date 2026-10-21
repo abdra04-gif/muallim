@@ -19,6 +19,7 @@ from muallim.application.ports.repositories import (
     LearnerProfileRepository,
     LearnerRepository,
     LearnerSettingsRepository,
+    ReminderRecipients,
     UnitOfWork,
 )
 from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
@@ -43,6 +44,7 @@ from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
+from muallim.application.use_cases.reminders import DueReminders
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.settings import ChangeSetting, GetSettings
@@ -72,6 +74,7 @@ from muallim.infrastructure.db.repositories.learners import (
     SqlLearnerProfileRepository,
     SqlLearnerRepository,
 )
+from muallim.infrastructure.db.repositories.reminders import SqlReminderRecipients
 from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRepository
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.erasures import FileErasureLog
@@ -182,6 +185,7 @@ class RequestProvider(Provider):
     profiles = provide(SqlLearnerProfileRepository, provides=LearnerProfileRepository)
     learner_settings = provide(SqlLearnerSettingsRepository, provides=LearnerSettingsRepository)
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
+    reminder_recipients = provide(SqlReminderRecipients, provides=ReminderRecipients)
     events = provide(SqlEventLog, provides=EventLog)
     snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
     annotator_directory = provide(SqlAnnotatorDirectory, provides=AnnotatorDirectory)
@@ -231,6 +235,7 @@ class RequestProvider(Provider):
         ScreenState,
         GetSettings,
         ChangeSetting,
+        DueReminders,
         GetReferenceAudio,
         ReportMistake,
         PublishCurriculum,

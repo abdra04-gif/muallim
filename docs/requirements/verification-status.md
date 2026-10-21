@@ -1,13 +1,13 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-20T23:42:11+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-21T00:57:58+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `f8d410eef636fbcb` | 101 |
+| код | `727a6907e8c41f4c` | 104 |
 | программа (книга) | `125a24eb1ee7e973` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `5009ec6fb8d3cec0` | 8 |
@@ -15,7 +15,7 @@
 | предрегистрация | `dd14f532dd71f045` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **63 из 66**.
+Проверено зелёными тестами: **64 из 66**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -65,7 +65,7 @@
 | FR-48 | `tests/unit/test_readable_images.py` | ✅ |
 | FR-49 | `tests/integration/test_console_beginner.py`, `tests/integration/test_isti_adha_audio.py`, `tests/integration/test_opening_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-50 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_staff.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-51 | — | нет автотестов |
+| FR-51 | `tests/integration/test_learner_settings_sql.py`, `tests/integration/test_reminders.py`, `tests/integration/test_screen_state.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_reminder_setting.py`, `tests/unit/test_settings_rules.py`, `tests/unit/test_settings_screens.py` | ✅ |
 | FR-52 | — | нет автотестов |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |

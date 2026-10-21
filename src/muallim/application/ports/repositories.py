@@ -82,6 +82,19 @@ class LearnerSettingsRepository(Protocol):
     async def change(self, learner_id: UUID, fields: Mapping[str, Any]) -> None:
         """Записать только эти поля: параллельный переход экрана не затрёт чужие."""
 
+    async def claim_reminder(self, learner_id: UUID, today: date) -> bool:
+        """Атомарно отметить «сегодня напомнили» (``reminder_sent_on = today``), если ещё не
+        отмечено этой датой; False — уже отмечено (другой тик или процесс успел)."""
+
+
+class ReminderRecipients(Protocol):
+    """Кому может прийти напоминание о занятии (ADR-0061 п. 4)."""
+
+    async def candidates(self) -> list[UUID]:
+        """Ученики с включённым напоминанием, не заблокировавшие бота."""
+
+    async def learner(self, learner_id: UUID) -> Learner | None: ...
+
 
 class CurriculumVersionError(Exception):
     """Контент программы изменился, а версия — нет: попытки нельзя будет связать с текстом."""

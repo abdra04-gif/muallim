@@ -7,6 +7,7 @@
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from html import escape
 from typing import Final
 
@@ -23,7 +24,13 @@ from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import Question, first_quiz_lesson
-from muallim.domain.settings import HowToRead, LearnerSettings
+from muallim.domain.settings import (
+    ASK_OFFSET_HOURS,
+    REMINDER_HOURS,
+    HowToRead,
+    LearnerSettings,
+    local_minute,
+)
 from muallim.presentation.telegram import render, texts, views
 from muallim.presentation.telegram.callbacks import (
     ChangeSetting,
@@ -656,10 +663,19 @@ def opening(curriculum: Curriculum) -> Screen:
     return Screen(caption, kb.as_markup(), image, f"opening:{curriculum.version}")
 
 
+def _clock(minute: int) -> str:
+    """Минута суток → «7:00», «19:05»."""
+    return f"{minute // 60}:{minute % 60:02d}"
+
+
+def _back_to_settings(kb: InlineKeyboardBuilder) -> None:
+    kb.button(text=texts.BACK_TO_SETTINGS, callback_data=ShowSettings())
+
+
 def settings(s: LearnerSettings) -> Screen:
     """⚙️ Настройки (FR-51): одно окно, нажатие ставит значение и перерисовывает экран."""
     kb = InlineKeyboardBuilder()
-    kb.button(text=texts.SETTING_HOW_TO_READ, callback_data=Noop())
+    kb.button(text=texts.SETTING_HOW_TO_READ, callback_data=ShowSettings(page="hint"))
     for option in HowToRead:
         label = texts.HOW_TO_READ_OPTIONS[option.value]
         chosen = option is s.how_to_read
@@ -678,19 +694,79 @@ def settings(s: LearnerSettings) -> Screen:
             text=(texts.SETTING_ON if on else texts.SETTING_OFF).format(label=label),
             callback_data=ChangeSetting(name=name, value=str(not on).lower()),
         )
+    reminder = (
+        texts.SETTING_REMINDER_OFF
+        if s.reminder_minute is None
+        else texts.SETTING_REMINDER_AT.format(time=_clock(s.reminder_minute))
+    )
+    kb.button(text=reminder, callback_data=ShowSettings(page="reminder"))
     kb.button(text=texts.HELP_BUTTON, callback_data=Help())
     kb.button(text=texts.PRIVACY_BUTTON, callback_data=Privacy())
     kb.button(text=texts.ME_BUTTON, callback_data=Me())
     _home_row(kb)
-    kb.adjust(1, 3, 1, 1, 1, 1, 2, 2)
+    kb.adjust(1, 3, 1, 1, 1, 1, 1, 2, 2)
     return Screen(texts.SETTINGS, kb.as_markup())
+
+
+def reminder_hours(s: LearnerSettings) -> Screen:
+    """🔔 Во сколько напоминать: целые часы местного времени (ADR-0061, В2)."""
+    kb = InlineKeyboardBuilder()
+    for hour in REMINDER_HOURS:
+        kb.button(
+            text=_clock(hour * 60),
+            callback_data=ChangeSetting(name="reminder_minute", value=str(hour * 60)),
+        )
+    rows = [4] * (len(REMINDER_HOURS) // 4)
+    if s.reminder_minute is not None:
+        kb.button(
+            text=texts.REMINDER_OFF_BUTTON,
+            callback_data=ChangeSetting(name="reminder_minute", value="off"),
+        )
+        rows.append(1)
+    _back_to_settings(kb)
+    kb.adjust(*rows, 1)
+    return Screen(texts.REMINDER_HOURS, kb.as_markup())
+
+
+def reminder_ask_time(now: datetime) -> Screen:
+    """«Который у тебя час?» — кнопка с текущим временем для каждого смещения (ADR-0061, В3)."""
+    kb = InlineKeyboardBuilder()
+    for hours in ASK_OFFSET_HOURS:
+        kb.button(
+            text=_clock(local_minute(now, hours * 60)),
+            callback_data=ChangeSetting(name="utc_offset_min", value=str(hours * 60)),
+        )
+    _back_to_settings(kb)
+    kb.adjust(3, 3, 3, 2, 1)
+    return Screen(texts.REMINDER_ASK_TIME, kb.as_markup())
+
+
+def reminder(curriculum: Curriculum, progress: Progress) -> Screen:
+    """Напоминание о занятии: кнопка — на карточку, где ученик остановился."""
+    item = progress.continue_item or curriculum.first_item()
+    kb = InlineKeyboardBuilder()
+    kb.button(
+        text=texts.CONTINUE_BUTTON.format(title=curriculum.locate(item.id)[0].title),
+        callback_data=GoItem(item_id=item.id),
+    )
+    return Screen(texts.REMINDER, kb.as_markup())
+
+
+def me(pseudonym: str) -> Screen:
+    """«🪪 Мой ID» на месте экрана настроек (TD-FN-93 п. 4)."""
+    kb = InlineKeyboardBuilder()
+    _back_to_settings(kb)
+    _home_row(kb)
+    kb.adjust(2)
+    return Screen(views.me(pseudonym), kb.as_markup())
 
 
 def help_screen() -> Screen:
     kb = InlineKeyboardBuilder()
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
+    _back_to_settings(kb)
     _home_row(kb)
-    kb.adjust(2)
+    kb.adjust(1, 2)
     return Screen(texts.HELP, kb.as_markup())
 
 
@@ -709,8 +785,9 @@ def privacy(research_consent: bool) -> Screen:
         callback_data=DeleteData(confirmed=False),
         style=ButtonStyle.DANGER,
     )
+    _back_to_settings(kb)
     _home_row(kb)
-    kb.adjust(1)
+    kb.adjust(1, 1, 2)
     return Screen(views.privacy(research_consent), kb.as_markup())
 
 

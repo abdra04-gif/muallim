@@ -31,6 +31,12 @@ def message_of(cb: CallbackQuery) -> Message | None:
     return None if msg is None or isinstance(msg, InaccessibleMessage) else msg
 
 
+async def drop_sound(display: "Display", msg: Message) -> None:
+    """Ученик ушёл с карточки в меню: автоэталон над ней больше не нужен (TD-FN-93 п. 1)."""
+    if msg.bot is not None:
+        await display.drop_sound(msg.bot, msg.chat.id)
+
+
 @dataclass
 class Display:
     file_ids: dict[str, str] = field(default_factory=dict)  # ключ картинки → Telegram file_id

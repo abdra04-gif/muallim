@@ -2,10 +2,11 @@
 
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
+from datetime import date
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,3 +60,31 @@ class SqlLearnerSettingsRepository(LearnerSettingsRepository):
             .values(values)
         )
         return bool(getattr(result, "rowcount", 0))
+
+    async def claim_reminder(self, learner_id: UUID, today: date) -> bool:
+        """Условный UPDATE с проверкой rowcount: из двух тиков разом дату ставит один."""
+        column = learner_settings.c.reminder_sent_on
+        values: dict[str, Any] = {"reminder_sent_on": today, "updated_at": self.clock.now()}
+        result = await self.session.execute(
+            update(learner_settings)
+            .where(
+                learner_settings.c.learner_id == learner_id,
+                or_(column.is_(None), column != today),
+            )
+            .values(values)
+        )
+        if getattr(result, "rowcount", 0):
+            return True
+        exists = select(learner_settings.c.learner_id).where(
+            learner_settings.c.learner_id == learner_id
+        )
+        if (await self.session.execute(exists)).first() is not None:
+            return False  # строка есть и уже с сегодняшней датой
+        try:
+            async with self.session.begin_nested():  # строки нет: вставит один из двух
+                await self.session.execute(
+                    insert(learner_settings).values(learner_id=learner_id, **values)
+                )
+        except IntegrityError:
+            return False  # другой успел вставить (или ученика уже нет)
+        return True

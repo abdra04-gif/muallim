@@ -12,7 +12,9 @@ from sqlalchemy.ext.asyncio import (
 
 
 def create_engine(url: str, echo: bool = False) -> AsyncEngine:
-    engine = create_async_engine(url, echo=echo, pool_pre_ping=True)
+    # hide_parameters: значения запроса (Telegram ID и т. п.) не попадают в тексты ошибок и
+    # журнал SQLAlchemy (NFR-SEC-07).
+    engine = create_async_engine(url, echo=echo, pool_pre_ping=True, hide_parameters=True)
     if engine.dialect.name == "sqlite":
         # В SQLite внешние ключи (и каскадное удаление данных ученика) выключены по умолчанию.
         @event.listens_for(engine.sync_engine, "connect")
