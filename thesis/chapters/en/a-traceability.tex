@@ -22,7 +22,7 @@ RQ-1 & H1.4 & Q1.1--Q1.2 & precision, recall, F1 of off-the-shelf models (metric
 RQ-1 & --- & Q1.5 & precision and recall by error type and letter & R-08 \\
 RQ-2 & w/ sup. & Q7.1--Q7.3 & the agentic loop's best configuration vs.\ baselines: precision, recall, F1, FAR, FRR, paired bootstrap (RQ-2 evaluator); PER on expert recitation if fine-tuning is included & T-11, T-12 \\
 RQ-2 & --- & Q7.4--Q7.8 & gap closed, ECE, risk--coverage, learning curve, data sources, decided by the system, configuration log & T-11, T-14, R-14, R-15 \\
-RQ-3 & --- & Q8.1--Q8.4 & instrument: AUC, log loss, ECE of K0--K2; $\rho$ between K2's estimate and the blind teacher test; AFM fit & T-15, R-16 \\
+RQ-3 & --- & Q8.1--Q8.4 & instrument: AUC, log loss, ECE of K0--K2; $\rho$ between K2's estimate and the teacher test (system's estimates not shown); AFM fit & T-15, R-16 \\
 RQ-3 & w/ sup. & Q2.6, Q2.7, Q2.9 & learning dynamics: attempts to mastery, learning curves per skill, teacher test (entry, end, delayed), forgetting & R-17, T-16 \\
 RQ-3 & --- & Q2.1--Q2.5, Q2.8 & error-kind frequencies, confusions, difficult lines, errors by attribute (SQL reports 02--04, 08--11; exploratory) & T-03, T-04, R-09, R-10 \\
 E-7 & --- & Q3.1--Q3.2 & score change and recurrence after feedback (exploratory) & R-11 \\
@@ -76,7 +76,7 @@ The preregistration (version 0.5, to be approved and frozen before data collecti
   \item participants: adults consenting to voice recording, model training and teacher tests; first language and
     reading experience from the entry questionnaire;
   \item annotation: error type (reading / pronunciation / unclear) by both teachers on test attempts and every
-    tenth training attempt; a blind teacher test at entry, at the end of the pilot and delayed;
+    tenth training attempt; a teacher test (system's estimates not shown) at entry, at the end of the pilot and delayed;
   \item the split for RQ-2: about 30\,\% of learners in the test set, the list frozen by fingerprint before the
     agentic loop first runs; test annotation by two teachers; configuration search (cross-validation, a log
     of every configuration, a fixed budget) and mastery-model parameters only on the training part; the test set
