@@ -38,3 +38,7 @@ logs/
 
 # Чужие репозитории для справки (4,5 ГБ) — только локально, ADR-0063
 /external/
+
+# Jupyter-ноутбуки: в результатах ячеек — данные учеников (notebooks/README.md)
+*.ipynb
+.ipynb_checkpoints/

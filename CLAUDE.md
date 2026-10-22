@@ -17,6 +17,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `curriculum/` | вся книга по порядку (собирается `scripts/book/build.py` из расшифровки) — **только человек** |
 | `scripts/book/` | расшифровка книги (с. 10–85) и сборка программы |
 | `analytics/sql/` | SQL-отчёты |
+| `notebooks/` | Jupyter-ноутбуки автора: SQL → таблицы и графики (`db.py`, вход только для чтения; `*.ipynb` вне git — ADR-0067) |
 | `curriculum/feedback.ru.yaml`, `lexicon.ru.yaml` | объяснения ошибок (пока только русский; kk/en — `curriculum/drafts/`, ADR-0022) |
 | `book/` | **книга** (скан SRC-040, вне git и бота), `README.md` — выходные данные, `contents.yaml` — оглавление ↔ уроки |
 | `curriculum/audio/` | эталонные записи «как правильно» — **только человек** |

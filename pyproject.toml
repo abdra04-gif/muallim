@@ -46,6 +46,16 @@ dev = [
     "ruff>=0.8",
     "types-pyyaml>=6.0",
 ]
+# Jupyter-ноутбуки в VS Code: запросы к базе, таблицы и графики для главы 4 (notebooks/README.md).
+# Только для автора исследования; бот и src/ их не импортируют.
+notebook = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "pandas>=3.1.0",
+]
+
+[tool.uv]
+default-groups = ["dev", "notebook"]  # иначе `uv sync` удалит ноутбучные библиотеки
 
 [build-system]
 requires = ["uv_build>=0.8,<0.14"]

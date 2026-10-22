@@ -34,6 +34,13 @@
 5. Таблицы (`attempts`, `detected_errors`, `annotations`, …) **не редактировать руками** — разметка
    идёт через `muallim-research annotation-export/import` (`docs/data/annotation-guide.md`).
 
+**То же в VS Code** (расширение «PostgreSQL» от Microsoft, `ms-ossdata.vscode-pgsql`): подключение
+«muallim (просмотр)» уже прописано в `.vscode/settings.json` — тот же вход `muallim_reader`.
+Значок слона слева → подключение → пароль `READER_DB_PASSWORD` из `.env` (сохранится в связке
+ключей macOS, не в репозитории) → `muallim` → Schemas → `public` → Views. Свой запрос — правой
+кнопкой по базе `muallim` (не по подключению) → «Создать запрос», запуск — Shift+Enter. Готовые
+запросы — в личном `.vscode/queries.sql`; как писать свои — `docs/data/sql-guide.md`.
+
 Консоль без программ: `make db-shell`, потом например
 `SELECT expected, heard, COUNT(*) FROM v_errors GROUP BY 1, 2 ORDER BY 3 DESC;` (выход — `\q`).
 

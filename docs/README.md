@@ -15,6 +15,7 @@
 | узнать, чем измеряется качество (скорость, точность, надёжность) | `requirements/quality-scenarios.md` |
 | понять, зачем считается каждая метрика и на какой RQ отвечает | `research/metrics-gqm.md` |
 | разобраться в таблицах БД | `data/data-dictionary.md` |
+| посмотреть данные, написать свой SQL-запрос | `data/browsing.md`, `data/sql-guide.md` |
 | разметить данные | `data/annotation-guide.md` |
 | построить отчёт | `data/reports.md` |
 | узнать про книгу и методику | `pedagogy/` |
