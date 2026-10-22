@@ -84,7 +84,7 @@
 | `created_at` | timestamptz | |
 | `reference_variant` | varchar(16), null | по какому эталону оценено: `wasl` / `waqf` (ADR-0019) |
 | `candidates` | JSON, null | все эталоны: `[{"variant", "reference", "score"}]` |
-| `model_output` | JSON, null | сырые данные модели сверх строки фонем (для отладки и дообучения) |
+| `model_output` | JSON, null | сырые данные модели сверх строки фонем (для отладки и дообучения): `phonemes` — строка; `phonemes_full` — `{"text", "probs": [числа], "ids": [числа]}`, уверенность по каждой фонеме; `sifat_full` — список `{"phonemes_group", <признак>: {"text", "prob", "idx"} \| null}`. У попыток до 2026-10-23 `phonemes_full`/`sifat_full` — строка `repr()` с `tensor(…)` (TD-FN-99); у `tikraar` модель отдаёт `prob = 2.0` — не вероятность |
 | `policy` | JSON, null | пороги на момент решения: `{"pass_threshold", "excellent_threshold"}` |
 | `app_version` | varchar(64), null | версия кода: `0.2.0+a1b2c3d[-dirty]` |
 | `feedback_language` | varchar(8), null | на каком языке показано объяснение |
@@ -114,7 +114,7 @@
 | `published_at` | timestamptz | когда версия впервые записана в БД | 🟢 |
 
 ## Представления (views) для просмотра — `src/muallim/infrastructure/db/views.py`
-Только чтение. Telegram ID в них нет — только псевдоним. Открывать в DBeaver/psql (`docs/data/browsing.md`).
+Только чтение. Telegram ID в них нет — только псевдоним. Открывать в DBeaver, VS Code (расширение PostgreSQL), psql или `notebooks/db.py` (`docs/data/browsing.md`, `docs/data/sql-guide.md`). Здесь — главные поля; все колонки — в `views.py`.
 
 | Представление | Строка = | Главные поля |
 |---|---|---|

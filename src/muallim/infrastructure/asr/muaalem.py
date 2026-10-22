@@ -6,7 +6,7 @@
 
 import asyncio
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields, is_dataclass
 from functools import lru_cache
 from typing import Any
 
@@ -90,25 +90,37 @@ class MuaalemRecognizer(PronunciationRecognizer):
 def _raw_output(output: Any) -> dict[str, Any]:
     """Сохраняем всё, что модель отдаёт сверх строки фонем (ADR-0019).
 
-    Структура выхода Muaalem в этом проекте ещё не проверена на реальной модели (TD-FN-07):
-    берём только JSON-сериализуемые поля, остальное — строкой, чтобы ничего не потерять.
+    Выход Muaalem — dataclass'ы (Unit, Sifa, SingleUnit) с тензорами torch. Тензоры → списки
+    чисел без округления (признаки B1, ADR-0051; TD-FN-99); неизвестное — строкой, чтобы
+    ничего не потерять.
     """
     raw: dict[str, Any] = {"phonemes": str(output.phonemes.text)}
     for name in ("phonemes", "sifat"):
         value = getattr(output, name, None)
-        if value is None:
-            continue
-        data = (
-            value.model_dump()
-            if hasattr(value, "model_dump")
-            else getattr(value, "__dict__", value)
-        )
-        try:
-            json.dumps(data, ensure_ascii=False)
-        except TypeError:
-            data = repr(data)
-        raw[f"{name}_full"] = data
+        if value is not None:
+            raw[f"{name}_full"] = _jsonable(value)
     return raw
+
+
+def _jsonable(value: Any) -> Any:
+    """Объект модели → то, что json.dumps сохранит без потерь."""
+    if value is None or isinstance(value, str | int | float | bool):
+        return value
+    if hasattr(value, "tolist"):  # torch.Tensor, numpy
+        return value.tolist()
+    if hasattr(value, "model_dump"):
+        value = value.model_dump()
+    elif is_dataclass(value) and not isinstance(value, type):
+        value = {f.name: getattr(value, f.name) for f in fields(value)}
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, list | tuple):
+        return [_jsonable(v) for v in value]
+    try:
+        json.dumps(value)
+    except TypeError:
+        return repr(value)
+    return value
 
 
 @lru_cache(maxsize=1024)
