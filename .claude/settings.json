@@ -54,8 +54,6 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Edit(./.env)",
-      "Read(./data/**)",
-      "Edit(./data/**)",
       "Edit(./docs/journal/prompts/**)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
