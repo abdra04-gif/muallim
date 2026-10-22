@@ -1,6 +1,6 @@
 % Master's thesis proposal (English). Build: make proposal → thesis/build/proposal-en.pdf
 % Facts and numbers come from the project repository (docs/, src/); sources — SRC-NNN in sources.bib.
-% Topic and RQs — ADR-0052 (approved by the author 2026-10-19); hypotheses — preregistration.md v0.4.
+% Topic, thesis statement, hypothesis and RQs — ADR-0064 (per supervisor's comments 2026-10-22); hypotheses — preregistration.md v0.5.
 % Оформление — как у ВКР (Положение о ГИА Университета Иннополис, п. 6.8): 14 pt, чёрный Times, поля 25/20 мм.
 \documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{english}
@@ -24,24 +24,22 @@
 \end{center}
 
 \begin{keybox}[Summary]
-Adult Russian-speaking Muslims learn to read the Qur'an with Ahmad-Hadi Maksudi's primer
-\emph{al-Muallim al-Thani} (``The Second Teacher''). Not everyone can study with a teacher: work, the distance
-to a madrasa and the cost of lessons get in the way, and a group lesson leaves no time for each learner's
-difficulties. Automatic reading feedback could give the learner an individual session between lessons: read as
-much as needed and work through their own mistakes. But open Qur'anic recitation models are trained on expert
-reciters, their accuracy on non-Arab beginners has not been measured, and they know nothing about what a
-learner has already mastered. This thesis collects a \textbf{dataset} and trains
-\textbf{models} on it. A tutor that walks the learner through the primer page by page serves as the collection
-tool: with consent it gathers the first corpus of primer-level reading by adult Russian-speaking beginners,
-and two teachers annotate it at the phoneme level, separating \emph{reading errors} (the wrong sign was read)
-from \emph{pronunciation errors} (the sign was right, the sound was wrong). On this corpus the open Quran
-Muaalem model \emph{learns} from the teachers, and on top of it a \emph{mastery model} estimates from speech
-whether the learner has mastered each skill of the book. The idea is ``one primer, two learners'': the
-book's lessons define a skill map along which both the AI and the person learn. The thesis answers four
-questions: how reliably the two error types can be told apart (RQ-1); how the AI learns from teacher
-corrections and the book's minimal pairs (RQ-2); whether mastery of each skill can be measured from speech
-and whether adapting the AI improves that measurement (RQ-3); and how Russian-speaking adults progress
-through the book's skills (RQ-4).
+In Russia and Kazakhstan, \emph{The Second Teacher} (\emph{al-Muallim ath-Thani}) is a popular method for
+teaching Arabic reading: beginners use it to learn to read the Qur'an from scratch. Independent practice
+requires automatic reading assessment, but open Qur'anic recitation models are trained on expert reciters. On
+recitations with errors their accuracy drops: the phoneme error rate rises from 0.54\,\% to 5.78\,\%
+\cite{SRC-002}. These models have not been evaluated on beginners learning Arabic as a foreign language. A
+small curated speech dataset of primer-level reading by beginners, annotated by teachers, makes it possible
+to assess how reliably existing models detect reading and pronunciation errors. Using agentic
+loop-engineering, these models and components can then be combined into a reading assessment system closer to
+the teacher's judgement. The result is a tool for out-of-class practice that complements the teacher,
+distinguishes reading from pronunciation errors and estimates what the learner has already mastered.
+
+\textbf{Hypothesis:} by collecting a small curated speech dataset, it is possible to evaluate existing
+solutions and, using agentic loop-engineering, develop an effective tool for beginners' out-of-class practice.
+The thesis answers two main questions and one additional one: how reliable off-the-shelf models are (RQ-1);
+how much agentic loop-engineering improves accuracy over baseline approaches (RQ-2); and how the tool affects
+learning dynamics with a teacher (RQ-3).
 \end{keybox}
 
 \section{Problem}
@@ -60,8 +58,8 @@ In the words of the author's professor: what can be measured can be solved.
 
 \section{Motivation}
 
-For more than a century one primer has dominated Russia and Central Asia. Ahmad-Hadi Maksudi (1868--1941)
-wrote \emph{al-Muallim al-Thani} as a bridge from knowing the letters to reading the Qur'an correctly. The
+In Russia and Kazakhstan, \emph{The Second Teacher} (\emph{al-Muallim ath-Thani}) is a popular method for
+teaching Arabic reading. Ahmad-Hadi Maksudi (1868--1941) wrote the book as a bridge from knowing the letters to reading the Qur'an correctly. The
 book follows the Jadid phonetic method: a letter is learned as a sound rather than by its name, and syllables
 are gradually built into words \cite{SRC-015,SRC-016,SRC-017}. It is still reprinted, and the Spiritual
 Administrations of Muslims of Tatarstan and Kazakhstan officially distribute it \cite{SRC-020,SRC-040}.
@@ -105,9 +103,10 @@ before the topic is approved.
 
 \section{Aim, objectives and research questions}
 
-\textbf{Aim.} To collect a dataset of primer-level reading by Russian-speaking beginners and train models on it that
-detect reading errors and estimate from speech the mastery of each skill of \emph{al-Muallim
-al-Thani}, and to measure how close the models come to a teacher and what they reveal about how people learn.
+\textbf{Aim.} To collect a small curated speech dataset of primer-level reading by beginners annotated by
+teachers, to evaluate existing speech recognition and analysis models on it, and to use agentic
+loop-engineering to build from them a reading and pronunciation error-detection system for an out-of-class
+practice tool; additionally, to assess how the tool affects learning dynamics.
 
 \textbf{Objectives.}
 \begin{enumerate}[label=O\arabic*.]
@@ -117,33 +116,31 @@ al-Thani}, and to measure how close the models come to a teacher and what they r
   \item Build a tutor as the data-collection tool: it receives a voice message, recognises phonemes,
     explains the error in Russian and keeps a full decision trace for every attempt.
   \item Collect the dataset: consent (including model training), a pilot with 20--40 learners over 4--6 weeks,
-    phoneme-level annotation with error type by two teachers, blind annotation of test learners, a teacher
+    phoneme-level annotation with error type by two teachers (with the bot's answer shown), a teacher
     test at three points, a datasheet \cite{SRC-123}.
-  \item Adapt the recognition model on teacher corrections and the book's minimal pairs (B1, B2) and evaluate
-    it on a frozen learner-disjoint test set.
-  \item Build a mastery model for the book's skills that accounts for the recogniser's measured errors, and
-    validate it on next attempts and against the teacher test.
-  \item Describe learners' progress through the book's skills and answer RQ-1--RQ-4 with effect sizes and
-    confidence intervals under a preregistered plan.
+  \item Evaluate existing speech recognition and analysis models against teacher annotation (RQ-1).
+  \item Build agentic loop-engineering: an AI agent selects and combines off-the-shelf models and components
+    (including a fine-tuned model) by cross-validation on the training part; compare the best configuration
+    once with baseline approaches on the frozen test set (RQ-2).
+  \item Additionally: build a mastery model for the book's skills and, with it and the teacher test, describe
+    learning dynamics with the tool (RQ-3).
+  \item Answer RQ-1--RQ-3 with effect sizes and confidence intervals under a preregistered plan.
 \end{enumerate}
 
 \begin{rqbox}
-\textbf{RQ-1 (data).} How reliably can teachers and the model distinguish reading errors from pronunciation
-errors in beginners reading the book?\\[4pt]
-\textbf{RQ-2 (how the AI learns).} How much does adaptation on teacher corrections and the book's minimal
-pairs improve recognition for new learners, and how does this depend on the amount of data?\\[4pt]
-\textbf{RQ-3 (measuring mastery).} Can recognition be used to estimate whether a learner has mastered each
-skill of the book, and does adapting the AI improve this estimate?\\[4pt]
-\textbf{RQ-4 (how people learn).} How do Russian-speaking adults progress through the book's skills: what
-comes quickly, what slowly, what is forgotten?
+\textbf{Main hypothesis.} By collecting a small curated speech dataset, it is possible to evaluate existing solutions and, using agentic loop-engineering, develop an effective tool for beginners' out-of-class practice.\\[6pt]
+\textbf{RQ-1.} How reliably do existing speech recognition and analysis models detect reading and pronunciation errors in beginners learning Arabic and Quran reading?\\[4pt]
+\textbf{RQ-2.} To what extent does applying agentic loop-engineering to select and combine existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches?\\[4pt]
+\textbf{RQ-3 (additional).} To what extent does using the developed tool for out-of-class practice affect the learning dynamics of beginners studying with a teacher?
 \end{rqbox}
 
 The hypotheses below are recorded in a preregistration that will be frozen with a SHA-256 fingerprint
-before data collection begins \cite{SRC-067}. Everything else is reported as exploratory.
+before data collection begins \cite{SRC-067}. Hypotheses for RQ-2 and RQ-3 are formulated with the
+supervisor before the freeze. Everything else is reported as exploratory.
 
 \begin{table}[ht]
 \centering\small
-\caption{Confirmatory hypotheses (preregistration v0.4, to be approved with the supervisor).}
+\caption{Confirmatory hypotheses for RQ-1 (preregistration v0.5, to be approved with the supervisor).}
 \label{tab:hyp-en}
 \begin{tabularx}{\linewidth}{@{}lL@{}}
 \toprule
@@ -153,16 +150,6 @@ H1.1 & Teachers agree on the error type (reading / pronunciation) with $\kappa \
 H1.2 & Agreement ``B0 -- teacher'' ($\kappa$) is lower than ``teacher -- teacher''. \\
 H1.3 & B0 makes false rejections (FRR) more often than false acceptances (FAR). \\
 H1.4 & B0's precision and recall on beginners are lower than on the model's training domain. \\
-H2.1 & On test learners, B1 has a lower FRR than B0, with recall no lower than B0's minus 0.05. \\
-H2.2 & On test learners, B2 has a higher phoneme-level error-detection F1 than B0. \\
-H2.3 & B2 is not worse than B0 on expert recitation: phoneme error rate grows by at most 1 pp. \\
-H3.1 & The mastery model on top of the adapted recogniser predicts the next attempt more accurately (AUC) than
-       on top of B0. \\
-H3.2 & Accounting for the recogniser's measured noise raises the mastery model's AUC. \\
-H3.3 & The mastery estimate agrees with the blind teacher test: $\rho \ge 0.5$. \\
-H4.1 & Skills with sounds absent from Russian need more attempts to mastery. \\
-H4.2 & Russian speakers make more confirmed errors in emphasis (\emph{tafkhim}) than in place of
-       articulation. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -170,10 +157,11 @@ H4.2 & Russian speakers make more confirmed errors in emphasis (\emph{tafkhim}) 
 \paragraph{Scope} The curriculum covers the whole book (pp.~10--85), but evaluation focuses on the letter
 and vowel lessons (pp.~10--24): learners start there, and they hold the most errors and skills. Tajweed rules
 such as \emph{ikhfa} and \emph{idgham}, other first languages, choosing the next card from estimated mastery,
-and a controlled experiment on explanations are left for the PhD. The model is adapted, not trained from
-scratch: the pilot yields orders of magnitude less data than training from scratch needs. The tutor
-complements a teacher and does not claim to replace one. RQ-4 describes how people learn with the system; it
-does not prove that the system taught them, which would need a control group.
+and a controlled experiment on explanations are left for the PhD, as are the earlier questions on how the AI
+learns, how to measure mastery and how people learn (their strength is to be re-checked). Models are not
+trained from scratch: agentic loop-engineering selects, combines and, with enough data, fine-tunes
+off-the-shelf models. The tutor complements a teacher and does not claim to replace one. Without a control
+group, RQ-3 describes learning dynamics with the tool; it does not prove that the tool caused them.
 
 \section{Approach: an AI solution}
 
@@ -184,7 +172,7 @@ problem, and each is evaluated with a method suited to the specific claim. There
 \begin{figure}[ht]
 \centering
 \resizebox{\linewidth}{!}{\input{figures/fig-research-design}}
-\caption{Research design: three artefacts, four questions and the data for each.}
+\caption{Research design: three artefacts, three questions and the data for each.}
 \label{fig:design-en}
 \end{figure}
 
@@ -216,9 +204,13 @@ wrongly (\ar{ح} as Russian ``kh'', \ar{ق} as ``k'', no emphasis). Unclear case
 learning these are different problems: the first needs a hint about the sign, the second about articulation.
 The corpus comes with a datasheet \cite{SRC-123}.
 
-\subsection{Artefact B: a recognition model that learns from teachers}
+\subsection{Artefact B: an error-detection system built by agentic loop-engineering}
 
-Three systems are compared on the same recordings. \textbf{B0} is Muaalem as is, with rules and thresholds.
+\textbf{Baseline approaches} are \textbf{B0} --- Muaalem as is, with rules and thresholds --- and the best
+single off-the-shelf model from RQ-1. In \textbf{agentic loop-engineering} an AI agent repeatedly proposes a
+configuration --- which models to take, how to combine them, which thresholds and alignment rules to apply ---
+runs it and compares it with teacher annotation by learner-level cross-validation on the training part; every
+configuration tried and its metric are logged. Two components the agent can choose are prepared in advance.
 \textbf{B1} is a verifier trained on top of B0's outputs: for each phoneme it takes the model's confidence,
 the articulatory-attribute probabilities, \emph{Goodness of Pronunciation} \cite{SRC-115}, duration and
 material type, and estimates the probability of a real error. Its probabilities are calibrated
@@ -230,9 +222,10 @@ from: a correct reading of the card with \ar{ك} is a ready-made error example f
 \ar{ق}, and so on for every minimal pair \cite{SRC-119}; reading errors are simulated similarly for children
 \cite{SRC-132}. There are three data sources --- teacher corrections, the book's minimal pairs and learners'
 ``the bot was wrong'' disputes --- and the contribution of each is measured. The fine-tuned model is also
-tested on expert recitation, so that gains are not bought by forgetting \cite{SRC-118}.
+tested on expert recitation, so that gains are not bought by forgetting \cite{SRC-118}. The best
+configuration by cross-validation is frozen and compared once with the baseline approaches on the test set.
 
-\subsection{Artefact C: a mastery model for the book's skills}
+\subsection{Artefact C: a mastery model for the book's skills (for RQ-3)}
 
 The book's lessons are a ready-made \emph{skill map}: each exercise introduces ``letter + vowel or sign
 $\to$ sound'' correspondences in a fixed order, and each line of the book exercises several such skills.
@@ -243,8 +236,8 @@ but the ``correct / incorrect'' observation comes from a recogniser that itself 
 false acceptances and rejections, measured against teachers on the training part, enter the model
 explicitly. This extends the idea of Project LISTEN \cite{SRC-125}. The models are evaluated by how well they
 predict the next attempt and by calibration \cite{SRC-126}; deep knowledge tracing \cite{SRC-127} is only
-exploratory on small data. The skill map is checked with learning curves \cite{SRC-128}. In this way the
-AI's learning (artefact B) directly affects how accurately we see the person's learning.
+exploratory on small data. The skill map is checked with learning curves \cite{SRC-128}. In RQ-3 the mastery
+model's estimate, together with the teacher test, shows learning dynamics.
 
 \subsection{How validity is protected}
 
@@ -258,58 +251,58 @@ methodology deserves its own research question or a separate paper will be decid
 
 \section{Studies}
 
-\paragraph{Study 1 --- data (RQ-1)} Both teachers annotate phonemes and error type on all test attempts and
-on every tenth training attempt. The reliability of the error type is Cohen's $\kappa$ \cite{SRC-104}
-between teachers, with ``unclear'' as its own category. The model is compared with teachers following the
-Iqra'Eval and L2-ARCTIC protocols \cite{SRC-063,SRC-064}: precision, recall, F1, false acceptances (FAR) and
-rejections (FRR), and $\kappa$ ``model -- teacher'' against the ``teacher -- teacher'' ceiling; phoneme-level
-agreement is Krippendorff's $\alpha$ \cite{SRC-065}. Confidence intervals are bootstrapped over learners.
+\paragraph{Study 1 --- reliability of off-the-shelf models (RQ-1)} Both teachers annotate phonemes and error
+type on all test attempts and on every tenth training attempt. The reliability of the error type is Cohen's
+$\kappa$ \cite{SRC-104} between teachers, with ``unclear'' as its own category. Off-the-shelf models are
+compared with teachers following the Iqra'Eval and L2-ARCTIC protocols \cite{SRC-063,SRC-064}: precision,
+recall, F1, false acceptances (FAR) and rejections (FRR), and $\kappa$ ``model -- teacher'' against the
+``teacher -- teacher'' ceiling; phoneme-level agreement is Krippendorff's $\alpha$ \cite{SRC-065}. Confidence
+intervals are bootstrapped over learners.
 
-\paragraph{Study 2 --- how the AI learns (RQ-2)} Before any training, about 30\,\% of learners are assigned
-to the test set and their list is fingerprinted; none of their recordings is used for training, calibration
-or threshold selection \cite{SRC-122}. Both teachers annotate test learners' attempts \emph{blind}, without
-seeing the system's answer, and reconcile disagreements --- this is the gold standard. Hyperparameters are
-chosen only by learner-level cross-validation within the training part \cite{SRC-121}. The test set is opened
-once. The summary measure is the \emph{gap closed}: how far a system's $\kappa$ with gold rises from B0
-toward the teacher--teacher ceiling. The \emph{learning curve} (quality at 25, 50, 75 and 100\,\% of training
-learners), the \emph{contribution of each data source}, and the share of attempts the system decides on its
-own at a given risk --- the workload it takes off the teacher --- are always reported.
+\paragraph{Study 2 --- agentic loop-engineering (RQ-2)} Before the loop first runs, about 30\,\% of learners
+are assigned to the test set and their list is fingerprinted; none of their recordings is used for
+configuration search, training, calibration or threshold selection \cite{SRC-122}. Both teachers annotate
+test learners' attempts, seeing the bot's answer and correcting it, and reconcile disagreements ---
+this is the gold standard. The agent searches configurations only by learner-level cross-validation within
+the training part \cite{SRC-121}; the log of every configuration tried is published, so that choosing the
+best cannot be mistaken for overfitting. The test set is opened once. The summary measure is the \emph{gap
+closed}: how far the best configuration's $\kappa$ with gold rises from the baseline toward the
+teacher--teacher ceiling. The \emph{learning curve} (quality at 25, 50, 75 and 100\,\% of training learners),
+the \emph{contribution of each data source}, and the share of attempts the system decides on its own at a
+given risk --- the workload it takes off the teacher --- are always reported.
 
-\paragraph{Study 3 --- measuring mastery (RQ-3)} Parameters of K1 and K2, and the recogniser's errors for
-K2, are estimated on training learners. On test learners the models predict the gold outcome of the next
-attempt on a skill; AUC, log loss and calibration are compared for K0, K1 and K2 on top of B0 and on top of
-the adapted model. The external criterion is the teacher test: from a fixed list of book lines the teacher
-marks each skill ``correct / incorrect'' without seeing the system's estimates; the final mastery estimate is
-compared with it by Spearman's $\rho$.
-
-\paragraph{Study 4 --- how people learn (RQ-4)} The teacher test is given three times: at entry, at the end of
-the pilot and 1--2 weeks later. From the logs we build learning curves for the book's skills
-\cite{SRC-128}, attempts to mastery and the drop after breaks between sessions \cite{SRC-129}; skills with
-sounds absent from Russian are compared with the rest in a mixed model with a learner random effect
-\cite{SRC-106}. Following DART \cite{SRC-130,SRC-131}, the AI's accuracy and people's learning are reported
-separately. Holm's correction is applied across the twelve confirmatory hypotheses.
+\paragraph{Study 3 --- learning dynamics (RQ-3, additional)} Parameters of the mastery models K1 and K2, and
+the recogniser's errors for K2, are estimated on training learners. The teacher test is given three times: at
+entry, at the end of the pilot and 1--2 weeks later; from a fixed list of book lines the teacher marks each
+skill ``correct / incorrect'' without seeing the system's estimates. Learning dynamics are described by the
+mastery model's estimate and the teacher test: learning curves for the book's skills \cite{SRC-128},
+attempts to mastery and the drop after breaks between sessions \cite{SRC-129}; agreement of the model's
+estimate with the teacher test is Spearman's $\rho$. Following DART \cite{SRC-130,SRC-131}, the AI's accuracy
+and people's learning are reported separately. Holm's correction is applied to the confirmatory hypotheses
+once they are approved.
 
 \section{Expected contributions}
 
 \begin{enumerate}
-  \item[\textbf{C1.}] \textbf{Dataset:} the first corpus of reading by adult Russian-speaking beginners, tied to
-    the skills of \emph{al-Muallim al-Thani}, separating reading from pronunciation errors, with measured
-    annotation reliability, a blind gold test set and a datasheet; released with the weights if ethics and
-    consent allow \cite{SRC-097,SRC-123}.
-  \item[\textbf{C2.}] \textbf{A model that learns from teachers:} small-data adaptation of an open model (a
-    verifier with a guarantee on the false-rejection rate and LoRA with the book's minimal pairs) with a
-    learning curve and the measured contribution of each data source.
-  \item[\textbf{C3.}] \textbf{Mastery estimation from speech:} a mastery model that accounts for recogniser
-    errors measured against teachers, validated on next attempts and against a blind teacher test.
-  \item[\textbf{C4.}] \textbf{Knowledge about learners:} the first learning curves of Russian-speaking adults
-    over the skills of a primer --- what comes quickly, what slowly, what is forgotten.
+  \item[\textbf{C1.}] \textbf{Dataset:} the first dataset of primer-level reading by beginners learning Arabic as
+    a foreign language, tied to the skills of \emph{al-Muallim ath-Thani}, separating reading from
+    pronunciation errors, with measured annotation reliability, a gold test set and a datasheet; released
+    with the weights if ethics and consent allow \cite{SRC-097,SRC-123}.
+  \item[\textbf{C2.}] \textbf{Evaluation of off-the-shelf models:} the reliability of open speech recognition and
+    analysis models on beginners, measured against teachers (RQ-1).
+  \item[\textbf{C3.}] \textbf{A system built by agentic loop-engineering:} a configuration of off-the-shelf
+    models and components, its gain over baseline approaches and the log of every variant tried (RQ-2).
+  \item[\textbf{C4.}] \textbf{Additionally --- learning dynamics:} how mastery of the material changes with the
+    tool, by a mastery model that accounts for recogniser errors and by the teacher test (RQ-3).
 \end{enumerate}
 
 The engineering result is a reproducible ``collect $\to$ annotate $\to$ train $\to$ evaluate'' pipeline with
 replaceable model, database and messenger --- a ready testbed for comparing models.
 
 \paragraph{Foundation for the PhD} The master's thesis leaves the doctoral work its tools: the dataset, the
-frozen test set, the skill map, the mastery model and the training pipeline. This sets up the doctoral line
+frozen test set, the skill map, the mastery model and the agentic loop-engineering pipeline --- plus the
+deferred questions on how the AI learns, how to measure mastery and how people learn (their strength is to be
+re-checked). This sets up the doctoral line
 ``teaching the AI and learning with it'': choosing the next card from estimated mastery (an extension of OBER
 \cite{SRC-134}), choosing which attempts to send to a teacher for annotation, and transferring the model to
 other first languages and tajweed rules.
@@ -332,7 +325,7 @@ The plan is shown in Fig.~\ref{fig:gantt-en}. Until December 2026: the proposal,
 curriculum against the scan, the error-type annotation rule and the teacher test; in November--December the
 training pipeline and the mastery models are debugged on open data and simulation. Data collection runs from
 January to March 2027, with the teacher test at entry, at the end and delayed; the list of test learners is
-frozen in February. Training of B1, B2, K1 and K2 and the single test run are in April; then analysis and
+frozen in February. Agentic loop-engineering, fine-tuning of components, mastery models K1 and K2 and the single test run are in April; then analysis and
 writing, a pre-defence in May and the defence in June 2027.
 Chapters 1 and 2 (introduction and literature review) are submitted to Moodle by 10 December 2026, as the
 programme requires.
@@ -358,10 +351,12 @@ attempt level --- thousands of observations even from 20--40 learners; report ef
 The model often errs on beginners & An honestly measured low accuracy is itself a result of RQ-1 and the
 starting point of RQ-2; a ``not sure'' outcome; raw model output in every attempt. \\
 Teachers cannot carry the load & Error type only on test attempts and every tenth training attempt; a short
-test (about 5 minutes); if short of capacity, H3.3 is dropped by a new preregistration version before looking
-at the data. \\
+test (about 5 minutes); if short of capacity, RQ-3 is reduced to a description from logs by a new
+preregistration version before looking at the data. \\
 Too little data to fine-tune & B1 works on hundreds of examples; minimal-pair augmentation; with fewer than
-\textasciitilde1{,}500 annotated attempts by 15 April, B2 is reported as a feasibility check. \\
+\textasciitilde1{,}500 annotated attempts by 15 April, fine-tuning is removed from the agentic loop's components. \\
+The agentic loop overfits & Search only by learner-level cross-validation on the training part, a log of
+every configuration, the test set is opened once. \\
 Leakage between training and test & Learner-level split, test list and evaluator fingerprinted, a hook bars
 the agent from reading test labels, the test set is opened once. \\
 Legal and ethical obstacles & Discuss data controller and ethics with the supervisor now; close the
@@ -381,7 +376,7 @@ median processing time was 1.7\,s (90th percentile 5.0\,s). The properties of th
 checked on 5{,}000 random phoneme strings per property with no violations \cite{SRC-096}. The code has about
 9{,}000 lines of Python in 92 modules; 736 automated tests pass; 47 functional requirements are traced to
 tests. Every attempt already stores the raw model output with per-phoneme confidence, the model version and
-the time --- exactly what B1, system comparison and the mastery model need. None of these numbers answers a
+the time --- exactly what model evaluation, agentic loop-engineering and the mastery model need. None of these numbers answers a
 research question yet; they show that the instrument is ready.
 
 \section{Proposed thesis outline}
@@ -390,11 +385,11 @@ research question yet; they show that the instrument is ready.
   \item \textbf{Introduction} --- problem, motivation, aim, questions, contributions.
   \item \textbf{Literature review} --- the primer and the phonetic method; tutors that listen to reading;
     Qur'anic reading error detection; speech model adaptation and calibration; knowledge tracing.
-  \item \textbf{Methodology} --- design science; GQM metrics; design of the four studies; data split and test
+  \item \textbf{Methodology} --- design science; GQM metrics; design of the three studies; data split and test
     protection; preregistration; threats to validity.
-  \item \textbf{Implementation} --- curriculum and skill map; collection tool and annotation; models B1 and B2;
-    mastery models K1 and K2; privacy; the agent harness.
-  \item \textbf{Evaluation and discussion} --- RQ-1--RQ-4, limitations.
+  \item \textbf{Implementation} --- curriculum and skill map; collection tool and annotation; agentic
+    loop-engineering and its components (B1, B2); mastery models K1 and K2; privacy; the agent harness.
+  \item \textbf{Evaluation and discussion} --- RQ-1--RQ-3, limitations.
   \item \textbf{Conclusion} --- answers, contributions, PhD directions.
 \end{enumerate}
 

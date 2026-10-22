@@ -339,7 +339,7 @@ error.
 layer: a forward pass over the learner's attempts in time order, parameters per skill, estimation by EM or grid
 search on training learners. K2 differs only in its observation model, into which the chosen recogniser's
 $\mathrm{FAR}_p$ and $\mathrm{FRR}_p$, computed by the protected evaluator on the training part, are plugged.
-Each recogniser (B0, B1, B2) therefore gets its own K2, and the RQ-3 comparison comes down to one call with
+Each recogniser (B0 or the agentic loop's best configuration) therefore gets its own K2, and the RQ-3 comparison comes down to one call with
 different error tables.
 
 \paragraph{Checking before the data} Before the models run on the pilot they are checked on simulated learners

@@ -41,7 +41,7 @@
 | `data-analyst` | SQL-отчёты, анализ | `analytics/` |
 | `pedagogy-reviewer` | проверка учебного контента и методики | ничего (только предложения) |
 | `thesis-scribe` | CHANGELOG, ADR, журнал, материалы диплома | `docs/`, `CHANGELOG.md` |
-| `asr-evaluator` | протокол оценки модели, метрики RQ-1/RQ-2 с ДИ, сопоставимость с IqraEval (ADR-0033) | `analytics/`, `docs/research/`; код — спецификацией для `/feature` |
+| `asr-evaluator` | протокол оценки модели, метрики RQ-1/RQ-2 с ДИ (RQ-2 — agentic loop против базовых подходов, ADR-0064), сопоставимость с IqraEval (ADR-0033) | `analytics/`, `docs/research/`; код — спецификацией для `/feature` |
 | `thesis-writer` | черновики глав из материалов репозитория | `thesis/chapters/*.tex` (ADR-0037) |
 | `citation-verifier` | сверка источников с первоисточниками, ГОСТ Р 7.0.5 | ничего (только отчёт) |
 | `thesis-opponent` | чтение главы как оппонент на защите | ничего (только отчёт) |

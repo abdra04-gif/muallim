@@ -1,30 +1,26 @@
-% Дизайн исследования: три артефакта, четыре RQ, данные и тип исследования.
-% Источник: docs/research/metrics-gqm.md (G1, G7, G8, G2), preregistration.md (v0.4), roadmap 1.4–1.8, ADR-0051, ADR-0052.
+% Дизайн исследования: три артефакта, три RQ (RQ-3 дополнительный), данные и тип исследования.
+% Источник: docs/research/metrics-gqm.md (G1, G7, G8, G2), preregistration.md (v0.5), roadmap 1.4–1.7, ADR-0051, ADR-0064.
 \begin{tikzpicture}[node distance=4mm and 6mm]
-  \node[hot,text width=4.1cm] (a1) {\textbf{\LANG{Artefact A}{Артефакт A}}: \LANG{dataset}{набор данных}\\[-1pt]{\scriptsize\LANG{book-ordered tutor as collection tool; teacher annotation: reading vs.\ pronunciation errors}{тренажёр по книге как инструмент сбора; разметка учителей: ошибки чтения и произношения}}};
-  \node[hot,right=5mm of a1,text width=4.1cm] (a2) {\textbf{\LANG{Artefact B}{Артефакт B}}: \LANG{recognition model}{модель распознавания}\\[-1pt]{\scriptsize\LANG{B0 as is; B1 calibrated verifier; B2 LoRA with book minimal pairs}{B0 как есть; B1 калиброванный верификатор; B2 LoRA с минимальными парами книги}}};
-  \node[goldbox,right=5mm of a2,text width=4.1cm] (a3) {\textbf{\LANG{Artefact C}{Артефакт C}}: \LANG{mastery model}{модель усвоения}\\[-1pt]{\scriptsize\LANG{book skill map; K0 share correct, K1 BKT, K2 noise-aware BKT}{карта навыков книги; K0 доля верных, K1 BKT, K2 BKT с учётом шума}}};
+  \node[hot,text width=4.1cm,minimum height=2.7cm] (a1) {\textbf{\LANG{Artefact A}{Артефакт A}}: \LANG{dataset}{датасет}\\[-1pt]{\scriptsize\LANG{book-ordered tutor as collection tool; teacher annotation: reading vs.\ pronunciation errors}{тренажёр по книге как инструмент сбора; разметка учителей: ошибки чтения и произношения}}};
+  \node[hot,anchor=north west,text width=4.1cm,minimum height=2.7cm] at ([xshift=5mm]a1.north east) (a2) {\textbf{\LANG{Artefact B}{Артефакт B}}: \LANG{error-detection system}{система обнаружения ошибок}\\[-1pt]{\scriptsize\LANG{agentic loop selects and combines models and components (B1, B2); baseline: B0}{agentic loop выбирает и комбинирует модели и компоненты (B1, B2); базовый: B0}}};
+  \node[goldbox,anchor=north west,text width=4.1cm,minimum height=2.7cm] at ([xshift=5mm]a2.north east) (a3) {\textbf{\LANG{Artefact C}{Артефакт C}}: \LANG{mastery model}{модель усвоения}\\[-1pt]{\scriptsize\LANG{book skill map; K0 share correct, K1 BKT, K2 noise-aware BKT}{карта навыков книги; K0 доля верных, K1 BKT, K2 BKT с учётом шума}}};
 
-  \node[rqbox-node,minimum height=1.25cm,below=7mm of a1,xshift=-2.0cm,text width=2.9cm] (rq1) {\textbf{RQ-1}\\[-1pt]{\scriptsize\LANG{data: reading vs.\ pronunciation errors}{данные: ошибки чтения и произношения}}};
-  \node[rqbox-node,minimum height=1.25cm,right=of rq1,text width=2.9cm] (rq2) {\textbf{RQ-2}\\[-1pt]{\scriptsize\LANG{how the AI learns}{как учится ИИ}}};
-  \node[rqbox-node,minimum height=1.25cm,right=of rq2,text width=2.9cm] (rq3) {\textbf{RQ-3}\\[-1pt]{\scriptsize\LANG{measuring mastery from speech}{оценка усвоения по речи}}};
-  \node[rqbox-node,minimum height=1.25cm,right=of rq3,text width=2.9cm] (rq4) {\textbf{RQ-4}\\[-1pt]{\scriptsize\LANG{how people learn}{как учатся люди}}};
+  \node[rqbox-node,minimum height=1.6cm,below=7mm of a2,text width=4.1cm] (rq2) {\textbf{RQ-2}\\[-1pt]{\scriptsize\LANG{agentic loop-engineering vs.\ baselines}{agentic loop-engineering против базовых подходов}}};
+  \node[rqbox-node,minimum height=1.6cm,left=5mm of rq2,text width=4.1cm] (rq1) {\textbf{RQ-1}\\[-1pt]{\scriptsize\LANG{reliability of off-the-shelf models}{надёжность готовых моделей}}};
+  \node[rqbox-node,minimum height=1.6cm,right=5mm of rq2,text width=4.1cm] (rq3) {\textbf{RQ-3} {\scriptsize\LANG{(additional)}{(дополнительный)}}\\[-1pt]{\scriptsize\LANG{learning dynamics with the tool}{динамика освоения с инструментом}}};
 
-  \node[soft,minimum height=1.75cm,below=of rq1,text width=2.9cm] (d1) {\scriptsize\LANG{two teachers; $\kappa$ on error type; model vs.\ teacher: P/R/F1, FAR/FRR}{два учителя; $\kappa$ по типу ошибки; модель против учителя: P/R/F1, FAR/FRR}};
-  \node[soft,minimum height=1.75cm,below=of rq2,text width=2.9cm] (d2) {\scriptsize\LANG{learner-disjoint frozen test, blind gold; learning curve; data sources}{замороженный тест по ученикам, слепое «золото»; кривая обучения; источники данных}};
-  \node[soft,minimum height=1.75cm,below=of rq3,text width=2.9cm] (d3) {\scriptsize\LANG{AUC of next attempt; agreement with blind teacher test}{AUC следующей попытки; согласие со слепым тестом учителя}};
-  \node[soft,minimum height=1.75cm,below=of rq4,text width=2.9cm] (d4) {\scriptsize\LANG{skill learning curves; attempts to mastery; delayed test}{кривые обучения по навыкам; попыток до усвоения; отложенный тест}};
+  \node[soft,minimum height=2.1cm,below=of rq1,text width=4.1cm] (d1) {\scriptsize\LANG{two teachers; $\kappa$ on error type; models vs.\ teacher: P/R/F1, FAR/FRR}{два учителя; $\kappa$ по типу ошибки; модели против учителя: P/R/F1, FAR/FRR}};
+  \node[soft,minimum height=2.1cm,below=of rq2,text width=4.1cm] (d2) {\scriptsize\LANG{learner-level CV, log of all configurations; frozen test, gold by two teachers, opened once}{CV по ученикам, журнал всех конфигураций; замороженный тест, «золото» двух учителей, один прогон}};
+  \node[soft,minimum height=2.1cm,below=of rq3,text width=4.1cm] (d3) {\scriptsize\LANG{mastery estimate; teacher test at entry, end, delayed; learning curves}{оценка модели усвоения; тест учителя: вход, конец, отложенный; кривые обучения}};
 
   \node[lab,below=1mm of d1] {\LANG{measurement study}{измерительное}};
   \node[lab,below=1mm of d2] {\LANG{controlled ML experiment}{контролируемый ML-эксперимент}};
-  \node[lab,below=1mm of d3] {\LANG{predictive validation}{проверка предсказания}};
-  \node[lab,below=1mm of d4] {\LANG{longitudinal observation}{лонгитюдное наблюдение}};
+  \node[lab,below=1mm of d3] {\LANG{longitudinal observation}{лонгитюдное наблюдение}};
 
   \draw[arr] (a1.south) -- (rq1.north);
   \draw[arr] (a1.south) -- (rq2.north);
   \draw[arr] (a2.south) -- (rq2.north);
   \draw[arr] (a2.south) -- (rq3.north);
   \draw[arr] (a3.south) -- (rq3.north);
-  \draw[arr] (a3.south) -- (rq4.north);
-  \foreach \r/\d in {rq1/d1,rq2/d2,rq3/d3,rq4/d4}{\draw[arr] (\r) -- (\d);}
+  \foreach \r/\d in {rq1/d1,rq2/d2,rq3/d3}{\draw[arr] (\r) -- (\d);}
 \end{tikzpicture}

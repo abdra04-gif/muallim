@@ -1,11 +1,12 @@
-% Chapter 6. Answers to RQs (after the pilot), contributions, doctoral directions (docs/roadmap.md, stage 2; ADR-0051, ADR-0052).
+% Chapter 6. Answers to RQs (after the pilot), contributions, doctoral directions (docs/roadmap.md, stage 2; ADR-0051, ADR-0064).
 \chapter{Conclusion}\label{ch:concl}
 
 \section{Summary}
 
-The thesis set out to develop a dataset of primer-level reading by Russian-speaking beginners and an AI model
-that detects reading errors in it and estimates from speech the mastery of each skill of \emph{al-Muallim
-al-Thani}, and to measure how close the model comes to a teacher and what it reveals about how people learn.
+The thesis set out to collect a small curated speech dataset of primer-level reading by beginners annotated by
+teachers, to evaluate existing speech recognition and analysis models on it, and to use agentic loop-engineering
+to build from them a reading and pronunciation error-detection system for an out-of-class practice tool, and,
+additionally, to assess how the tool affects learning dynamics.
 The literature review showed that the primer's sound-based, incremental method suits automatic feedback and
 provides a ready-made skill map; that nobody had measured the best open model for Qur'anic Arabic on
 primer-level reading by second-language beginners or adapted it to them, although small-data methods for this
@@ -15,36 +16,37 @@ recogniser errors measured against teachers nor have been applied to adults lear
 The collection tool built in response turns the whole book into 125 lessons and 800 cards traceable to page and
 line; grades every voice message at the phoneme level with a full decision trace; explains errors in Russian;
 and stores consented, pseudonymised data ready for teacher annotation that separates reading from pronunciation
-errors. Model adaptation is designed as a controlled experiment: a frozen learner-disjoint test set with blind
-annotation, a calibrated verifier with a ``not sure'' outcome and a controlled false-rejection rate, LoRA
-fine-tuning with augmentation from the book's minimal pairs, a learning curve and the contribution of each data
-source. The mastery model is built over the book's skill map and accounts for the recogniser's measured errors;
-it is validated on next attempts and against a blind teacher test. All of this was built under mechanical checks
+errors. Agentic loop-engineering is designed as a controlled experiment: an AI agent selects and combines
+off-the-shelf models and components --- a calibrated verifier with a ``not sure'' outcome and a controlled
+false-rejection rate, LoRA fine-tuning with augmentation from the book's minimal pairs --- only by
+cross-validation on training learners; every configuration tried is logged, and the best one is compared once
+with baseline approaches on a frozen test set annotated by two teachers. The mastery model is built over the book's
+skill map, accounts for the recogniser's measured errors and, with the teacher test, measures learning
+dynamics. All of this was built under mechanical checks
 that protect both the code and the experiments.
 
 \section{Answers to the research questions}
 
-\paragraph{RQ-1 (data)} \pending{answer after the pilot and double annotation}.
-\paragraph{RQ-2 (how the AI learns)} \pending{answer after training and the single test run}.
-\paragraph{RQ-3 (measuring mastery)} \pending{answer after fitting the mastery models and the teacher test}.
-\paragraph{RQ-4 (how people learn)} \pending{answer after the pilot and the delayed test}.
+\paragraph{RQ-1 (reliability of off-the-shelf models)} \pending{answer after the pilot and double annotation}.
+\paragraph{RQ-2 (agentic loop-engineering)} \pending{answer after the agentic loop and the single test run}.
+\paragraph{RQ-3 (additional, learning dynamics)} \pending{answer after the pilot, the teacher test and the delayed test}.
 
 \section{Contributions}
 
 \begin{enumerate}
-  \item[\textbf{C1.}] A corpus of reading by adult Russian-speaking beginners tied to the skills of
-    \emph{al-Muallim al-Thani}, collected with consent, with phoneme-level and error-type annotation by teachers,
-    measured reliability, a blind gold test set and a datasheet.
-  \item[\textbf{C2.}] Small-data adaptation of an open model to the new population --- a calibrated verifier with
-    a conformal bound on false rejections and LoRA fine-tuning with minimal-pair augmentation --- with a learning
-    curve, the contribution of data sources and a leakage-free evaluation protocol.
-  \item[\textbf{C3.}] A mastery model of the book's skills that accounts for recogniser errors measured against
-    teachers, validated on next attempts and against a blind teacher test.
-  \item[\textbf{C4.}] Learning curves of Russian-speaking adults over the skills of a primer: what comes quickly,
-    what slowly, what is forgotten.
+  \item[\textbf{C1.}] A dataset of primer-level reading by beginners learning Arabic as a foreign language, tied to
+    the skills of \emph{al-Muallim ath-Thani}, collected with consent, with phoneme-level and error-type annotation
+    by teachers, measured reliability, a gold test set and a datasheet.
+  \item[\textbf{C2.}] The reliability of open speech recognition and analysis models on beginners, measured
+    against teachers.
+  \item[\textbf{C3.}] An error-detection system built by agentic loop-engineering from off-the-shelf models and
+    components, with its gain over baseline approaches, a log of every configuration tried and a leakage-free
+    evaluation protocol.
+  \item[\textbf{C4.}] Additionally, learning dynamics with the tool, by a mastery model that accounts for
+    recogniser errors and by the teacher test.
 \end{enumerate}
 
-The engineering result is a reproducible ``collect $\to$ annotate $\to$ train $\to$ evaluate'' pipeline, a
+The engineering result is a reproducible ``collect $\to$ annotate $\to$ agentic loop $\to$ evaluate'' pipeline, a
 digital curriculum of the book traceable to an edition and a tutor with an open architecture in which models can
 be compared in shadow mode; the methodological result is a documented harness for AI-agent development and ML
 experiments.
@@ -73,9 +75,13 @@ and consent allow (contribution C1).
 
 The master's thesis is designed as the first stage of a doctoral project and hands it its tools: the dataset; a
 frozen test set that stays a test set, so that future results remain comparable; the skill map and the mastery
-model; the training pipeline and the learning curve; and shadow mode for comparing models on live attempts. The
+model; the agentic loop-engineering pipeline and its configuration log; and shadow mode for comparing models on live attempts. The
 main doctoral line is \emph{teaching the AI and learning with it}; it splits into the following directions.
 \begin{enumerate}
+  \item \textbf{Deferred master's questions.} How the AI learns from teacher corrections and the book's
+    minimal pairs, whether mastery of each skill can be measured from speech, and how adults progress through
+    the book's skills; these questions and their hypotheses were moved out of the master's thesis (ADR-0064),
+    and their strength and novelty are to be re-checked.
   \item \textbf{Choosing the next card from mastery.} Use the mastery estimate to choose what the learner reads
     next and what to review, and evaluate this by mastery rather than engagement (an extension of OBER
     \cite{SRC-134}).

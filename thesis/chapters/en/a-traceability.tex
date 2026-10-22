@@ -18,19 +18,13 @@ RQ-1 & H1.1 & Q1.7 & teacher--teacher $\kappa$ on error type (reading / pronunci
 RQ-1 & --- & Q1.8 & model--teacher $\kappa$ on error type; shares of types by part of the book & T-13 \\
 RQ-1 & H1.2 & Q1.4 & $\kappa$ tutor--teacher vs.\ teacher--teacher; $\alpha$ (metrics module) & T-02 \\
 RQ-1 & H1.3 & Q1.3 & FAR, FRR, agreement with the tutor (metrics module, SQL report 05) & T-01 \\
-RQ-1 & H1.4 & Q1.1--Q1.2 & precision, recall, F1 (metrics module) & T-01 \\
+RQ-1 & H1.4 & Q1.1--Q1.2 & precision, recall, F1 of off-the-shelf models (metrics module) & T-01 \\
 RQ-1 & --- & Q1.5 & precision and recall by error type and letter & R-08 \\
-RQ-2 & H2.1 & Q7.1 & FRR and recall of B1 vs.\ B0, paired bootstrap (RQ-2 evaluator) & T-11 \\
-RQ-2 & H2.2 & Q7.2 & phoneme-level F1 of B2 vs.\ B0 (RQ-2 evaluator) & T-11 \\
-RQ-2 & H2.3 & Q7.3 & PER on held-out expert recitation & T-12 \\
-RQ-2 & --- & Q7.4--Q7.8 & gap closed, ECE, risk--coverage, learning curve, data sources, decided by the system & T-11, T-14, R-14, R-15 \\
-RQ-3 & H3.1, H3.2 & Q8.1, Q8.3 & AUC, log loss, ECE of K0--K2 on B0 and on the adapted model (RQ-3 evaluator) & T-15 \\
-RQ-3 & H3.3 & Q8.2 & $\rho$ between K2's estimate and the blind teacher test & R-16 \\
-RQ-3 & --- & Q8.4 & AFM fit: book skill map vs.\ ``one letter, one skill'' & T-15 \\
-RQ-4 & H4.1 & Q2.6 & attempts to mastery; learning curves per skill (AFM) & R-17 \\
-RQ-4 & H4.2 & Q2.8 & errors by articulatory attribute & R-10 \\
-RQ-4 & --- & Q2.7, Q2.9 & teacher test: entry, end, delayed; forgetting & T-16 \\
-RQ-4 & --- & Q2.1--Q2.5 & error-kind frequencies, confusions, difficult lines (SQL reports 02--04, 08--11) & T-03, T-04, R-09 \\
+RQ-2 & w/ sup. & Q7.1--Q7.3 & the agentic loop's best configuration vs.\ baselines: precision, recall, F1, FAR, FRR, paired bootstrap (RQ-2 evaluator); PER on expert recitation if fine-tuning is included & T-11, T-12 \\
+RQ-2 & --- & Q7.4--Q7.8 & gap closed, ECE, risk--coverage, learning curve, data sources, decided by the system, configuration log & T-11, T-14, R-14, R-15 \\
+RQ-3 & --- & Q8.1--Q8.4 & instrument: AUC, log loss, ECE of K0--K2; $\rho$ between K2's estimate and the blind teacher test; AFM fit & T-15, R-16 \\
+RQ-3 & w/ sup. & Q2.6, Q2.7, Q2.9 & learning dynamics: attempts to mastery, learning curves per skill, teacher test (entry, end, delayed), forgetting & R-17, T-16 \\
+RQ-3 & --- & Q2.1--Q2.5, Q2.8 & error-kind frequencies, confusions, difficult lines, errors by attribute (SQL reports 02--04, 08--11; exploratory) & T-03, T-04, R-09, R-10 \\
 E-7 & --- & Q3.1--Q3.2 & score change and recurrence after feedback (exploratory) & R-11 \\
 Method & --- & Q6.1--Q6.3 & blocks by reason; interventions; iterations (journals) & R-13, T-08 \\
 \bottomrule
@@ -69,10 +63,12 @@ A long vowel is written with two letters (\textrussian{аа, ии, уу}); sylla
 
 \chapter{Preregistration summary}\label{app:prereg}
 
-The preregistration (version 0.4, to be approved and frozen before data collection) fixes:
+The preregistration (version 0.5, to be approved and frozen before data collection) fixes:
 \begin{itemize}
-  \item twelve confirmatory hypotheses (Table~\ref{tab:hyp}), mandatory descriptive reports (the model's learning
-    curve, the contribution of data sources, learners' learning curves) and exploratory analyses declared in
+  \item the main hypothesis and three questions (RQ-3 additional); confirmatory hypotheses for RQ-1
+    (Table~\ref{tab:hyp}), hypotheses for RQ-2 and RQ-3 with the supervisor; mandatory descriptive reports (the
+    agentic loop's log, the best configuration's learning curve, the contribution of data sources, learners'
+    learning curves) and exploratory analyses declared in
     advance (E-1, E-4--E-9); everything else is also exploratory;
   \item the unit of analysis (attempt) and clusters (learner);
   \item exclusions: stub attempts, unusable and off-task recordings (counted separately), attempts before the
@@ -81,13 +77,15 @@ The preregistration (version 0.4, to be approved and frozen before data collecti
     reading experience from the entry questionnaire;
   \item annotation: error type (reading / pronunciation / unclear) by both teachers on test attempts and every
     tenth training attempt; a blind teacher test at entry, at the end of the pilot and delayed;
-  \item the split for RQ-2 and RQ-3: about 30\,\% of learners in the test set, the list frozen by fingerprint
-    before training; blind test annotation by two teachers; hyperparameters and mastery-model parameters only
-    on the training part; the test set opened once;
-  \item the fallback: fewer than \textasciitilde1{,}500 annotated attempts by 15.04.2027 --- B2 as a feasibility
-    check, RQ-2 answered by B1, H3.1 on top of B1;
+  \item the split for RQ-2: about 30\,\% of learners in the test set, the list frozen by fingerprint before the
+    agentic loop first runs; test annotation by two teachers; configuration search (cross-validation, a log
+    of every configuration, a fixed budget) and mastery-model parameters only on the training part; the test set
+    opened once;
+  \item the fallback: fewer than \textasciitilde1{,}500 annotated attempts by 15.04.2027 --- fine-tuning is
+    removed from the agentic loop's components;
   \item the stopping rule: the planned end of the pilot; interim reports descriptive only;
   \item analysis: cluster-bootstrap intervals, mixed models, Holm's correction at $\alpha=0.05$;
+  \item deferred: the earlier hypotheses H2.1--H4.2 were moved to the PhD plan (ADR-0064);
   \item freezing: the SHA-256 fingerprint and date are recorded in the research log; any change is a new
     version with a reason.
 \end{itemize}

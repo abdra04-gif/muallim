@@ -2,12 +2,12 @@
 % docs/thesis/figures.md. Pilot results are marked \pending until they exist.
 % Preliminary checks: docs/research/research-log.md (2026-10-17), docs/requirements/quality-scenarios.md,
 % docs/architecture/change-scenarios.md. Harness incidents: docs/thesis/materials-log.md, docs/journal/sessions/.
-% RQs — ADR-0052.
+% RQs — ADR-0064.
 \chapter{Evaluation and Discussion}\label{ch:eval}
 
 This chapter reports what has been measured so far and what the pilot will add. Section~\ref{sec:eval-status}
 summarises the state of each study. Section~\ref{sec:eval-prelim} presents preliminary technical
-validation. Sections~\ref{sec:eval-rq1}--\ref{sec:eval-rq4} describe the results for RQ-1 to RQ-4, which
+validation. Sections~\ref{sec:eval-rq1}--\ref{sec:eval-rq3} describe the results for RQ-1 to RQ-3, which
 depend on pilot data, and Section~\ref{sec:eval-harness} the evidence collected so far on the validity of
 development.
 Section~\ref{sec:eval-discussion} discusses the findings and Section~\ref{sec:eval-limits} their limits.
@@ -16,20 +16,20 @@ Section~\ref{sec:eval-discussion} discusses the findings and Section~\ref{sec:ev
 
 \begin{table}[ht]
 \centering\small
-\caption{State of the four studies.}
+\caption{State of the three studies.}
 \label{tab:eval-status}
 \begin{tabularx}{\linewidth}{@{}P{2.6cm}LL@{}}
 \toprule
 Study & Ready now & Needs \\
 \midrule
-1. Data (RQ-1) & Annotation in Telegram and packages; phoneme-level metrics, $\kappa$, $\alpha$ computed
-automatically; error catalogue; entry questionnaire & Error type in annotation (TD-FN-76); pilot attempts; two
-annotators; bootstrap intervals \\
-2. How the AI learns (RQ-2) & Raw model output and versions in every attempt; recogniser port; phoneme-level
-metrics & Training pipeline (TD-FN-72); blind test annotation (TD-FN-73); GPU (TD-FN-74); pilot data \\
-3. Measuring mastery (RQ-3) & Attempts with time and book line; the curriculum from which the skill map is
-built & Skill map and K1/K2 (TD-FN-78); teacher test (TD-FN-77); pilot data \\
-4. How people learn (RQ-4) & Attempt log with time; difficult-line and confusion reports & Teacher test at three
+1. Reliability of off-the-shelf models (RQ-1) & Annotation in Telegram and packages; phoneme-level metrics,
+$\kappa$, $\alpha$ computed automatically; error catalogue; entry questionnaire & Error type in annotation
+(TD-FN-76); pilot attempts; two annotators; list of off-the-shelf models; bootstrap intervals \\
+2. Agentic loop-engineering (RQ-2) & Raw model output and versions in every attempt; recogniser port;
+phoneme-level metrics & Agentic loop and training pipeline (TD-FN-72); configuration log; test
+annotation; GPU (TD-FN-74); pilot data \\
+3. Learning dynamics (RQ-3, add.) & Attempt log with time and book line; the curriculum from which the skill
+map is built; difficult-line and confusion reports & Skill map and K1/K2 (TD-FN-78); teacher test at three
 points (TD-FN-77); learning curves per skill; pilot \\
 \bottomrule
 \end{tabularx}
@@ -87,10 +87,10 @@ per property in every run of the suite and 5\,000 per property in a one-off run,
 
 Adding a second recogniser required three files and no change to the domain, the use cases, the database
 or the interface; all architecture contracts and tests passed (QAS-10). This supports the claim that the
-tutor can be used to compare models on the same recordings; this is exactly how RQ-2 compares B0, B1 and
-B2.
+tutor can be used to compare models on the same recordings; this is exactly how RQ-2 compares agentic-loop
+configurations with the baselines.
 
-\section{RQ-1: data}\label{sec:eval-rq1}
+\section{RQ-1: reliability of off-the-shelf models}\label{sec:eval-rq1}
 
 \begin{notebox}
 This section will be completed after the pilot and double annotation. Below is the planned form of the tables;
@@ -148,27 +148,27 @@ Teacher A -- teacher B & & \\
 The analysis will report the shares of reading and pronunciation errors by part of the book, precision and
 recall by error type and by letter (R-08), Krippendorff's $\alpha$ per phoneme between annotators, the share of
 disputed attempts that annotators corrected, and a separate block of self-corrections. H1.1--H1.4 are tested as
-preregistered, H1.2 also on the blindly annotated part.
+preregistered.
 
-\section{RQ-2: how the AI learns}\label{sec:eval-rq2}
+\section{RQ-2: agentic loop-engineering}\label{sec:eval-rq2}
 
 \begin{notebox}
-This section will be completed after B1 and B2 are trained and the single test run (April 2027). Below is the
-planned form of the tables; values appear only with a passport.
+This section will be completed after the agentic loop and the single test run (April 2027). Below is the
+planned form of the tables; values will appear only with a passport.
 \end{notebox}
 
 \begin{table}[ht]
 \centering\small
-\caption{B0, B1 and B2 on test learners with blind gold annotation (T-11).}
+\caption{Baselines and the agentic loop's best configuration on test learners with gold annotation (T-11).}
 \label{tab:T-11}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Measure & B0 & B1 & B2 \\
+Measure & B0 & Best single & Best configuration \\
 \midrule
 Precision / recall / F1 & \pending{T-11} & & \\
 FAR / FRR (verdict) & & & \\
 $\kappa$ with gold & & & \\
-Gap closed $G_B$ & 0 & & \\
+Share of gap closed $G_B$ & 0 & & \\
 ECE & & & \\
 Share ``not sure'' & --- & & \\
 Decided by the system at risk $\le\varepsilon$ & & & \\
@@ -178,43 +178,45 @@ Decided by the system at risk $\le\varepsilon$ & & & \\
 
 \begin{table}[ht]
 \centering\small
-\caption{Contribution of data sources to adaptation (T-14).}
+\caption{Contribution of data sources to the best configuration (T-14).}
 \label{tab:T-14}
 \begin{tabular}{@{}lcc@{}}
 \toprule
-Training data & B2 F1 & B1 FRR \\
+Training data & F1 & FRR \\
 \midrule
 Teacher corrections & \pending{T-14} & \\
-+ book minimal pairs & & \\
-+ learner disputes & & \\
++ the book's minimal pairs & & \\
++ learners' disputes & & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[ht]
 \centering\small
-\caption{Preservation on expert recitation: PER of B0 and B2 (T-12, H2.3).}
+\caption{Retention on expert recitation if the configuration includes a fine-tuned model: PER (T-12).}
 \label{tab:T-12}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Set & B0 & B2 & Difference, 95\,\% CI \\
+Set & B0 & Best configuration & Difference, 95\,\% CI \\
 \midrule
 Held-out expert recitation & \pending{T-12} & & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The analysis will report the differences B1 $-$ B0 and B2 $-$ B0 with paired cluster-bootstrap intervals (H2.1,
-H2.2), the non-inferiority check on expert recitation (H2.3), whether the conformal guarantee holds on the test
-set, B1's risk--coverage curve (R-14) and the learning curve of B1 and B2 (R-15) --- how quality grows with the
-number of training learners. If the fallback of Section~\ref{sec:method-s2} applies, B2 will be described as a
-feasibility check and RQ-2 will be answered by B1.
+The analysis will report ``best configuration $-$ baseline'' differences with paired cluster-bootstrap
+intervals, the non-inferiority check on expert recitation (if the configuration includes fine-tuning), whether
+the conformal guarantee holds on the test set (if the verifier is included), the risk--coverage curve (R-14),
+the best configuration's learning curve (R-15) --- how quality grows with the number of training learners ---
+and the agentic loop's log: how many configurations were tried and how the cross-validation metric changed. If
+the fallback of Section~\ref{sec:method-s2} applies, fine-tuning is removed from the components and RQ-2 is
+answered by selecting and combining off-the-shelf models.
 
-\section{RQ-3: measuring mastery}\label{sec:eval-rq3}
+\section{RQ-3 (additional): learning dynamics}\label{sec:eval-rq3}
 
 \begin{notebox}
-This section will be completed after the mastery models are fitted and the single test run. Below is the planned
-form of the table.
+This section will be completed after the pilot, the teacher test and the delayed test. Below is the planned
+form of the table that validates the measurement instrument (the mastery model).
 \end{notebox}
 
 \begin{table}[ht]
@@ -228,28 +230,22 @@ Model & AUC & Log loss & ECE \\
 K0 (share correct) & \pending{T-15} & & \\
 K1 on B0 & & & \\
 K2 on B0 & & & \\
-K1 on adapted & & & \\
-K2 on adapted & & & \\
+K1 on the best configuration & & & \\
+K2 on the best configuration & & & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The analysis will report AUC differences with paired cluster-bootstrap intervals (H3.1, H3.2) and the agreement
-of K2's final estimate with the blind teacher test by skill group (R-16, H3.3). The AFM fit with the book's skill
-map against a ``one letter, one skill'' map will show whether the skills are well chosen. If the adapted model
-hears more accurately but the mastery estimate does not change, that is also a result: recogniser noise is then
-not the main limit on measuring mastery.
-
-\section{RQ-4: how people learn}\label{sec:eval-rq4}
-
-\pending{RQ-4 results}. The analysis will present learning curves per skill of the book and attempts to mastery
-for sounds absent from Russian and the rest (R-17, H4.1), errors by \emph{sifat} attribute (R-10, H4.2), the
-teacher test at entry, at the end of the pilot and on the delayed test (T-16), and the drop after breaks between
-sessions. The error profile completes the picture: error-type frequencies (T-03), the hardest lines and minimal
-pairs of the book (T-04), and confusion matrices over all reported and over confirmed errors (R-09); the
-difference between the two matrices shows how much of the apparent learner profile the model creates. The
-comparison by first language (E-1) runs only if both groups exist. Without a control group these results describe
-how people learn with the system; they do not prove that the system taught them.
+\pending{RQ-3 results}. The analysis will report how fit the mastery model is as an instrument (T-15, agreement
+of K2's estimate with the blind teacher test, R-16) and present learning dynamics: learning curves per skill of
+the book and attempts to mastery (R-17), the teacher test at entry, at the end of the pilot and on the delayed
+test (T-16), and the drop after breaks between sessions. The AFM fit with the book's skill map against a ``one
+letter, one skill'' map will show whether the skills are well chosen. The error profile completes the picture:
+error-type frequencies (T-03), the hardest lines and minimal pairs of the book (T-04), and confusion matrices
+over all reported and over confirmed errors (R-09); the difference between the two matrices shows how much of
+the apparent learner profile the model creates. Comparing sounds absent from Russian with the rest, errors by
+\emph{sifat} attribute (R-10) and the comparison by first language (E-1) are exploratory. Without a control
+group these results describe learning dynamics with the tool; they do not prove that the tool caused them.
 
 \section{Validity of development: the harness}\label{sec:eval-harness}
 
@@ -309,7 +305,7 @@ reject a correct reading or accept a wrong one, and an adapted model can show a 
 leakage rather than learning. The remedies have the same shape: deterministic external
 checks that the system cannot edit, a log of every decision, and an escalation path to a human. For the
 agent these are frozen tests, layer contracts and STOP verdicts; for the model they are the decision trace,
-the ``the bot was wrong'' button, teacher annotation, a frozen and blindly annotated test set, and a
+the ``the bot was wrong'' button, teacher annotation, a frozen test set, and a
 ``not sure'' outcome with a controlled false-rejection rate.
 
 \paragraph{What a tutor can and cannot claim} The literature and the preliminary checks support a modest
@@ -319,24 +315,25 @@ reflects this by making disputes easy, sending disputed attempts to teachers fir
 a teacher needs to review a verdict.
 
 \paragraph{One primer, two learners} The thesis links the AI's learning and the person's learning through one
-skill map. If adapting the model on teacher corrections makes the mastery estimate more accurate (RQ-3), then
-improving the AI directly improves what we know about the learner --- and therefore what can be done for them:
+skill map. If the system built by agentic loop-engineering hears more accurately (RQ-2), the mastery estimate on
+top of it should also become more accurate (RQ-3), so improving the AI directly improves what we know about the learner --- and therefore what can be done for them:
 choose the next card, review what was forgotten, call a teacher. This is the bridge to the PhD.
 
-\paragraph{Pending findings} \pending{interpretation of RQ-1--RQ-4 results, including how much of the gap to a
-teacher adaptation closed, how much data it needed and how much more accurate the mastery estimate became}.
+\paragraph{Pending findings} \pending{interpretation of RQ-1--RQ-3 results, including how much of the gap to a
+teacher agentic loop-engineering closed, how much data and how many configurations it needed, and how mastery
+of the material changed with the tool}.
 
 \section{Limitations}\label{sec:eval-limits}
 
 The pilot is small and closed, so its results describe the participants rather than all Russian-speaking
-beginners. Annotators of the training part see the tutor's answer, which may inflate agreement; the test
-set is therefore annotated blind. The test set is small --- about ten learners --- so intervals for RQ-2 will
-be wide, and the gain from adaptation on these learners need not transfer to other Russian speakers or to
+beginners. Annotators see the tutor's answer, which may inflate agreement with B0. The test set is small --- about ten learners --- so intervals for RQ-2 will
+be wide, and the best configuration's gain on these learners need not transfer to other Russian speakers or to
 later lessons of the book. The model was trained on Qur'anic
 recitation, whereas pages 10--37 of the book contain syllables and words that are not Qur'anic; results are
 therefore reported by material type. The boundary between reading and pronunciation errors is set by the
-annotation rule, and teachers may disagree on borderline cases. Without a control group, RQ-4 describes how
-people learn with the system but does not prove its effect; the teacher test is short and is given by the same
+annotation rule, and teachers may disagree on borderline cases. Without a control group, RQ-3 describes learning
+dynamics with the tool but does not prove its effect; the agentic loop tries many configurations, so the search
+runs only on the training part and the log of every configuration is published; the teacher test is short and is given by the same
 teachers who annotate. The similarity score used for verdicts is coarse on long lines. The
 case study of the harness has one developer, one project and an author who is also the evaluator; it is
 illustrative, not comparative. Finally, the curriculum text transcribed from the scan is still awaiting full

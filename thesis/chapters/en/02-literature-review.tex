@@ -18,7 +18,7 @@ October 2026, and every source carries a reliability grade in the project regist
 Ahmad Hadi Maksudi (1868--1941), a Kazan teacher of Arabic and a Jadid educator, wrote two primers that
 are frequently confused. \emph{Mögallim äwwäl} (``The First Teacher'', 1892) taught Tatar literacy in
 Arabic script and went through more than thirty editions before 1918 \cite{SRC-015,SRC-019}.
-\emph{al-Muallim al-Thani} (``The Second Teacher'') continued it, leading from the letters to correct reading
+\emph{al-Muallim ath-Thani} (``The Second Teacher'') continued it, leading from the letters to correct reading
 of the Qur'an with the basics of \emph{tajwid}. It is usually dated to the mid-1890s, but no primary
 bibliographic source confirming the first edition was found \cite{SRC-018}. Modern texts go back to the
 Kazan edition of 1917, which also underlies a Russian-language adaptation for Russian speakers
@@ -82,7 +82,7 @@ Indonesian Iqro method makes the teacher's role explicit: once the letters are k
 explains but signals where the error is, and the learner corrects it \cite{SRC-057}. Teachers also advise
 against relying on transliteration, because ``sound cannot be conveyed on paper'' \cite{SRC-021,SRC-022},
 and weekly oral checks by a teacher remain the norm after a course \cite{SRC-039}. Controlled trials of
-primer methods for Qur'anic reading --- \emph{al-Muallim al-Thani}, \emph{Qaida Nuraniyya} or Iqro --- were not
+primer methods for Qur'anic reading --- \emph{al-Muallim ath-Thani}, \emph{Qaida Nuraniyya} or Iqro --- were not
 found \cite{SRC-038}.
 
 \section{The learners}\label{sec:lr-learners}
@@ -252,8 +252,8 @@ Small data make inflated results easy. Tuning hyperparameters on the data on whi
 biases the estimate upwards; nested cross-validation or a separate test set is required \cite{SRC-121}.
 Kapoor and Narayanan found data leakage in hundreds of ML-based studies and proposed a taxonomy of it
 \cite{SRC-122}; in speech, the main leak is the same speaker in training and evaluation. Hence the rules
-of this work: a learner-disjoint split, a test set frozen before training, blind annotation of the test
-set, and a single run on it. The supervisor's group formulated the same requirements for studies in
+of this work: a learner-disjoint split, a test set frozen before training, annotation of the test
+set by two teachers, and a single run on it. The supervisor's group formulated the same requirements for studies in
 which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
 following Gebru and colleagues \cite{SRC-123}.
 
@@ -261,7 +261,7 @@ following Gebru and colleagues \cite{SRC-123}.
 
 \subsection{Learning to read, not only pronunciation}
 
-\emph{al-Muallim al-Thani} is a primer: the learner learns to see a letter with its vowel sign and turn it into
+\emph{al-Muallim ath-Thani} is a primer: the learner learns to see a letter with its vowel sign and turn it into
 a sound. The systems closest to this work are therefore not foreign-language pronunciation trainers but
 reading tutors that listen to a child reading aloud. Project LISTEN at Carnegie Mellon
 developed a tutor that used speech recognition to decide whether a word was read correctly, helped on hard
@@ -306,9 +306,9 @@ For a tutor this means judging by what the learner has mastered, not by how much
 \begin{keybox}[Implication]
 Tutors that listen to reading exist, but for children and their native script. Knowledge tracing can work with
 noisy recognition but does not account for recogniser errors measured against teachers. The lessons of
-\emph{al-Muallim al-Thani} provide a ready-made skill map. Hence two questions of the thesis: can mastery of
-each skill of the book be estimated from speech, and does adapting the AI improve the estimate (RQ-3); and how
-do Russian-speaking adults progress through these skills (RQ-4).
+\emph{al-Muallim ath-Thani} provide a ready-made skill map. Hence the additional question of the thesis: how the
+tool affects learning dynamics (RQ-3), which can be measured by mastery estimation over the book's skills that
+accounts for recogniser errors.
 \end{keybox}
 
 \section{Related systems}\label{sec:lr-related}
@@ -391,20 +391,21 @@ checks enforced by the environment, and every enforcement should leave a trace t
 
 \section{Summary and research gap}\label{sec:lr-gap}
 
-The method of \emph{al-Muallim al-Thani} --- sound-based, incremental, built on immediate correction ---
+The method of \emph{al-Muallim ath-Thani} --- sound-based, incremental, built on immediate correction ---
 fits automatic feedback well, and its lessons provide a ready-made skill map. An open phoneme-level model
-exists, and reading tutors and mastery models work for children. What is missing is evidence on four points:
+exists, and reading tutors and mastery models work for children. What is missing is evidence on four points, which set the questions of the thesis:
 \begin{enumerate}
-  \item there are no data: no corpus of reading by adult Russian-speaking beginners that separates reading
-    errors from pronunciation errors, and it is unknown how reliably teachers and the model tell them apart
-    (RQ-1);
-  \item it is unknown whether the model can be adapted on a small dataset from this population so that it
-    comes closer to a teacher on new learners, and how the gain depends on the amount and source of data ---
-    under an evaluation free of leakage (RQ-2);
-  \item speech-based mastery models do not account for recogniser errors measured against teachers, and it has
-    not been tested whether adapting the recogniser makes the mastery estimate more accurate (RQ-3);
-  \item it has not been measured how Russian-speaking adults acquire the skills of Arabic reading: what comes
-    quickly, what slowly, what is forgotten (RQ-4).
+  \item there are no data: no dataset of primer-level reading by beginners learning Arabic as a foreign language
+    that separates reading errors from pronunciation errors, and it is unknown how reliably existing models
+    detect these errors (RQ-1);
+  \item it is unknown whether a system built from off-the-shelf models and components on a small dataset from
+    this population comes closer to a teacher on new learners than baseline approaches, under an evaluation
+    free of leakage; agentic loop-engineering has not been applied to such a search (RQ-2)
+    \pending{confirm with a literature review on agentic loop-engineering};
+  \item speech-based mastery models do not account for recogniser errors measured against teachers, so there
+    is as yet no instrument to measure learning dynamics from speech (instrument for RQ-3);
+  \item it has not been measured how mastery of Arabic reading changes for beginners who study with a teacher
+    and practise with a tool outside lessons (RQ-3, additional).
 \end{enumerate}
 The effect of explanations in the learner's language remains a PhD question, and the AI-agent harness a means of
 validity described in the methodology. The next chapter describes how the thesis collects this evidence.

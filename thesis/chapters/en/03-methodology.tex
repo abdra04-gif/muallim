@@ -1,13 +1,13 @@
 % Chapter 3. Material: docs/requirements/quality-scenarios.md, docs/research/metrics-gqm.md,
 % docs/research/preregistration.md, docs/data/annotation-guide.md, docs/data/reports.md,
 % docs/architecture/design-iterations.md, docs/risks.md. Figure R-06 → fig-harness (Ch. 4).
-% Topic and RQs — ADR-0052; hypotheses — preregistration.md v0.4.
+% Topic and RQs — ADR-0064; hypotheses — preregistration.md v0.5.
 \chapter{Methodology}\label{ch:method}
 
 This chapter explains how the thesis produces and evaluates its artefacts. Section~\ref{sec:method-dsr}
 introduces the research paradigm. Sections~\ref{sec:method-req}--\ref{sec:method-gqm} describe how
 requirements, architecture and metrics were derived. Sections~\ref{sec:method-hyp}--\ref{sec:method-s4}
-present the four studies, and Sections~\ref{sec:method-prov}--\ref{sec:method-validity} cover
+present the hypothesis, the three studies and the mastery-measurement instrument, and Sections~\ref{sec:method-prov}--\ref{sec:method-validity} cover
 preregistration, ethics and threats to validity. Section~\ref{sec:method-harness} describes how the
 development harness protects both the code and the experiments.
 
@@ -17,9 +17,9 @@ The thesis follows design science research, which produces knowledge by building
 addresses a real problem and evaluating it rigorously \cite{SRC-100}. Wieringa separates two kinds of
 work inside such a project: \emph{design problems}, which ask how to change the world (``build a tutor
 that \ldots''), and \emph{knowledge questions}, which ask what is true about it (``how often does the model
-reject correct reading?'', ``how accurately does the model estimate mastery?'') \cite{SRC-101}. The
-research questions of this thesis are knowledge questions; the objectives O1--O5 are design problems that
-make them answerable, and O6 is a knowledge problem. Table~\ref{tab:hevner} shows
+reject correct reading?'', ``how much does agentic loop-engineering improve accuracy?'') \cite{SRC-101}. The
+research questions of this thesis are knowledge questions; the objectives O1--O3, O5 and O6 are design problems
+that make them answerable, and O4 and O7 are knowledge problems. Table~\ref{tab:hevner} shows
 how the thesis addresses Hevner's seven guidelines.
 
 \begin{table}[ht]
@@ -31,16 +31,16 @@ how the thesis addresses Hevner's seven guidelines.
 Guideline & In this thesis \\
 \midrule
 Design as an artefact & Artefact A, the dataset and its collection tool (the book-ordered tutor); artefact
-B, a recognition model that learns from teachers (B1, B2); artefact C, a mastery model of the book's skills
-(K1, K2). \\
+B, an error-detection system built by agentic loop-engineering from off-the-shelf models and components (B1,
+B2); artefact C, a mastery model of the book's skills (K1, K2). \\
 Problem relevance & Beginners practise alone; teachers' time does not scale; no tool checks primer-level
 reading in the learners' language. \\
-Design evaluation & Annotation reliability and model--teacher agreement (RQ-1), controlled experiment on a
-frozen test set (RQ-2), predictive validation and agreement with a teacher test (RQ-3), longitudinal
-observation (RQ-4). \\
-Research contributions & Dataset; adaptation of a model to an unstudied population; speech-based mastery
-estimation accounting for recogniser errors; learners' learning curves. \\
-Research rigour & Preregistration; learner-disjoint split and blind test set; standard MDD metrics; agreement statistics with confidence intervals;
+Design evaluation & Annotation reliability and agreement of off-the-shelf models with teachers (RQ-1),
+controlled experiment against baseline approaches on a frozen test set (RQ-2), longitudinal observation of
+learning dynamics (RQ-3, additional). \\
+Research contributions & Dataset; reliability of off-the-shelf models on beginners; a system built by agentic
+loop-engineering with a configuration log; additionally, learning dynamics with the tool. \\
+Research rigour & Preregistration; learner-disjoint split and frozen test set; standard MDD metrics; agreement statistics with confidence intervals;
 case-study protocol \cite{SRC-102}; Empirical Standards as checklist \cite{SRC-103}. \\
 Design as a search process & 50 recorded decisions with rejected alternatives; seven design iterations. \\
 Communication & Thesis, dataset card, fine-tuned weights, open architecture, and a doctoral roadmap. \\
@@ -123,8 +123,8 @@ Metrics were derived with the Goal--Question--Metric method \cite{SRC-048}: a go
 template (analyse \emph{object} for the purpose of \emph{purpose} with respect to \emph{quality focus} from
 the viewpoint of \emph{stakeholder} in the context of \emph{context}), refined into questions, and only then
 into metrics and data. A metric without a goal is not collected. Eight goals were defined: G1 annotation
-reliability and model--teacher agreement (RQ-1), G7 model adaptation (RQ-2), G8 mastery estimation (RQ-3),
-G2 how people learn (RQ-4), and the descriptive goals G3 explanations (exploratory), G4 engagement and the
+reliability and agreement of off-the-shelf models with teachers (RQ-1), G7 agentic loop-engineering against
+baseline approaches (RQ-2), G8 mastery estimation and G2 learning dynamics (RQ-3, additional), and the descriptive goals G3 explanations (exploratory), G4 engagement and the
 beginner's path, G5 system quality, and G6 development with AI agents (Section~\ref{sec:method-harness}).
 
 For the pilot, one \emph{main metric} and one \emph{counter-metric} were chosen. The main metric is the
@@ -134,18 +134,25 @@ share of falsely accepted attempts, attempts passed by the tutor but not by the 
 
 \section{Hypotheses}\label{sec:method-hyp}
 
-Table~\ref{tab:hyp} lists the confirmatory hypotheses. Declared exploratory in advance are: the comparison
+\textbf{Main hypothesis:} by collecting a small curated speech dataset, it is possible to evaluate existing solutions and, using agentic loop-engineering, develop an effective tool for beginners' out-of-class practice. It is tested by
+three questions (Section~\ref{sec:rq}): RQ-1 --- ``evaluate existing solutions'', RQ-2 --- ``using agentic
+loop-engineering, develop an effective tool'', RQ-3 (additional) --- the tool's effect on learning dynamics.
+
+Table~\ref{tab:hyp} lists the confirmatory hypotheses for RQ-1. Hypotheses for RQ-2 and RQ-3 are formulated with
+the supervisor and added in a new preregistration version before it is frozen \pending{hypotheses for RQ-2 and
+RQ-3 --- to be approved with the supervisor}. The earlier hypotheses H2.1--H4.2 (model adaptation, measuring
+mastery, how people learn) were moved to the PhD plan. Declared exploratory in advance are: the comparison
 of Kazakh and Russian speakers on \ar{ق} and \ar{غ} (E-1), the risk--coverage curve (E-4), the verifier on top
 of the fine-tuned model (E-5), deep knowledge tracing (E-6), the link between a full error explanation and the
 next attempt (E-7), a forgetting model (E-8), and the change in the share of reading and pronunciation errors
-through the book (E-9). The model's learning curve, the contribution of data sources and learners' learning
-curves are always reported, but descriptively. All of this is recorded in the preregistration
+through the book (E-9). The agentic loop's log, the best configuration's learning curve, the contribution of
+data sources and learners' learning curves are always reported, but descriptively. All of this is recorded in the preregistration
 (Section~\ref{sec:method-prov}); every other analysis is labelled exploratory and its findings are offered as
 hypotheses for future work.
 
 \begin{table}[ht]
 \centering\small
-\caption{Confirmatory hypotheses (preregistration v0.4).}
+\caption{Confirmatory hypotheses for RQ-1 (preregistration v0.5).}
 \label{tab:hyp}
 \begin{tabularx}{\linewidth}{@{}llL@{}}
 \toprule
@@ -156,17 +163,6 @@ H1.2 & RQ-1 & $\kappa$ between B0 and a teacher is lower than $\kappa$ between t
 H1.3 & RQ-1 & For B0, false rejections (FRR) are more frequent than false acceptances (FAR). \\
 H1.4 & RQ-1 & Precision and recall of B0 error detection on beginners are lower than reported on the
 model's training domain. \\
-H2.1 & RQ-2 & On test learners, B1 has a lower FRR than B0 with recall no lower than B0's minus
-$\delta=0.05$. \\
-H2.2 & RQ-2 & On test learners, B2 has a higher phoneme-level F1 than B0. \\
-H2.3 & RQ-2 & On expert recitation, B2's PER exceeds B0's by at most one percentage point
-(non-inferiority). \\
-H3.1 & RQ-3 & K2 on top of the adapted model predicts the gold outcome of the next attempt with a higher AUC
-than K2 on top of B0. \\
-H3.2 & RQ-3 & On the same recogniser, K2 has a higher AUC than K1. \\
-H3.3 & RQ-3 & K2's final estimate agrees with the blind teacher test: $\rho \ge 0.5$. \\
-H4.1 & RQ-4 & Skills with sounds absent from Russian need more attempts to mastery. \\
-H4.2 & RQ-4 & Russian speakers make more confirmed errors in emphasis than in place of articulation. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -188,7 +184,7 @@ analysis is an attempt; learners are clusters, because attempts by one learner a
 Exclusions are fixed in advance: attempts graded by the development stub; recordings labelled unusable or
 off-task by an annotator (counted separately); and attempts before the preregistration freeze.
 
-\section{Study 1: data (RQ-1)}\label{sec:method-s1}
+\section{Study 1: reliability of off-the-shelf models (RQ-1)}\label{sec:method-s1}
 
 \paragraph{Annotation} Two teachers who read confidently with tajwid annotate every attempt. Each sees the
 line of the book, the recording, the canonical phonemes, the phonemes the tutor heard and the errors it
@@ -238,10 +234,18 @@ much of an apparent learner profile is produced by the model. To avoid conclusio
 learner, every frequency is reported with the number of learners who contribute to it. The confirmed error
 profile feeds Study~4.
 
-\section{Study 2: how the AI learns (RQ-2)}\label{sec:method-s2}
+\section{Study 2: agentic loop-engineering (RQ-2)}\label{sec:method-s2}
 
-\paragraph{Systems} Three systems are compared on the same recordings. \textbf{B0} is Muaalem as is,
-with alignment and thresholds (Chapter~\ref{ch:impl}). \textbf{B1} is a verifier on top of B0's outputs.
+\paragraph{Baselines and the agentic loop} The \textbf{baseline approaches} are \textbf{B0}, Muaalem as is with
+alignment and thresholds (Chapter~\ref{ch:impl}), and the best single off-the-shelf model from Study~1
+\pending{list of off-the-shelf models and baselines --- to be approved}. In \textbf{agentic loop-engineering} an AI
+agent proposes a configuration (which models to take, how to combine them, which thresholds and alignment rules
+to apply, which components to include), runs it and compares it with teacher annotation by learner-level
+cross-validation on the training part; every configuration tried and its metric are logged. The loop's budget
+(number of iterations or compute hours) is fixed in the preregistration. Two components the agent can choose
+from are prepared in advance.
+
+\paragraph{Components} \textbf{B1} is a verifier on top of B0's outputs.
 For every canonical phoneme $j$ of an attempt it receives a feature vector $x_j$: the model's confidence for
 the phoneme, the probabilities of the articulatory attributes, the Goodness of Pronunciation score
 \begin{equation}
@@ -274,42 +278,45 @@ phonemes of the paired card, is a substitution example) \cite{SRC-119}, and by s
 $0.9/1.0/1.1$ \cite{SRC-120}. The hyperparameter grid ($r\in\{8,16\}$, learning rate, number of epochs with
 early stopping) is fixed in the preregistration.
 
-\paragraph{Split and test-set protection} Before the first training run, about 30\,\% of learners, stratified
+\paragraph{Split and test-set protection} Before the agentic loop first runs, about 30\,\% of learners, stratified
 by first language and activity, are assigned to the test set, and the list is fixed with a SHA-256
 fingerprint. The split is by learner, not by attempt; otherwise one speaker's voice would appear in both
-training and evaluation \cite{SRC-122}. B2's hyperparameters and B1's calibration are chosen only by
-5-fold learner-grouped cross-validation inside the training part \cite{SRC-121}. Both teachers annotate the
-test attempts blind, without seeing the tutor's answer, and reconcile disagreements; these gold labels are
-what all three systems are compared against. The test set is opened once, after all systems are trained and
-frozen and the evaluator is fixed by fingerprint.
+training and evaluation \cite{SRC-122}. The agent searches configurations --- including B2's
+hyperparameters and B1's calibration --- only by 5-fold learner-grouped cross-validation inside the training
+part \cite{SRC-121}; the log of every configuration tried is published, so that choosing the best cannot be
+mistaken for overfitting. Both teachers annotate the
+test attempts, seeing the tutor's answer and correcting it, and reconcile disagreements; these gold labels are
+what the baselines and the best configuration are compared against. The test set is opened once, after the
+agentic loop has finished, the best configuration is frozen and the evaluator is fixed by fingerprint.
 
-\paragraph{Metrics and analysis} For every system the Study~1 metrics are computed on the test set:
-phoneme-level precision, recall, F1 and diagnosis accuracy, verdict-level FAR and FRR, and $\kappa$ with the
-gold labels. H2.1 and H2.2 are tested with a paired cluster bootstrap over learners: the difference between
-two systems is recomputed on the same resampled learners. H2.3 is tested on a held-out set of expert
-recitation not used in training: the upper bound of the 95\,\% interval of the PER difference must be below
+\paragraph{Metrics and analysis} For the baselines and the best configuration the Study~1 metrics are computed
+on the test set: phoneme-level precision, recall, F1 and diagnosis accuracy, verdict-level FAR and FRR, and
+$\kappa$ with the gold labels. The difference between the best configuration and the baselines is tested with a
+paired cluster bootstrap over learners: the difference is recomputed on the same resampled learners. If the best
+configuration includes a fine-tuned model, it is also tested on a held-out set of expert recitation not used in
+training: the upper bound of the 95\,\% interval of the PER difference must be below
 one percentage point \cite{SRC-118}. The summary measure is the \emph{share of the gap closed}
 \begin{equation}
   G_B = \frac{\kappa_B - \kappa_{B0}}{\kappa_{TT} - \kappa_{B0}},
 \end{equation}
-where $\kappa_{TT}$ is the agreement between teachers: $G_B=0$ means adaptation achieved nothing, and
+where $\kappa_{TT}$ is the agreement between teachers: $G_B=0$ means the agentic loop achieved nothing, and
 $G_B=1$ means the system agrees with a teacher as well as teachers agree with each other. Always reported are
-the \emph{learning curve} of B1 and B2 (25, 50, 75 and 100\,\% of training learners), the \emph{contribution of
+the \emph{agentic loop's log}, the \emph{learning curve} of the best configuration (25, 50, 75 and 100\,\% of training learners), the \emph{contribution of
 data sources} --- teacher corrections only; plus the book's minimal pairs; plus learners' ``the bot was wrong''
 disputes --- and the share of attempts the system decides on its own at a risk of at most $\varepsilon$, that
 is, the workload it takes off the teacher. B1's risk--coverage curve is exploratory.
 
 \paragraph{Fallback} If fewer than about 1\,500 annotated attempts exist in the training part by 15 April
-2027, B2 is reported as a feasibility check, H2.2 and H2.3 are withdrawn by a new preregistration version
-before the test set is opened, and RQ-2 is answered by B1. The decision depends on the number of annotated
+2027, fine-tuning (B2) is removed from the agentic loop's components by a new preregistration version before
+the test set is opened, and the agent selects and combines off-the-shelf models without fine-tuning. The decision depends on the number of annotated
 attempts, not on results.
 
-\paragraph{Shadow mode} After training, B1 and B2 run inside the tutor in shadow mode: the learner sees B0's
-verdict, and the adapted systems' verdicts are stored in the attempt. Learners see the same system throughout
-the pilot, so a model change does not confound their progress (RQ-4), and attempts after training give a
+\paragraph{Shadow mode} After the agentic loop, the best configuration runs inside the tutor in shadow mode: the
+learner sees B0's verdict, and its verdicts are stored in the attempt. Learners see the same system throughout
+the pilot, so a model change does not confound their progress (RQ-3), and attempts after training give a
 descriptive check.
 
-\section{Study 3: measuring mastery (RQ-3)}\label{sec:method-s3}
+\section{The mastery model --- the measurement instrument for RQ-3}\label{sec:method-s3}
 
 \paragraph{Skill map} A skill is a ``letter + vowel or sign $\to$ sound'' correspondence introduced by the book;
 skills are ordered as the lessons introduce them. Each line of the book exercises several skills; the matrix
@@ -335,20 +342,22 @@ against teachers on the training part (Studies~1 and~2), and
   P(\hat o_t{=}1\mid L_t) = P(o_t{=}1\mid L_t)\,(1-\mathrm{FRR}_p) + P(o_t{=}0\mid L_t)\,\mathrm{FAR}_p .
 \end{equation}
 The recogniser's noise is thus not absorbed into $g$ and $s$, as in Beck and Sison \cite{SRC-125}, but enters
-the model as a measured quantity, and adapting the recogniser (smaller $\mathrm{FAR}_p$, $\mathrm{FRR}_p$)
+the model as a measured quantity, and a more accurate recognition system (smaller $\mathrm{FAR}_p$, $\mathrm{FRR}_p$)
 should make the mastery estimate more accurate. Parameters are estimated on training learners (EM or grid
-search); K1 and K2 are built on top of B0 and on top of the adapted system chosen by cross-validation on the
-training part.
+search); K1 and K2 are built on top of B0 and on top of the agentic loop's best configuration.
 
 \paragraph{Validation} On test learners the models predict the gold outcome of the next attempt on a skill
-(blind teacher annotation, not the system's verdict). The metrics are AUC, log loss and calibration error
-\cite{SRC-126}. H3.1 and H3.2 are tested with a paired cluster bootstrap of the AUC difference over learners.
-The external criterion (H3.3) is the teacher test at the end of the pilot: K2's final mastery estimate per skill
+(teacher annotation, not the system's verdict). The metrics are AUC, log loss and calibration error
+\cite{SRC-126}; the AUC difference is described with a paired cluster bootstrap over learners.
+The external criterion is the teacher test at the end of the pilot: K2's final mastery estimate per skill
 group is compared with the share of correct skills in the group on the test by Spearman's $\rho$, with a
 bootstrap interval over learners. Deep knowledge tracing \cite{SRC-127} is compared as exploration; no gain is
 expected from it on small data.
 
-\section{Study 4: how people learn (RQ-4)}\label{sec:method-s4}
+\section{Study 3: learning dynamics (RQ-3, additional)}\label{sec:method-s4}
+
+Learning dynamics with the tool are described by the mastery model's estimate (Section~\ref{sec:method-s3}) and
+the teacher test.
 
 \paragraph{Learning curves} For each skill, the error rate is plotted against the learner's attempt number on
 that skill. The additive factors model \cite{SRC-128}
@@ -361,17 +370,18 @@ $\gamma_k$) and which slowly. It also checks the skill map: if a skill is badly 
 The fit of AFM with the book's map is compared with a ``one letter, one skill'' map.
 
 \paragraph{Attempts to mastery and forgetting} A skill is considered mastered when K2 reaches $P(L)\ge0.95$. The
-number of attempts to mastery is compared between skills with sounds absent from Russian and the rest (H4.1) in
-a mixed model with a learner random effect \cite{SRC-106}. H4.2 uses the model's attribute (\emph{sifat})
-outputs on confirmed errors and is tested with a mixed logistic model. Forgetting is described in two ways:
+number of attempts to mastery is reported by skill and skill group. Comparing skills with sounds absent from
+Russian with the rest (a mixed model with a learner random effect \cite{SRC-106}) and analysing errors by
+attribute (\emph{sifat}) are exploratory: the earlier hypotheses H4.1 and H4.2 were moved to the PhD plan. Forgetting is described in two ways:
 retention on the delayed teacher test and the drop in the probability of a correct outcome after a break between
 sessions; a half-life memory model \cite{SRC-129} is exploratory.
 
 \paragraph{Teacher test} The share of correct skills at entry, at the end of the pilot and on the delayed test is
 reported descriptively by skill group. Without a control group, growth between tests does not prove that the
-system taught the learners: it describes how people learn with the system. Following DART \cite{SRC-130,SRC-131},
+tool caused the dynamics: it describes learning dynamics with the tool. Following DART \cite{SRC-130,SRC-131},
 the AI's accuracy and people's learning are reported separately. Holm's procedure controls the family-wise error
-at $\alpha=0.05$ across the twelve confirmatory hypotheses; effect sizes and confidence intervals are always
+at $\alpha=0.05$ across the confirmatory hypotheses (their number is set once the hypotheses for RQ-2 and
+RQ-3 are approved); effect sizes and confidence intervals are always
 reported. Data collection stops at the planned end of the pilot; interim reports are descriptive only.
 
 \section{Validity of development and experiments}\label{sec:method-harness}
@@ -392,8 +402,8 @@ Three mechanisms protect the results from being shaped after the fact.
 
 \paragraph{Preregistration} Hypotheses, exclusions, sample size and analysis are written down before data
 collection. When the author and supervisor approve the plan, its SHA-256 fingerprint and date are recorded,
-and any later change requires a new version with a stated reason. Separately, before the first training
-run, the list of test learners, the RQ-2 and RQ-3 evaluator code and the list of teacher-test lines are fixed
+and any later change requires a new version with a stated reason. Separately, before the agentic loop
+first runs, the list of test learners, the RQ-1--RQ-3 evaluator code and the list of teacher-test lines are fixed
 by fingerprint. Freezing data and
 evaluator by hash follows the practice of the supervisor's group \cite{SRC-067}.
 
@@ -439,12 +449,16 @@ Type & Threat & Response \\
 \midrule
 Construct & An annotator's label is not the ``true'' error; teachers may disagree. & Two annotators;
 teacher--teacher $\kappa$ as ceiling; written guide with versions. \\
-Construct & Annotators see the tutor's answer and may agree by suggestion, which favours B0. & The
-test set is annotated blind; H1.2 is also reported on the blind part; agreement analysed separately for
+Construct & Annotators see the tutor's answer and may agree by suggestion, which favours B0. & Both
+teachers annotate every test attempt; teacher--teacher agreement is reported next to model--teacher; agreement analysed separately for
 passed and failed attempts. \\
 Internal & Leakage between training and test (same speaker, tuning on the test set). & Learner-disjoint
 split; frozen test list; CV inside training; hook on test labels; test set opened once. \\
-Internal & Gains on beginners bought by forgetting. & H2.3 on held-out expert recitation. \\
+Internal & Gains on beginners bought by forgetting. & A fine-tuned model is tested on held-out expert
+recitation. \\
+Internal & The agentic loop tries many configurations and may fit the choice to the data. & Search only by
+learner-level CV on the training part; a log of every configuration; a fixed loop budget; the test set is
+opened once. \\
 Conclusion & Small test set (about ten learners). & Paired cluster bootstrap; wide intervals reported as
 they are; the learning curve shows how much data is missing. \\
 Construct & The boundary between reading and pronunciation errors depends on the annotation rule. & H1.1 tests
@@ -452,7 +466,7 @@ its reliability; ``unclear'' is its own category; the rule comes with examples f
 Construct & The book's skills may be badly chosen. & AFM curves per skill; comparison with a ``one letter, one
 skill'' map. \\
 Internal & Learners' progress may come from something other than the system (lessons with a teacher,
-repetition). & RQ-4 is framed as description; blind teacher test; no causal claims. \\
+repetition). & RQ-3 is framed as description; blind teacher test; no causal claims. \\
 Internal & The teacher test is given by the same teacher who annotates. & The test is blind to the system's
 estimates; the list of lines is fixed in advance and excluded from training. \\
 Internal & Long lines dilute errors in the similarity score. & RQ-1 is computed per phoneme, not only per
