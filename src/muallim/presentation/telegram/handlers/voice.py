@@ -17,6 +17,7 @@ from muallim.application.ports.recognition import RecognitionError
 from muallim.application.ports.storage import ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
+from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import RecordReference
 from muallim.application.use_cases.screen import ScreenState
@@ -25,6 +26,7 @@ from muallim.application.use_cases.staff import StaffAccess
 from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner
 from muallim.domain.policy import Verdict
+from muallim.domain.quiz import read_passed
 from muallim.presentation.telegram import opening, screens, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
@@ -49,6 +51,7 @@ async def on_voice(
     progress: FromDishka[GetProgress],
     screen_state: FromDishka[ScreenState],
     learner_settings: FromDishka[GetSettings],
+    quiz: FromDishka[PracticeQuiz],
 ) -> None:
     assert m.voice is not None  # гарантирует фильтр F.voice  # noqa: S101
     if m.voice.duration < 1:
@@ -118,7 +121,15 @@ async def on_voice(
     )
     await wait.delete()
     screen = screens.result(cur, result, library.has(result.item.id), resume, staff=staff)
+    # ступень ③ закрепления: попытка — ответ на открытый вопрос этой строки (ADR-0066 п. 8)
+    passed = read_passed(attempt.verdict)
+    linked = await quiz.attach_attempt(learner, result.item.id, attempt.id, passed=passed)
+    if linked is not None and not linked.finished:
+        screen = screens.with_quiz_next(screen)
     await display.send(bot, m.chat.id, screen)
+    if linked is not None and linked.summary is not None:
+        await screen_state.menu(learner)
+        await display.send(bot, m.chat.id, screens.quiz_summary(cur, linked.summary))
 
 
 @router.message()

@@ -31,15 +31,20 @@ class LettersSheet(CallbackData, prefix="sheet"):
 
 
 class Quiz(CallbackData, prefix="quiz"):
-    """Следующий вопрос закрепления."""
+    """Открытый или следующий вопрос закрепления (новый раунд — после итога)."""
 
 
 class QuizAnswer(CallbackData, prefix="qa"):
-    i: str  # id карточки-буквы
-    v: int  # огласовка
-    s: int  # seed вопроса
+    """Ответ на вопрос закрепления (ADR-0066): вопрос и варианты — в строке ``quiz_answers``."""
+
+    a: str  # id строки quiz_answers (UUID.hex)
     p: int  # выбранный вариант
-    k: int = -1  # начатые уроки букв на момент вопроса (маска); -1 — пересчитать
+
+
+class QuizSkip(CallbackData, prefix="qs"):
+    """«Не могу сейчас говорить / слушать» на ступенях ②③ (ADR-0066, как в Duolingo)."""
+
+    a: str  # id строки quiz_answers (UUID.hex)
 
 
 class Help(CallbackData, prefix="help"):

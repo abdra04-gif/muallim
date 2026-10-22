@@ -15,6 +15,7 @@ from muallim.presentation.telegram.handlers import (
     data,
     letters,
     navigation,
+    quiz,
     reference,
     settings,
     voice,
@@ -24,6 +25,7 @@ router: Final = Router(name="learner")
 router.include_routers(
     commands.router,
     navigation.router,
+    quiz.router,
     letters.router,
     daily.router,
     data.router,

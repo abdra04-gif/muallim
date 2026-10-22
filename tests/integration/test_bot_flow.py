@@ -425,20 +425,19 @@ async def test_old_quiz_button_gets_stale_alert(
     assert texts.STALE_BUTTON in ali.tg.alerts()
 
 
-@pytest.mark.parametrize(("vowel", "picked"), [(-1, 0), (3, 0), (0, -1), (0, 4)])
+@pytest.mark.parametrize(("answer", "picked"), [("0" * 32, 0), ("f" * 32, 1), ("zz", 0)])
 async def test_forged_quiz_answer_is_rejected_and_not_logged(
     bot_app: tuple[Dispatcher, AsyncContainer],
     learner_factory: Callable[[int], Learner],
-    vowel: int,
+    answer: str,
     picked: int,
 ) -> None:
-    """Огласовка вне 0..2 или вариант вне 0..3 — «устарела», в данные исследования не пишется."""
+    """Чужой или выдуманный вопрос (ADR-0066: в кнопке — id строки ``quiz_answers``) —
+    «устарела», в данные исследования не пишется."""
     _, container = bot_app
-    async with container() as request:
-        item = _letter_item(await request.get(Curriculum))
     ali = learner_factory(5102)
     await ali.write("/start")
     await ali.press(Consent(granted=False))
-    await ali.press(QuizAnswer(i=item, v=vowel, s=5, p=picked, k=-1))
-    assert texts.STALE_BUTTON in ali.tg.alerts()
+    await ali.press(QuizAnswer(a=answer, p=picked))
+    assert texts.QUIZ_STALE in ali.tg.alerts()  # вопрос закрепления, не карточка урока
     assert await _quiz_events(container) == 0

@@ -1,6 +1,5 @@
 """Команды ученика: /start, /lessons, /progress, /help, /privacy, /signs, /quiz, /me."""
 
-import random
 from typing import Final
 
 from aiogram import Bot, Router
@@ -17,6 +16,7 @@ from muallim.domain.learner import Learner
 from muallim.presentation.telegram import keyboards, screens, texts, views
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.daily import home_or_opening
+from muallim.presentation.telegram.handlers.quiz import quiz_screen
 from muallim.presentation.telegram.learner import NewLearner
 from muallim.presentation.telegram.screens import Screen
 
@@ -36,6 +36,7 @@ async def start(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
     questionnaire: FromDishka[Questionnaire],
+    quiz: FromDishka[PracticeQuiz],
 ) -> None:
     if is_new and not learner.research_consent:
         await m.answer(texts.WELCOME)
@@ -44,8 +45,11 @@ async def start(
     if await questionnaire.needed(learner):  # анкету бросили на середине — спросить ещё раз
         await display.send(bot, m.chat.id, PROFILE_START)
         return
-    screen = await home_or_opening(cur, await progress.execute(learner), learner, screen_state)
-    await display.send(bot, m.chat.id, screen)
+    waiting = (await quiz.overview(learner)).waiting
+    p = await progress.execute(learner)
+    await display.send(
+        bot, m.chat.id, await home_or_opening(cur, p, learner, screen_state, waiting)
+    )
 
 
 @router.message(Command("lessons"))
@@ -72,9 +76,11 @@ async def progress_cmd(
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
+    quiz: FromDishka[PracticeQuiz],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    await display.send(bot, m.chat.id, screens.progress(cur, await progress.execute(learner)))
+    p = await progress.execute(learner)
+    await display.send(bot, m.chat.id, screens.progress(cur, p, await quiz.overview(learner)))
 
 
 @router.message(Command("help"))
@@ -126,13 +132,7 @@ async def quiz_cmd(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
-    await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    q = await uc.next(learner, random.randrange(10**6))  # noqa: S311
-    await display.send(
-        bot,
-        m.chat.id,
-        screens.quiz(q) if q else screens.quiz_unavailable(cur, await progress.execute(learner)),
-    )
+    await display.send(bot, m.chat.id, await quiz_screen(uc, learner, screen_state, cur, progress))
 
 
 @router.message(Command("me"))

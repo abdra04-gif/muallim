@@ -19,6 +19,7 @@ from muallim.application.ports.repositories import (
     LearnerProfileRepository,
     LearnerRepository,
     LearnerSettingsRepository,
+    QuizAnswerRepository,
     ReminderRecipients,
     UnitOfWork,
 )
@@ -75,6 +76,7 @@ from muallim.infrastructure.db.repositories.learners import (
     SqlLearnerProfileRepository,
     SqlLearnerRepository,
 )
+from muallim.infrastructure.db.repositories.quiz import SqlQuizAnswerRepository
 from muallim.infrastructure.db.repositories.reminders import SqlReminderRecipients
 from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRepository
 from muallim.infrastructure.db.uow import SqlUnitOfWork
@@ -185,6 +187,7 @@ class RequestProvider(Provider):
     learners = provide(SqlLearnerRepository, provides=LearnerRepository)
     profiles = provide(SqlLearnerProfileRepository, provides=LearnerProfileRepository)
     learner_settings = provide(SqlLearnerSettingsRepository, provides=LearnerSettingsRepository)
+    quiz_answers = provide(SqlQuizAnswerRepository, provides=QuizAnswerRepository)
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
     reminder_recipients = provide(SqlReminderRecipients, provides=ReminderRecipients)
     events = provide(SqlEventLog, provides=EventLog)
@@ -236,6 +239,26 @@ class RequestProvider(Provider):
         """«🔁 Повторение» на сегодня — по местной дате ученика (ADR-0062, ADR-0061)."""
         return GetReview(curriculum, attempts, policy, clock, learner_settings)
 
+    @provide
+    def quiz(
+        self,
+        *,
+        curriculum: Curriculum,
+        attempts: AttemptRepository,
+        answers: QuizAnswerRepository,
+        library: ReferenceAudioLibrary,
+        events: EventLog,
+        uow: UnitOfWork,
+        clock: Clock,
+        ids: IdGenerator,
+        learner_settings: LearnerSettingsRepository,
+    ) -> PracticeQuiz:
+        """«🧠 Закрепление» — по местной дате ученика (ADR-0066, ADR-0061)."""
+        return PracticeQuiz(
+            curriculum=curriculum, attempts=attempts, answers=answers, audio=library,
+            events=events, uow=uow, clock=clock, ids=ids, settings=learner_settings,
+        )  # fmt: skip
+
     use_cases = provide_all(
         EnsureLearner,
         SetResearchConsent,
@@ -252,7 +275,6 @@ class RequestProvider(Provider):
         GetReferenceAudio,
         ReportMistake,
         PublishCurriculum,
-        PracticeQuiz,
         RedeemInvite,
         NextAnnotation,
         SubmitAnnotation,

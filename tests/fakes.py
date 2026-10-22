@@ -18,6 +18,7 @@ from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 
 if TYPE_CHECKING:
     from muallim.domain import review
+    from muallim.domain.quiz import QuizAnswer
 
 
 class FixedClock:
@@ -321,3 +322,43 @@ class InMemoryAnnotationTasks:
 
     async def add(self, label: Label) -> None:
         self.labels.append(label)
+
+
+@dataclass
+class InMemoryQuizAnswers:
+    """Ответы «🧠 Закрепления» (ADR-0066): строка пишется при показе, ответ — в неё же."""
+
+    rows: dict[UUID, "QuizAnswer"] = field(default_factory=dict)
+
+    async def add(self, row: "QuizAnswer") -> bool:
+        """Как UNIQUE (learner_id, round_no, position): место занято — не вставляет."""
+        place = (row.learner_id, row.round_no, row.position)
+        if any((r.learner_id, r.round_no, r.position) == place for r in self.rows.values()):
+            return False
+        self.rows[row.id] = row
+        return True
+
+    async def get(self, answer_id: UUID) -> "QuizAnswer | None":
+        return self.rows.get(answer_id)
+
+    async def record(
+        self,
+        answer_id: UUID,
+        *,
+        picked: int | None,
+        correct: bool | None,
+        answered_at: datetime,
+        attempt_id: UUID | None = None,
+    ) -> bool:
+        """``correct`` = None — вопрос пропущен («Не могу сейчас говорить/слушать»)."""
+        row = self.rows.get(answer_id)
+        if row is None or row.answered_at is not None:
+            return False
+        self.rows[answer_id] = replace(
+            row, picked=picked, correct=correct, answered_at=answered_at, attempt_id=attempt_id
+        )
+        return True
+
+    async def history(self, learner_id: UUID) -> "list[QuizAnswer]":
+        mine = [r for r in self.rows.values() if r.learner_id == learner_id]
+        return sorted(mine, key=lambda r: (r.round_no, r.position))

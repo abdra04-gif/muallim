@@ -10,6 +10,8 @@ erDiagram
     attempts ||--o{ learner_reports : "«бот ошибся»"
     learners ||--o{ learner_reports : "оспаривает"
     curriculum_items |o--o{ attempts : "строка книги (item_id + curriculum_version)"
+    learners ||--o{ quiz_answers : "закрепление (ADR-0066)"
+    attempts |o--o{ quiz_answers : "чтение на ступени ③"
 
     learners {
         uuid id PK
@@ -104,4 +106,20 @@ erDiagram
         uuid learner_id FK "SET NULL при удалении"
         string event
         json payload
+    }
+
+    quiz_answers {
+        uuid id PK
+        uuid learner_id FK "CASCADE"
+        int round_no "UNIQUE с learner_id, position"
+        smallint position
+        smallint step "1 узнаю, 2 слышу, 3 читаю"
+        string letter_id
+        string item_id
+        json options
+        smallint picked
+        bool correct "NULL — пропуск"
+        uuid attempt_id FK "SET NULL"
+        timestamptz shown_at
+        timestamptz answered_at
     }

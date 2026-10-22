@@ -458,23 +458,15 @@ async def test_voice_on_menu_is_not_downloaded(app: tuple[Dispatcher, AsyncConta
 async def test_quiz_answer_shows_the_options_the_learner_saw(
     app: tuple[Dispatcher, AsyncContainer],
     curriculum: Curriculum,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """TD-FN-90 п. 4 (ADR-0025, FR-49): ответ закрепления показывает ровно те варианты, что были
-    на кнопках, даже если между вопросом и ответом ученик начал новый урок буквы."""
-    import random  # noqa: PLC0415
-
-    from muallim.domain.quiz import make_question, question_from  # noqa: PLC0415
+    на кнопках, даже если между вопросом и ответом ученик начал новый урок буквы. С ADR-0066
+    варианты хранятся в строке ``quiz_answers`` с момента показа."""
+    from muallim.infrastructure.db.repositories.quiz import SqlQuizAnswerRepository  # noqa: PLC0415
     from muallim.presentation.telegram.callbacks import Quiz, QuizAnswer  # noqa: PLC0415
 
-    seed = 0
     lessons = {les.id: les for les in curriculum.lessons}
-    before = [lessons["L003"], lessons["L005"]]
-    shown = make_question(curriculum, before, seed)
-    after = question_from(curriculum, shown.item_id, shown.vowel, seed, [*before, lessons["L004"]])
-    assert after.options != shown.options, "предусловие: новый урок меняет отвлекающие варианты"
-
-    dp, _ = app
+    dp, container = app
     ali = _person(dp)
     await ali.write("/start")
     await ali.press(Opening(act="skip"))
@@ -482,12 +474,14 @@ async def test_quiz_answer_shows_the_options_the_learner_saw(
         practice = next(i for i in lessons[lesson].items if i.is_practice)
         await ali.press(GoItem(item_id=practice.id))
         await ali.voice()
-    monkeypatch.setattr(random, "randrange", lambda *_: seed)
     await ali.press(Quiz())
     asked = [(text, data) for text, data in _labels(ali) if data.startswith(QuizAnswer.__prefix__)]
+    async with container() as request:
+        rows = await SqlQuizAnswerRepository(await request.get(AsyncSession)).history(UUID(int=1))
+    shown = rows[-1]
     assert [text for text, _ in asked] == list(shown.options)
 
     await ali.press(GoItem(item_id="L004-02"))  # начал новый урок буквы (курсор — урок 4)
-    await ali.press(asked[0][1])  # ответил кнопкой со старого экрана вопроса
+    await ali.press(asked[(shown.answer + 1) % 4][1])  # неверно, кнопкой со старого экрана
     answered = [text for text, data in _labels(ali) if data == "noop"]
     assert answered == list(shown.options), "на экране ответа — те же варианты, что на кнопках"

@@ -6,24 +6,25 @@
 
 import re
 from collections.abc import Collection, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from html import escape
 from typing import Final
 
 from aiogram.enums import ButtonStyle
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from muallim.application.transcription import as_text
 from muallim.application.use_cases.progress import LessonStatus, Progress
+from muallim.application.use_cases.quiz import QuizOverview, QuizRest, QuizResult, QuizView
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
 from muallim.domain.assessment import Assessment, ErrorKind
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem, letters_before
 from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
 from muallim.domain.policy import Verdict
-from muallim.domain.quiz import Question, first_quiz_lesson
+from muallim.domain.quiz import QUIZ_ROUND, RoundSummary, Step, first_quiz_lesson
 from muallim.domain.settings import (
     ASK_OFFSET_HOURS,
     REMINDER_HOURS,
@@ -49,6 +50,7 @@ from muallim.presentation.telegram.callbacks import (
     Privacy,
     Quiz,
     QuizAnswer,
+    QuizSkip,
     RecordReference,
     ShareLesson,
     ShowProgress,
@@ -131,7 +133,7 @@ def _bar(done: int, total: int) -> str:
 
 
 # ---------- главная ----------
-def home(curriculum: Curriculum, progress: Progress) -> Screen:
+def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> Screen:
     item = progress.continue_item or curriculum.first_item()
     lesson, _ = curriculum.locate(item.id)
     fresh = progress.attempts_total == 0 and item == curriculum.first_item()
@@ -147,7 +149,10 @@ def home(curriculum: Curriculum, progress: Progress) -> Screen:
     label = texts.START_BUTTON if fresh else texts.CONTINUE_BUTTON.format(title=lesson.title)
     kb.button(text=label, callback_data=GoItem(item_id=item.id))
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
-    kb.button(text=texts.QUIZ_BUTTON, callback_data=Quiz())
+    quiz_label = (
+        texts.QUIZ_BUTTON_WAITING.format(n=quiz_waiting) if quiz_waiting else texts.QUIZ_BUTTON
+    )
+    kb.button(text=quiz_label, callback_data=Quiz())
     kb.button(text=texts.SIGNS_BUTTON, callback_data=Signs())
     kb.button(text=texts.PROGRESS_BUTTON, callback_data=ShowProgress())
     kb.button(text=texts.SETTINGS_BUTTON, callback_data=ShowSettings())  # FR-51
@@ -620,7 +625,7 @@ def _explanations(r: RecitationResult, has_audio: bool) -> list[str]:
 
 
 # ---------- прогресс, помощь, данные ----------
-def progress(curriculum: Curriculum, p: Progress) -> Screen:
+def progress(curriculum: Curriculum, p: Progress, quiz: QuizOverview | None = None) -> Screen:
     lines = [
         texts.PROGRESS_HEAD.format(
             done=p.done_lessons,
@@ -629,6 +634,8 @@ def progress(curriculum: Curriculum, p: Progress) -> Screen:
             attempts=p.attempts_total,
         )
     ]
+    if quiz is not None and quiz.letters:  # ⭐ по буквам — сразу под шапкой (ADR-0066)
+        lines.append(texts.QUIZ_CONFIDENT.format(n=quiz.confident, total=quiz.letters) + "\n")
     shown = [lp for lp in p.lessons if lp.total and lp.status is not LessonStatus.NEW]
     for lp in shown:
         line = (
@@ -909,38 +916,114 @@ def letters_sheet(
     return Screen(caption, kb.as_markup())
 
 
-def quiz(q: Question) -> Screen:
-    kb = InlineKeyboardBuilder()
-    for k, option in enumerate(q.options):
-        kb.button(
-            text=option,
-            callback_data=QuizAnswer(i=q.item_id, v=q.vowel, s=q.seed, p=k, k=q.started),
-        )
-    _home_row(kb)
-    kb.adjust(2, 2, 1)
-    image = render.card(q.prompt, set(), (0, 1)) if render.available() else None
-    caption = texts.QUIZ_ASK if image else f"<b>{escape(q.prompt)}</b>\n\n{texts.QUIZ_ASK}"
-    return Screen(caption, kb.as_markup(), image, f"quiz:{q.item_id}:{q.vowel}")
-
-
-def quiz_answer(q: Question, picked: int) -> Screen:
-    right = picked == q.answer
-    caption = (texts.QUIZ_RIGHT if right else texts.QUIZ_WRONG).format(
-        prompt=escape(q.prompt), answer=escape(q.correct), picked=escape(q.options[picked])
+def quiz(view: QuizView) -> Screen:
+    """Вопрос закрепления (ADR-0066): ① картинка слога и варианты кириллицей; ② 🔊 и арабские
+    слоги, сам слог не показан; ③ строка буквы — прочитать голосом."""
+    q = view.question
+    header = texts.QUIZ_HEADER.format(
+        position=view.position, total=QUIZ_ROUND, correct=view.correct_so_far
     )
     kb = InlineKeyboardBuilder()
-    # Варианты остаются на экране в цвете (Bot API 9.4): верный — зелёный, выбранный неверный —
-    # красный. Нажать их снова нельзя (Noop); старые клиенты цвет не покажут — подпись главнее.
+    if q.step == Step.HEAR:
+        kb.button(text=texts.QUIZ_LISTEN, callback_data=Listen(item_id=q.item_id))
+    for k, option in enumerate(q.options):
+        kb.button(text=option, callback_data=QuizAnswer(a=view.answer_id.hex, p=k))
+    skip = {Step.HEAR: texts.QUIZ_CANT_LISTEN, Step.READ: texts.QUIZ_CANT_SPEAK}.get(Step(q.step))
+    if skip:  # как в Duolingo: пропустить без ошибки, ступень — на паузе (ADR-0066)
+        kb.button(text=skip, callback_data=QuizSkip(a=view.answer_id.hex))
+    _home_row(kb)
+    if q.step == Step.HEAR:
+        kb.adjust(1, 2, 2, 1, 1)
+        return Screen(f"{header}\n\n{texts.QUIZ_HEAR_ASK}", kb.as_markup())
+    ask = texts.QUIZ_ASK if q.step == Step.RECOGNIZE else texts.QUIZ_READ_ASK
+    kb.adjust(*((2, 2) if q.options else ()), *((1,) if skip else ()), 1)
+    image = render.card(q.prompt, set(), (0, 1)) if render.available() else None
+    body = ask if image else f"<b>{escape(q.prompt)}</b>\n\n{ask}"
+    return Screen(f"{header}\n\n{body}", kb.as_markup(), image, f"quiz:{q.item_id}")
+
+
+def quiz_answer(result: QuizResult) -> Screen:
+    """Разбор неверного ответа (верный — сразу следующий вопрос): верный вариант — зелёный,
+    выбранный — красный (ADR-0043); 🔊 и «▶️ Дальше». Нажать варианты снова нельзя (Noop);
+    подпись главнее цвета для старых клиентов."""
+    q = result.view.question
+    picked = result.picked if result.picked is not None else -1
+    right = q.options[q.answer] if q.options else ""
+    shown = q.options[picked] if 0 <= picked < len(q.options) else ""
+    template = texts.QUIZ_WRONG_HEAR if q.step == Step.HEAR else texts.QUIZ_WRONG
+    caption = template.format(prompt=escape(q.prompt), answer=escape(right), picked=escape(shown))
+    kb = InlineKeyboardBuilder()
     for k, option in enumerate(q.options):
         style = (
             ButtonStyle.SUCCESS if k == q.answer else ButtonStyle.DANGER if k == picked else None
         )
         kb.button(text=option, callback_data=Noop(), style=style)
-    kb.button(text=texts.QUIZ_NEXT, callback_data=Quiz(), style=ButtonStyle.PRIMARY)
+    kb.button(text=texts.QUIZ_LISTEN, callback_data=Listen(item_id=q.item_id))
+    if not result.finished:  # после 10-го — итог отдельным сообщением ниже
+        kb.button(text=texts.QUIZ_NEXT, callback_data=Quiz(), style=ButtonStyle.PRIMARY)
     _home_row(kb)
-    kb.adjust(2, 2, 2)
-    image = render.card(q.prompt, set(), (0, 1)) if render.available() else None
-    return Screen(caption, kb.as_markup(), image, f"quiz:{q.item_id}:{q.vowel}")
+    kb.adjust(*((2, 2) if q.options else ()), 1, 1, 1)
+    image = None
+    if q.step == Step.RECOGNIZE and render.available():
+        image = render.card(q.prompt, set(), (0, 1))
+    return Screen(caption, kb.as_markup(), image, f"quiz:{q.item_id}" if image else "")
+
+
+def quiz_summary(curriculum: Curriculum, summary: RoundSummary) -> Screen:
+    """Итог раунда: счёт, буквы с ошибками (🔊 каждой), сколько букв уже «⭐ уверенно»."""
+    lines = [texts.QUIZ_SUMMARY.format(correct=summary.correct, total=summary.total)]
+    kb = InlineKeyboardBuilder()
+    repeat = [x for x in summary.repeat if _in_program(curriculum, x)]
+    if repeat:
+        letters = [_letter_of(curriculum.locate(x)[0]) for x in repeat]
+        lines.append(texts.QUIZ_SUMMARY_REPEAT.format(letters=" ".join(letters)))
+        for x, letter in zip(repeat, letters, strict=True):
+            kb.button(text=f"🔊 {letter}", callback_data=Listen(item_id=x))
+    else:
+        lines.append(texts.QUIZ_SUMMARY_ALL)
+    if summary.letters:
+        lines.append(texts.QUIZ_CONFIDENT.format(n=summary.confident, total=summary.letters))
+    kb.button(text=texts.QUIZ_AGAIN, callback_data=Quiz(), style=ButtonStyle.PRIMARY)
+    _home_row(kb)
+    full, rest = divmod(len(repeat), SHEET_LISTEN_PER_ROW)
+    kb.adjust(*([SHEET_LISTEN_PER_ROW] * full), *((rest,) if rest else ()), 1, 1)
+    return Screen("\n\n".join(lines), kb.as_markup())
+
+
+def quiz_rest(rest: QuizRest) -> Screen:
+    """«На сегодня всё»: буквы ждут срока повторения (ADR-0066) — вместо однообразных кругов."""
+    lines = [texts.QUIZ_REST]
+    if rest.letters:
+        lines.append(texts.QUIZ_CONFIDENT.format(n=rest.confident, total=rest.letters))
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
+    _home_row(kb)
+    kb.adjust(2)
+    return Screen("\n\n".join(lines), kb.as_markup())
+
+
+def _in_program(curriculum: Curriculum, item_id: str) -> bool:
+    try:
+        curriculum.item(item_id)
+    except KeyError:  # карточку убрали при пересборке книги
+        return False
+    return True
+
+
+def with_quiz_next(screen: Screen) -> Screen:
+    """Разбор голосового на ступени ③: вместо кнопок урока («▶️ Дальше», «◀️ Назад», «🔁 Ещё
+    раз» увели бы из раунда) — «🧠 Дальше по закреплению»; 🔊 эталона и «🚩 Бот ошибся» остаются."""
+    keep = (Listen.__prefix__ + ":", Dispute.__prefix__ + ":")
+    kept = [
+        [b for b in row if isinstance(b.callback_data, str) and b.callback_data.startswith(keep)]
+        for row in screen.keyboard.inline_keyboard
+    ]
+    rows = [
+        [InlineKeyboardButton(text=texts.QUIZ_READ_NEXT, callback_data=Quiz().pack())],
+        *[row for row in kept if row],
+        [InlineKeyboardButton(text=texts.HOME_BUTTON, callback_data=Home().pack())],
+    ]
+    return replace(screen, keyboard=InlineKeyboardMarkup(inline_keyboard=rows))
 
 
 def quiz_unavailable(curriculum: Curriculum, progress: Progress) -> Screen:

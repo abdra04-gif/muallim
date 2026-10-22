@@ -87,7 +87,8 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.Lessons: callbacks.Lessons(part=big, page=big),
         callbacks.Signs: callbacks.Signs(),
         callbacks.Quiz: callbacks.Quiz(),
-        callbacks.QuizAnswer: callbacks.QuizAnswer(i=item, v=big, s=big, p=big),
+        callbacks.QuizAnswer: callbacks.QuizAnswer(a=attempt, p=big),  # id строки quiz_answers
+        callbacks.QuizSkip: callbacks.QuizSkip(a=attempt),  # «Не могу сейчас…» (ADR-0066)
         callbacks.Help: callbacks.Help(),
         callbacks.Privacy: callbacks.Privacy(),
         callbacks.RecordReference: callbacks.RecordReference(item_id=item),

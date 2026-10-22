@@ -186,12 +186,39 @@
 | `reason` | varchar(32) | `read_correctly` / `wrong_error` / `other` |
 | `created_at` | timestamptz | |
 
+## `quiz_answers` — ответы «🧠 Закрепления» (FR-53, ADR-0066, миграция 0009)
+Одна строка — один показанный вопрос: пишется при показе, ответ дописывается в неё же один раз
+(повторное нажатие — «кнопка устарела»). Строка без ответа (`answered_at` NULL) — вопрос показан, но не
+отвечен; `answered_at` есть, а `correct`, `picked`, `attempt_id` — NULL: пропущен кнопкой «Не могу сейчас
+говорить/слушать» (не ошибка). `answered_at − shown_at` у вопроса, к которому вернулись позже, может быть в днях. Ступени
+и сроки повторения не хранятся — вычисляются из этих строк (`domain/quiz.py`, M-19).
+| Поле | Тип | Описание |
+|---|---|---|
+| `id` | UUID, PK | его `hex` — в кнопке ответа (`qa:<id>:<вариант>`) |
+| `learner_id` | UUID → learners, CASCADE | удаляется вместе с учеником |
+| `round_no` | int | номер раунда ученика (1, 2, …); `UNIQUE (learner_id, round_no, position)` — одно место, один вопрос |
+| `position` | smallint ≥ 1 | место в раунде (1–10, `QUIZ_ROUND`) |
+| `step` | smallint 1–3 | ступень: 1 — узнаю (кириллица), 2 — слышу (🔊 → арабский слог), 3 — читаю голосом |
+| `letter_id` | varchar(32) | буква — id головной карточки урока (`L007-05` = ت); для модели усвоения (RQ-3) |
+| `item_id` | varchar(32) | что было на экране: слог (`L007-03`) на ступенях 1–2, строка буквы на 3 |
+| `vowel` | smallint 0–2 | огласовка: 0 фатха, 1 кясра, 2 дамма |
+| `options` | JSON | варианты в том порядке, как показаны; на ступени 3 — пусто |
+| `answer` | smallint | индекс верного варианта; на ступени 3 — −1 |
+| `picked` | smallint 0–3, NULL | что нажал ученик; NULL — не отвечал или ступень 3 |
+| `correct` | bool, NULL | верно ли; на ступени 3 — вердикт попытки не `failed` (M-01); NULL — не отвечен или пропущен |
+| `attempt_id` | UUID → attempts, SET NULL | попытка чтения на ступени 3 |
+| `reason` | varchar(16) | почему выбран вопрос: `retry`, `due`, `mistake`, `new`, `old` |
+| `shown_at` | timestamptz | когда показан |
+| `answered_at` | timestamptz, NULL | когда ответил; время ответа = `answered_at − shown_at` |
+| `curriculum_version` | varchar(32) | версия программы при показе |
+| `rule` | varchar(8) | версия правила отбора (`v2` — ADR-0066) |
+
 ## `interaction_events` — журнал действий
 | Поле | Тип | Описание |
 |---|---|---|
 | `id` | int, PK | |
 | `learner_id` | UUID → learners, SET NULL | после удаления ученика событие остаётся обезличенным |
-| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_answered`, `feedback_language_set`, `learner_deleted`; разметка (FR-17, `learner_id` — сам разметчик): `annotation_shown`, `annotation_submitted` (payload: `annotator`, `attempt_id`, `status`), `annotator_invite_redeemed`, `annotator_invite_failed` (для ограничения подбора кода) |
+| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `attempt_disputed`, `quiz_skipped` (payload: `letter_id`, `item_id`, `step`, `position`), `quiz_answered` (payload: `letter_id`, `item_id`, `step`, `vowel`, `position`, `correct`; до ADR-0066 — `item_id`, `vowel`, `correct`; источник правды — `quiz_answers`), `feedback_language_set`, `learner_deleted`; разметка (FR-17, `learner_id` — сам разметчик): `annotation_shown`, `annotation_submitted` (payload: `annotator`, `attempt_id`, `status`), `annotator_invite_redeemed`, `annotator_invite_failed` (для ограничения подбора кода) |
 | `payload` | JSON | только ID карточек, баллы, флаги; **никогда** — текст сообщений |
 | `created_at` | timestamptz | |
 

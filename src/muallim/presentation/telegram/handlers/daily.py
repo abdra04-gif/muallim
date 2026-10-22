@@ -26,7 +26,11 @@ router: Final = Router(name="learner.daily")
 
 
 async def home_or_opening(
-    cur: Curriculum, progress: Progress, learner: Learner, screen_state: ScreenState
+    cur: Curriculum,
+    progress: Progress,
+    learner: Learner,
+    screen_state: ScreenState,
+    quiz_waiting: int = 0,
 ) -> Screen:
     """Главная — или сначала «Начнём занятие», если сегодня его ещё не было.
 
@@ -35,7 +39,7 @@ async def home_or_opening(
     await screen_state.menu(learner, finish=True)
     if await screen_state.needs_opening(learner, progress):
         return screens.opening(cur)
-    return screens.home(cur, progress)
+    return screens.home(cur, progress, quiz_waiting)
 
 
 @router.callback_query(Opening.filter())

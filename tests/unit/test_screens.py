@@ -16,7 +16,6 @@ from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.policy import GradingPolicy
-from muallim.domain.quiz import make_question
 from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, screens, texts
 from tests.fakes import FixedClock
@@ -173,41 +172,11 @@ def test_progress_screen_lists_done_lessons(curriculum: Curriculum) -> None:
     assert "2 из" in s.caption and _has_home(s.keyboard)
 
 
-def test_quiz_screen_offers_four_answers_and_home(curriculum: Curriculum) -> None:
-    q = make_question(curriculum, _letters(curriculum)[:5], seed=7)
-    s = screens.quiz(q)
-    answers = [d for _, d in _buttons(s.keyboard) if d.startswith("qa:")]
-    assert len(answers) == 4 and _has_home(s.keyboard)
-    right = screens.quiz_answer(q, q.answer)
-    wrong = screens.quiz_answer(q, (q.answer + 1) % 4)
-    assert right.caption.startswith("✅") and wrong.caption.startswith("❌")
-    assert q.options[q.answer] in wrong.caption
-    assert cb.Quiz().pack() in [d for _, d in _buttons(right.keyboard)]
+# Экраны закрепления — tests/unit/test_quiz_screens.py (ADR-0066).
 
 
 def _styles(kb: InlineKeyboardMarkup) -> dict[str, str | None]:
     return {b.text: b.style for row in kb.inline_keyboard for b in row}
-
-
-def test_quiz_answer_colours_right_green_and_wrong_pick_red(curriculum: Curriculum) -> None:
-    """Цвет кнопок (Bot API 9.4, SRC-088): верный вариант — зелёный, выбранный неверный — красный.
-
-    Старые клиенты цвет не покажут — подпись «✅/❌» остаётся главной.
-    """
-    q = make_question(curriculum, _letters(curriculum)[:5], seed=7)
-    picked = (q.answer + 1) % 4
-    wrong = screens.quiz_answer(q, picked)
-    styles = _styles(wrong.keyboard)
-    assert styles[q.options[q.answer]] == "success"
-    assert styles[q.options[picked]] == "danger"
-    others = [o for k, o in enumerate(q.options) if k not in (q.answer, picked)]
-    assert all(styles[o] is None for o in others)
-    answered = [d for t, d in _buttons(wrong.keyboard) if t in q.options]
-    assert answered and all(d == cb.Noop().pack() for d in answered)  # повторно не ответить
-    right = _styles(screens.quiz_answer(q, q.answer).keyboard)
-    assert right[q.options[q.answer]] == "success"
-    assert list(right.values()).count("danger") == 0
-    assert right[texts.QUIZ_NEXT] == "primary"
 
 
 def test_deleting_data_is_red_and_consent_is_not_coloured() -> None:

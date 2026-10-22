@@ -642,40 +642,7 @@ async def test_pseudonym_is_stable_and_derived_from_internal_id(w: World) -> Non
     assert learner.pseudonym == f"L-{learner.id.hex[:8]}"
 
 
-# ---------- закрепление (ADR-0025) ----------
-async def test_quiz_needs_started_letters_and_logs_answers(curriculum: Curriculum) -> None:
-    from muallim.application.use_cases.quiz import PracticeQuiz  # noqa: PLC0415
-
-    attempts, events, uow = InMemoryAttempts(), ListEventLog(), SpyUoW()
-    learners = InMemoryLearners()
-    learner, _ = await EnsureLearner(learners, uow, FixedClock(), SequentialIds(), events).execute(
-        1, "ru"
-    )
-    quiz = PracticeQuiz(curriculum, attempts, events, uow)
-    assert await quiz.next(learner, seed=1) is None  # ещё ничего не читал
-    letters = [les for les in curriculum.lessons if les.section == "letter"][:3]
-    learner.current_item_id = letters[2].items[0].id
-    for les in letters[:2]:
-        await attempts.add(_attempt_for(learner, les.items[0].id), ())
-    q = await quiz.next(learner, seed=5)
-    heads = {i.id for les in letters for i in les.items if i.kind is ItemKind.LETTER}
-    assert q is not None and q.item_id in heads
-    again = await quiz.answer(learner, q.item_id, q.vowel, q.seed, q.answer)
-    assert again == q
-    assert events.events[-1] == (
-        "quiz_answered", learner.id, {"item_id": q.item_id, "vowel": q.vowel, "correct": True},
-    )  # fmt: skip
-
-
-def _attempt_for(learner: Learner, item_id: str):  # type: ignore[no-untyped-def]
-    from muallim.domain.assessment import assess  # noqa: PLC0415
-    from muallim.domain.attempt import Attempt  # noqa: PLC0415
-
-    a = assess("بَ", "بَ")
-    return Attempt(
-        SequentialIds().new_id(), learner.id, item_id, "v", "m", a, Verdict.EXCELLENT,
-        None, None, 1, FixedClock().now(),
-    )  # fmt: skip
+# ---------- закрепление — tests/unit/test_quiz_practice.py (ADR-0066) ----------
 
 
 async def test_progress_week_marks_days_with_attempts(w: World) -> None:
@@ -780,32 +747,6 @@ async def test_continue_after_last_lesson_of_program_stays_on_it(steps: World) -
     await _read(steps, learner, "S03-01")
     await _read(steps, learner, "S03-02")
     assert await _continue(steps, learner) == "S03-02"
-
-
-async def test_quiz_options_are_from_letters_the_learner_started(curriculum: Curriculum) -> None:
-    """Ответы-обманки — из начатых букв; тот же вопрос восстанавливается по кнопке."""
-    from muallim.application.use_cases.quiz import PracticeQuiz  # noqa: PLC0415
-
-    attempts, events, uow = InMemoryAttempts(), ListEventLog(), SpyUoW()
-    learner, _ = await EnsureLearner(
-        InMemoryLearners(), uow, FixedClock(), SequentialIds(), events
-    ).execute(2, "ru")
-    letters = [les for les in curriculum.lessons if les.section == "letter"][:3]  # ء ر ز
-    for les in letters:
-        await attempts.add(_attempt_for(learner, les.items[0].id), ())
-    allowed = {
-        s
-        for les in letters
-        for i in les.items
-        if i.kind is ItemKind.LETTER
-        for s in i.sound.split(" · ")
-    }
-    quiz = PracticeQuiz(curriculum, attempts, events, uow)
-    for seed in range(20):
-        q = await quiz.next(learner, seed=seed)
-        assert q is not None
-        assert set(q.options) <= allowed, (seed, q.options)
-        assert await quiz.answer(learner, q.item_id, q.vowel, q.seed, 0) == q
 
 
 async def test_today_without_settings_uses_default_offset(w: World) -> None:

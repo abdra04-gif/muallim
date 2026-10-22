@@ -9,6 +9,7 @@ from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
+from muallim.domain.quiz import QuizAnswer
 from muallim.domain.report import LearnerReport
 from muallim.domain.review import Outcome
 from muallim.domain.settings import LearnerSettings
@@ -79,6 +80,30 @@ class AttemptRepository(Protocol):
 
     async def recent_errors(self, learner_id: UUID, attempts: int, /) -> list[PronunciationError]:
         """Ошибки последних ``attempts`` попыток ученика (по времени) — для частых букв."""
+
+
+class QuizAnswerRepository(Protocol):
+    """Ответы «🧠 Закрепления» (ADR-0066): строка пишется при показе, ответ — в неё же один раз."""
+
+    async def add(self, row: QuizAnswer) -> bool:
+        """Вставить показанный вопрос; False — это место раунда уже занято (двойное нажатие)."""
+
+    async def get(self, answer_id: UUID) -> QuizAnswer | None: ...
+
+    async def record(
+        self,
+        answer_id: UUID,
+        *,
+        picked: int | None,
+        correct: bool | None,
+        answered_at: datetime,
+        attempt_id: UUID | None = None,
+    ) -> bool:
+        """Записать ответ (``correct`` None — пропущен); False — строки нет или ответ уже
+        записан (кнопка устарела)."""
+
+    async def history(self, learner_id: UUID) -> list[QuizAnswer]:
+        """Все строки ученика по порядку: раунд, место в раунде."""
 
 
 class LearnerSettingsRepository(Protocol):

@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-22T15:21:43+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-22T20:37:41+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `45481883b184bb49` | 107 |
+| код | `ec884cf7d12ee69d` | 109 |
 | программа (книга) | `125a24eb1ee7e973` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
-| миграции | `5009ec6fb8d3cec0` | 8 |
+| миграции | `8d9824574007fee4` | 9 |
 | зависимости | `a9f76fc0b602ab89` | 1 |
-| предрегистрация | `2a90abca86935f02` | 1 |
+| предрегистрация | `7ac254d967a4668f` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **64 из 66**.
+Проверено зелёными тестами: **65 из 67**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -67,6 +67,7 @@
 | FR-50 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_staff.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-51 | `tests/integration/test_learner_settings_sql.py`, `tests/integration/test_reminders.py`, `tests/integration/test_screen_state.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_reminder_setting.py`, `tests/unit/test_settings_rules.py`, `tests/unit/test_settings_screens.py` | ✅ |
 | FR-52 | — | нет автотестов |
+| FR-53 | `tests/integration/test_quiz_answers_sql.py`, `tests/integration/test_quiz_bot.py`, `tests/unit/test_quiz.py`, `tests/unit/test_quiz_ladder.py`, `tests/unit/test_quiz_practice.py`, `tests/unit/test_quiz_screens.py` | ✅ |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |

@@ -303,6 +303,42 @@ learner_settings = Table(
     ),
 )
 
+# «🧠 Закрепление» (FR-53, ADR-0066): одна строка — один показанный вопрос; ответ дописывается в
+# неё же один раз. Буква — для модели усвоения (RQ-3), слог — что было на экране.
+quiz_answers = Table(
+    "quiz_answers",
+    metadata,
+    Column("id", Uuid, primary_key=True),
+    Column(
+        "learner_id",
+        Uuid,
+        ForeignKey("learners.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    Column("round_no", Integer, nullable=False),
+    Column("position", SmallInteger, nullable=False),
+    Column("step", SmallInteger, nullable=False),
+    Column("letter_id", String(32), nullable=False),
+    Column("item_id", String(32), nullable=False),
+    Column("vowel", SmallInteger, nullable=False),
+    Column("options", JSON, nullable=False),
+    Column("answer", SmallInteger, nullable=False),
+    Column("picked", SmallInteger),
+    Column("correct", Boolean),
+    Column("attempt_id", Uuid, ForeignKey("attempts.id", ondelete="SET NULL")),
+    Column("reason", String(16), nullable=False, server_default=""),
+    Column("shown_at", UtcDateTime(), nullable=False),
+    Column("answered_at", UtcDateTime()),
+    Column("curriculum_version", String(32), nullable=False),
+    Column("rule", String(8), nullable=False),
+    CheckConstraint("step BETWEEN 1 AND 3", name="step_range"),
+    CheckConstraint("vowel BETWEEN 0 AND 2", name="vowel_range"),
+    CheckConstraint("position >= 1", name="position_positive"),
+    CheckConstraint("picked IS NULL OR picked BETWEEN 0 AND 3", name="picked_range"),
+    # одно место раунда — один вопрос: двойное нажатие не даёт раунд из 11 (автор 2026-10-23)
+    UniqueConstraint("learner_id", "round_no", "position"),
+)
+
 interaction_events = Table(
     "interaction_events",
     metadata,

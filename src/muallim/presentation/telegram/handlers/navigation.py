@@ -1,6 +1,5 @@
-"""Навигация кнопками: главная, уроки, прогресс, справка, знаки, закрепление, карточка."""
+"""Навигация кнопками: главная, уроки, прогресс, справка, знаки, карточка (закрепление — quiz)."""
 
-import random
 from typing import Final
 
 from aiogram import Router
@@ -26,8 +25,6 @@ from muallim.presentation.telegram.callbacks import (
     Lessons,
     Menu,
     Noop,
-    Quiz,
-    QuizAnswer,
     ShowProgress,
     Signs,
 )
@@ -47,12 +44,13 @@ async def cb_home(
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
+    quiz: FromDishka[PracticeQuiz],
 ) -> None:
     if msg := message_of(cb):
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
-        await display.show(
-            msg, await home_or_opening(cur, await progress.execute(learner), learner, screen_state)
-        )
+        waiting = (await quiz.overview(learner)).waiting
+        p = await progress.execute(learner)
+        await display.show(msg, await home_or_opening(cur, p, learner, screen_state, waiting))
     await cb.answer()
 
 
@@ -84,11 +82,13 @@ async def cb_progress(
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
+    quiz: FromDishka[PracticeQuiz],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
-        await display.show(msg, screens.progress(cur, await progress.execute(learner)))
+        p = await progress.execute(learner)
+        await display.show(msg, screens.progress(cur, p, await quiz.overview(learner)))
     await cb.answer()
 
 
@@ -120,50 +120,6 @@ async def cb_signs(
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.signs(cur, await progress.execute(learner)))
     await cb.answer()
-
-
-@router.callback_query(Quiz.filter())
-async def cb_quiz(
-    cb: CallbackQuery,
-    screen_state: FromDishka[ScreenState],
-    display: FromDishka[Display],
-    learner: FromDishka[Learner],
-    uc: FromDishka[PracticeQuiz],
-    cur: FromDishka[Curriculum],
-    progress: FromDishka[GetProgress],
-) -> None:
-    await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    q = await uc.next(learner, random.randrange(10**6))  # noqa: S311
-    if msg := message_of(cb):
-        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
-        await display.show(
-            msg,
-            screens.quiz(q)
-            if q
-            else screens.quiz_unavailable(cur, await progress.execute(learner)),
-        )
-    await cb.answer()
-
-
-@router.callback_query(QuizAnswer.filter())
-async def cb_quiz_answer(
-    cb: CallbackQuery,
-    screen_state: FromDishka[ScreenState],
-    callback_data: QuizAnswer,
-    display: FromDishka[Display],
-    learner: FromDishka[Learner],
-    uc: FromDishka[PracticeQuiz],
-) -> None:
-    await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    data = callback_data
-    try:
-        q = await uc.answer(learner, data.i, data.v, data.s, data.p, started=data.k)
-    except (KeyError, IndexError):
-        await cb.answer(texts.STALE_BUTTON, show_alert=True)
-        return
-    if msg := message_of(cb):
-        await display.show(msg, screens.quiz_answer(q, data.p))
-    await cb.answer("✅" if data.p == q.answer else "❌")
 
 
 @router.callback_query(GoItem.filter())

@@ -6,6 +6,7 @@
 import re
 from collections.abc import Set as AbstractSet
 from dataclasses import replace
+from datetime import date
 from html import escape
 from typing import Any
 from uuid import UUID
@@ -20,7 +21,7 @@ from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson
 from muallim.domain.policy import GradingPolicy, Verdict
-from muallim.domain.quiz import QuizError, make_question
+from muallim.domain.quiz import QuizError, next_pick
 from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, screens, texts, views
 from tests.fakes import FixedClock
@@ -93,9 +94,11 @@ def test_rule_card_does_not_promise_reading() -> None:
 
 
 def test_wrong_quiz_answer_moves_on_to_next_question() -> None:
-    """Ответ уже показан в цвете — «попробуй ещё» не к чему; дальше — «Ещё вопрос»."""
+    """Ответ уже показан в цвете — «попробуй ещё» не к чему; текст называет кнопку дальше
+    (с ADR-0066 — «▶️ Дальше», буква вернётся сама через пару вопросов)."""
     assert "попробуй ещё" not in texts.QUIZ_WRONG.casefold()
-    assert "ещё вопрос" in texts.QUIZ_WRONG.casefold()
+    button = texts.QUIZ_NEXT.split(" ", 1)[-1].casefold()
+    assert button in texts.QUIZ_WRONG.casefold()
 
 
 def test_send_voice_hint_does_not_point_down() -> None:
@@ -137,15 +140,24 @@ def test_card_head_counts_steps_not_lines(curriculum: Curriculum) -> None:
 
 
 def _quiz_opens_at(c: Curriculum) -> Lesson:
-    """Первый урок буквы, с которого make_question даёт вопрос (до него — QuizError)."""
+    """Первый урок буквы, с которого ``next_pick`` даёт вопрос (до него — QuizError)."""
     letters = _letters(c)
+
+    def ask(lessons: list[Lesson]) -> None:
+        heads = [
+            i.id for les in lessons for i in les.items if i.kind is ItemKind.LETTER and i.sound
+        ]
+        next_pick(
+            c, started=heads, history=(), round_len=0, today=date(2026, 10, 22), reading_errors={}
+        )
+
     for k, lesson in enumerate(letters):
         try:
-            make_question(c, letters[: k + 1], seed=0)
+            ask(letters[: k + 1])
         except QuizError:
             continue
         with pytest.raises(QuizError):
-            make_question(c, letters[:k], seed=0)
+            ask(letters[:k])
         return lesson
     raise AssertionError("закрепление не открывается ни на одном уроке")
 

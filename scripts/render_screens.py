@@ -12,6 +12,7 @@ from uuid import UUID
 from muallim.application.feedback import Explanation
 from muallim.application.transcription import as_text, legend, reading
 from muallim.application.use_cases.progress import LessonProgress, Progress
+from muallim.application.use_cases.quiz import QuizResult, QuizView
 from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import RecitationResult
 from muallim.domain.assessment import assess
@@ -19,7 +20,7 @@ from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import letters_before
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
-from muallim.domain.quiz import make_question
+from muallim.domain.quiz import Pick, PickReason, RoundSummary, build_question, letter_heads
 from muallim.domain.settings import LearnerSettings
 from muallim.infrastructure.asr.reading import QuranReadingGuide
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
@@ -88,7 +89,12 @@ def main() -> None:
     sad = next(les for les in letters if les.title.split(" · ")[0].endswith("ص"))
     sad_line = next(i for i in sad.items if i.kind.value == "line")
     mim = c.lesson(started)
-    q = make_question(c, letters[:6], seed=11)
+    heads = letter_heads(letters[:6])
+    q = build_question(c, Pick(heads[-1], 1, 2, PickReason.NEW), heads)
+    view = QuizView(UUID(int=1), q, round_no=1, position=3, correct_so_far=2)
+    hear = QuizView(
+        UUID(int=2), build_question(c, Pick(heads[-2], 2, 0, PickReason.OLD), heads), 1, 4, 3
+    )
     shots = {
         "01_home": screens.home(c, p),
         "02_parts": screens.lessons(c, p, part=-1),
@@ -104,8 +110,14 @@ def main() -> None:
         "08_quran": card(find(lambda les, i: i.quran == "112:1")),
         "09_result_errors": screens.result(c, result(sad_line.id, ("ص", "س"), False), True),
         "10_result_done": screens.result(c, result(mim.items[-1].id, None, True), True),
-        "11_quiz": screens.quiz(q),
-        "12_quiz_answer": screens.quiz_answer(q, (q.answer + 1) % 4),
+        "11_quiz": screens.quiz(view),
+        "12_quiz_answer": screens.quiz_answer(
+            QuizResult(view, (q.answer + 1) % 4, correct=False, finished=False)
+        ),
+        "12b_quiz_hear": screens.quiz(hear),
+        "12c_quiz_summary": screens.quiz_summary(
+            c, RoundSummary(8, 10, tuple(heads[1:3]), confident=2, letters=len(heads))
+        ),
         "13_signs": screens.signs(c, p),
         "14_progress": screens.progress(c, p),
         "15_help": screens.help_screen(),
