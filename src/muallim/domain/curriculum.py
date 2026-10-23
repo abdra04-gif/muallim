@@ -9,6 +9,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from muallim.domain.arabic import HAMZA_FORMS
+
 
 class ItemKind(StrEnum):
     LETTER = "letter"  # буква с огласовками — заголовок раздела книги
@@ -77,6 +79,11 @@ class Lexicon:
     # значки через пробел -> пояснение
     transcription_legend: Mapping[str, str] = field(default_factory=dict)
     vowel_tips: Mapping[str, str] = field(default_factory=dict)  # гласный -> как держать рот
+    # согласная -> (как сказать кириллицей, пометка): «ха» горлом / «ха» легко (FR-54)
+    sounds: Mapping[str, tuple[str, str]] = field(default_factory=dict)
+    # согласная -> слоги (фатха, кясра, дамма) как в карточках курса: «со», «сы», «су»
+    syllables: Mapping[str, tuple[str, str, str]] = field(default_factory=dict)
+    missing: str = ""  # как назвать пропущенный звук в разборе («пропущено»)
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,3 +165,15 @@ def letters_before(curriculum: Curriculum, lesson_id: str) -> tuple[LessonItem, 
         if lesson.section == "letter":
             out.extend(i for i in lesson.items if i.kind is ItemKind.LETTER)
     return tuple(out)
+
+
+def lesson_letter(lesson: Lesson) -> str | None:
+    """Буква урока буквы (``section == "letter"``): первая буква головной карточки, опоры хамзы —
+    ء (с. 10 книги). У уроков не про букву (мадд, ташдид…) — None. Одна функция для сценария и
+    экрана (FR-54)."""
+    if lesson.section != "letter":
+        return None
+    head = next((i.text[0] for i in lesson.items if i.kind is ItemKind.LETTER and i.text), "")
+    if not head:
+        return None
+    return "ء" if head in HAMZA_FORMS else head

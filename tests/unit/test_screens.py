@@ -8,16 +8,16 @@ from uuid import UUID
 import pytest
 from aiogram.types import InlineKeyboardMarkup
 
-from muallim.application.feedback import Explanation
+from muallim.application.feedback import Explanation, FeedbackRenderer
 from muallim.application.use_cases.progress import LessonProgress, Progress
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
-from muallim.domain.assessment import assess
+from muallim.domain.assessment import assess, unread_from
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.policy import GradingPolicy
 from muallim.presentation.telegram import callbacks as cb
-from muallim.presentation.telegram import render, screens, texts
+from muallim.presentation.telegram import render, screens, texts, views
 from tests.fakes import FixedClock
 
 
@@ -284,74 +284,96 @@ def test_card_hides_reading_under_spoiler(curriculum: Curriculum) -> None:
     assert "tg-spoiler" not in screens.card(curriculum, item, False, False).caption
 
 
-def _with_errors(c: Curriculum) -> RecitationResult:
-    item = _head(_letters(c)[1])
-    base = _result(c, item.id, "سَ سِ سُ", False)
+def _words_right(ok: int, total: int) -> str:
+    """Счётчик «Верно N слов из M» со склонением (FR-54, вид одобрен автором 2026-10-23)."""
+    return texts.RESULT_WORDS.format(ok=ok, words=views.plural(ok, texts.WORD_FORMS), total=total)
+
+
+SWAP_THREE = "سُمْ صِفْ فَصْ سَرَفَ صَبَرَ بَسَرَ"  # L020-06: ص→س в 1-м, 4-м и 6-м словах
+STOPPED = "سُمْ صِفْ فَصْ سَرَفَ"  # L020-06: остановился после 4-го слова
+
+
+def _with_errors(
+    c: Curriculum, renderer: FeedbackRenderer, heard: str = SWAP_THREE
+) -> RecitationResult:
+    """Попытка строки L020-06 (урок ص) с разбором группами (FR-54), как её строит сценарий."""
+    from muallim.application.breakdown import build_breakdown  # noqa: PLC0415
+
+    item = c.item("L020-06")
+    a = assess(item.text, heard)
+    unread = unread_from(a.reference, heard)
+    base = _result(c, item.id, heard, False)
     return replace(
         base,
-        feedback=(
-            Explanation("«с̣а» → у тебя «са»\nс̣ — твёрдо, не «с».", "Подсказка: твёрдо."),
-            Explanation("«ра» → у тебя «ла»\nНужно «р».", "Кончик языка дрожит."),
-        ),
-        expected_reading=(("с̣а", True), ("ра", False)),
-        heard_reading=(("са", False), ("ра", False)),
-        legend=LEGEND,
-        practice=("с̣а",),
+        feedback=renderer.explain(a.errors, a.reference, unread),
+        unread_from=unread,
+        breakdown=build_breakdown(a, item.text, c.lexicon, unread=unread, lesson_letter="ص"),
     )
 
 
-def test_result_with_errors_compares_syllables_in_caption(curriculum: Curriculum) -> None:
-    s = screens.result(curriculum, _with_errors(curriculum), has_audio=True)
-    assert "Нужно:" in s.caption and "<u>с̣а</u>-ра" in s.caption
-    assert "У тебя:" in s.caption and "са-ра" in s.caption
-
-
-def test_result_explains_briefly_with_details_folded(curriculum: Curriculum) -> None:
-    """Коротко — сразу; «👄 Подробнее» — свёрнуто; в конце одна строка «что сделать»."""
-    s = screens.result(curriculum, _with_errors(curriculum), has_audio=True)
-    assert "1️⃣ «с̣а» → у тебя «са»" in s.details and "2️⃣ «ра»" in s.details
-    assert "<blockquote expandable>👄 Подробнее" in s.details
-    assert "Подсказка: твёрдо." in s.details and "Кончик языка" in s.details
-    assert "🔊" in s.details  # есть эталон — «послушай»
-    quiet = screens.result(curriculum, _with_errors(curriculum), has_audio=False)
-    assert "🔊" not in quiet.details
-
-
-def test_result_shows_at_most_three_places(curriculum: Curriculum) -> None:
-    """Методисты: исправлять несколько ошибок, а не все сразу (Neri et al.)."""
-    r = replace(
-        _with_errors(curriculum),
-        feedback=tuple(Explanation(f"«с{i}» → у тебя «х»", "") for i in range(5)),
-    )
+def test_result_with_errors_names_needed_and_heard_sound(
+    curriculum: Curriculum, renderer: FeedbackRenderer
+) -> None:
+    """FR-54 (было FR-43 «Нужно / У тебя» по слогам): пункт называет нужный и прозвучавший звук."""
+    r = _with_errors(curriculum, renderer)
+    assert r.breakdown is not None
+    (g,) = r.breakdown.groups
     s = screens.result(curriculum, r, has_audio=True)
-    assert "3️⃣" in s.details and "4️⃣" not in s.details and "ещё 2" in s.details
+    shown = s.caption + s.details
+    assert g.need_label in shown and g.heard_label in shown
+    assert "Нужно:" not in shown and "У тебя:" not in shown
 
 
-def test_result_praises_what_is_already_right(curriculum: Curriculum) -> None:
-    """Сначала — что получилось: новичку важно видеть, что большая часть уже верно."""
-    s = screens.result(curriculum, _with_errors(curriculum), has_audio=True)
-    assert "✅ Прочитано верно — 1 из 2" in s.caption
+def test_result_explains_briefly_without_folded_how_to_say(
+    curriculum: Curriculum, renderer: FeedbackRenderer
+) -> None:
+    """Коротко — сразу; «👄 Подробнее» на экране больше нет (FR-54); в конце — «что сделать»."""
+    s = screens.result(curriculum, _with_errors(curriculum, renderer), has_audio=True)
+    shown = s.caption + s.details
+    assert texts.ERROR_NUMBERS[0] in shown
+    assert "<blockquote expandable>👄" not in shown and "👄" not in shown
+    assert texts.PLAN_LISTEN in shown  # есть эталон — «послушай»
+    quiet = screens.result(curriculum, _with_errors(curriculum, renderer), has_audio=False)
+    assert texts.PLAN_READ in quiet.caption + quiet.details
+    assert texts.PLAN_LISTEN not in quiet.caption + quiet.details
 
 
-def test_unread_syllables_are_not_praised(curriculum: Curriculum) -> None:
-    r = replace(
-        _with_errors(curriculum),
-        expected_reading=(("ба", False), ("с̣а", True), ("ра", True)),
-        unread_from=2,
-    )
-    assert "1 из 3" in screens.result(curriculum, r, has_audio=True).caption
+# test_result_shows_at_most_three_places → test_result_review_screen.py (не больше двух пунктов)
 
 
-def test_second_try_shows_progress_and_fixed_syllables(curriculum: Curriculum) -> None:
-    r = replace(_with_errors(curriculum), previous_score=40, fixed=("ба", "ту"))
+def test_result_praises_what_is_already_right(
+    curriculum: Curriculum, renderer: FeedbackRenderer
+) -> None:
+    """Сначала — что получилось: «верно 3 слова из 6» (FR-54: счёт слов вместо слогов)."""
+    s = screens.result(curriculum, _with_errors(curriculum, renderer), has_audio=True)
+    assert _words_right(3, 6) in s.caption
+    assert "слог" not in s.caption
+
+
+def test_unread_words_are_not_praised(curriculum: Curriculum, renderer: FeedbackRenderer) -> None:
+    """Не дочитанные слова — не «верно»: прочитаны верно 2 слова из 6."""
+    r = _with_errors(curriculum, renderer, STOPPED)
+    assert r.unread_from is not None
+    s = screens.result(curriculum, r, has_audio=True)
+    assert _words_right(2, 6) in s.caption
+
+
+def test_second_try_shows_progress_and_fixed_syllables(
+    curriculum: Curriculum, renderer: FeedbackRenderer
+) -> None:
+    """«Было → стало» остаётся в процентах; «✨ Исправлено» — по буквам, подписями групп
+    (FR-54, Р1 автора 2026-10-23), а не слогами со значками."""
+    fixed = ("ح «ха» горлом", "ص «со»")
+    r = replace(_with_errors(curriculum, renderer), previous_score=40, fixed=fixed)
     s = screens.result(curriculum, r, has_audio=True)
     score = r.attempt.assessment.score
     assert f"Было 40% → стало {score}%" in s.caption
-    assert "Исправлено: «ба», «ту»" in s.caption
+    (line,) = [ln for ln in s.caption.splitlines() if "Исправлено" in ln]
+    assert all(label in line for label in fixed)
 
 
-def test_first_try_has_no_progress_line(curriculum: Curriculum) -> None:
-    s = screens.result(curriculum, _with_errors(curriculum), has_audio=True)
+def test_first_try_has_no_progress_line(curriculum: Curriculum, renderer: FeedbackRenderer) -> None:
+    s = screens.result(curriculum, _with_errors(curriculum, renderer), has_audio=True)
     assert "Было" not in s.caption and "Исправлено" not in s.caption
 
 
@@ -361,16 +383,17 @@ def test_correct_result_is_one_message(curriculum: Curriculum) -> None:
     assert s.details == "" and "Что сделать" not in s.caption
 
 
-def test_result_caption_fits_telegram_photo_limit(curriculum: Curriculum) -> None:
-    """Подпись к фото — не больше 1024 символов; длинные объяснения уходят вторым сообщением."""
+def test_result_caption_fits_telegram_photo_limit(
+    curriculum: Curriculum, renderer: FeedbackRenderer
+) -> None:
+    """Подпись к фото — не больше 1024 символов, даже с длинным «исправлено» и блоком учителя."""
     r = replace(
-        _with_errors(curriculum),
-        feedback=tuple(Explanation("Очень подробно. " * 6, "Ещё. " * 30) for _ in range(6)),
-        expected_reading=tuple((f"с̣а{i}", i % 2 == 0) for i in range(40)),
-        heard_reading=tuple((f"са{i}", False) for i in range(40)),
+        _with_errors(curriculum, renderer, "سُمْ سِفْ فَسْ سَرَفَ سَبَرَ بَسَرَ"),
+        previous_score=40,
+        fixed=tuple(f"ص «со» {i}" for i in range(60)),
     )
-    s = screens.result(curriculum, r, has_audio=True)
-    assert len(s.caption) <= 1024
+    s = screens.result(curriculum, r, has_audio=True, staff=True)
+    assert len(s.caption) <= screens.CAPTION_LIMIT
 
 
 def test_syllable_card_says_how_to_read_and_offers_listen(curriculum: Curriculum) -> None:

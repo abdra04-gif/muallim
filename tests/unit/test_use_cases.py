@@ -3,7 +3,7 @@
 Контент меняет человек (curriculum/), поэтому сценарии проверяются на своей маленькой программе.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 
 import pytest
@@ -22,7 +22,7 @@ from muallim.application.use_cases.learners import (
 )
 from muallim.application.use_cases.progress import GetProgress, LessonStatus
 from muallim.application.use_cases.reading import HowToRead
-from muallim.application.use_cases.recitation import AssessRecitation
+from muallim.application.use_cases.recitation import AssessRecitation, RecitationResult
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
@@ -520,6 +520,40 @@ async def test_every_error_is_stored_with_its_own_message(w: World) -> None:
     result = await w.assess().execute(learner, b"ogg")
     ((attempt, messages),) = w.attempts.items
     assert len(messages) == len(attempt.assessment.errors) > len(result.feedback)
+    # FR-54: «как сказать» ушло с экрана, но в БД — прежний полный текст к каждой ошибке
+    a = attempt.assessment
+    assert messages == w.catalog.renderer("ru").render(a.errors, a.reference)
+
+
+async def test_result_has_review_grouped_by_error(w: World) -> None:
+    """FR-54: сценарий отдаёт экрану разбор группами — ر→ل в «مَرْمَرُ», одно слово из одного."""
+    learner = await w.learner()
+    await w.cards().execute(learner, "L02-03")  # مَرْمَرُ
+    w.recognizer.heard = "مَلْمَرُ"
+    result = await w.assess().execute(learner, b"ogg")
+    assert result.breakdown is not None
+    (g,) = result.breakdown.groups
+    assert (g.expected, g.heard) == ("ر", "ل") and len(g.places) == 1
+    assert (result.breakdown.words_ok, result.breakdown.words_total) == (0, 1)
+
+
+async def test_correct_reading_has_empty_review(w: World) -> None:
+    learner = await w.learner()
+    result = await w.assess().execute(learner, b"ogg")
+    assert result.breakdown is not None and result.breakdown.groups == ()
+
+
+async def test_review_marks_letter_of_letter_lesson(w: World, curriculum: Curriculum) -> None:
+    """FR-54: в уроке буквы (L024, ح) группа этой буквы — буква урока («Буква урока» на экране)."""
+    book = replace(w, curriculum=curriculum)
+    learner = await book.learner()
+    await book.cards().execute(learner, "L024-07")  # مُحْسِنُ مَحْشَرُ مِنْحَرُ مَحْفَلُ أَحْسَنَ
+    book.recognizer.heard = "مُهْسِنُ مَحْشَرُ مِنْهَرُ مَحْفِلُ أَحْسَنَ"
+    result = await book.assess().execute(learner, b"ogg")
+    assert result.breakdown is not None
+    first, *rest = result.breakdown.groups
+    assert (first.expected, first.heard, first.lesson_letter) == ("ح", "ه", True)
+    assert len(first.places) == 2 and not any(g.lesson_letter for g in rest)
 
 
 async def test_second_try_shows_score_before_and_fixed_syllables(w: World) -> None:
@@ -531,7 +565,43 @@ async def test_second_try_shows_score_before_and_fixed_syllables(w: World) -> No
     w.recognizer.heard = None  # теперь верно
     second = await w.assess().execute(learner, b"ogg")
     assert second.previous_score == first.attempt.assessment.score
-    assert second.fixed == ("мар",)
+    # FR-54 (Р1): «✨ Исправлено» — по буквам: подпись группы ر→ل, а не слог «мар»
+    assert first.breakdown is not None
+    assert second.fixed == (first.breakdown.groups[0].need_label,)
+
+
+async def _two_tries(
+    w: World, curriculum: Curriculum, item: str, first: str, second: str
+) -> RecitationResult:
+    book = replace(w, curriculum=curriculum)
+    learner = await book.learner()
+    await book.cards().execute(learner, item)
+    book.recognizer.heard = first
+    await book.assess().execute(learner, b"ogg")
+    book.recognizer.heard = second
+    return await book.assess().execute(learner, b"ogg")
+
+
+async def test_letter_confused_differently_is_not_fixed(w: World, curriculum: Curriculum) -> None:
+    """I6 (а): в прошлый раз ح→ه, теперь ح→خ — буква ح всё ещё не та, «исправлено» её нет."""
+    result = await _two_tries(
+        w, curriculum, "L024-07",
+        "مُهْسِنُ مَحْشَرُ مِنْحَرُ مَحْفَلُ أَحْسَنَ", "مُخْسِنُ مَحْشَرُ مِنْحَرُ مَحْفَلُ أَحْسَنَ",
+    )  # fmt: skip
+    assert result.previous_score is not None
+    assert result.fixed == ()
+
+
+async def test_error_in_the_part_not_read_now_is_not_fixed(
+    w: World, curriculum: Curriculum
+) -> None:
+    """I6 (б): прошлая ошибка в последнем слове; теперь до него не дочитал — это не исправление."""
+    result = await _two_tries(
+        w, curriculum, "L020-06",
+        "صُمْ صِفْ فَصْ صَرَفَ صَبَرَ بَسَرَ", "صُمْ صِفْ فَصْ",
+    )  # fmt: skip
+    assert result.breakdown is not None and result.breakdown.unread
+    assert result.fixed == ()
 
 
 async def test_previous_try_is_of_the_same_line_only(w: World) -> None:

@@ -15,14 +15,23 @@ from aiogram.enums import ButtonStyle
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from muallim.application.transcription import as_text
+from muallim.application.breakdown import VOWEL_KINDS, Breakdown, ErrorGroup, Place
+from muallim.application.transcription import as_text, plain
 from muallim.application.use_cases.progress import LessonStatus, Progress
 from muallim.application.use_cases.quiz import QuizOverview, QuizRest, QuizResult, QuizView
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
-from muallim.domain.assessment import Assessment, ErrorKind
-from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem, letters_before
-from muallim.domain.phonetics import CONSONANTS, Zone, articulation_zone, count_syllables, syllables
+from muallim.domain import arabic
+from muallim.domain.assessment import ErrorKind
+from muallim.domain.curriculum import (
+    Curriculum,
+    ItemKind,
+    Lesson,
+    LessonItem,
+    lesson_letter,
+    letters_before,
+)
+from muallim.domain.phonetics import Zone, articulation_zone
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import QUIZ_ROUND, RoundSummary, Step, first_quiz_lesson
 from muallim.domain.settings import (
@@ -91,8 +100,8 @@ def _home_row(kb: InlineKeyboardBuilder, *extra: tuple[str, object]) -> None:
 
 
 def _letter_of(lesson: Lesson) -> str:
-    head = next((i.text[0] for i in lesson.items if i.kind is ItemKind.LETTER), "")
-    return "ء" if head in "أإؤئآ" else head
+    """Буква урока (одна функция домена, FR-54); не урок буквы — пусто."""
+    return lesson_letter(lesson) or ""
 
 
 def _letter_shown(lesson: Lesson) -> str:
@@ -179,14 +188,7 @@ def voice_on_home(curriculum: Curriculum, progress: Progress) -> Screen:
 
 
 def _days(n: int) -> str:
-    one, few, many = texts.DAY_FORMS
-    if n % 10 == 1 and n % 100 != 11:
-        word = one
-    elif 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
-        word = few
-    else:
-        word = many
-    return f"{n} {word}" if n else texts.STREAK_ZERO
+    return f"{n} {views.plural(n, texts.DAY_FORMS)}" if n else texts.STREAK_ZERO
 
 
 # ---------- уроки: части книги → уроки части ----------
@@ -421,100 +423,150 @@ def result(
 ) -> Screen:
     """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие».
 
+    Разбор группами (FR-54, ADR-0070): в тексте — не больше ``views.MAX_ERRORS_SHOWN`` пунктов
+    (буква урока первой), остальные — на картинке; без картинки — все пункты текстом. Не влезает в
+    подпись — хвост уходит вторым сообщением, ничего не обрезая. Разбор строит сценарий; нет его
+    (``breakdown is None``) — экран без разбора.
+
     «Услышано» и блок «Для исследования» с номером попытки видят только учитель и разметчик
     (``staff``): новичку они мешают, номер попытки ученик получает в «🚩 Бот ошибся» (FR-50).
     """
     a = r.attempt.assessment
     lesson, _ = curriculum.locate(r.item.id)
-    head = [_VERDICT[r.verdict], texts.RESULT_SCORE.format(bar=views.bar(a.score), score=a.score)]
+    breakdown = r.breakdown or Breakdown((), 0, 0)
+    groups = breakdown.groups
+    unread = _unread_line(curriculum, r.item.text, breakdown)
+    counter = ""
+    if breakdown.words_total > 1 and breakdown.words_ok and (groups or breakdown.unread):
+        words = views.plural(breakdown.words_ok, texts.WORD_FORMS)
+        counter = texts.RESULT_WORDS.format(
+            ok=breakdown.words_ok, words=words, total=breakdown.words_total
+        )
     image = None
     if render.available() and r.lesson_completed and not a.errors:  # с ошибками — сначала разбор
         image = _postcard_image(lesson)
     elif render.available():
-        wrong = render.error_clusters(r.item.text, [e.syllable or 1 for e in a.errors], a.reference)
-        unread = set()
-        if r.unread_from is not None:
-            first = _first_unread_consonant(a.reference, r.unread_from)
-            unread = render.unread_clusters(r.item.text, a.reference, first)
-        states = render.word_states(r.item.text, wrong, unread)
-        ok = sum(1 for s in states if s is render.WordState.OK)
-        label = texts.RESULT_WORDS.format(ok=ok, total=len(states))
-        image = render.result_words(r.item.text, states, a.score, label, _swap(a))
-    else:
-        head.insert(1, f"<b>{escape(r.item.text)}</b>")
-    head += [*_progress(r), *_praise(r)]
-    parts: list[str] = []
-    if staff and not r.feedback:
-        parts.append(escape(texts.HEARD_LINE.format(text=r.heard_transcription)))
+        image = render.result_marks(text=r.item.text, breakdown=breakdown, score_label=counter)
+    blocks = ["\n".join(x for x in (_VERDICT[r.verdict], counter) if x)]  # «Верно 2 слова из 5»
+    if image is None:
+        blocks.append(f"<b>{escape(r.item.text)}</b>")
+    blocks += _progress(r)
     if r.lesson_completed:
-        parts.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
+        blocks.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
     if r.next_item is None:
-        parts.append(texts.LAST_ITEM)
-    research = (
-        texts.RESEARCH_BLOCK.format(
-            code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
-            reference=escape(a.reference),
-            heard=escape(a.heard),
+        blocks.append(texts.LAST_ITEM)
+    if staff and not r.feedback:
+        blocks.append(escape(texts.HEARD_LINE.format(text=r.heard_transcription)))
+    shown = len(groups) if image is None else views.MAX_ERRORS_SHOWN
+    blocks += [_group_point(curriculum, n, g) for n, g in enumerate(groups[:shown])]
+    if len(groups) > shown:
+        blocks.append(texts.MORE_ON_IMAGE.format(n=len(groups) - shown))
+    blocks.append(unread)
+    if groups or unread:
+        blocks.append(texts.PLAN_LISTEN if has_audio else texts.PLAN_READ)
+    if staff:
+        blocks.append(
+            texts.RESEARCH_BLOCK.format(
+                code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
+                reference=escape(a.reference),
+                heard=escape(a.heard),
+            )
         )
-        if staff
-        else ""
-    )
-    details = ""
-    if r.feedback:
-        letter_line = _lesson_letter_line(lesson, r)  # буква урока — первой строкой (ADR-0062, В3)
-        details = "\n\n".join(p for p in [letter_line, *_explanations(r, has_audio), research] if p)
-    else:
-        parts.append(research)
-    if r.feedback and r.expected_reading:  # «Нужно / У тебя» — сразу под вердиктом
-        rest = len("\n\n".join(head + parts)) + 2
-        head.append(_comparison(r, CAPTION_LIMIT - rest))
+    caption, details = _split_caption([b for b in blocks if b])
     keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume)
-    return Screen("\n\n".join(p for p in head + parts if p), keyboard, image, details=details)
+    return Screen(caption, keyboard, image, details=details)
 
 
-_LETTER_SWAPS: Final = frozenset(
-    {ErrorKind.LETTER_SUBSTITUTION, ErrorKind.SOUND_SUBSTITUTION, ErrorKind.FRAGMENT_SUBSTITUTION}
-)
+_WORDS_SHOWN: Final = 3  # слов в пункте; дальше — texts.WORDS_MORE
+_UNDER: Final = frozenset("ٍِ")  # кясра и танвин кясра — под буквой
+_MADD_POINTS: Final = {
+    ErrorKind.MADD_TOO_SHORT: texts.POINT_MADD_SHORT,
+    ErrorKind.MADD_TOO_LONG: texts.POINT_MADD_LONG,
+}
 
 
-def _lesson_letter_line(lesson: Lesson, r: RecitationResult) -> str:
-    """В уроке буквы: вместо неё прозвучала другая или её нет — строка для начала разбора.
+def _letter_head(curriculum: Curriculum, letter: str, *, lesson_letter: bool = False) -> str:
+    name = curriculum.lexicon.consonants.get(arabic.phoneme_of(letter), ("", ""))[0] or letter
+    template = texts.HEAD_LESSON_LETTER if lesson_letter else texts.HEAD_LETTER
+    return template.format(letter=letter, name=name)
 
-    Только прочитанная часть строки (непрочитанный конец — не ошибки, как в разборе); огласовки
-    и удвоение — не «другая буква» (ADR-0062, В3 (а)). Вердикт и балл не меняются (OQ-14).
-    """
-    if lesson.section != "letter" or not (letter := _letter_of(lesson)):
+
+def _group_text(curriculum: Curriculum, g: ErrorGroup) -> str:
+    """Первая строка пункта — по-русски (Р6): «Буква урока ح (Хэ): нужно …, у тебя …»."""
+    need, heard = escape(g.need_label), escape(g.heard_label)
+    if g.kind is ErrorKind.EXTRA_SOUND:
+        return texts.POINT_EXTRA.format(heard=heard)
+    if g.kind in _MADD_POINTS:
+        head = _letter_head(curriculum, g.carrier) if g.carrier else texts.HEAD_LONG
+        return _MADD_POINTS[g.kind].format(head=head, need=need, heard=heard)
+    if g.kind in VOWEL_KINDS:
+        sign = g.expected or g.heard
+        name = curriculum.lexicon.vowels.get(sign, sign).split(" (", maxsplit=1)[0]
+        if not g.carrier:
+            head = texts.HEAD_SIGN.format(vowel_name=name)
+        else:
+            under = sign in _UNDER
+            template = texts.HEAD_SIGN_UNDER if under else texts.HEAD_SIGN_OVER
+            head = template.format(letter=g.carrier, vowel_name=name)
+        return texts.POINT.format(head=head, need=need, heard=heard)
+    head = (
+        _letter_head(curriculum, g.letter, lesson_letter=g.lesson_letter)
+        if g.letter
+        else texts.HEAD_SOUND
+    )
+    template = texts.POINT_SHADDA if g.kind is ErrorKind.SHADDA_MISSING else texts.POINT
+    return template.format(head=head, need=need, heard=heard)
+
+
+def _group_point(curriculum: Curriculum, n: int, g: ErrorGroup) -> str:
+    """Пункт разбора (вид одобрен автором 2026-10-23/24, Р6):
+    «1️⃣ Буква урока ح (Хэ): нужно «ха» горлом, у тебя «ха» легко (2 раза)»
+    «В словах: مُحْسِنُ «мух-си-ну» · مِنْحَرُ «мин-ха-ру»»."""
+    numbers = texts.ERROR_NUMBERS
+    number = numbers[n] if n < len(numbers) else f"{n + 1}."
+    line = " ".join(x for x in (number, _group_text(curriculum, g), views.times(g.times)) if x)
+    places = list({p.word_index: p for p in g.places if p.word_text}.values())
+    if not places:
+        return line
+    shown = _words(places[:_WORDS_SHOWN])
+    if len(places) > _WORDS_SHOWN:
+        shown += texts.WORDS_MORE
+    template = texts.WORDS_ONE if len(places) == 1 else texts.WORDS_MANY
+    return f"{line}\n{template.format(words=shown)}"
+
+
+def _words(places: Sequence[Place]) -> str:
+    return texts.WORDS_SEPARATOR.join(
+        texts.POINT_WORD.format(word=escape(p.word_text), reading=escape(p.word_reading))
+        for p in places
+    )
+
+
+def _unread_line(curriculum: Curriculum, text: str, breakdown: Breakdown) -> str:
+    """«⏹ Запись закончилась на слове …» — первое не дочитанное слово с простым чтением."""
+    words = text.split()
+    if not breakdown.unread or breakdown.unread[0] >= len(words):
         return ""
-    a = r.attempt.assessment
-    cut = None
-    spans = syllables(a.reference) if r.unread_from is not None else []
-    if r.unread_from is not None and 0 < r.unread_from < len(spans):
-        cut = spans[r.unread_from][0]
-    for e in a.errors:
-        if letter not in e.expected or (cut is not None and e.position >= cut):
-            continue
-        if e.kind is ErrorKind.SOUND_MISSING:
-            return texts.LESSON_LETTER_MISSING.format(letter=letter)
-        if e.kind in _LETTER_SWAPS:
-            heard = [c for c in e.heard if c in CONSONANTS]
-            if letter in heard:  # согласная та же — ошибка в огласовке
-                continue
-            if not heard:
-                return texts.LESSON_LETTER_MISSING.format(letter=letter)
-            return texts.LESSON_LETTER_WRONG.format(letter=letter, heard=heard[0])
-    return ""
+    word = words[breakdown.unread[0]]
+    reading = plain(word, curriculum.lexicon)
+    return texts.RESULT_UNREAD.format(
+        word=texts.POINT_WORD.format(word=escape(word), reading=escape(reading))
+    )
 
 
-def _swap(a: Assessment) -> tuple[str, str, str, str, str] | None:
-    """Первая замена одной буквы другой — «нужна ص вместо прозвучала س» на картинке."""
-    for e in a.errors:
-        if e.expected in CONSONANTS and e.heard in CONSONANTS and e.expected != e.heard:
-            return e.expected, e.heard, texts.SWAP_NEED, texts.SWAP_INSTEAD, texts.SWAP_HEARD
-    return None
+def _split_caption(blocks: Sequence[str]) -> tuple[str, str]:
+    """Подпись к фото — не больше ``CAPTION_LIMIT``: блоки по порядку, пока влезают; остальное
+    — вторым сообщением целиком (ничего не теряется)."""
+    caption: list[str] = []
+    for k, block in enumerate(blocks):
+        if len("\n\n".join([*caption, block])) > CAPTION_LIMIT and caption:
+            return "\n\n".join(caption), "\n\n".join(blocks[k:])
+        caption.append(block)
+    return "\n\n".join(caption), ""
 
 
 def _progress(r: RecitationResult) -> list[str]:
-    """«Было → стало» (только если балл изменился, FR-50) и исправленные слоги."""
+    """«Было → стало» (только если балл изменился, FR-50) и что исправлено — подписями групп."""
     if r.previous_score is None:
         return []
     now = r.attempt.assessment.score
@@ -523,23 +575,8 @@ def _progress(r: RecitationResult) -> list[str]:
         trend = texts.TREND_UP if now > r.previous_score else texts.TREND_DOWN
         lines.append(texts.RESULT_PROGRESS.format(trend=trend, before=r.previous_score, now=now))
     if r.fixed:
-        syllables = ", ".join(f"«{escape(s)}»" for s in r.fixed)
-        lines.append(texts.RESULT_FIXED.format(syllables=syllables))
+        lines.append(texts.RESULT_FIXED.format(sounds=", ".join(escape(s) for s in r.fixed)))
     return ["\n".join(lines)] if lines else []
-
-
-def _praise(r: RecitationResult) -> list[str]:
-    """Сначала — что уже верно (непрочитанное не в счёт); только если есть и ошибки."""
-    total = len(r.expected_reading)
-    right = sum(1 for _, wrong in r.expected_reading[: r.unread_from] if not wrong)
-    if not r.feedback or not 0 < right < total:
-        return []
-    return [texts.RESULT_RIGHT.format(n=right, total=total)]
-
-
-def _first_unread_consonant(reference: str, unread: int) -> int:
-    """Номер (с 1) первой согласной непрочитанного слога."""
-    return count_syllables(reference[: syllables(reference)[unread][0]]) + 1
 
 
 def _result_keyboard(
@@ -589,45 +626,6 @@ def _result_keyboard(
     )
     kb.adjust(*rows)
     return kb.as_markup()
-
-
-def _comparison(r: RecitationResult, budget: int) -> str:
-    """«Нужно» и «У тебя» по слогам; слог с ошибкой подчёркнут (FR-43).
-
-    Длинную строку укорачиваем по целым слогам (не внутри тега), чтобы уложиться в ``budget``.
-    """
-    for keep in range(len(r.expected_reading), 0, -1):
-        tail = "…" if keep < len(r.expected_reading) else ""
-        expected = "-".join(
-            f"<u>{escape(text)}</u>" if wrong else escape(text)
-            for text, wrong in r.expected_reading[:keep]
-        )
-        heard = escape(as_text(r.heard_reading[:keep])) if r.heard_reading else "—"
-        lines = [
-            texts.RESULT_EXPECTED.format(text=expected + tail),
-            texts.RESULT_HEARD.format(text=heard + (tail if r.heard_reading[keep:] else "")),
-            *(f"<i>{escape(line)}</i>" for line in r.legend),
-        ]
-        text = "\n".join(lines)
-        if len(text) <= budget:
-            return text
-    return ""
-
-
-def _explanations(r: RecitationResult, has_audio: bool) -> list[str]:
-    """Коротко — до трёх мест (ADR-0031); «👄 Подробнее» — свёрнуто; одна строка «что сделать»."""
-    shown = r.feedback[: views.MAX_ERRORS_SHOWN]
-    numbers = texts.ERROR_NUMBERS
-    out = [f"{n} {escape(e.text)}" for n, e in zip(numbers, shown, strict=False)]
-    if len(r.feedback) > len(shown):
-        out.append(texts.MORE_ERRORS.format(n=len(r.feedback) - len(shown)))
-    more = [f"{n} {escape(e.more)}" for n, e in zip(numbers, shown, strict=False) if e.more]
-    if more:
-        out.append(
-            f"<blockquote expandable>{texts.MORE_HEAD}\n" + "\n\n".join(more) + "</blockquote>"
-        )
-    out.append(texts.PLAN_LISTEN if has_audio else texts.PLAN_READ)
-    return out
 
 
 # ---------- прогресс, помощь, данные ----------

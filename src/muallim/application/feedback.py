@@ -20,11 +20,11 @@ from muallim.domain.phonetics import (
 )
 
 # Следуют за буквой: если пропущена сама буква, отдельно о них не говорим.
-_FOLLOW_MISSING = frozenset({ErrorKind.VOWEL_MISSING, ErrorKind.MADD_TOO_SHORT})
+FOLLOW_MISSING = frozenset({ErrorKind.VOWEL_MISSING, ErrorKind.MADD_TOO_SHORT})
 
 # Порядок разбора (ADR-0031): лахн джали — явные ошибки, меняют слово (буква, огласовка, ташдид,
 # пропуск, лишнее) — 0; лахн хафи — долгота (мадд) — 1. Источник: SRC-052.
-_PRIORITY = {ErrorKind.MADD_TOO_SHORT: 1, ErrorKind.MADD_TOO_LONG: 1}
+PRIORITY = {ErrorKind.MADD_TOO_SHORT: 1, ErrorKind.MADD_TOO_LONG: 1}
 
 
 def _syllable_of(reference: str, position: int) -> int:
@@ -49,11 +49,11 @@ def _as_heard(reference: str, start: int, end: int, errors: list[PronunciationEr
 def _meaningful(group: list[PronunciationError]) -> list[PronunciationError]:
     """Пропущена буква — её огласовка и мадд пропущены вместе с ней: о них отдельно не говорим."""
     if any(e.kind is ErrorKind.SOUND_MISSING for e in group):
-        return [e for e in group if e.kind not in _FOLLOW_MISSING]
+        return [e for e in group if e.kind not in FOLLOW_MISSING]
     return group
 
 
-def _focus(e: PronunciationError) -> PronunciationError:
+def focus(e: PronunciationError) -> PronunciationError:
     """«Прочитано иначе» — о первой перепутанной букве, а если буквы верны — о гласном."""
     if e.kind is not ErrorKind.FRAGMENT_SUBSTITUTION:
         return e
@@ -71,7 +71,7 @@ def _focus(e: PronunciationError) -> PronunciationError:
 
 def _main(group: list[PronunciationError]) -> PronunciationError:
     """Главная ошибка места — о ней короткая подсказка."""
-    return min(_meaningful(group), key=lambda e: _PRIORITY.get(e.kind, 0))
+    return min(_meaningful(group), key=lambda e: PRIORITY.get(e.kind, 0))
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,7 +172,7 @@ class FeedbackRenderer:
 
     @staticmethod
     def _rank(group: list[PronunciationError], first: int) -> tuple[int, int]:
-        return min(_PRIORITY.get(e.kind, 0) for e in group), first
+        return min(PRIORITY.get(e.kind, 0) for e in group), first
 
     def _place(
         self,
@@ -195,7 +195,7 @@ class FeedbackRenderer:
             line = f"«{expected}»"
         else:
             line = t.line.format(expected=expected, heard=heard)
-        main = _focus(_main(group))
+        main = focus(_main(group))
         hint = t.short.get(main.kind, "").format(**self._fields(main))
         about = [main] if main.kind is not _main(group).kind else _meaningful(group)
         more = " ".join(dict.fromkeys(h for e in about if (h := self._how(e))))

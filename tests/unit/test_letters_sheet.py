@@ -1,5 +1,5 @@
 """FR-52 (пакет В, круг 1, ADR-0062): шпаргалка букв по книге, «новая буква / уже знаешь»,
-ошибка в букве урока — первой строкой разбора.
+ошибка в букве урока — первой строкой разбора (с FR-54 — первым пунктом «Буква урока …»).
 
 Решения автора 2026-10-21 (ADR-0062, В3): строгость к букве урока НЕ вводится — зачёт как раньше
 (от 80 %, OQ-14); ошибка в букве урока только выделяется в разборе первой строкой.
@@ -22,7 +22,7 @@ from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
 from muallim.domain.policy import GradingPolicy, Verdict
 from muallim.presentation.telegram import callbacks as cb
-from muallim.presentation.telegram import render, screens, texts, views
+from muallim.presentation.telegram import render, screens, texts
 from tests.fakes import FixedClock
 
 CALLBACK_LIMIT = 64  # байт, Telegram Bot API
@@ -249,17 +249,24 @@ def test_non_letter_lesson_has_no_new_letter(curriculum: Curriculum) -> None:
     assert marker not in caption
 
 
-# ---------- ошибка в букве урока — первой строкой разбора ----------
+# ---------- ошибка в букве урока — первым пунктом «Буква урока» (FR-54, Р6) ----------
 def _result(c: Curriculum, item_id: str, heard: str) -> RecitationResult:
+    """Попытка с разбором группами, как её строит сценарий; буква урока — у урока буквы."""
+    from muallim.application.breakdown import build_breakdown  # noqa: PLC0415
+
     item = c.item(item_id)
     a = assess(item.text, heard)
     attempt = Attempt(
         UUID(int=1), UUID(int=2), item.id, "v", "stub", a, GradingPolicy().verdict(a),
         None, None, 1, FixedClock().now(),
     )  # fmt: skip
+    lesson, _ = c.locate(item_id)
+    head = next((i.text[0] for i in lesson.items if i.kind is ItemKind.LETTER), "")
+    letter = ("ء" if head in "أإؤئآ" else head) if lesson.section == "letter" else None
+    review = build_breakdown(a, item.text, c.lexicon, lesson_letter=letter)
     return RecitationResult(
         item, attempt, tuple(Explanation(f"Ошибка {n}") for n in range(len(a.errors))), "",
-        c.next_item(item.id),
+        c.next_item(item.id), breakdown=review,
     )  # fmt: skip
 
 
@@ -271,11 +278,27 @@ def _heard(c: Curriculum, *swaps: tuple[str, str]) -> str:
     return text
 
 
+def _shown(s: screens.Screen) -> str:
+    return s.caption + "\n" + s.details
+
+
+def _first_point(s: screens.Screen) -> str:
+    """Первый пункт разбора: строка с «1️⃣» (и что перед номером) до «2️⃣» или абзаца."""
+    one, two = texts.ERROR_NUMBERS[:2]
+    shown = _shown(s)
+    assert one in shown, "нет первого пункта разбора"
+    before, rest = shown.split(one, maxsplit=1)
+    return before.rsplit("\n", maxsplit=1)[-1] + rest.split(two, maxsplit=1)[0].split("\n\n")[0]
+
+
 def test_lesson_letter_swap_opens_the_explanation(curriculum: Curriculum) -> None:
     heard = _heard(curriculum, ("مُرْ", "نُرْ"))  # м прозвучала как н
     r = _result(curriculum, MIM_LINE, heard)
-    s = screens.result(curriculum, r, has_audio=False)
-    assert s.details.startswith(texts.LESSON_LETTER_WRONG.format(letter="م", heard="ن"))
+    assert r.breakdown is not None
+    (g,) = r.breakdown.groups
+    assert (g.expected, g.heard, g.lesson_letter) == ("م", "ن", True)
+    point = _first_point(screens.result(curriculum, r, has_audio=False))
+    assert "Буква урока" in point and g.need_label in point and g.heard_label in point
 
 
 def test_lesson_letter_line_comes_first_even_after_other_errors(curriculum: Curriculum) -> None:
@@ -284,19 +307,29 @@ def test_lesson_letter_line_comes_first_even_after_other_errors(curriculum: Curr
     r = _result(curriculum, MIM_LINE, heard)
     errors = r.attempt.assessment.errors
     assert [e.expected for e in errors][:1] == ["ر"]  # порядок ошибок в строке
-    s = screens.result(curriculum, r, has_audio=False)
-    assert s.details.startswith(texts.LESSON_LETTER_WRONG.format(letter="م", heard="ن"))
+    assert r.breakdown is not None
+    first = r.breakdown.groups[0]
+    assert (first.expected, first.heard, first.lesson_letter) == ("م", "ن", True)
+    point = _first_point(screens.result(curriculum, r, has_audio=False))
+    assert "Буква урока" in point and first.heard_label in point
 
 
 def test_missing_lesson_letter_opens_the_explanation(curriculum: Curriculum) -> None:
     heard = _heard(curriculum, ("مُرْ", "رْ"))  # «мур» → «р»: буква м пропущена
     r = _result(curriculum, MIM_LINE, heard)
-    s = screens.result(curriculum, r, has_audio=False)
-    assert s.details.startswith(texts.LESSON_LETTER_MISSING.format(letter="م"))
+    assert r.breakdown is not None
+    first = r.breakdown.groups[0]
+    assert (first.expected, first.lesson_letter) == ("م", True)
+    point = _first_point(screens.result(curriculum, r, has_audio=False))
+    assert "Буква урока" in point and first.need_label in point
 
 
 def test_lesson_letter_error_does_not_change_verdict_or_score(curriculum: Curriculum) -> None:
-    """В3 (автор 2026-10-21): зачёт как раньше — от 80 %; строгость отложена (OQ-14)."""
+    """В3 (автор 2026-10-21): зачёт как раньше — от 80 %; строгость отложена (OQ-14).
+
+    FR-54: строки «Точность» на экране больше нет — балл не меняется, буква урока только
+    называется первым пунктом.
+    """
     heard = _heard(curriculum, ("مُرْ", "نُرْ"))
     r = _result(curriculum, MIM_LINE, heard)
     score = r.attempt.assessment.score
@@ -304,17 +337,15 @@ def test_lesson_letter_error_does_not_change_verdict_or_score(curriculum: Curric
     assert r.verdict is Verdict.PASSED
     s = screens.result(curriculum, r, has_audio=False)
     assert s.caption.startswith(texts.VERDICT_PASSED)
-    assert texts.RESULT_SCORE.format(bar=views.bar(score), score=score) in s.caption
-    assert texts.LESSON_LETTER_WRONG.format(letter="م", heard="ن") in s.details
+    assert "Буква урока" in _first_point(s)
 
 
 def test_error_in_another_letter_has_no_lesson_letter_line(curriculum: Curriculum) -> None:
     heard = _heard(curriculum, ("رُمْ", "لُمْ"))  # ошибка в ر, буква урока — م
     r = _result(curriculum, MIM_LINE, heard)
+    assert r.breakdown is not None
+    assert not any(g.lesson_letter for g in r.breakdown.groups)
     s = screens.result(curriculum, r, has_audio=False)
-    assert s.details  # разбор есть
-    for template in (texts.LESSON_LETTER_WRONG, texts.LESSON_LETTER_MISSING):
-        marker = _marker(template)
-        assert marker, "у строки о букве урока должна быть постоянная часть до {letter}"
-        assert marker not in s.details
-    assert texts.LESSON_LETTER_WRONG.format(letter="ر", heard="ل") not in s.details
+    _first_point(s)  # разбор есть
+    assert "⭐" not in _shown(s)  # ⭐ — значок «Закрепления», в разборе его нет
+    assert "Буква урока" not in _shown(s)

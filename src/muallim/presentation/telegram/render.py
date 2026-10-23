@@ -10,26 +10,36 @@ Telegram не умеет крупный шрифт и цвет в тексте, 
 ``available()`` → False, и бот показывает текстовые карточки.
 """
 
-import difflib
 import io
-import unicodedata
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
 from pathlib import Path
-from typing import Final
 
 from PIL import Image, ImageDraw, ImageFont, features
 
-from muallim.domain.phonetics import CONSONANTS
+from muallim.application.breakdown import VOWEL_KINDS, Breakdown, ErrorGroup
+from muallim.domain import arabic
+from muallim.domain.assessment import ErrorKind
+from muallim.presentation.telegram import texts, views
+
+# Разбор строки — из домена (FR-54): те же объекты, а не копия.
+HAMZA_FORMS = arabic.HAMZA_FORMS
+MADD_LETTERS = arabic.MADD_LETTERS
+PHONEME_OF = arabic.PHONEME_OF
+SHADDA = arabic.SHADDA
+Cluster = arabic.Cluster
+WordState = arabic.WordState
+clusters = arabic.clusters
+consonant_clusters = arabic.consonant_clusters
+error_clusters = arabic.error_clusters
+unread_clusters = arabic.unread_clusters
+word_states = arabic.word_states
 
 FONTS = Path(__file__).parent / "assets" / "fonts"
 ZWJ = "‍"
-SHADDA = "ّ"
-HAMZA_FORMS = frozenset("ءأإؤئآ")
-MADD_LETTERS = frozenset("اىوي")  # без знаков — удлинение, а не согласный
-PHONEME_OF: Final = {"ة": "ت", "ى": "ي"}  # как буква текста записана в фонемах
+TATWEEL = "ـ"  # носитель знака, когда букв много
 
 # Холст не шире 900 px (FR-48): Telegram сжимает картинку до ширины сообщения (~360 pt на
 # телефоне), и на широком холсте буквы и огласовки мельчают. Шрифт — крупнее относительно ширины,
@@ -75,118 +85,9 @@ def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
 
 
 # ---------- разбор текста ----------
-@dataclass(frozen=True, slots=True)
-class Cluster:
-    """Буква со своими огласовками; start/end — индексы в строке."""
-
-    start: int
-    end: int
-    base: str
-    marks: str
-
-    @property
-    def is_consonant(self) -> bool:
-        if self.base in HAMZA_FORMS:
-            return True
-        if self.base in MADD_LETTERS and not self.marks:
-            return False
-        return unicodedata.category(self.base) == "Lo"
-
-
-def clusters(text: str) -> list[Cluster]:
-    out: list[Cluster] = []
-    i = 0
-    while i < len(text):
-        j = i + 1
-        while j < len(text) and unicodedata.category(text[j]) == "Mn":
-            j += 1
-        if not text[i].isspace():
-            out.append(Cluster(i, j, text[i], text[i + 1 : j]))
-        i = j
-    return out
-
-
-def consonant_clusters(text: str) -> list[int]:
-    """Номер кластера для каждого согласного по порядку (шадда — два согласных)."""
-    order: list[int] = []
-    for n, c in enumerate(clusters(text)):
-        if c.is_consonant:
-            order += [n] * (2 if SHADDA in c.marks else 1)
-    return order
-
-
+# Одна реализация на домен и картинку (FR-54): здесь — реэкспорт из ``domain.arabic``.
 def accent_clusters(text: str, letters: Collection[str]) -> set[int]:
     return {n for n, c in enumerate(clusters(text)) if c.base in letters}
-
-
-def error_clusters(
-    text: str, syllables: Collection[int | None], reference: str | None = None
-) -> set[int]:
-    """Слоги ошибок (с 1, по согласным эталона) → кластеры текста (ADR-0024).
-
-    С ``reference`` (эталон в фонемах) согласные сопоставляются по буквам: в фонемах шадда
-    бывает одной согласной, «ٱ» внутри фразы не читается, и счёт по номеру уезжает.
-    Буквы мадда и непроизносимые буквы подсвечиваются вместе со своим слогом.
-    """
-    if reference is None:
-        order = consonant_clusters(text)
-        return {order[s - 1] for s in syllables if s is not None and 1 <= s <= len(order)}
-    owner = _owners(text, reference)
-    letters = clusters(text)
-    found = set()
-    for s in syllables:
-        if s is not None and 1 <= s <= len(owner):
-            found.add(owner[s - 1])
-    # к ошибочной букве — её «хвост» без своего звука (мадд, татвиль) и немые буквы перед ней
-    tied = _tied(letters, set(owner))
-    return {n for n in range(len(letters)) if tied[n] in found}
-
-
-def unread_clusters(text: str, reference: str, consonant: int) -> set[int]:
-    """Кластеры текста от ``consonant``-й согласной эталона (с 1) до конца строки."""
-    total = sum(1 for ch in reference if ch in CONSONANTS)
-    return error_clusters(text, range(consonant, total + 1), reference)
-
-
-def _letter(c: Cluster) -> str:
-    """Буква текста так, как она записана в фонемах."""
-    return "ء" if c.base in HAMZA_FORMS or c.base == "ٱ" else PHONEME_OF.get(c.base, c.base)
-
-
-def _owners(text: str, reference: str) -> list[int]:
-    """Для каждой согласной эталона — кластер текста, к которому она относится."""
-    letters = clusters(text)
-    spoken = [n for n, c in enumerate(letters) if c.is_consonant]
-    sounds = [ch for ch in reference if ch in CONSONANTS]
-    matcher = difflib.SequenceMatcher(
-        None, [_letter(letters[n]) for n in spoken], sounds, autojunk=False
-    )
-    owner: list[int] = []
-    for _, i1, i2, j1, j2 in matcher.get_opcodes():
-        for k in range(j2 - j1):
-            if i2 > i1:  # equal/replace: по порядку, лишние фонемы — к последней букве
-                owner.append(spoken[min(i1 + k, i2 - 1)])
-            else:  # вставка (шадда двумя согласными, танвин) — к предыдущей букве
-                owner.append(owner[-1] if owner else spoken[min(i1, len(spoken) - 1)])
-    return owner
-
-
-def _tied(letters: Sequence[Cluster], voiced: set[int]) -> list[int]:
-    """Кластер → чью ошибку он разделяет: буква без звука — с соседней звучащей."""
-    tied = list(range(len(letters)))
-    last = None
-    for n, c in enumerate(letters):  # мадд и татвиль — к предыдущей звучащей
-        if n in voiced:
-            last = n
-        elif not c.is_consonant and last is not None:
-            tied[n] = last
-    following = None
-    for n in range(len(letters) - 1, -1, -1):  # немая согласная (ٱ, лям) — к следующей
-        if n in voiced:
-            following = n
-        elif letters[n].is_consonant and following is not None:
-            tied[n] = following
-    return tied
 
 
 # ---------- вёрстка ----------
@@ -496,30 +397,6 @@ def letter_forms(
     return _png(img)
 
 
-class WordState(StrEnum):
-    OK = "ok"
-    WRONG = "wrong"
-    UNREAD = "unread"
-
-
-def word_states(text: str, wrong: Collection[int], unread: Collection[int]) -> list[WordState]:
-    """Состояние каждого слова строки по кластерам ошибок: хоть одна ошибка — слово неверно;
-    все буквы не прочитаны — слово не прочитано."""
-    words = text.split()
-    of_word: list[list[int]] = [[] for _ in words]
-    for n, c in enumerate(clusters(text)):
-        of_word[text[: c.start].count(" ") if " " in text else 0].append(n)
-    out = []
-    for members in of_word:
-        if members and all(m in unread for m in members):
-            out.append(WordState.UNREAD)
-        elif any(m in wrong and m not in unread for m in members):
-            out.append(WordState.WRONG)
-        else:
-            out.append(WordState.OK)
-    return out
-
-
 def result_words(
     text: str,
     states: Sequence[WordState],
@@ -591,6 +468,297 @@ def result_words(
             draw.text((cx, cy - 24), letter, font=big, fill=color, anchor="mm")
             draw.text((cx, cy + 58), label, font=small, fill=(107, 98, 88), anchor="mm")
         draw.text((WIDTH // 2, cy), instead, font=small, fill=INK, anchor="mm")
+    return _png(img)
+
+
+# ---------- разбор попытки группами (FR-54, ADR-0070) ----------
+BADGE = 24  # запас над строкой для номеров групп
+BADGE_RADIUS = 19
+BADGE_STEP = 44  # номера над соседними буквами не помещаются в ряд — следующий ряд выше (I4)
+LEGEND_MAX_ROWS = 6  # строк легенды не больше: дальше — texts.LEGEND_MORE (B2)
+LEGEND_ROW = 180  # строка легенды: «Нужно:» буква крупно и подпись звука, рядом — «У тебя:»
+LEGEND_LETTER = 104  # буква в легенде — крупно (FR-54): ≥ 30 pt на экране телефона
+LEGEND_COLUMNS = (300, 590)  # середины колонок «Нужно» и «У тебя»
+LEGEND_LABEL_WIDTH = 270
+LEGEND_MORE_HEIGHT = 56
+Color = tuple[int, int, int]
+Box = tuple[int, int, int, int]
+
+
+def legend_rows(breakdown: Breakdown) -> list[tuple[int, str, str]]:
+    """Строка легенды на группу: (номер, нужно, у тебя) — номер совпадает с пунктом текста; не
+    больше ``LEGEND_MAX_ROWS`` (длинная строка с десятками ошибок — B2)."""
+    groups = breakdown.groups[:LEGEND_MAX_ROWS]
+    return [(n, g.need_label, g.heard_label) for n, g in enumerate(groups, start=1)]
+
+
+def group_numbers(breakdown: Breakdown) -> dict[int, int]:
+    """Кластер строки → номер группы (первая группа места главнее): красная буква."""
+    out: dict[int, int] = {}
+    for n, g in enumerate(breakdown.groups, start=1):
+        for place in g.places:
+            for cluster in place.clusters:
+                out.setdefault(cluster, n)
+    return out
+
+
+def badges(breakdown: Breakdown) -> list[tuple[int, int]]:
+    """Номера над буквами: (кластер, номер группы) — над первой буквой каждого места групп из
+    легенды. У одной буквы бывает несколько номеров (шадда и огласовка) — каждый виден (I4)."""
+    out: dict[tuple[int, int], None] = {}
+    for n, g in enumerate(breakdown.groups[:LEGEND_MAX_ROWS], start=1):
+        for place in g.places:
+            if place.clusters:
+                out[(place.clusters[0], n)] = None
+    return list(out)
+
+
+@dataclass(frozen=True, slots=True)
+class _Line:
+    text: str
+    right: float
+    spans: list[tuple[float, float]]
+    origin: tuple[float, int]
+    offset: int  # номер первого кластера строки во всём тексте
+
+
+@dataclass(frozen=True, slots=True)
+class _Layout:
+    font: ImageFont.FreeTypeFont
+    line_height: int
+    lines: list[_Line]
+    badges: list[tuple[int, Box]]  # (номер, рамка)
+    bottom: int
+
+
+def _layout(text: str, breakdown: Breakdown, top: int) -> _Layout:
+    """Вёрстка строки и номеров: номер — над буквой, если рядом уже номер — рядом выше."""
+    size = ARABIC_SIZE if len(text) > 14 else SHORT_SIZE
+    font = _font(size)
+    line_height = int(size * 1.7)
+    numbers: dict[int, list[int]] = {}
+    for cluster, n in badges(breakdown):
+        numbers.setdefault(cluster, []).append(n)
+    r, gap = BADGE_RADIUS, 2 * BADGE_RADIUS + 6
+    lines, boxes, y, offset = [], [], top, 0
+    for line in _wrap(text.split(), font, TEXT_WIDTH):
+        right = (WIDTH + font.getlength(line, direction="rtl")) / 2
+        spans = _spans(line, font)
+        wanted = sorted(
+            (right - (a + b) / 2, n)
+            for k, (a, b) in enumerate(spans)
+            for n in numbers.get(offset + k, [])
+        )
+        rows: list[list[float]] = []
+        placed: list[tuple[int, float, int]] = []  # (ряд, x, номер)
+        for cx, n in wanted:
+            row = next(
+                (i for i, xs in enumerate(rows) if all(abs(cx - x) >= gap for x in xs)), None
+            )
+            if row is None:
+                rows.append([])
+                row = len(rows) - 1
+            rows[row].append(cx)
+            placed.append((row, cx, n))
+        extra = max(len(rows) - 1, 0) * BADGE_STEP
+        origin = (right, y + BADGE + extra + line_height // 2)
+        ink_top = origin[1] + font.getbbox(line, anchor="rm", direction="rtl")[1]
+        base = max(ink_top - 32, y + extra + 22)
+        for row, cx, n in placed:
+            cy = base - row * BADGE_STEP
+            boxes.append((n, (int(cx - r), int(cy - r), int(cx + r), int(cy + r))))
+        lines.append(_Line(line, right, spans, origin, offset))
+        offset += len(spans)
+        y += BADGE + extra + line_height
+    return _Layout(font, line_height, lines, boxes, y)
+
+
+def badge_boxes(text: str, breakdown: Breakdown) -> list[tuple[int, Box]]:
+    """Где на картинке стоят номера групп: (номер, (x0, y0, x1, y1)); рамки не пересекаются."""
+    return _layout(text, breakdown, _TOP).badges
+
+
+def _is_arabic(ch: str) -> bool:
+    return "\u0600" <= ch <= "\u06ff" or "\ufb50" <= ch <= "\ufeff"
+
+
+def _runs(text: str) -> list[tuple[str, bool]]:
+    """Подпись на куски: арабские буквы — шрифтом Scheherazade (в PT Sans их нет), остальное —
+    PT Sans."""
+    runs: list[tuple[str, bool]] = []
+    for ch in text:
+        is_arabic = _is_arabic(ch)
+        if runs and runs[-1][1] == is_arabic:
+            runs[-1] = (runs[-1][0] + ch, is_arabic)
+        else:
+            runs.append((ch, is_arabic))
+    return runs
+
+
+def _run_font(is_arabic: bool, size: int) -> ImageFont.FreeTypeFont:
+    return _font(round(size * 1.4)) if is_arabic else _ui_font(size)
+
+
+def _mixed_width(text: str, size: int) -> float:
+    return sum(
+        _run_font(is_arabic, size).getlength(run, direction="rtl" if is_arabic else None)
+        for run, is_arabic in _runs(text)
+    )
+
+
+def _mixed(
+    draw: ImageDraw.ImageDraw, at: tuple[float, int], text: str, size: int, fill: Color
+) -> None:
+    """Подпись слева направо от ``at`` (середина строки по высоте): кириллица и арабская буква."""
+    x, y = at
+    for run, is_arabic in _runs(text):
+        font = _run_font(is_arabic, size)
+        if is_arabic:  # по видимым границам: у арабской буквы середина строки шрифта ниже глаза
+            _, top, _, bottom = draw.textbbox((0, 0), run, font=font, direction="rtl")
+            draw.text((x, y - (top + bottom) / 2), run, font=font, fill=fill, direction="rtl")
+            x += font.getlength(run, direction="rtl")
+        else:
+            draw.text((x, y), run, font=font, fill=fill, anchor="lm")
+            x += font.getlength(run)
+
+
+def _badge(draw: ImageDraw.ImageDraw, cx: float, cy: float, n: int) -> None:
+    r = 19
+    draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=ACCENT)
+    draw.text((cx, cy), str(n), font=_ui_font(28, bold=True), fill=PAPER, anchor="mm")
+
+
+def _recolor(
+    img: Image.Image,
+    line: str,
+    font: ImageFont.FreeTypeFont,
+    origin: tuple[float, int],
+    paint: tuple[tuple[int, int, int, int], Color],
+) -> None:
+    """Перекрасить в строке ``line`` только то, что внутри рамки (буква по её границам)."""
+    box, color = paint
+    layer = Image.new("RGB", img.size, PAPER)
+    ImageDraw.Draw(layer).text(origin, line, font=font, fill=color, anchor="rm", direction="rtl")
+    ink = Image.new("L", img.size, 0)
+    ImageDraw.Draw(ink).text(origin, line, font=font, fill=255, anchor="rm", direction="rtl")
+    mask = Image.new("L", img.size, 0)
+    ImageDraw.Draw(mask).rectangle(box, fill=255)
+    img.paste(layer, (0, 0), Image.composite(ink, Image.new("L", img.size, 0), mask))
+
+
+def _marked_text(img: Image.Image, layout: _Layout, breakdown: Breakdown, text: str) -> None:
+    """Строка крупно: верные буквы зелёные, ошибка — красная с номером над ней, не дочитанное —
+    серое."""
+    draw = ImageDraw.Draw(img)
+    numbers = group_numbers(breakdown)
+    unread_words = set(breakdown.unread)
+    unread = {n for n, w in enumerate(arabic.cluster_words(text)) if w in unread_words}
+    font, half = layout.font, layout.line_height // 2
+    for line in layout.lines:
+        draw.text(line.origin, line.text, font=font, fill=OK, anchor="rm", direction="rtl")
+        top = line.origin[1] - half
+        for k, (a, b) in enumerate(line.spans):
+            n = line.offset + k
+            color = MUTED if n in unread else ACCENT if n in numbers else None
+            if color is not None:
+                box = (int(line.right - b), top, int(line.right - a + 1), top + layout.line_height)
+                _recolor(img, line.text, font, line.origin, (box, color))
+    for n, (x0, y0, x1, y1) in layout.badges:
+        _badge(draw, (x0 + x1) / 2, (y0 + y1) / 2, n)
+
+
+def _glyph(
+    draw: ImageDraw.ImageDraw, cx: float, box: tuple[int, int], text: str, fill: Color
+) -> None:
+    """Буква (слог) крупно шрифтом арабского текста, по видимым границам внутри полосы ``box``:
+    хвост ح или ق не наезжает на подпись под ней."""
+    top, bottom = box
+    if not text:
+        draw.text((cx, (top + bottom) / 2), "—", font=_ui_font(48), fill=fill, anchor="mm")
+        return
+    size = LEGEND_LETTER
+    while True:
+        font = _font(size)
+        left, t, right, b = draw.textbbox((0, 0), text, font=font, direction="rtl")
+        if b - t <= bottom - top or size <= 40:
+            break
+        size -= 6
+    x = cx - (left + right) / 2
+    y = (top + bottom) / 2 - (t + b) / 2
+    draw.text((x, y), text, font=font, fill=fill, direction="rtl")
+
+
+def _legend_sides(group: ErrorGroup) -> tuple[str, str]:
+    """Что рисовать крупно: буквы как в тексте (ة, أ), шадда, или слоги буквы-носителя знака."""
+    if group.kind in VOWEL_KINDS:
+        carrier = group.carrier or TATWEEL
+        return (
+            carrier + group.expected if group.expected else carrier,
+            carrier + group.heard if group.heard else carrier,
+        )
+    need = group.letter or ("" if group.kind is ErrorKind.EXTRA_SOUND else group.expected)
+    if group.kind is ErrorKind.SHADDA_MISSING:
+        return need + SHADDA, need
+    if not group.letter and group.kind is not ErrorKind.EXTRA_SOUND:
+        need = ""  # звук без буквы в тексте (н танвина) — не рисуем чужую букву (M3)
+    return need, group.heard
+
+
+def _legend(draw: ImageDraw.ImageDraw, breakdown: Breakdown, top: int) -> None:
+    """Под чертой — строка на группу: номер, «Нужно:» и буква крупно зелёным, «У тебя:» и буква
+    крупно красным, под буквами — подпись звука, справа — сколько раз."""
+    draw.line((PAD + 30, top, WIDTH - PAD - 30, top), fill=GREY_BG, width=2)
+    y = top + 16
+    headings = (
+        texts.RESULT_EXPECTED.format(text="").strip(),
+        texts.RESULT_HEARD.format(text="").strip(),
+    )
+    for (n, need, heard), group in zip(legend_rows(breakdown), breakdown.groups, strict=False):
+        _badge(draw, PAD + 40, y + LEGEND_ROW // 2 - 8, n)
+        sides = zip(
+            LEGEND_COLUMNS, headings, _legend_sides(group), (need, heard), (OK, ACCENT), strict=True
+        )
+        for cx, heading, glyph, label, color in sides:
+            draw.text((cx, y + 16), heading, font=_ui_font(26), fill=INK, anchor="mm")
+            _glyph(draw, cx, (y + 36, y + 128), glyph, color)
+            size = 26
+            while size > 18 and _mixed_width(label, size) > LEGEND_LABEL_WIDTH:
+                size -= 2
+            _mixed(draw, (cx - _mixed_width(label, size) / 2, y + 150), label, size, color)
+        if times := views.times(group.times):
+            draw.text(
+                (WIDTH - PAD - 24, y + LEGEND_ROW // 2 - 8),
+                times,
+                font=_ui_font(26, bold=True),
+                fill=ACCENT,
+                anchor="rm",
+            )
+        y += LEGEND_ROW
+    if (more := len(breakdown.groups) - LEGEND_MAX_ROWS) > 0:
+        line = texts.LEGEND_MORE.format(n=more)
+        draw.text((WIDTH // 2, y + 24), line, font=_ui_font(28), fill=INK, anchor="mm")
+
+
+_TOP, _TOP_LABEL = 48, 96  # верх строки: без подписи и под подписью «Верно 2 слова из 5»
+
+
+def result_marks(text: str, breakdown: Breakdown, score_label: str = "") -> bytes:
+    """Разбор группами (FR-54): верные буквы зелёные, ошибка — красная только сама буква с
+    номером группы над ней, не дочитанное — серое; внизу — строка на группу «нужно / у тебя»
+    (не больше ``LEGEND_MAX_ROWS``). Холст 900 px (FR-48); высота растёт с числом групп."""
+    layout = _layout(text, breakdown, _TOP_LABEL if score_label else _TOP)
+    rows = len(legend_rows(breakdown))
+    legend = LEGEND_ROW * rows + 40 if rows else 0
+    if len(breakdown.groups) > rows:
+        legend += LEGEND_MORE_HEIGHT
+    img = Image.new("RGB", (WIDTH, layout.bottom + legend + 50), PAPER)
+    draw = _frame(img)
+    if score_label:
+        label_font = _fit(score_label, 30, WIDTH - 2 * PAD - 40, bold=True)
+        draw.text((PAD + 20, 70), score_label, font=label_font, fill=INK, anchor="lm")
+    _marked_text(img, layout, breakdown, text)
+    if rows:
+        _legend(draw, breakdown, layout.bottom + 10)
     return _png(img)
 
 

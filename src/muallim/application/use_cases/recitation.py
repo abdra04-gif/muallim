@@ -3,6 +3,7 @@
 import time
 from dataclasses import dataclass
 
+from muallim.application.breakdown import Breakdown, ErrorGroup, build_breakdown
 from muallim.application.feedback import Explanation, FeedbackCatalog
 from muallim.application.ports.recognition import PronunciationRecognizer, RecognitionError
 from muallim.application.ports.repositories import AttemptRepository, UnitOfWork
@@ -12,7 +13,7 @@ from muallim.application.transcription import Reading, as_text, legend, reading
 from muallim.application.use_cases.cards import OpenItem
 from muallim.domain.assessment import Assessment, assess_variants, unread_from
 from muallim.domain.attempt import Attempt
-from muallim.domain.curriculum import Curriculum, LessonItem, Lexicon
+from muallim.domain.curriculum import Curriculum, LessonItem, Lexicon, lesson_letter
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy, Verdict
 
@@ -31,7 +32,8 @@ class RecitationResult:
     practice: tuple[str, ...] = ()  # слоги с ошибками — сказать медленно 3 раза
     unread_from: int | None = None  # с какого слога ``expected_reading`` строка не дочитана
     previous_score: int | None = None  # балл прошлой попытки этой строки
-    fixed: tuple[str, ...] = ()  # слоги с ошибкой в прошлый раз, верные теперь
+    fixed: tuple[str, ...] = ()  # подписи групп ошибок прошлой попытки, которых теперь нет
+    breakdown: Breakdown | None = None  # разбор группами для экрана (FR-54); сценарий заполняет
 
     @property
     def verdict(self) -> Verdict:
@@ -109,6 +111,10 @@ class AssessRecitation:
         )
         heard = reading(recognition.heard, renderer.lexicon)
         lesson, _ = self.curriculum.locate(item.id)
+        letter = lesson_letter(lesson)
+        breakdown = build_breakdown(
+            best.assessment, item.text, renderer.lexicon, unread=unread, lesson_letter=letter
+        )
         was_done = await self._lesson_done(learner, lesson.practice_items)
         previous = await self.attempts.last_assessment(learner.id, item.id)
         await self.attempts.add(attempt, renderer.render(errors, reference))
@@ -132,7 +138,10 @@ class AssessRecitation:
             practice=tuple(dict.fromkeys(text for text, wrong in expected[:unread] if wrong)),
             unread_from=unread,
             previous_score=previous.score if previous else None,
-            fixed=_fixed(previous, expected, renderer.lexicon) if previous else (),
+            fixed=_fixed(previous, breakdown, item.text, renderer.lexicon, letter)
+            if previous
+            else (),
+            breakdown=breakdown,
         )
 
     async def _lesson_done(self, learner: Learner, items: tuple[LessonItem, ...]) -> bool:
@@ -147,14 +156,32 @@ def _read_part(shown: Reading, unread: int | None) -> Reading:
     return shown[:unread] + tuple((text, False) for text, _ in shown[unread:])
 
 
-def _fixed(previous: Assessment, now: Reading, lexicon: Lexicon) -> tuple[str, ...]:
-    """Слоги, где в прошлый раз была ошибка, а теперь нет (сравниваем по тексту слога).
+def _fixed(
+    previous: Assessment, now: Breakdown, text: str, lexicon: Lexicon, letter: str | None
+) -> tuple[str, ...]:
+    """Ошибки прошлой попытки (группы), которых теперь нет, — их подписи (FR-54, Р1).
 
-    Непрочитанный в прошлый раз конец — не исправление: тогда это были не ошибки.
+    Сравнение по виду и нужному звуку, без прозвучавшего: ح→ه, а теперь ح→خ — не исправлено (I6).
+    Прошлые ошибки в словах, до которых сейчас не дочитал, — не исправление; непрочитанный в
+    прошлый раз конец — тоже (тогда это были не ошибки).
     """
-    before = _read_part(
-        reading(previous.reference, lexicon, [e.syllable for e in previous.errors]),
-        unread_from(previous.reference, previous.heard),
+    before = build_breakdown(
+        previous,
+        text,
+        lexicon,
+        unread=unread_from(previous.reference, previous.heard),
+        lesson_letter=letter,
     )
-    wrong_now = {text for text, wrong in now if wrong}
-    return tuple(dict.fromkeys(text for text, wrong in before if wrong and text not in wrong_now))
+    still = {_key(g) for g in now.groups}
+    unread = set(now.unread)
+    return tuple(
+        dict.fromkeys(
+            g.need_label
+            for g in before.groups
+            if _key(g) not in still and any(p.word_index not in unread for p in g.places)
+        )
+    )
+
+
+def _key(g: ErrorGroup) -> tuple[str, ...]:
+    return (g.kind, g.expected)

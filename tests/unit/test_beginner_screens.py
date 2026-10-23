@@ -116,10 +116,19 @@ def test_progress_repeat_lists_step_numbers() -> None:
     assert texts.PROGRESS_ITEM == "{n}"
 
 
-def test_syllable_and_word_counters_are_distinguishable() -> None:
-    """В подписи считаются слоги, на картинке — слова: «11 из 12» и «5 из 6» не путаются."""
-    assert "слог" in texts.RESULT_RIGHT
-    assert "слов" in texts.RESULT_WORDS
+def test_result_counts_words_only(curriculum: Curriculum) -> None:
+    """FR-54: один счётчик — слова («верно N слов из M»); счёт слогов с экрана ушёл, и
+    «11 из 12» слогов рядом с «5 из 6» слов больше не путает."""
+    assert texts.RESULT_WORDS.startswith("Верно")  # «Верно 2 слова из 5», без «слов верно»
+    r = _failed_reviewed(curriculum)
+    s = screens.result(curriculum, r, has_audio=True)
+    words = len(r.item.text.split())
+    # ни одного верного слова — счётчика нет (решение автора 2026-10-24: «Верно 0» обидно)
+    assert (
+        texts.RESULT_WORDS.format(ok=0, words=views.plural(0, texts.WORD_FORMS), total=words)
+        not in s.caption
+    )
+    assert "слогов" not in _everything(s)
 
 
 def test_fresh_learner_start_button_opens_lesson_one(curriculum: Curriculum) -> None:
@@ -337,6 +346,15 @@ def _failed(c: Curriculum) -> RecitationResult:
     return r
 
 
+def _failed_reviewed(c: Curriculum) -> RecitationResult:
+    """«رَ رِ رُ» прочитано «سَ سِ سُ»; разбор группами — как его строит сценарий (FR-54)."""
+    from muallim.application.breakdown import build_breakdown  # noqa: PLC0415
+
+    r = _failed(c)
+    a = r.attempt.assessment
+    return replace(r, breakdown=build_breakdown(a, r.item.text, c.lexicon, lesson_letter="ر"))
+
+
 def test_correct_result_hides_research_block_and_heard_line(curriculum: Curriculum) -> None:
     item = curriculum.item("L001-02")
     s = screens.result(curriculum, _result(curriculum, item.id, item.text), has_audio=True)
@@ -344,8 +362,8 @@ def test_correct_result_hides_research_block_and_heard_line(curriculum: Curricul
 
 
 def test_result_with_errors_hides_research_block(curriculum: Curriculum) -> None:
-    s = screens.result(curriculum, _failed(curriculum), has_audio=True)
-    assert s.details  # разбор есть
+    s = screens.result(curriculum, _failed_reviewed(curriculum), has_audio=True)
+    assert texts.ERROR_NUMBERS[0] in _everything(s)  # разбор есть (FR-54: в той же подписи)
     assert _research_shown(s) == []
 
 

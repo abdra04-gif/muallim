@@ -12,8 +12,8 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 
 | Слой | Папка | Главные файлы |
 |---|---|---|
-| domain | `src/muallim/domain/` | `assessment.py` (сравнение фонем, типы ошибок), `policy.py` (пороги), `curriculum.py`, `learner.py`, `attempt.py`, `phonetics.py` |
-| application | `src/muallim/application/` | `use_cases/*.py` (сценарии), `ports/*.py` (протоколы), `feedback.py` (тексты ошибок) |
+| domain | `src/muallim/domain/` | `assessment.py` (сравнение фонем, типы ошибок), `policy.py` (пороги), `curriculum.py`, `learner.py`, `attempt.py`, `phonetics.py`, `arabic.py` (строка на буквы и слова, сопоставление с эталоном — FR-54, ADR-0070) |
+| application | `src/muallim/application/` | `use_cases/*.py` (сценарии), `ports/*.py` (протоколы), `feedback.py` (полный текст каждой ошибки для БД), `breakdown.py` (разбор попытки группами для экрана — FR-54, ADR-0070), `transcription.py` |
 | infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (Muaalem, заглушка), `audio/` (ffmpeg, файлы), `curriculum/` (YAML), `erasures.py` (журнал удалений, ADR-0054) |
 | presentation | `src/muallim/presentation/telegram/` | `handlers/` (по темам: команды, навигация, данные, эталон и жалоба, голосовое), `annotation.py`, `errors.py` (перехват сбоев), `display.py` (показ экранов), `opening.py` (начало занятия: истиаза и басмала, ADR-0050; что на экране и идёт ли начало занятия — в БД, сценарий `use_cases/screen.py`, ADR-0061), `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
 | research | `src/muallim/research/` | `reports.py`, `annotation.py`, `dataset.py`, `integrity.py` (сверка БД и файлов), `erasures.py` (повтор журнала удалений) |

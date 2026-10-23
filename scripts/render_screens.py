@@ -9,15 +9,16 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
+from muallim.application.breakdown import build_breakdown
 from muallim.application.feedback import Explanation
 from muallim.application.transcription import as_text, legend, reading
 from muallim.application.use_cases.progress import LessonProgress, Progress
 from muallim.application.use_cases.quiz import QuizResult, QuizView
 from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.recitation import RecitationResult
-from muallim.domain.assessment import assess
+from muallim.domain.assessment import assess, unread_from
 from muallim.domain.attempt import Attempt
-from muallim.domain.curriculum import letters_before
+from muallim.domain.curriculum import lesson_letter, letters_before
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.domain.quiz import Pick, PickReason, RoundSummary, build_question, letter_heads
@@ -84,6 +85,10 @@ def main() -> None:
             expected_reading=expected, heard_reading=heard_r,
             legend=legend(as_text(expected) + as_text(heard_r), lex),
             practice=tuple(dict.fromkeys(text for text, wrong in expected if wrong)),
+            breakdown=build_breakdown(
+                a, item.text, lex, unread=unread_from(ref, heard),
+                lesson_letter=lesson_letter(c.locate(item.id)[0]),
+            ),
         )  # fmt: skip
 
     sad = next(les for les in letters if les.title.split(" · ")[0].endswith("ص"))

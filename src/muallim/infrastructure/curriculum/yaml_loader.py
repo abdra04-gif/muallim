@@ -41,6 +41,16 @@ def load_lexicon(path: Path) -> Lexicon:
             k: str(v) for k, v in (raw.get("transcription_legend") or {}).items()
         },
         vowel_tips={k: str(v) for k, v in (raw.get("vowel_tips") or {}).items()},
+        sounds={
+            k: (str(v["say"]), str(v.get("note") or ""))
+            for k, v in (raw.get("sounds") or {}).items()
+        },
+        syllables={
+            k: (str(v["syllables"][0]), str(v["syllables"][1]), str(v["syllables"][2]))
+            for k, v in (raw.get("sounds") or {}).items()
+            if v.get("syllables")
+        },
+        missing=str(raw.get("missing") or ""),
     )
 
 

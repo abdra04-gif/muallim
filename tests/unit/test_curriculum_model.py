@@ -75,3 +75,19 @@ def test_duplicate_item_ids_rejected() -> None:
 def test_unknown_lesson_raises(curriculum: Curriculum) -> None:
     with pytest.raises(KeyError):
         curriculum.lesson("L99")
+
+
+# ---------- FR-54: буква урока — одна функция домена ----------
+@pytest.mark.parametrize(
+    ("lesson_id", "letter"),
+    [("L003", "ء"), ("L004", "ر"), ("L020", "ص"), ("L024", "ح"), ("L031", None)],
+    ids=["hamza", "ra", "sad", "ha", "madd_lesson"],
+)
+def test_lesson_letter_of_letter_lessons(
+    curriculum: Curriculum, lesson_id: str, letter: str | None
+) -> None:
+    """Буква урока — первая буква головной карточки урока буквы; опоры хамзы — ء (с. 10 книги);
+    у уроков не про букву (мадд, ташдид…) — None. Её используют сценарий и экран (FR-54)."""
+    from muallim.domain.curriculum import lesson_letter  # noqa: PLC0415
+
+    assert lesson_letter(curriculum.lesson(lesson_id)) == letter
