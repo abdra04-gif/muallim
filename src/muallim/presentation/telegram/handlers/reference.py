@@ -39,7 +39,7 @@ async def take_recording(state: FSMContext) -> str | None:
 
 
 async def send_reference(msg: Message, item_id: str, audio: bytes) -> Message:
-    """Эталон отдельным сообщением: запись учителя — голосовое, чтение Хусари — аудио (mp3)."""
+    """Эталон отдельным сообщением: OGG (учитель, готовые записи) — голосовое, аят — аудио (mp3)."""
     if audio[:4] == b"OggS":
         return await msg.answer_voice(BufferedInputFile(audio, filename=f"{item_id}.ogg"))
     return await msg.answer_audio(

@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     audio_dir: Path = PROJECT_ROOT / "data" / "audio"
     curriculum_dir: Path = PROJECT_ROOT / "curriculum"
     reference_audio_dir: Path = PROJECT_ROOT / "curriculum" / "audio"
-    # Эталон для аятов: чтец EveryAyah (ADR-0025); кэш вне git — data/recitations
+    # Эталон для аятов: аль-Афаси с EveryAyah (ADR-0068); кэш вне git — data/recitations
     recitations_dir: Path = PROJECT_ROOT / "data" / "recitations"
-    reciter: str = "Husary_Muallim_128kbps"
+    reciter: str = "Alafasy_128kbps"
     app_version: str | None = None  # по умолчанию — версия пакета + git-коммит (ADR-0019)
     pass_threshold: int = Field(default=80, ge=0, le=100)
     excellent_threshold: int = Field(default=90, ge=0, le=100)

@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace husary-cuts design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -68,8 +68,8 @@ migration: ## Новая миграция: make migration m="описание"
 	@test -n "$(m)" || (echo 'укажите m="описание"' && exit 1)
 	uv run alembic revision --autogenerate -m "$(m)" --rev-id $$(printf "%04d" $$(( $$(ls migrations/versions/*.py | wc -l) + 1 )))
 
-husary-cuts: ## Нарезка «как правильно» из чтения Хусари: make husary-cuts a="--sections letter"
-	uv run --extra ml python scripts/audio/husary_cuts.py $(a)
+library-sounds: ## Готовые записи букв и слогов (ар-Раи) и истиазы (аль-Афаси) → curriculum/audio/library
+	uv run python scripts/audio/library_sounds.py
 
 errors: ## Каталог ошибок: make errors a="--letter ص --lesson L18" (все фильтры: --help)
 	uv run muallim-research errors $(a)

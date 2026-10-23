@@ -55,13 +55,14 @@ from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.asr.stub import StubRecognizer
+from muallim.infrastructure.audio.ffmpeg import trim_silence
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.audio.http import fetch
 from muallim.infrastructure.audio.reference_library import (
     CombinedReferenceAudio,
     FileReferenceAudio,
-    HusaryCuts,
     RecitationCache,
+    SoundLibrary,
 )
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
@@ -118,9 +119,11 @@ class AppProvider(Provider):
         texts = {i.id: i.text for les in curriculum.lessons for i in les.items if not i.quran}
         return CombinedReferenceAudio(
             FileReferenceAudio(self.settings.reference_audio_dir),
-            RecitationCache(self.settings.recitations_dir, fetch, self.settings.reciter),
+            RecitationCache(
+                self.settings.recitations_dir, fetch, self.settings.reciter, trim_silence
+            ),
             ayat,
-            HusaryCuts.load(self.settings.reference_audio_dir / "husary"),
+            SoundLibrary.load(self.settings.reference_audio_dir / "library"),
             texts,
         )
 

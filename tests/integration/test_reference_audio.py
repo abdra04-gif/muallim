@@ -78,46 +78,46 @@ async def test_recitation_failure_returns_none(tmp_path: Path) -> None:
     assert await library.get("L200-01") is None
 
 
-def _cuts(root: Path, rows: str) -> None:
+def _sounds(root: Path, rows: str) -> None:
     root.mkdir(parents=True, exist_ok=True)
-    (root / "cuts.yaml").write_text(rows, encoding="utf-8")
+    (root / "sounds.yaml").write_text(rows, encoding="utf-8")
     for name in ("a.ogg", "b.ogg"):
         (root / name).write_bytes(b"OggS" + name.encode())
 
 
-async def test_husary_cuts_by_card_text_skip_rejected(tmp_path: Path) -> None:
-    from muallim.infrastructure.audio.reference_library import HusaryCuts  # noqa: PLC0415
+async def test_sound_library_by_card_text_skips_rejected(tmp_path: Path) -> None:
+    from muallim.infrastructure.audio.reference_library import SoundLibrary  # noqa: PLC0415
 
-    _cuts(
+    _sounds(
         tmp_path,
-        "- {text: رَ, file: a.ogg, status: unchecked}\n"
-        "- {text: رِ, file: b.ogg, status: bad}\n"
-        "- {text: رُ, file: ../../secret.ogg, status: ok}\n",
+        "- {text: رَ, file: a.ogg, status: unchecked, source: SRC-144}\n"
+        "- {text: رِ, file: b.ogg, status: bad, source: SRC-144}\n"
+        "- {text: رُ, file: ../../secret.ogg, status: ok, source: SRC-144}\n",
     )
-    cuts = HusaryCuts.load(tmp_path)
-    assert cuts.has("رَ") and await cuts.get("رَ") == b"OggSa.ogg"
-    assert not cuts.has("رِ")  # человек прослушал и отклонил
-    assert not cuts.has("رُ")  # путь за пределы папки не принимаем
-    assert not HusaryCuts.load(tmp_path / "нет").has("رَ")
+    sounds = SoundLibrary.load(tmp_path)
+    assert sounds.has("رَ") and await sounds.get("رَ") == b"OggSa.ogg"
+    assert not sounds.has("رِ")  # человек прослушал и отклонил
+    assert not sounds.has("رُ")  # путь за пределы папки не принимаем
+    assert not SoundLibrary.load(tmp_path / "нет").has("رَ")
 
 
-async def test_cut_is_the_last_resort_after_teacher_and_ayah(tmp_path: Path) -> None:
+async def test_library_sound_is_the_last_resort_after_teacher_and_ayah(tmp_path: Path) -> None:
     from muallim.infrastructure.audio.reference_library import (  # noqa: PLC0415
         CombinedReferenceAudio,
-        HusaryCuts,
         RecitationCache,
+        SoundLibrary,
     )
 
     async def fetch(url: str) -> bytes:
         return b"mp3"
 
-    _cuts(tmp_path / "husary", "- {text: رَ, file: a.ogg, status: ok}\n")
+    _sounds(tmp_path / "library", "- {text: رَ, file: a.ogg, status: ok, source: SRC-144}\n")
     teacher = FileReferenceAudio(tmp_path / "teacher")
     library = CombinedReferenceAudio(
         teacher,
         RecitationCache(tmp_path / "cache", fetch),
         {},
-        HusaryCuts.load(tmp_path / "husary"),
+        SoundLibrary.load(tmp_path / "library"),
         {"L004-02": "رَ", "L004-03": "رِ"},
     )
     assert library.has("L004-02") and not library.has("L004-03")
@@ -126,17 +126,75 @@ async def test_cut_is_the_last_resort_after_teacher_and_ayah(tmp_path: Path) -> 
     assert await library.get("L004-02") == b"teacher"
 
 
-def test_repository_cuts_point_to_existing_files() -> None:
-    root = Path(__file__).resolve().parents[2] / "curriculum" / "audio" / "husary"
-    manifest = root / "cuts.yaml"
-    if not manifest.is_file():
-        pytest.skip("нарезок пока нет")
+async def test_ayat_are_read_by_alafasy_by_default(tmp_path: Path) -> None:
+    """Чтец аятов — Мишари Рашид аль-Афаси, муратталь без пауз для повторения (SRC-145)."""
+    from muallim.bootstrap.config import Settings  # noqa: PLC0415
+    from muallim.infrastructure.audio.reference_library import RecitationCache  # noqa: PLC0415
+
+    calls: list[str] = []
+
+    async def fetch(url: str) -> bytes:
+        calls.append(url)
+        return b"mp3"
+
+    await RecitationCache(tmp_path, fetch).get("1:2")
+    assert calls == ["https://everyayah.com/data/Alafasy_128kbps/001002.mp3"]
+    assert Settings.model_fields["reciter"].default == "Alafasy_128kbps"
+
+
+async def test_recitation_is_trimmed_once_and_cached_trimmed(tmp_path: Path) -> None:
+    """Тишина в начале и в конце аята обрезается один раз — при скачивании."""
+    from muallim.infrastructure.audio.reference_library import RecitationCache  # noqa: PLC0415
+
+    trims: list[bytes] = []
+
+    async def fetch(url: str) -> bytes:
+        return b"  mp3  "
+
+    async def trim(audio: bytes) -> bytes:
+        trims.append(audio)
+        return audio.strip()
+
+    cache = RecitationCache(tmp_path, fetch, trim=trim)
+    assert await cache.get("1:1") == b"mp3"
+    assert await cache.get("1:1") == b"mp3"  # второй раз — из кэша, уже обрезанный
+    assert trims == [b"  mp3  "]
+
+
+LIBRARY = Path(__file__).resolve().parents[2] / "curriculum" / "audio" / "library"
+
+
+def test_repository_sounds_point_to_existing_files_with_source() -> None:
     import yaml  # noqa: PLC0415
 
+    manifest = LIBRARY / "sounds.yaml"
+    assert manifest.is_file(), "нет curriculum/audio/library/sounds.yaml"
     for row in yaml.safe_load(manifest.read_text(encoding="utf-8")) or []:
         assert row["status"] in ("unchecked", "ok", "bad"), row["text"]
-        assert row["status"] == "bad" or (root / row["file"]).is_file(), row["text"]
-        if row.get("manual"):  # целый файл не из аята (истиаза, SRC-136): источник обязателен
-            assert row.get("source"), row["text"]
-            continue
-        assert row["parts"] and all(":" in p["aya"] for p in row["parts"]), row["text"]
+        assert row["status"] == "bad" or (LIBRARY / row["file"]).is_file(), row["text"]
+        assert str(row.get("source", "")).startswith("SRC-"), row["text"]
+
+
+_LETTER = r"[\u0621-\u064A\u0671]"
+_SYLLABLE = rf"{_LETTER}[\u064E-\u0650]"
+
+
+def test_every_letter_and_syllable_card_has_a_library_sound(curriculum: object) -> None:
+    """Буква, слог и тройка слогов звучат готовой записью диктора, а не нарезкой (SRC-144)."""
+    import re  # noqa: PLC0415
+
+    from muallim.domain.curriculum import Curriculum  # noqa: PLC0415
+    from muallim.infrastructure.audio.reference_library import SoundLibrary  # noqa: PLC0415
+
+    assert isinstance(curriculum, Curriculum)
+    pattern = re.compile(rf"(?:{_LETTER}|{_SYLLABLE}(?: {_SYLLABLE}){{2}}|{_SYLLABLE})")
+    sounds = SoundLibrary.load(LIBRARY)
+    cards = {
+        i.text
+        for les in curriculum.lessons
+        for i in les.items
+        if not i.quran and pattern.fullmatch(i.text)
+    }
+    assert cards, "шаблон не нашёл ни одной карточки-слога"
+    missing = sorted(t for t in cards if not sounds.has(t) and t not in {"ٱ", "ة"})
+    assert not missing, missing

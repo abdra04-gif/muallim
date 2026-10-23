@@ -1,10 +1,11 @@
-"""Эталон «как правильно» (ADR-0018, ADR-0025).
+"""Эталон «как правильно» (ADR-0018, ADR-0025, ADR-0068).
 
 1. Запись учителя: curriculum/audio/<id карточки>.ogg — главнее всего.
-2. Для строк из Корана — учебное чтение (муаллим) Махмуда Халиля аль-Хусари по аятам с EveryAyah
-   (SRC-042), кэш на диске data/recitations/. Синтез речи не используется (ADR-0018).
-3. Для букв, слогов и строк книги — нарезка из того же чтения Хусари (ADR-0032):
-   curriculum/audio/husary/, список и проверка — cuts.yaml (scripts/audio/husary_cuts.py).
+2. Для строк из Корана — чтение Мишари Рашида аль-Афаси по аятам с EveryAyah (SRC-145), тишина по
+   краям обрезается при скачивании, кэш на диске data/recitations/. Синтез речи не используется.
+3. Для букв и слогов — готовые записи диктора (ADR-0068): «Нурания» в чтении Мухаммада Фарука
+   ар-Раи (SRC-144), истиаза — аль-Афаси; curriculum/audio/library/, список — sounds.yaml
+   (scripts/audio/library_sounds.py).
 """
 
 import asyncio
@@ -58,15 +59,21 @@ class FileReferenceAudio(ReferenceAudioLibrary):
 
 
 Fetch = Callable[[str], Awaitable[bytes]]
+Trim = Callable[[bytes], Awaitable[bytes]]
+
+
+async def _as_is(audio: bytes) -> bytes:
+    return audio
 
 
 @dataclass
 class RecitationCache:
-    """Аяты чтеца с EveryAyah: скачиваются один раз и хранятся на диске."""
+    """Аяты чтеца с EveryAyah: скачиваются один раз, без тишины по краям, и хранятся на диске."""
 
     root: Path
     fetch: Fetch
-    reciter: str = "Husary_Muallim_128kbps"
+    reciter: str = "Alafasy_128kbps"
+    trim: Trim = _as_is
 
     async def get(self, ref: str) -> bytes | None:
         m = _AYA.fullmatch(ref)
@@ -82,6 +89,7 @@ class RecitationCache:
         except Exception:  # сеть недоступна — эталона просто нет
             logger.warning("Не удалось скачать %s", url, exc_info=True)
             return None
+        data = await self.trim(data)
         await asyncio.to_thread(_write, path, data)
         return data
 
@@ -94,18 +102,18 @@ def _write(path: Path, data: bytes) -> None:
 
 
 @dataclass(frozen=True, slots=True)
-class HusaryCuts:
-    """Нарезки из чтения Хусари по тексту карточки (ADR-0032).
+class SoundLibrary:
+    """Готовые записи букв и слогов по тексту карточки (ADR-0068).
 
-    cuts.yaml: ``- {text, file, status, parts: [...]}``; status ``bad`` — человек прослушал и
-    отклонил, такую нарезку не даём. Ключ — текст, а не id: id карточек меняются при пересборке.
+    sounds.yaml: ``- {text, file, status, source, origin}``; status ``bad`` — человек прослушал и
+    отклонил, такую запись не даём. Ключ — текст, а не id: id карточек меняются при пересборке.
     """
 
     files: Mapping[str, Path]
 
     @classmethod
-    def load(cls, root: Path) -> "HusaryCuts":
-        manifest = root / "cuts.yaml"
+    def load(cls, root: Path) -> "SoundLibrary":
+        manifest = root / "sounds.yaml"
         if not manifest.is_file():
             return cls({})
         rows = yaml.safe_load(manifest.read_text(encoding="utf-8")) or []
@@ -126,12 +134,12 @@ class HusaryCuts:
 
 @dataclass
 class CombinedReferenceAudio(ReferenceAudioLibrary):
-    """Запись учителя → аят Хусари целиком (id → «сура:аят») → нарезка Хусари (id → текст)."""
+    """Запись учителя → аят аль-Афаси целиком (id → «сура:аят») → готовая запись (id → текст)."""
 
     teacher: FileReferenceAudio
     recitations: RecitationCache
     ayat: Mapping[str, str] = field(default_factory=dict)
-    cuts: HusaryCuts = field(default_factory=lambda: HusaryCuts({}))
+    cuts: SoundLibrary = field(default_factory=lambda: SoundLibrary({}))
     texts: Mapping[str, str] = field(default_factory=dict)  # id карточки -> её арабский текст
 
     def has(self, item_id: str) -> bool:

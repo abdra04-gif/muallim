@@ -1,8 +1,8 @@
-"""Истиаза звучит из нарезок Хусари, а не из папки записей учителя (FR-49, ADR-0032).
+"""Истиаза звучит готовой записью Мишари Рашида аль-Афаси, а не из папки записей учителя (FR-49).
 
-``curriculum/audio/<id>.ogg`` — только записи учителя; готовые нарезки чтения Хусари лежат в
-``curriculum/audio/husary`` и описаны в ``cuts.yaml``. Строку, собранную вручную (``manual: true``),
-пересборка ``scripts/audio/husary_cuts.py`` не должна терять.
+``curriculum/audio/<id>.ogg`` — только записи учителя; готовые записи (буквы и слоги ар-Раи,
+истиаза аль-Афаси) лежат в ``curriculum/audio/library`` и описаны в ``sounds.yaml``. Строку,
+добавленную вручную (``manual: true``), пересборка ``scripts/audio/library_sounds.py`` не теряет.
 """
 
 import importlib.util
@@ -13,13 +13,13 @@ import pytest
 import yaml
 
 from muallim.domain.curriculum import Curriculum
-from muallim.infrastructure.audio.reference_library import HusaryCuts
+from muallim.infrastructure.audio.reference_library import SoundLibrary
 
 pytestmark = pytest.mark.integration
 
 ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "curriculum" / "audio"
-HUSARY = AUDIO / "husary"
+LIBRARY = AUDIO / "library"
 ISTI_ADHA = "L001-02"
 
 
@@ -27,19 +27,20 @@ def test_teacher_folder_has_no_isti_adha_file() -> None:
     assert not (AUDIO / f"{ISTI_ADHA}.ogg").exists()
 
 
-def test_isti_adha_is_a_manual_husary_cut(curriculum: Curriculum) -> None:
+def test_isti_adha_is_a_manual_alafasy_recording(curriculum: Curriculum) -> None:
     text = curriculum.item(ISTI_ADHA).text
-    rows = yaml.safe_load((HUSARY / "cuts.yaml").read_text(encoding="utf-8")) or []
+    rows = yaml.safe_load((LIBRARY / "sounds.yaml").read_text(encoding="utf-8")) or []
     found = [r for r in rows if r.get("text") == text]
-    assert len(found) == 1, "истиазы нет в cuts.yaml"
+    assert len(found) == 1, "истиазы нет в sounds.yaml"
     row = found[0]
     assert row.get("manual") is True
     assert row.get("status") != "bad"
-    assert (HUSARY / Path(row["file"]).name).is_file()
+    assert "Alafasy" in str(row.get("origin", ""))
+    assert (LIBRARY / Path(row["file"]).name).is_file()
 
 
-def test_husary_library_finds_isti_adha_by_text(curriculum: Curriculum) -> None:
-    assert HusaryCuts.load(HUSARY).has(curriculum.item(ISTI_ADHA).text)
+def test_library_finds_isti_adha_by_text(curriculum: Curriculum) -> None:
+    assert SoundLibrary.load(LIBRARY).has(curriculum.item(ISTI_ADHA).text)
 
 
 # ---------- пересборка манифеста не теряет ручные строки ----------

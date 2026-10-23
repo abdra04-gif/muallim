@@ -1,13 +1,13 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-22T21:17:00+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-23T09:00:07+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `f0d94220fb1fcb47` | 109 |
+| код | `716787c332baf069` | 109 |
 | программа (книга) | `125a24eb1ee7e973` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `8d9824574007fee4` | 9 |
@@ -54,7 +54,7 @@
 | FR-37 | `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-38 | `tests/unit/test_render.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-39 | `tests/unit/test_quiz.py`, `tests/unit/test_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-40 | `tests/integration/test_reference_audio.py` | ✅ |
+| FR-40 | `tests/integration/test_audio_decode.py`, `tests/integration/test_reference_audio.py` | ✅ |
 | FR-41 | `tests/unit/test_curriculum_content.py` | ✅ |
 | FR-42 | `tests/integration/test_di.py` | ✅ |
 | FR-43 | `tests/integration/test_reading_guide.py`, `tests/unit/test_feedback.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
