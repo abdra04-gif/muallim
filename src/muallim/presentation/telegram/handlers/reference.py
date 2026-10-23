@@ -45,7 +45,6 @@ async def send_reference(msg: Message, item_id: str, audio: bytes) -> Message:
     return await msg.answer_audio(
         BufferedInputFile(audio, filename=f"{item_id}.mp3"),
         title=texts.RECITER_TITLE,
-        performer="EveryAyah",
     )
 
 
