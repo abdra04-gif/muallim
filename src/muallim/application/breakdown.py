@@ -290,7 +290,11 @@ def _letter_labels(
     missing = lexicon.missing or EMPTY
     if main.kind is ErrorKind.SHADDA_MISSING and line.consonants:
         need, heard = _shadda(line, k)
-        return f"«{plain(need, lexicon)}»", f"«{plain(heard, lexicon)}»"
+        need, heard = f"«{plain(need, lexicon)}»", f"«{plain(heard, lexicon)}»"
+        if need == heard:  # ع и ء простой кириллицей не видны: «би-а» — удвоение покажем звуком
+            sound = _sound_label(main.expected, lexicon, written=written or None)
+            need, heard = f"{sound} ×2", sound
+        return need, heard
     need = _sound_label(main.expected, lexicon, written=written or None)
     heard = missing if main.kind is ErrorKind.SOUND_MISSING else _sound_label(main.heard, lexicon)
     return need, heard
@@ -361,6 +365,8 @@ def _vowel_labels(
     missing = main.kind is ErrorKind.VOWEL_MISSING and not heard[len(carrier) :]
     need_label = _syllable_label(need, lexicon, note)
     heard_label = (lexicon.missing or EMPTY) if missing else _syllable_label(heard, lexicon, note)
+    if heard_label == need_label:  # «ثُۥۥ» → «ثۥۥ»: на слух слог тот же — огласовка пропущена
+        heard_label = lexicon.missing or EMPTY
     return need_label, heard_label
 
 
