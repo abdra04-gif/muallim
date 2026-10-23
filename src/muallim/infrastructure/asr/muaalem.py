@@ -15,6 +15,7 @@ from muallim.application.ports.recognition import (
     Recognition,
     RecognitionError,
 )
+from muallim.infrastructure.asr.script import for_phonetizer
 from muallim.infrastructure.audio.ffmpeg import SAMPLE_RATE, decode_to_pcm
 
 # Параметры чтения: риваят Хафс, все мадды по 4 харакята. Методическое решение — менять
@@ -125,10 +126,28 @@ def _jsonable(value: Any) -> Any:
 
 @lru_cache(maxsize=1024)
 def _references(text: str) -> tuple[Any, tuple[tuple[str, str], tuple[str, str]]]:
-    """Эталон для модели и два допустимых варианта: со слитным чтением (васл) и с остановкой."""
+    """Эталон для модели и два допустимых варианта: со слитным чтением (васл) и с остановкой.
+
+    Варианты — только из звуков, которые модель умеет выдать: знак мадда «ٓ» над словом, вырезанным
+    из аята, фонетизатор оставляет как есть (в аяте за ним шла хамза), а это письмо, не звук.
+    """
     from quran_transcript import MoshafAttributes, quran_phonetizer  # noqa: PLC0415
 
     moshaf = MoshafAttributes(**MOSHAF_PARAMS)
+    text = for_phonetizer(text)
     waqf = quran_phonetizer(text, moshaf, remove_spaces=True)
     wasl = quran_phonetizer(text + _WASL_SUFFIX, moshaf, remove_spaces=True).phonemes[:-1]
-    return waqf, (("wasl", wasl), ("waqf", waqf.phonemes))
+    sounds = _model_sounds()
+    return waqf, (
+        ("wasl", "".join(ch for ch in wasl if ch in sounds)),
+        ("waqf", "".join(ch for ch in waqf.phonemes if ch in sounds)),
+    )
+
+
+@lru_cache(maxsize=1)
+def _model_sounds() -> frozenset[str]:
+    """Алфавит фонем модели (quran-transcript): буквы, огласовки, мадд, калькаля, ихфа…"""
+    from quran_transcript import alphabet  # noqa: PLC0415
+
+    ph = alphabet.phonetics
+    return frozenset("".join(getattr(ph, f.name) for f in fields(ph)))

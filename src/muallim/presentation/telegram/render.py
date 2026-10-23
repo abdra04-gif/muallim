@@ -468,7 +468,17 @@ def letter_forms(
         draw.text((x, 140), form, font=font, fill=ACCENT, anchor="mm", direction="rtl")
         draw.text((x, 312), label, font=small, fill=(107, 98, 88), anchor="mm")  # ниже хвостов букв
     draw.line((PAD + 40, 352, WIDTH - PAD - 40, 352), fill=GREY_BG, width=2)
-    draw.text((WIDTH // 2, 452), vowels, font=_font(116), fill=INK, anchor="mm", direction="rtl")
+    # огласовки — по видимым границам посередине между чертой (352) и плашками зон (590):
+    # у высокой связки «أُ» центр строки шрифта ниже глаза, и дамма наезжала на черту
+    vowel_font = _font(116)
+    left, top, right, bottom = draw.textbbox((0, 0), vowels, font=vowel_font, direction="rtl")
+    draw.text(
+        (WIDTH // 2 - (left + right) / 2, 471 - (top + bottom) / 2),
+        vowels,
+        font=vowel_font,
+        fill=INK,
+        direction="rtl",
+    )
     if zone_labels:
         pill_font = _ui_font(28, bold=True)
         widths = [int(pill_font.getlength(t)) + 44 for t, _ in zone_labels]

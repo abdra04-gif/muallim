@@ -147,3 +147,16 @@ def test_longest_word_fits_inside_frame_with_large_font() -> None:
     img, (left, _, right, _) = _ink_box(png)
     assert left > FRAME_MARGIN + 5, "слово вылезло влево за поле"
     assert right < img.width - FRAME_MARGIN - 5, "слово вылезло вправо за поле"
+
+
+@needs_raqm
+@pytest.mark.parametrize(("letter", "vowels"), [("أ", "أَ إِ أُ"), ("ل", "لَ لِ لُ"), ("ي", "يَ يِ يُ")])
+def test_vowel_row_of_letter_card_stays_between_line_and_zones(letter: str, vowels: str) -> None:
+    """Аудит 2026-10-23: дамма над «أُ» (самая высокая связка) наезжала на черту под формами.
+
+    Черта — y = 352, плашки зон начинаются с y = 590 (render.letter_forms).
+    """
+    png = render.letter_forms(letter, vowels, texts.LETTER_FORMS, [])
+    _, (_, top, _, bottom) = _ink_box(png)
+    assert top > 352 + 6, f"огласовки наехали на черту: верх {top}"
+    assert bottom < 590 - 6, f"огласовки наехали на плашки зон: низ {bottom}"
