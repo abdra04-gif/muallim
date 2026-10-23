@@ -1,28 +1,28 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-23T09:00:07+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-23T13:14:01+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `716787c332baf069` | 109 |
-| программа (книга) | `125a24eb1ee7e973` | 3 |
+| код | `95fe2edf2b9f8808` | 110 |
+| программа (книга) | `bb226e6806a0f751` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `8d9824574007fee4` | 9 |
 | зависимости | `bcfe92232236f824` | 1 |
 | предрегистрация | `7ac254d967a4668f` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **65 из 67**.
+Проверено зелёными тестами: **66 из 68**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
 | FR-01 | `tests/architecture/test_book.py`, `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-02 | `tests/unit/test_curriculum_model.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-03 | `tests/integration/test_bot_flow.py` | ✅ |
-| FR-04 | `tests/unit/test_assessment.py`, `tests/unit/test_policy.py` | ✅ |
+| FR-04 | `tests/integration/test_reading_guide.py`, `tests/unit/test_assessment.py`, `tests/unit/test_phonetizer_script.py`, `tests/unit/test_policy.py` | ✅ |
 | FR-05 | `tests/unit/test_feedback.py` | ✅ |
 | FR-06 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py` | ✅ |
 | FR-07 | `tests/unit/test_use_cases.py` | ✅ |
@@ -57,7 +57,7 @@
 | FR-40 | `tests/integration/test_audio_decode.py`, `tests/integration/test_reference_audio.py` | ✅ |
 | FR-41 | `tests/unit/test_curriculum_content.py` | ✅ |
 | FR-42 | `tests/integration/test_di.py` | ✅ |
-| FR-43 | `tests/integration/test_reading_guide.py`, `tests/unit/test_feedback.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-43 | `tests/integration/test_reading_guide.py`, `tests/unit/test_feedback.py`, `tests/unit/test_phonetizer_script.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-44 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-45 | `tests/integration/test_opening_bot.py`, `tests/unit/test_new_screens.py` | ✅ |
 | FR-46 | `tests/unit/test_new_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
@@ -66,8 +66,9 @@
 | FR-49 | `tests/integration/test_console_beginner.py`, `tests/integration/test_isti_adha_audio.py`, `tests/integration/test_opening_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-50 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_staff.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-51 | `tests/integration/test_learner_settings_sql.py`, `tests/integration/test_reminders.py`, `tests/integration/test_screen_state.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_reminder_setting.py`, `tests/unit/test_settings_rules.py`, `tests/unit/test_settings_screens.py` | ✅ |
-| FR-52 | — | нет автотестов |
+| FR-52 | `tests/integration/test_letters_sheet_bot.py`, `tests/unit/test_letters_sheet.py` | ✅ |
 | FR-53 | `tests/integration/test_quiz_answers_sql.py`, `tests/integration/test_quiz_bot.py`, `tests/unit/test_quiz.py`, `tests/unit/test_quiz_ladder.py`, `tests/unit/test_quiz_practice.py`, `tests/unit/test_quiz_screens.py` | ✅ |
+| FR-54 | — | нет автотестов |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |
