@@ -70,6 +70,11 @@
 ## Команды для агента
 `/feature <описание>` — полный цикл; `/ship` — проверки и коммит с push (`docs/process/git.md`); `/adr <тема>` — новое ADR; `/source <ссылка>` — новый источник;
 `/report` — отчёт по данным; `/thesis-note <что>` — запись в материалы диплома.
+Цикл чтения статей (`docs/research/reading/README.md`): `/read-next [тема]` — что прочитать;
+`/read-note <SRC> <мнение>` — карточка с оценкой автора; `/read-draft <раздел>` — текст диплома с `\cite`.
+Методика и защита: `/justify [область]` — реестр обоснований (`docs/research/justification.md`);
+`/supervisor повестка | итоги …` — встреча с руководителем (`docs/thesis/supervisor/`);
+`/defense-drill [тема]` — тренировка защиты, банк вопросов (`docs/thesis/defense/questions.md`).
 
 ## Ограничения (честно для диссертации)
 - Хук `guard.py` ловит типовые способы записи в `tests/` через shell; хитрый обход возможен —

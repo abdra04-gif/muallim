@@ -7,6 +7,10 @@
 | понять, как архитектура выросла из требований качества | `architecture/design-iterations.md` |
 | узнать, **почему** сделано так и что отбросили | `adr/README.md` |
 | понять, откуда взялась строка / цифра / идея | `research/sources.md` (ключи `SRC-NNN`) |
+| что я прочитал, что думаю о статье, какие статьи читать дальше | `research/reading/README.md` (`/read-next`, `/read-note`, `/read-draft`) |
+| чем обосновано каждое методическое решение, где дыры | `research/justification.md` (`/justify`) |
+| что решили с руководителем и когда | `thesis/supervisor/` (`/supervisor`) |
+| вопросы к защите и мои ответы | `thesis/defense/questions.md` (`/defense-drill`) |
 | найти, где реализовано требование и чем проверено | `requirements/traceability.md` |
 | увидеть, какие требования **сейчас** проверены зелёными тестами, и отпечаток версии | `requirements/verification-status.md` (`make trace`) |
 | проследить RQ → гипотеза → метрика → расчёт → рисунок в главе | `research/traceability.md` |
