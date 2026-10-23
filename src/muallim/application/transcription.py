@@ -86,6 +86,10 @@ def _as_phonemes(text: str) -> str:
         elif base in (ALIF_WASL, _TATWEEL) and not marks.strip("ا"):
             out.append(marks)  # «ٱ» не читается, «ـٰ» — долгое «аа»
             continue
+        if base == "ى" and marks == "ا":  # «عَلَىٰ»: ى с надстрочным алифом — долгое «аа»
+            out.append("ا")
+            previous_vowel = ""
+            continue
         if base == "ا" and any(v in marks for v in _MADD_OF.values()):
             base = "ء"  # алиф с огласовкой («اِسْتَ») читается как хамза
         following = letters[n + 1] if n + 1 < len(letters) else None
@@ -126,7 +130,7 @@ def _syllable(part: str, lexicon: Lexicon) -> str:
     """Слог простой кириллицей; буква с короткой огласовкой — слог из карточки курса."""
     cards = lexicon.syllables.get(part[:1])
     vowel = part[1:2]
-    if cards and vowel in _SHORT and not (part[2:3] and part[2] in _LONG):
+    if cards and vowel and vowel in _SHORT and not (part[2:3] and part[2] in _LONG):
         rest = part[2:]
         return cards[_SHORT.index(vowel)] + (_simple(transcribe(rest, lexicon)) if rest else "")
     return _simple(transcribe(part, lexicon))
