@@ -332,7 +332,7 @@ def write_contents(lessons_: list[dict]) -> None:
 def main() -> None:
     doc = {
         "id": "al-muallim-al-thani-ru",
-        "version": "2026.10.21-book-5",
+        "version": "2026.10.23-book-6",
         "title": "Муаллим сани — вся книга Максуди",
         "source": {
             "source_id": SRC,

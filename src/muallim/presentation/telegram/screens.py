@@ -95,6 +95,12 @@ def _letter_of(lesson: Lesson) -> str:
     return "ء" if head in "أإؤئآ" else head
 
 
+def _letter_shown(lesson: Lesson) -> str:
+    """Буква урока для ученика: у первого урока — элиф с хэмзэ «أ», как на с. 10 книги."""
+    letter = _letter_of(lesson)
+    return "أ" if letter == "ء" else letter
+
+
 def _alphabet_map(curriculum: Curriculum, progress: Progress) -> tuple[bytes | None, str]:
     """Карта букв по таблице книги (урок 1), раскрашенная по статусу уроков букв."""
     if not render.available():
@@ -332,10 +338,10 @@ def _new_letter(curriculum: Curriculum, lesson: Lesson, known: Sequence[LessonIt
     """«Новая буква: X · уже знаешь: …» на первом шаге урока буквы (ADR-0062 п. 7)."""
     head = next((it for it in lesson.items if it.kind is ItemKind.LETTER), None)
     line = texts.NEW_LETTER.format(
-        letter=_letter_of(lesson), name=escape(head.name if head else "")
+        letter=_letter_shown(lesson), name=escape(head.name if head else "")
     )
     if known:
-        letters = " ".join(_letter_of(curriculum.locate(it.id)[0]) for it in known)
+        letters = " ".join(_letter_shown(curriculum.locate(it.id)[0]) for it in known)
         line += "\n" + texts.ALREADY_KNOW.format(letters=letters)
     return line
 
@@ -349,7 +355,7 @@ def _card_image(lesson: Lesson, item: LessonItem, i: int, large: bool = False) -
         return render.letters(item.text)
     if item.kind is ItemKind.RULE:
         return render.rule(item.text, scale)
-    if item.kind is ItemKind.LETTER and (letter := _letter_of(lesson)):
+    if item.kind is ItemKind.LETTER and (letter := _letter_shown(lesson)):
         zone = articulation_zone(letter)
         zones = [(texts.ZONES[z.value], z is zone) for z in Zone] if zone else []
         return render.letter_forms(letter, item.text, texts.LETTER_FORMS, zones)
@@ -705,7 +711,7 @@ def plain_title(title: str) -> str:
 
 
 def _postcard_image(lesson: Lesson, p: Progress | None = None) -> bytes:
-    letter = _letter_of(lesson) if lesson.section == "letter" else ""
+    letter = _letter_shown(lesson) if lesson.section == "letter" else ""
     page = lesson.source.page if lesson.source is not None else None
     subtitle = texts.POSTCARD_SUBTITLE.format(lesson=plain_title(lesson.title), page=page or "—")
     streak = texts.POSTCARD_STREAK.format(days=_days(p.streak_days)) if p and p.streak_days else ""
@@ -900,7 +906,7 @@ def letters_sheet(
     kb = InlineKeyboardBuilder()
     listen = 0
     for head in known:
-        letter = _letter_of(curriculum.locate(head.id)[0])
+        letter = _letter_shown(curriculum.locate(head.id)[0])
         lines.append(
             texts.SHEET_LINE.format(letter=letter, name=escape(head.name), sound=escape(head.sound))
         )
@@ -975,7 +981,7 @@ def quiz_summary(curriculum: Curriculum, summary: RoundSummary) -> Screen:
     kb = InlineKeyboardBuilder()
     repeat = [x for x in summary.repeat if _in_program(curriculum, x)]
     if repeat:
-        letters = [_letter_of(curriculum.locate(x)[0]) for x in repeat]
+        letters = [_letter_shown(curriculum.locate(x)[0]) for x in repeat]
         lines.append(texts.QUIZ_SUMMARY_REPEAT.format(letters=" ".join(letters)))
         for x, letter in zip(repeat, letters, strict=True):
             kb.button(text=f"🔊 {letter}", callback_data=Listen(item_id=x))

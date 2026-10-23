@@ -33,7 +33,7 @@ async def test_sheet_from_card_shows_known_letters_and_returns_to_card(
     card_caption, _ = _view(person)
     await person.press(_find(person, texts.SHEET_BUTTON))
     caption, _ = _view(person)
-    for letter, name in (("ء", "Хэмзэ"), ("ر", "Ра"), ("ز", "Зэй")):
+    for letter, name in (("أ", "Элиф с хэмзэ"), ("ر", "Ра"), ("ز", "Зэй")):
         assert letter in caption and name in caption
     assert "Мим" not in caption
     await person.press(_find(person, texts.BACK_BUTTON))

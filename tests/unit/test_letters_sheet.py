@@ -3,7 +3,7 @@
 
 Решения автора 2026-10-21 (ADR-0062, В3): строгость к букве урока НЕ вводится — зачёт как раньше
 (от 80 %, OQ-14); ошибка в букве урока только выделяется в разборе первой строкой.
-Буквы шпаргалки — по книге, строго до урока (у урока хэмзэ — пусто, у урока م — ء ر ز).
+Буквы шпаргалки — по книге, строго до урока (у урока элифа с хэмзэ — пусто, у урока م — أ ر ز).
 Экраны проверяются без Telegram и без картинок; распознавание — готовая оценка ``assess``.
 """
 
@@ -97,7 +97,7 @@ def test_lesson_after_the_alphabet_knows_all_28_letters(curriculum: Curriculum) 
 # ---------- шпаргалка: экран ----------
 def test_sheet_lists_letter_name_and_sound_of_each_known_letter(curriculum: Curriculum) -> None:
     s = screens.letters_sheet(curriculum, MIM, audio=frozenset())
-    for letter, lid in (("ء", HAMZA), ("ر", RA), ("ز", ZAY)):
+    for letter, lid in (("أ", HAMZA), ("ر", RA), ("ز", ZAY)):
         head = _head(curriculum.lesson(lid))
         assert letter in s.caption
         assert head.name in s.caption
@@ -122,7 +122,7 @@ def test_sheet_offers_listen_for_each_letter_with_reference(curriculum: Curricul
     heads = [_head(curriculum.lesson(lid)) for lid in (HAMZA, RA, ZAY)]
     s = screens.letters_sheet(curriculum, MIM, audio={h.id for h in heads})
     buttons = _buttons(s.keyboard)
-    for letter, head in zip(("ء", "ر", "ز"), heads, strict=True):
+    for letter, head in zip(("أ", "ر", "ز"), heads, strict=True):
         listen = [t for t, d in buttons if d == cb.Listen(item_id=head.id).pack()]
         assert len(listen) == 1, buttons
         assert "🔊" in listen[0] and letter in listen[0]
@@ -200,28 +200,46 @@ def _first_step(c: Curriculum, lesson_id: str) -> str:
 def test_first_step_of_mim_names_new_letter_and_known_ones(curriculum: Curriculum) -> None:
     caption = _first_step(curriculum, MIM)
     assert texts.NEW_LETTER.format(letter="م", name="Мим") in caption
-    assert texts.ALREADY_KNOW.format(letters="ء ر ز") in caption
+    assert texts.ALREADY_KNOW.format(letters="أ ر ز") in caption
 
 
 def test_first_step_of_ra_knows_only_hamza(curriculum: Curriculum) -> None:
     caption = _first_step(curriculum, RA)
     assert texts.NEW_LETTER.format(letter="ر", name="Ра") in caption
-    assert texts.ALREADY_KNOW.format(letters="ء") in caption
+    assert texts.ALREADY_KNOW.format(letters="أ") in caption
 
 
 def test_first_letter_lesson_has_no_already_know(curriculum: Curriculum) -> None:
     caption = _first_step(curriculum, HAMZA)
-    assert texts.NEW_LETTER.format(letter="ء", name="Хэмзэ") in caption
+    assert texts.NEW_LETTER.format(letter="أ", name="Элиф с хэмзэ") in caption
     marker = _marker(texts.ALREADY_KNOW)
     assert marker, "у «уже знаешь» должна быть постоянная часть до {letters}"
     assert marker not in caption
+
+
+def test_letter_forms_card_of_first_lesson_shows_alif_with_hamza(
+    curriculum: Curriculum, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Аудит 2026-10-23: медаль, шпаргалка и «новая буква» — «أ», а карточка форм рисовала «ء»."""
+    drawn: list[str] = []
+    monkeypatch.setattr(render, "available", lambda: True)
+
+    def letter_forms(letter: str, *_: object) -> bytes:
+        drawn.append(letter)
+        return b""
+
+    monkeypatch.setattr(render, "letter_forms", letter_forms)
+    lesson = curriculum.lesson(HAMZA)
+    head = _head(lesson)
+    screens._card_image(lesson, head, lesson.items.index(head))
+    assert drawn == ["أ"]
 
 
 @pytest.mark.parametrize("item_id", ["L006-02", "L006-05", MIM_LINE])
 def test_later_steps_do_not_repeat_new_letter(curriculum: Curriculum, item_id: str) -> None:
     s = screens.card(curriculum, curriculum.item(item_id), has_audio=False, is_teacher=False)
     assert texts.NEW_LETTER.format(letter="م", name="Мим") not in s.caption
-    assert texts.ALREADY_KNOW.format(letters="ء ر ز") not in s.caption
+    assert texts.ALREADY_KNOW.format(letters="أ ر ز") not in s.caption
 
 
 def test_non_letter_lesson_has_no_new_letter(curriculum: Curriculum) -> None:
