@@ -459,12 +459,8 @@ def result(
         blocks.append(escape(texts.HEARD_LINE.format(text=r.heard_transcription)))
     shown = len(groups) if image is None else views.MAX_ERRORS_SHOWN
     blocks += [_group_point(curriculum, n, g) for n, g in enumerate(groups[:shown])]
-    if image is not None:  # «ещё K — на картинке» — только те, кто правда в легенде (Н1)
-        legend = min(len(groups), render.LEGEND_MAX_ROWS)
-        if (on_image := legend - shown) > 0:
-            blocks.append(texts.MORE_ON_IMAGE.format(n=on_image))
-        if (hidden := len(groups) - max(legend, shown)) > 0:
-            blocks.append(texts.MORE_NOT_SHOWN.format(n=hidden))
+    if len(groups) > shown:
+        blocks.append(texts.MORE_ON_IMAGE.format(n=len(groups) - shown))
     blocks.append(unread)
     if groups or unread:
         blocks.append(texts.PLAN_LISTEN if has_audio else texts.PLAN_READ)
