@@ -8,7 +8,7 @@
                                  загрузить размеченный tasks.csv (docs/data/annotation-guide.md)
   annotator-invite A2            приглашение в разметку в Telegram: код на сутки, один вход
   annotator-revoke A2            закрыть доступ сразу (и по приглашению, и из ANNOTATOR_IDS)
-  annotators                     разметчики по приглашению и отозванные
+  annotators                     разметчики (по приглашению и по /annotate) и отозванные
   dataset-export                 manifest.jsonl + truth.csv/predictions.csv (Iqra'Eval) + аудио
                                  в data/exports/<дата>/
   verify [--delete-orphans]      сверка БД и файлов записей: потери, лишние, повреждённые
@@ -38,6 +38,7 @@ from muallim.research import (
     errors,
     integrity,
     metrics,
+    pilot,
     reports,
 )
 
@@ -54,8 +55,10 @@ async def _run(args: argparse.Namespace) -> str:
                 engine, PROJECT_ROOT / "analytics" / "sql", clock.now()
             )
             async with create_session_factory(engine)() as session:
-                gqm = metrics.render(await metrics.collect(session, clock.now().date()))
-            out.write_text(f"{sql}\n{gqm}", encoding="utf-8")
+                today = clock.now().date()
+                gqm = metrics.render(await metrics.collect(session, today))
+                pilot_md = pilot.render(await pilot.collect(session, today))
+            out.write_text(f"{sql}\n{gqm}\n{pilot_md}", encoding="utf-8")
             return f"Отчёт: {out}"
         async with create_session_factory(engine)() as session:
             if args.command.startswith("annotat"):

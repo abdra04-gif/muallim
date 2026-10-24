@@ -226,3 +226,55 @@ async def test_render_is_markdown_without_telegram_ids(session: AsyncSession) ->
 async def test_empty_database_renders_without_errors(session: AsyncSession) -> None:
     md = metrics.render(await metrics.collect(session, TODAY))
     assert "нет данных" in md
+
+
+async def test_confidence_intervals_by_learner(session: AsyncSession) -> None:
+    """95 % ДИ бутстрэпом по ученикам (preregistration.md H1.2–H1.4). Ученик B прочитал верно и
+    модель ничего не отметила: выборки только из B не определяют precision и пропускаются, поэтому
+    ДИ precision — от precision ученика A до неё же."""
+    await _seed(session)
+    ci = (await metrics.collect(session, TODAY)).ci
+    assert set(ci) == {
+        "precision", "recall", "F1", "FAR вердикта", "FRR вердикта",
+        "κ бот — учитель", "κ учитель — учитель",
+    }  # fmt: skip
+    assert ci["precision"] == pytest.approx((2 / 3, 2 / 3))
+    assert ci["recall"] == pytest.approx((2 / 3, 2 / 3))
+    low, high = ci["κ бот — учитель"] or (2.0, -2.0)
+    assert -1.0 <= low <= high <= 1.0
+
+
+async def test_no_interval_with_one_learner(session: AsyncSession) -> None:
+    """Один ученик — повторять выборку не из чего: ДИ нет, а не ложный нулевой разброс."""
+    learner = Learner(UUID(int=1), 987654321, "L-aaaa", "ru", _at(1))
+    await SqlLearnerRepository(session).add(learner)
+    result = assess("صَ", "سَ")
+    await SqlAttemptRepository(session).add(
+        Attempt(UUID(int=1), learner.id, "L01-14", "v1", "muaalem", result,
+                GradingPolicy().verdict(result), None, 900, 1000, _at(2)),
+        ("msg",),
+    )  # fmt: skip
+    await session.execute(
+        insert(annotations),
+        [{"attempt_id": UUID(int=1), "annotator": "T1", "label": "agree",
+          "corrected_phonemes": "سَ", "guide_version": "2.0", "comment": "",
+          "created_at": _at(3)}],
+    )  # fmt: skip
+    await session.commit()
+    ci = (await metrics.collect(session, TODAY)).ci
+    assert all(value is None for value in ci.values())
+
+
+async def test_detection_by_reference_sound(session: AsyncSession) -> None:
+    """Q1.5: precision по звуку эталона, отмеченному моделью; recall — по разметке."""
+    await _seed(session)
+    by_sound = (await metrics.collect(session, TODAY)).by_sound
+    assert by_sound["ص"] == metrics.KindQuality(flagged=2, confirmed=2, errors=3, caught=2)
+    assert by_sound["َ"] == metrics.KindQuality(flagged=1, confirmed=0, errors=0, caught=0)
+
+
+async def test_render_shows_intervals_and_sounds(session: AsyncSession) -> None:
+    await _seed(session)
+    md = metrics.render(await metrics.collect(session, TODAY))
+    assert "95 % ДИ" in md and "бутстрэп" in md
+    assert "По звуку эталона" in md

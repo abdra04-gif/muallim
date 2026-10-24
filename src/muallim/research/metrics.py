@@ -6,10 +6,15 @@ L2-ARCTIC (SRC-063) и Iqra'Eval (SRC-043): разметчик пишет, чт�
 учителя»; берётся его последняя метка на попытку. Формулы — чистые функции; ``collect`` берёт
 данные через SQLAlchemy Core (SQLite в тестах, PostgreSQL в работе). Заглушка и метки
 ``audio_unusable`` / ``off_task`` не входят.
+
+95 % ДИ (FR-55, preregistration.md H1.2–H1.4) — кластерный бутстрэп по ученикам: попытки одного
+ученика зависимы, поэтому выборка повторяется целыми учениками (``cluster_bootstrap``).
 """
 
+import math
+import random
 from collections import Counter, defaultdict
-from collections.abc import Hashable, Iterable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from enum import StrEnum
@@ -33,6 +38,8 @@ RETURN_DAYS = 7
 # Версия правила сравнения по фонемам (phoneme_errors / phoneme_outcomes). Менять вместе с
 # правилом: выгрузка «по звукам» её пишет, чтобы итоги разных версий не смешивались.
 COMPARISON_VERSION = "1"
+BOOTSTRAP_REPS = 2000  # повторов бутстрэпа: обычный выбор для 95 % процентильного ДИ
+CI_LEVEL = 0.95
 
 
 # ---------- формулы: по фонемам ----------
@@ -239,6 +246,39 @@ def nearest_rank(values: Iterable[int], percent: int) -> int | None:
     return ordered[rank - 1]
 
 
+def cluster_bootstrap[T](
+    clusters: Sequence[Sequence[T]],
+    stat: Callable[[Sequence[T]], float | None],
+    *,
+    reps: int = BOOTSTRAP_REPS,
+    level: float = CI_LEVEL,
+    seed: int = 0,
+) -> tuple[float, float] | None:
+    """Процентильный ДИ статистики, выборка — целыми кластерами (учениками) с возвращением.
+
+    Повтор, где статистика не определена (None), пропускается. None — меньше двух кластеров или
+    ни один повтор не дал значения. ``seed`` постоянный: отчёт воспроизводим.
+    """
+    if not 0 < level < 1:
+        msg = f"level — доля строго между 0 и 1, а не {level}"
+        raise ValueError(msg)
+    if len(clusters) < 2:  # из одного ученика повторять нечего
+        return None
+    rng = random.Random(seed)  # noqa: S311 — не криптография, нужна воспроизводимость
+    values: list[float] = []
+    for _ in range(reps):
+        sample = [v for c in rng.choices(clusters, k=len(clusters)) for v in c]
+        if (value := stat(sample)) is not None:
+            values.append(value)
+    if not values:
+        return None
+    values.sort()
+    tail = (1 - level) / 2
+    low = values[min(len(values) - 1, math.floor(tail * len(values)))]
+    high = values[max(0, math.ceil((1 - tail) * len(values)) - 1)]
+    return low, high
+
+
 @dataclass(frozen=True, slots=True)
 class Retention:
     learners: int
@@ -349,10 +389,59 @@ class Metrics:
     failures: Failures
     retention: Retention
     self_corrected: SelfCorrection
+    ci: dict[str, tuple[float, float] | None]  # 95 % ДИ бутстрэпом по ученикам
+    by_sound: dict[str, KindQuality]  # Q1.5: по звуку эталона
+
+
+@dataclass(frozen=True, slots=True)
+class _Unit:
+    """Вклад одной метки (или пары разметчиков) в метрики — для бутстрэпа по ученикам."""
+
+    counts: PhonemeCounts | None = None
+    verdict: tuple[bool, bool] | None = None  # (бот засчитал, учитель засчитал бы)
+    teachers: tuple[bool, bool] | None = None  # вердикты двух разметчиков на одну попытку
+
+
+def _units_counts(units: Sequence[_Unit]) -> PhonemeCounts:
+    total = PhonemeCounts()
+    for u in units:
+        if u.counts is not None:
+            total += u.counts
+    return total
+
+
+def _verdict_rate(units: Sequence[_Unit], *, bot: bool) -> float | None:
+    """FAR вердикта (bot=True: засчитано, учитель — нет) или FRR (bot=False: наоборот)."""
+    teacher = [t for b, t in (u.verdict for u in units if u.verdict) if b is bot]
+    return _ratio(teacher.count(not bot), len(teacher))
+
+
+def _count_sounds(
+    by_sound: Mapping[str, Counter[str]], reference: str, model: set[int], human: set[int]
+) -> None:
+    """Q1.5: те же счёты, что по типу ошибки, но ключ — звук эталона на этой позиции."""
+    for pos in model:
+        by_sound["flagged"][reference[pos]] += 1
+        by_sound["confirmed"][reference[pos]] += pos in human
+    for pos in human:
+        by_sound["errors"][reference[pos]] += 1
+        by_sound["caught"][reference[pos]] += pos in model
+
+
+_CI_STATS: dict[str, Callable[[Sequence[_Unit]], float | None]] = {
+    "precision": lambda u: mdd_quality(_units_counts(u)).precision,
+    "recall": lambda u: mdd_quality(_units_counts(u)).recall,
+    "F1": lambda u: mdd_quality(_units_counts(u)).f1,
+    "FAR вердикта": lambda u: _verdict_rate(u, bot=True),
+    "FRR вердикта": lambda u: _verdict_rate(u, bot=False),
+    "κ бот — учитель": lambda u: cohen_kappa([x.verdict for x in u if x.verdict]),
+    "κ учитель — учитель": lambda u: cohen_kappa([x.teachers for x in u if x.teachers]),
+}
 
 
 @dataclass(frozen=True, slots=True)
 class _Label:
+    learner: UUID
     status: str
     actual: str | None
     reference: str
@@ -372,17 +461,21 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
         Counter[str](),
         Counter[str](),
     )
+    by_sound = {name: Counter[str]() for name in ("flagged", "confirmed", "errors", "caught")}
+    clusters: dict[UUID, list[_Unit]] = defaultdict(list)
     pairs: list[tuple[bool, bool]] = []
     usable: dict[UUID, dict[str, tuple[bool, frozenset[int], int]]] = defaultdict(dict)
     self_marked = {attempt_id for (attempt_id, _), lab in labels.items() if lab.self_corrected}
     self_counts = PhonemeCounts()
+    learner_of: dict[UUID, UUID] = {}
     for (attempt_id, annotator), lab in sorted(labels.items(), key=lambda kv: kv[0][1]):
         if lab.status not in USABLE or lab.actual is None:
             continue
         if attempt_id in self_marked:  # самоисправление — отдельный блок, не в главных цифрах
             self_counts += phoneme_decisions(lab.reference, lab.heard, lab.actual)
             continue
-        counts += phoneme_decisions(lab.reference, lab.heard, lab.actual)
+        decided = phoneme_decisions(lab.reference, lab.heard, lab.actual)
+        counts += decided
         by_model = phoneme_errors(lab.reference, lab.heard)
         by_human = phoneme_errors(lab.reference, lab.actual)
         for pos, (kind, _) in by_model.items():
@@ -391,8 +484,11 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
         for pos, (kind, _) in by_human.items():
             errors[kind] += 1
             caught[kind] += pos in by_model
+        _count_sounds(by_sound, lab.reference, set(by_model), set(by_human))
         teacher = lab.policy.verdict(assess(lab.reference, lab.actual)) != Verdict.FAILED
         pairs.append((lab.bot_passed, teacher))
+        clusters[lab.learner].append(_Unit(decided, (lab.bot_passed, teacher)))
+        learner_of[attempt_id] = lab.learner
         usable[attempt_id][annotator] = (teacher, frozenset(by_human), len(lab.reference))
 
     accepted = [teacher for bot, teacher in pairs if bot]
@@ -401,8 +497,14 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
         len(accepted), accepted.count(False), len(rejected), rejected.count(True),
         _ratio(accepted.count(False), len(accepted)), _ratio(rejected.count(True), len(rejected)),
     )  # fmt: skip
-    shared = [list(v.values()) for v in usable.values() if len(v) >= 2]
+    shared_by = {a: list(v.values()) for a, v in usable.items() if len(v) >= 2}
+    shared = list(shared_by.values())
     teacher_pairs = [(a[0], b[0]) for a, b, *_ in shared]  # первые два по коду разметчика
+    for attempt_id, (first, second, *_) in shared_by.items():
+        clusters[learner_of[attempt_id]].append(_Unit(teachers=(first[0], second[0])))
+    groups = list(clusters.values())
+    ci = {name: cluster_bootstrap(groups, stat) for name, stat in _CI_STATS.items()}
+    sounds = sorted(set(by_sound["flagged"]) | set(by_sound["errors"]))
     units = [
         ["err" if pos in marks else "ok" for _, marks, _ in raters]
         for raters in shared
@@ -435,6 +537,12 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
         len(per_attempt), sum(1 for n in per_attempt.values() if n >= 2),
         response, await _failures(session), retention(days, today),
         SelfCorrection(len(self_marked), self_counts, mdd_quality(self_counts)),
+        ci,
+        {
+            sound: KindQuality(*(by_sound[n][sound] for n in ("flagged", "confirmed", "errors",
+                                                               "caught")))
+            for sound in sounds
+        },
     )  # fmt: skip
 
 
@@ -444,7 +552,8 @@ async def _latest_labels(
     """Последняя метка каждого разметчика на каждую попытку (раньше поставленные — история)."""
     rows = await session.execute(
         select(
-            annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
+            attempts.c.learner_id, annotations.c.attempt_id, annotations.c.annotator,
+            annotations.c.label,
             annotations.c.corrected_phonemes, attempts.c.reference_phonemes,
             attempts.c.heard_phonemes, attempts.c.verdict, attempts.c.policy,
             annotations.c.self_corrected,
@@ -454,10 +563,22 @@ async def _latest_labels(
         .order_by(annotations.c.created_at, annotations.c.id)
     )  # fmt: skip
     latest: dict[tuple[UUID, str], _Label] = {}
-    for attempt_id, annotator, status, actual, reference, heard, verdict, policy, own in rows.all():
+    for (
+        learner,
+        attempt_id,
+        annotator,
+        status,
+        actual,
+        reference,
+        heard,
+        verdict,
+        policy,
+        own,
+    ) in rows.all():
         latest[(attempt_id, annotator)] = _Label(
-            status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy), bool(own)
-        )
+            learner, status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy),
+            bool(own),
+        )  # fmt: skip
     return latest
 
 
@@ -521,6 +642,11 @@ def render(m: Metrics) -> str:
         ("κ учитель — учитель (вердикт)", _num(m.kappa_teachers), f"пар: {m.pairs_teachers}"),
         ("α учитель — учитель (фонемы)", _num(m.alpha_phonemes), f"фонем: {m.alpha_units}"),
     ]
+    intervals = [(name, _interval(value)) for name, value in m.ci.items()]
+    sounds = [
+        (sound, k.flagged, k.confirmed, _num(k.precision), k.errors, k.caught, _num(k.recall))
+        for sound, k in m.by_sound.items()
+    ]
     kinds = [
         (kind, k.flagged, k.confirmed, _num(k.precision), k.errors, k.caught, _num(k.recall))
         for kind, k in m.by_kind.items()
@@ -547,6 +673,17 @@ def render(m: Metrics) -> str:
             f"{m.double_annotated}. Фонем: TA {c.ta}, FR {c.fr}, FA {c.fa}, TR {c.tr}.",
             "",
             to_markdown_table(("метрика", "значение", "из чего"), quality),
+            "",
+            f"95 % ДИ — кластерный бутстрэп по ученикам ({BOOTSTRAP_REPS} повторов, "
+            "процентильный): попытки одного ученика зависимы, поэтому выборка повторяется "
+            "целыми учениками (`docs/research/preregistration.md`, H1.2–H1.4). Меньше двух "
+            "учеников — нет данных.",
+            "",
+            to_markdown_table(("метрика", "95 % ДИ"), intervals),
+            "",
+            "По звуку эталона (Q1.5; precision — где отметила модель, recall — по разметке):",
+            "",
+            to_markdown_table(("звук", *KIND_COLUMNS[1:]), sounds),
             "",
             "## Самоисправления (руководство 2.1)",
             "",
@@ -599,6 +736,10 @@ def render(m: Metrics) -> str:
             "",
         ]
     )
+
+
+def _interval(value: tuple[float, float] | None) -> str:
+    return "нет данных" if value is None else f"{value[0]:.3f} – {value[1]:.3f}"
 
 
 def _num(value: float | None) -> str:
