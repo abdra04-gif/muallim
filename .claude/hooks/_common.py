@@ -3,10 +3,41 @@
 import json
 import sys
 from datetime import UTC, datetime
+from functools import cache
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
+# Основная папка проекта: хуки всегда запускаются отсюда, даже из сессии в копии (worktree).
+MAIN = Path(__file__).resolve().parents[2]
+WORKTREES = MAIN / ".claude" / "worktrees"
+
+
+@cache
+def read_event() -> dict[str, Any]:
+    """Событие из stdin; читается один раз — его нужны и ROOT, и самому хуку."""
+    try:
+        data = json.load(sys.stdin)
+    except (json.JSONDecodeError, ValueError, OSError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def worktree_of(cwd: object) -> Path | None:
+    """Копия `.claude/worktrees/<имя>`, в которой работает сессия, или None (ADR-0073)."""
+    if not isinstance(cwd, str) or not cwd:
+        return None
+    try:
+        rel = Path(cwd).resolve().relative_to(WORKTREES)
+    except ValueError:
+        return None
+    if not rel.parts:
+        return None
+    tree = WORKTREES / rel.parts[0]
+    return tree if (tree / ".git").exists() else None
+
+
+# Корень, который проверяют хуки: копия сессии, если она в копии, иначе основная папка.
+ROOT = worktree_of(read_event().get("cwd")) or MAIN
 
 
 def log_event(kind: str, reason: str) -> None:
@@ -29,14 +60,6 @@ def log_event(kind: str, reason: str) -> None:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
     except OSError:
         pass
-
-
-def read_event() -> dict[str, Any]:
-    try:
-        data = json.load(sys.stdin)
-    except json.JSONDecodeError:
-        return {}
-    return data if isinstance(data, dict) else {}
 
 
 def phase() -> str:

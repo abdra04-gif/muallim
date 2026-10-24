@@ -42,3 +42,6 @@ logs/
 # Jupyter-ноутбуки: в результатах ячеек — данные учеников (notebooks/README.md)
 *.ipynb
 .ipynb_checkpoints/
+
+# Копии для параллельных сессий Claude (ADR-0073)
+.claude/worktrees/

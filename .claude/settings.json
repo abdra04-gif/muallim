@@ -43,8 +43,16 @@
       "Edit(./pyproject.toml)",
       "Edit(./uv.lock)",
       "Edit(./CLAUDE.md)",
-      "Edit(./.claude/**)",
-      "Write(./.claude/**)",
+      "Edit(./.claude/settings*.json)",
+      "Edit(./.claude/hooks/**)",
+      "Edit(./.claude/agents/**)",
+      "Edit(./.claude/commands/**)",
+      "Edit(./.claude/skills/**)",
+      "Write(./.claude/settings*.json)",
+      "Write(./.claude/hooks/**)",
+      "Write(./.claude/agents/**)",
+      "Write(./.claude/commands/**)",
+      "Write(./.claude/skills/**)",
       "Edit(./.github/**)",
       "Edit(./scripts/**)",
       "Edit(./migrations/versions/**)",
@@ -70,11 +78,26 @@
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log_prompt.py\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_lock.py\"",
+            "timeout": 10
           }
         ]
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_lock.py\"",
+            "timeout": 10
+          }
+        ]
+      },
       {
         "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit|Bash|Grep|Glob",
         "hooks": [
@@ -144,6 +167,22 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_context.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_lock.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_lock.py\"",
             "timeout": 10
           }
         ]

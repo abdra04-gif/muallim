@@ -369,3 +369,76 @@ def test_git_guard_allows_clean_commit(repo: Path) -> None:
     (repo / "CHANGELOG.md").write_text("# log\n- ок\n", encoding="utf-8")
     git(repo, "add", "CHANGELOG.md")
     assert git_guard(repo, "git commit -m 'docs: ок'").returncode == 0
+
+
+# --- ADR-0073: параллельные сессии — одна в основной папке, остальные в своих копиях ---
+def worktree(project: Path, name: str = "w") -> Path:
+    tree = project / ".claude" / "worktrees" / name
+    tree.mkdir(parents=True)
+    (tree / ".git").write_text("gitdir: ../../../.git/worktrees/w\n", encoding="utf-8")
+    return tree
+
+
+def test_hooks_check_the_worktree_of_the_session(project: Path) -> None:
+    tree = worktree(project)
+    (tree / ".agent-phase").write_text("impl", encoding="utf-8")
+    edit = {"file_path": str(tree / "tests" / "test_x.py")}
+    event: dict[str, object] = {"tool_name": "Edit", "tool_input": edit, "cwd": str(tree / "src")}
+    assert run_hook(project, "guard.py", event).returncode == 2  # фаза копии, а не основной
+    main_edit = {"file_path": str(project / "tests" / "test_x.py")}
+    assert guard(project, "Edit", **main_edit) == 0  # в основной папке фаза off
+
+
+def lock(project: Path, session: str, event: str, **extra: object) -> int:
+    (project / ".git").mkdir(exist_ok=True)
+    payload = {"session_id": session, "hook_event_name": event, "cwd": str(project), **extra}
+    return run_hook(project, "session_lock.py", payload).returncode
+
+
+def edit(project: Path) -> dict[str, object]:
+    return {"tool_name": "Edit", "tool_input": {"file_path": str(project / "src" / "x.py")}}
+
+
+def test_second_session_cannot_edit_main_folder(project: Path) -> None:
+    assert lock(project, "A", "PreToolUse", **edit(project)) == 0  # первая правка — метка у A
+    assert lock(project, "B", "PreToolUse", **edit(project)) == 2
+    commit = {"tool_name": "Bash", "tool_input": {"command": "git commit -m x"}}
+    assert lock(project, "B", "PreToolUse", **commit) == 2
+    read = {"tool_name": "Bash", "tool_input": {"command": "git status && pytest -q"}}
+    assert lock(project, "B", "PreToolUse", **read) == 0  # чтение не мешает
+    assert lock(project, "A", "PreToolUse", **edit(project)) == 0
+
+
+def test_second_session_is_told_to_use_worktree(project: Path) -> None:
+    lock(project, "A", "PreToolUse", **edit(project))
+    payload: dict[str, object] = {
+        "session_id": "B", "hook_event_name": "SessionStart", "cwd": str(project)
+    }  # fmt: skip
+    result = run_hook(project, "session_lock.py", payload)
+    assert "EnterWorktree" in result.stdout
+    payload["session_id"] = "A"
+    assert run_hook(project, "session_lock.py", payload).stdout == ""
+
+
+def test_session_in_worktree_is_free(project: Path) -> None:
+    lock(project, "A", "PreToolUse", **edit(project))
+    tree = worktree(project)
+    inside = {"tool_name": "Edit", "tool_input": {"file_path": str(tree / "src" / "x.py")}}
+    assert lock(project, "B", "PreToolUse", cwd=str(tree), **inside) == 0
+
+
+def test_lock_released_on_exit_and_when_stale(project: Path) -> None:
+    lock(project, "A", "PreToolUse", **edit(project))
+    lock(project, "A", "SessionEnd")
+    assert lock(project, "B", "PreToolUse", **edit(project)) == 0  # A вышла — метка у B
+    stale = {"session": "B", "ts": 0}
+    (project / ".git" / "claude-main-session.json").write_text(json.dumps(stale), "utf-8")
+    assert lock(project, "C", "PreToolUse", **edit(project)) == 0  # B молчит давно
+
+
+def test_doc_sync_finds_duplicate_adr_numbers(repo: Path) -> None:
+    (repo / "docs" / "adr").mkdir(parents=True, exist_ok=True)
+    for name in ("0072-a.md", "0072-b.md"):
+        (repo / "docs" / "adr" / name).write_text("# x\n", encoding="utf-8")
+    result = doc_sync(repo)
+    assert result.returncode == 2 and "0072-a.md, 0072-b.md" in result.stderr

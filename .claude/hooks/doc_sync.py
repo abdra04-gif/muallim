@@ -128,7 +128,24 @@ def new_requirements_untraced(changed: set[str]) -> list[str]:
 
 
 WATCHED = ("docs/", "src/", "tests/", "scripts/", "migrations/", ".claude/", "thesis/")
-NOISE = ("__pycache__", ".pytest_cache", ".ruff_cache", ".mypy_cache", ".DS_Store", "thesis/build/")
+NOISE = (
+    "__pycache__",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".mypy_cache",
+    ".DS_Store",
+    "thesis/build/",
+    ".claude/worktrees/",
+)
+
+
+def duplicate_adr_numbers() -> list[str]:
+    """Два ADR с одним номером — так бывает после слияния параллельных сессий (ADR-0073)."""
+    seen: dict[str, list[str]] = {}
+    for path in sorted((ROOT / "docs" / "adr").glob("[0-9][0-9][0-9][0-9]-*.md")):
+        seen.setdefault(path.name[:4], []).append(path.name)
+    dups = [", ".join(names) for names in seen.values() if len(names) > 1]
+    return [f"Один номер у двух ADR — перенумеруйте более поздний: {d}" for d in dups]
 
 
 def ignored_project_files() -> list[str]:
@@ -199,6 +216,7 @@ def main() -> None:
     problems += text_versions_problems(changed)
     problems += new_requirements_untraced(changed)
     problems += ignored_project_files()
+    problems += duplicate_adr_numbers()
     if problems:
         block(
             "Документация и код разошлись — исправь до завершения (doc_sync, ADR-0039):\n- "

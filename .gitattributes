@@ -1,0 +1,5 @@
+# Параллельные сессии в копиях (ADR-0073): журналы и CHANGELOG только дописываются —
+# при слиянии строки обеих сторон сохраняются, без конфликта.
+docs/journal/prompts/*.md merge=union
+docs/journal/hooks/*.jsonl merge=union
+CHANGELOG.md merge=union
