@@ -115,6 +115,29 @@ async def test_failed_redeems_are_counted_per_learner(session: AsyncSession) -> 
     assert await directory.failed_redeems(UUID(int=1), clock.now()) == 0
 
 
+async def test_register_gives_next_free_code_and_binds_telegram(session: AsyncSession) -> None:
+    """Открытый вход по /annotate: код не совпадёт ни с меткой Excel, ни с приглашением,
+    ни с кодом из настроек; повторный вход того же человека — тот же код."""
+    await _seed(session)
+    await SqlAnnotationTasks(session).add(_label(10, "A1"))  # метка из Excel
+    clock, directory = FixedClock(), SqlAnnotatorDirectory(session)
+    await annotators.create_invite(session, "A4", clock)  # приглашение ещё не использовано
+    code = await directory.register(900, frozenset({"A2"}), clock.now())
+    assert code == "A5"
+    assert await directory.bound_code(900) == "A5"
+    assert await directory.register(900, frozenset({"A2"}), clock.now()) == "A5"
+    assert await directory.register(901, frozenset({"A2"}), clock.now()) == "A6"
+    listed = {row.code: row for row in await annotators.list_annotators(session)}
+    assert listed["A5"].telegram_bound and not listed["A5"].revoked
+
+
+async def test_revoked_code_is_never_given_again(session: AsyncSession) -> None:
+    clock, directory = FixedClock(), SqlAnnotatorDirectory(session)
+    assert await directory.register(900, frozenset(), clock.now()) == "A1"
+    await annotators.revoke(session, "A1", clock)
+    assert await directory.register(901, frozenset(), clock.now()) == "A2"
+
+
 # ---------- очередь ----------
 async def test_queue_order_and_contents_match_excel_package(
     session: AsyncSession, tmp_path: Path
@@ -138,6 +161,16 @@ async def test_queue_order_and_contents_match_excel_package(
     await annotation.export_package(session, store.root, tmp_path / "pkg", "A1", 10)
     excel = (tmp_path / "pkg" / "tasks.csv").read_text(encoding="utf-8-sig").splitlines()[1:]
     assert [line.split(",")[1] for line in excel] == [str(UUID(int=10)), str(UUID(int=11))]
+
+
+async def test_own_attempts_never_reach_annotators_queue(session: AsyncSession) -> None:
+    """Ученик, вошедший в разметку, свои попытки (и свои споры) не размечает (ADR-0072)."""
+    await _seed(session)
+    tasks = SqlAnnotationTasks(session)
+    own = await SqlAnnotatorDirectory(session).register(111, frozenset({"A1"}), FixedClock().now())
+    assert await tasks.next_for(own, frozenset()) is None  # 10 и 11 — попытки ученика 111
+    assert await tasks.remaining(own) == 0
+    assert await tasks.remaining("A1") == 2  # остальным они видны как раньше
 
 
 async def test_disputed_attempt_comes_first_with_learner_reason(session: AsyncSession) -> None:

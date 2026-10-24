@@ -143,17 +143,75 @@ def _act(act: str) -> str:
     return AnnotateAct(a=UUID(int=10).hex, act=act).pack()
 
 
-async def test_stranger_sees_nothing_of_annotation(
+async def test_anyone_who_writes_annotate_can_annotate(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    """Открытый вход (решение автора 2026-10-24): ни ID, ни кода — /annotate и всё."""
+    _, container = app
+    newcomer, tg = person(STRANGER_TG)
+    await newcomer.write("/annotate")
+    shown = "\n".join(tg.texts())
+    assert "A2" in shown  # A1 занят в настройках — новичок получает следующий код
+    assert "Бот прав" in shown or "Бот прав" in str(newcomer.last_screen().reply_markup)
+    (voice,) = tg.voices
+    assert voice.protect_content is True
+    await newcomer.press(_act("ok"))
+    (label,) = await _labels(container)
+    assert (label["annotator"], label["label"]) == ("A2", "agree")
+
+
+async def test_welcome_is_shown_only_on_first_join(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    newcomer, tg = person(STRANGER_TG)
+    await newcomer.write("/annotate")
+    first = len([t for t in tg.texts() if "Добро пожаловать" in t])
+    await newcomer.write("/annotate")
+    assert first == 1
+    assert len([t for t in tg.texts() if "Добро пожаловать" in t]) == 1
+
+
+async def test_button_without_joining_does_nothing(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    """Подделанная кнопка от того, кто не писал /annotate, ничего не сохраняет."""
+    _, container = app
+    stranger, tg = person(STRANGER_TG)
+    await stranger.write("/start")  # обычный ученик: экран с кнопками есть, /annotate не было
+    await stranger.press(_act("ok"))
+    assert await _labels(container) == []
+    assert tg.voices == []
+
+
+async def test_revoked_annotator_cannot_come_back_with_annotate(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:
     _, container = app
-    stranger, tg = person(STRANGER_TG)
-    await stranger.write("/annotate")
-    assert tg.voices == []  # ни одной записи ученика
+    async with container() as request:
+        session = await request.get(AsyncSession)
+        await annotators.revoke(session, "A1", FixedClock())
+        await session.commit()
+    annotator, tg = person(ANNOTATOR_TG)
+    await annotator.write("/annotate")
+    assert tg.voices == []
     assert not any("A1" in t or "разметк" in t.lower() for t in tg.texts())
-    # подделанная кнопка тоже не работает: доступ проверяется на каждом нажатии
-    await stranger.press(_act("ok"))
-    assert await _labels(container) == []
+
+
+async def test_annotator_can_redo_previous_answer(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    """Нажал «Бот прав» по ошибке — «↩️ Переделать» показывает ту же запись снова."""
+    _, container = app
+    annotator, tg = person(ANNOTATOR_TG)
+    await annotator.write("/annotate")
+    await annotator.press(_act("ok"))
+    assert "Переделать" in str(annotator.last_screen().reply_markup)
+    await annotator.press(_act("redo"))
+    assert len(tg.voices) == 2  # та же запись ещё раз
+    await annotator.press(_act("fix"))
+    await annotator.write("صَ")
+    labels = await _labels(container)
+    assert [(lb["annotator"], lb["label"]) for lb in labels] == [("A1", "agree"), ("A1", "fix")]
 
 
 async def test_annotator_from_settings_confirms_bot(
@@ -256,3 +314,49 @@ async def test_revoked_annotator_loses_access_immediately(
         await session.commit()
     await annotator.press(_act("ok"))
     assert await _labels(container) == []
+
+
+async def test_annotate_with_extra_word_still_lets_newcomer_in(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    """«/annotate привет» — не приглашение: новичок входит, без «код не подходит»."""
+    newcomer, tg = person(STRANGER_TG)
+    await newcomer.write("/annotate привет")
+    assert len(tg.voices) == 1
+    assert any("Добро пожаловать" in t for t in tg.texts())
+    assert not any("Код не подходит" in t for t in tg.texts())
+
+
+async def _second_attempt(container: AsyncContainer) -> None:
+    """Ещё одна попытка того же ученика (11): бот тоже услышал س вместо ص."""
+    async with container() as request:
+        session, store = await request.get(AsyncSession), await request.get(AudioStore)
+        sha = await store.save(b"OggS-learner-voice-2")
+        result = assess("صَ", "سَ")
+        await SqlAttemptRepository(session).add(
+            Attempt(UUID(int=11), UUID(int=1), "L01-14", "v1", "muaalem", result,
+                    GradingPolicy().verdict(result), sha, 900, 10, FixedClock().now()),
+            ("msg",),
+        )  # fmt: skip
+        await session.commit()
+
+
+async def test_redo_keeps_current_card_and_its_fix(
+    app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
+) -> None:
+    """Начал исправлять следующую (11), вернулся «↩️ Переделать» к прошлой (10): исправление 11
+    не теряется, и 11 не присылается второй раз — одну запись нельзя разметить дважды."""
+    _, container = app
+    await _second_attempt(container)
+    annotator, tg = person(ANNOTATOR_TG)
+    second = AnnotateAct(a=UUID(int=11).hex, act="fix").pack()
+    await annotator.write("/annotate")
+    await annotator.press(_act("ok"))  # 10 — бот прав; бот показывает 11
+    await annotator.press(second)  # 11 — бот ошибся, жду фонемы
+    await annotator.press(_act("redo"))  # вспомнил про 10
+    await annotator.press(_act("bad"))  # 10 — плохая запись
+    assert len(tg.voices) == 3  # 10, 11, снова 10 — без второй 11
+    await annotator.write("صَ")  # фонемы для 11
+    labels = [(lb["attempt_id"], lb["label"]) for lb in await _labels(container)]
+    assert labels == [(UUID(int=10), "agree"), (UUID(int=10), "audio_unusable"),
+                      (UUID(int=11), "fix")]  # fmt: skip

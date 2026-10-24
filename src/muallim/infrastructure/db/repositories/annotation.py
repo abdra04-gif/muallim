@@ -1,4 +1,4 @@
-"""Очередь разметки и разметчики по приглашению (FR-17).
+"""Очередь разметки и разметчики: по приглашению и вошедшие сами по /annotate (FR-17, ADR-0072).
 
 Очередь одна для Telegram и пакета Excel (``queue_query``): попытки с записью, реальной моделью и
 согласием ученика, которые этот разметчик ещё не размечал. Первыми — оспоренные учеником
@@ -10,11 +10,28 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import ScalarSelect, Select, and_, delete, exists, func, insert, select, update
+from sqlalchemy import (
+    ScalarSelect,
+    Select,
+    and_,
+    delete,
+    exists,
+    func,
+    insert,
+    select,
+    union,
+    update,
+)
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
-from muallim.domain.annotation import GUIDE_VERSION, AnnotationTask, Label
+from muallim.domain.annotation import (
+    GUIDE_VERSION,
+    AnnotationTask,
+    Label,
+    next_annotator_code,
+)
 from muallim.domain.policy import Verdict
 from muallim.infrastructure.db.tables import (
     annotations,
@@ -29,6 +46,7 @@ from muallim.infrastructure.db.tables import (
 )
 
 INVITE_FAILED = "annotator_invite_failed"
+_REGISTER_TRIES = 5  # два новичка в одну секунду: второй берёт следующий номер
 
 
 def _report() -> ScalarSelect[Any]:
@@ -72,9 +90,13 @@ def queue_query(annotator: str) -> Select[Any]:
     )
     disputed = exists().where(learner_reports.c.attempt_id == attempts.c.id)
     found_errors = exists().where(detected_errors.c.attempt_id == attempts.c.id)
+    # Свои попытки не размечают: вход открыт (ADR-0072), ученик не подтверждает свой же спор.
+    mine = exists().where(
+        annotators.c.code == annotator, annotators.c.telegram_user_id == learners.c.telegram_user_id
+    )
     return (
         _tasks()
-        .where(~own)
+        .where(~own, ~mine)
         .order_by(disputed.desc(), found_errors.desc(), attempts.c.created_at.desc(), attempts.c.id)
     )
 
@@ -189,3 +211,28 @@ class SqlAnnotatorDirectory(AnnotatorDirectory):
                 learner_id=learner_id, event=INVITE_FAILED, payload={}, created_at=at
             )
         )
+
+    async def register(self, telegram_user_id: int, reserved: frozenset[str], now: datetime) -> str:
+        for _ in range(_REGISTER_TRIES):
+            if (bound := await self.bound_code(telegram_user_id)) is not None:
+                return bound
+            used = await self.session.execute(
+                union(
+                    select(annotators.c.code),
+                    select(annotator_invites.c.annotator),
+                    select(annotations.c.annotator),
+                )
+            )
+            code = next_annotator_code(reserved | frozenset(used.scalars().all()))
+            try:
+                async with self.session.begin_nested():
+                    await self.session.execute(
+                        insert(annotators).values(
+                            code=code, telegram_user_id=telegram_user_id, created_at=now
+                        )
+                    )
+            except IntegrityError:
+                continue  # код или этот Telegram уже заняли параллельно — смотрим заново
+            return code
+        msg = "Не удалось выдать код разметчика: слишком много одновременных входов"
+        raise RuntimeError(msg)

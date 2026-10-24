@@ -10,6 +10,7 @@ import pytest
 
 from muallim.application.use_cases.annotation import (
     AnnotatorAccess,
+    JoinAnnotation,
     NextAnnotation,
     NotAnnotator,
     RedeemInvite,
@@ -28,6 +29,8 @@ from muallim.domain.annotation import (
     check_self_correction,
     clean_phonemes,
     invite_digest,
+    looks_like_invite,
+    next_annotator_code,
     valid_annotator_code,
 )
 from muallim.domain.learner import Learner
@@ -88,6 +91,21 @@ def test_invite_digest_ignores_case_dashes_and_spaces() -> None:
     assert len(invite_digest("KQ7M29FX")) == 64
 
 
+@pytest.mark.parametrize(
+    ("text", "ok"),
+    [
+        ("KQ7M-29FX-HT3P", True),
+        (" kq7m 29fx ht3p ", True),
+        ("привет", False),
+        ("A2", False),
+        ("KQ7M-29FX-HT3", False),
+        ("KQ7M-29FX-HT3O", False),
+    ],  # O — нет в алфавите приглашений
+)
+def test_only_invite_shaped_text_after_annotate_is_an_invite(text: str, ok: bool) -> None:
+    assert looks_like_invite(text) is ok
+
+
 # ---------- сценарии ----------
 def _learner(tg: int) -> Learner:
     return Learner(UUID(int=tg), tg, f"L-{tg}", "ru", FixedClock().now())
@@ -121,6 +139,9 @@ class World:
 
     def redeem(self) -> RedeemInvite:
         return RedeemInvite(self.directory, self.uow, self.events, self.clock)
+
+    def join(self) -> JoinAnnotation:
+        return JoinAnnotation(self.access, self.directory, self.uow, self.events, self.clock)
 
 
 async def test_access_from_settings_list_and_from_invite() -> None:
@@ -234,6 +255,77 @@ async def test_label_for_deleted_attempt_is_not_saved() -> None:
     w = World()
     gone = await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=99), AnnotationStatus.AGREE)
     assert gone is False and w.tasks.labels == []
+
+
+# ---------- открытый вход по /annotate (решение автора 2026-10-24) ----------
+@pytest.mark.parametrize(
+    ("taken", "expected"),
+    [
+        (set(), "A1"),
+        ({"A1", "A2"}, "A3"),
+        ({"A1", "A7", "t-2_b"}, "A8"),  # номер — после наибольшего, дыры не занимаются
+        ({"a5", "A01"}, "A1"),  # чужие написания не считаются: только «A» и число без нулей
+    ],
+)
+def test_next_annotator_code_never_reuses_a_code(taken: set[str], expected: str) -> None:
+    assert next_annotator_code(frozenset(taken)) == expected
+    assert valid_annotator_code(expected)
+
+
+async def test_anyone_who_writes_annotate_joins_with_new_code() -> None:
+    w = World()  # A1 уже есть в настройках — новичок получает A2
+    newcomer = _learner(STRANGER_TG)
+    assert await w.join().execute(newcomer) == ("A2", True)
+    assert await w.access.code_for(STRANGER_TG) == "A2"
+    assert ("annotator_joined", newcomer.id, {"annotator": "A2"}) in w.events.events
+    assert w.uow.commits == 1
+    shown = await w.next().execute(newcomer)  # и сразу может размечать
+    assert shown is not None and shown.annotator == "A2"
+
+
+async def test_joining_again_keeps_the_same_code() -> None:
+    w = World()
+    newcomer = _learner(STRANGER_TG)
+    await w.join().execute(newcomer)
+    assert await w.join().execute(newcomer) == ("A2", False)
+    assert await w.join().execute(_learner(ANNOTATOR_TG)) == ("A1", False)  # из настроек
+    assert [e for e in w.events.events if e[0] == "annotator_joined"] == [
+        ("annotator_joined", newcomer.id, {"annotator": "A2"})
+    ]
+
+
+async def test_revoked_annotator_cannot_join_again() -> None:
+    """Открытый вход не обходит отзыв: annotator-revoke по-прежнему закрывает доступ."""
+    w = World()
+    w.directory.bound[STRANGER_TG] = "A2"
+    w.directory.revoked.add("A2")
+    w.directory.revoked.add("A1")
+    assert await w.join().execute(_learner(STRANGER_TG)) is None
+    assert await w.join().execute(_learner(ANNOTATOR_TG)) is None
+    assert await w.access.code_for(STRANGER_TG) is None
+    assert not any(e[0] == "annotator_joined" for e in w.events.events)
+
+
+async def test_new_codes_skip_codes_used_anywhere() -> None:
+    """Код из Excel-разметки или приглашения новичку не достаётся: метки людей не смешаются."""
+    w = World()
+    w.directory.used_codes.update({"A2", "A5"})
+    assert await w.join().execute(_learner(STRANGER_TG)) == ("A6", True)
+
+
+async def test_labelled_record_can_be_shown_again_to_redo_the_answer() -> None:
+    w = World()
+    me = _learner(ANNOTATOR_TG)
+    await w.submit().execute(me, UUID(int=1), AnnotationStatus.AGREE)
+    again = await w.next().again(me, UUID(int=1))
+    assert again is not None
+    assert again.task.attempt_id == UUID(int=1) and again.audio == b"ogg\x00"
+    # новая метка — рядом со старой; в данных берётся последняя метка разметчика
+    await w.submit().execute(me, UUID(int=1), AnnotationStatus.FIX, actual="صَ")
+    assert [lb.status for lb in w.tasks.labels] == [AnnotationStatus.AGREE, AnnotationStatus.FIX]
+    assert await w.next().again(me, UUID(int=99)) is None  # запись удалена
+    with pytest.raises(NotAnnotator):
+        await w.next().again(_learner(STRANGER_TG), UUID(int=1))
 
 
 # ---------- самоисправление: отдельная категория (решение автора 2026-10-18, SRC-068) ----------

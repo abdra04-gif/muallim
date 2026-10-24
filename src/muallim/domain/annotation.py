@@ -51,6 +51,9 @@ _ANNOTATOR_CODE: Final = re.compile(r"[A-Za-z0-9_-]{1,64}")
 INVITE_TTL: Final = timedelta(hours=24)  # приглашение действует сутки и один раз
 MAX_INVITE_FAILURES: Final = 5  # неверных кодов подряд — и вход закрыт…
 INVITE_LOCK: Final = timedelta(hours=1)  # …на час: подбирать код бессмысленно
+# Без похожих знаков (0/O, 1/I/L): код диктуют голосом или переписывают с экрана.
+INVITE_ALPHABET: Final = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+INVITE_LENGTH: Final = 12  # «KQ7M-29FX-HT3P»: ≈ 59 бит — подобрать нельзя
 
 
 class LabelError(ValueError):
@@ -99,6 +102,26 @@ def check_self_correction(status: AnnotationStatus, *, self_corrected: bool) -> 
 def valid_annotator_code(code: str) -> bool:
     """Код разметчика (A1, A2…): латиница, цифры, «-» и «_», до 64 символов. Имени — нет."""
     return bool(_ANNOTATOR_CODE.fullmatch(code))
+
+
+def looks_like_invite(text: str) -> bool:
+    """Похоже ли слово после /annotate на код приглашения. «/annotate привет» — нет: это
+    обычный открытый вход (ADR-0072), а не неверный код."""
+    normal = "".join(text.split()).replace("-", "").upper()
+    return len(normal) == INVITE_LENGTH and all(c in INVITE_ALPHABET for c in normal)
+
+
+_AUTO_CODE: Final = re.compile(r"A([1-9][0-9]*)")
+
+
+def next_annotator_code(taken: frozenset[str]) -> str:
+    """Код новичку при входе по /annotate: «A» и номер после наибольшего занятого.
+
+    Дыры не занимаются: код отозванного или ушедшего разметчика новому не достаётся —
+    иначе метки двух людей смешаются под одним кодом (κ считается по коду).
+    """
+    numbers = [int(m.group(1)) for code in taken if (m := _AUTO_CODE.fullmatch(code))]
+    return f"A{max(numbers, default=0) + 1}"
 
 
 def invite_digest(code: str) -> str:

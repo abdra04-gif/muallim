@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     teacher_ids: str = ""
 
     # Разметчики в Telegram (FR-17): «код:Telegram ID» через запятую, например «A1:123,A2:456».
-    # Отдельно от учителей. Второй путь — приглашение: muallim-research annotator-invite A2
+    # Отдельно от учителей. Не обязательно: любой входит по /annotate с новым кодом (ADR-0072)
     annotator_ids: str = ""
 
     @property

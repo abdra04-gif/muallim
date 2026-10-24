@@ -27,6 +27,7 @@ from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.application.use_cases.annotation import (
     AnnotatorAccess,
+    JoinAnnotation,
     NextAnnotation,
     RedeemInvite,
     SubmitAnnotation,
@@ -279,6 +280,7 @@ class RequestProvider(Provider):
         ReportMistake,
         PublishCurriculum,
         RedeemInvite,
+        JoinAnnotation,
         NextAnnotation,
         SubmitAnnotation,
     )

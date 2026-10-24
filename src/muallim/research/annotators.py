@@ -1,7 +1,7 @@
 """Доступ разметчиков к разметке в Telegram (FR-17, ADR-0041): приглашение, отзыв, список.
 
-Выдаёт и отзывает доступ только исследователь — командами ``muallim-research`` на своём
-компьютере или сервере. В боте этого нет: посторонний не может ни попросить, ни выдать доступ.
+Приглашение и отзыв — командами ``muallim-research`` у исследователя. С ADR-0072 вход в боте
+открыт и без приглашения (``/annotate``); отзыв по-прежнему закрывает доступ навсегда.
 """
 
 import secrets
@@ -11,12 +11,18 @@ from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.system import Clock
-from muallim.domain.annotation import INVITE_TTL, invite_digest, valid_annotator_code
+from muallim.domain.annotation import (
+    INVITE_ALPHABET,
+    INVITE_LENGTH,
+    INVITE_TTL,
+    invite_digest,
+    valid_annotator_code,
+)
 from muallim.infrastructure.db.tables import annotator_invites, annotators
 
-# Без похожих знаков (0/O, 1/I/L): код диктуют голосом или переписывают с экрана.
-_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
-_GROUPS, _GROUP = 3, 4  # «KQ7M-29FX-HT3P»: 12 знаков ≈ 59 бит — подобрать нельзя
+_ALPHABET = INVITE_ALPHABET
+_GROUPS, _GROUP = 3, 4  # «KQ7M-29FX-HT3P»
+assert _GROUPS * _GROUP == INVITE_LENGTH  # noqa: S101
 
 
 def _check(code: str) -> None:

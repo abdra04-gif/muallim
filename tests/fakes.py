@@ -8,7 +8,7 @@ from uuid import UUID
 
 from muallim.application.ports.erasures import ErasureAction
 from muallim.application.ports.recognition import Recognition, RecognitionError
-from muallim.domain.annotation import AnnotationTask, Label
+from muallim.domain.annotation import AnnotationTask, Label, next_annotator_code
 from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
@@ -276,6 +276,7 @@ class InMemoryAnnotators:
     bound: dict[int, str] = field(default_factory=dict)
     revoked: set[str] = field(default_factory=set)
     failures: dict[UUID, list[datetime]] = field(default_factory=dict)
+    used_codes: set[str] = field(default_factory=set)  # коды из меток Excel и приглашений
 
     async def bound_code(self, telegram_user_id: int) -> str | None:
         return self.bound.get(telegram_user_id)
@@ -298,6 +299,14 @@ class InMemoryAnnotators:
 
     async def add_failed_redeem(self, learner_id: UUID, at: datetime) -> None:
         self.failures.setdefault(learner_id, []).append(at)
+
+    async def register(self, telegram_user_id: int, reserved: frozenset[str], now: datetime) -> str:
+        if (code := self.bound.get(telegram_user_id)) is not None:
+            return code
+        taken = reserved | self.used_codes | self.revoked | set(self.bound.values())
+        code = next_annotator_code(frozenset(taken))
+        self.bound[telegram_user_id] = code
+        return code
 
 
 @dataclass

@@ -18,7 +18,7 @@ logger: Final = logging.getLogger(__name__)
 @dataclass(frozen=True, slots=True)
 class StaffAccess:
     teachers: frozenset[int]  # TEACHER_IDS
-    annotators: AnnotatorAccess  # ANNOTATOR_IDS и приглашения
+    annotators: AnnotatorAccess  # ANNOTATOR_IDS, приглашения и вошедшие по /annotate
 
     async def is_staff(self, learner: Learner) -> bool:
         if learner.telegram_user_id in self.teachers:

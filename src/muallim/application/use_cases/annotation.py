@@ -1,8 +1,9 @@
-"""Разметка в Telegram (FR-17, ADR-0041): доступ разметчика, приглашение, очередь, метка.
+"""Разметка в Telegram (FR-17, ADR-0041, ADR-0072): доступ разметчика, очередь, метка.
 
-Доступ — двумя путями (решение автора 2026-10-18): список ANNOTATOR_IDS в настройках и
-одноразовое приглашение на сутки. Отозванный код закрывает оба. Права проверяются при каждом
-действии, а не один раз при входе: подделанная или старая кнопка без доступа ничего не сделает.
+Доступ открыт: кто написал /annotate, тот разметчик с новым кодом (решение автора 2026-10-24,
+ADR-0072). Прежние пути — ANNOTATOR_IDS и приглашение — остаются. Отозванный код закрывает доступ
+навсегда, и /annotate его не возвращает. Права проверяются при каждом действии, а не один раз при
+входе: кнопка того, кто не входил или отозван, ничего не сделает.
 """
 
 from collections.abc import Mapping
@@ -89,6 +90,31 @@ class RedeemInvite:
 
 
 @dataclass(frozen=True, slots=True)
+class JoinAnnotation:
+    """Вход по /annotate без кода и ID (ADR-0072). Отозванного не пускает снова."""
+
+    access: AnnotatorAccess
+    directory: AnnotatorDirectory
+    uow: UnitOfWork
+    events: EventLog
+    clock: Clock
+
+    async def execute(self, learner: Learner) -> tuple[str, bool] | None:
+        """(код, впервые ли) или None — доступ этому человеку закрыт исследователем."""
+        tg = learner.telegram_user_id
+        if (code := await self.access.code_for(tg)) is not None:
+            return code, False
+        if tg in self.access.configured or await self.directory.bound_code(tg) is not None:
+            return None  # код был, но отозван
+        code = await self.directory.register(
+            tg, frozenset(self.access.configured.values()), self.clock.now()
+        )
+        await self.events.record("annotator_joined", learner.id, {"annotator": code})
+        await self.uow.commit()
+        return code, True
+
+
+@dataclass(frozen=True, slots=True)
 class ShownTask:
     annotator: str
     task: AnnotationTask
@@ -121,6 +147,23 @@ class NextAnnotation:
                 return ShownTask(annotator, task, audio, remaining)
             skipped.add(task.attempt_id)  # файла нет — покажет muallim-research verify
         return None
+
+    async def again(self, learner: Learner, attempt_id: UUID) -> ShownTask | None:
+        """«↩️ Переделать»: та же запись ещё раз. Новая метка ляжет рядом, в данных — последняя.
+
+        None — записи больше нет (ученик удалил данные или отозвал согласие) или нет файла.
+        """
+        annotator = await self.access.require(learner)
+        task = await self.tasks.get(attempt_id)
+        audio = await self.audio.read(task.audio_sha256) if task is not None else None
+        if task is None or audio is None:
+            return None
+        remaining = await self.tasks.remaining(annotator)
+        await self.events.record(
+            "annotation_redo", learner.id, {"annotator": annotator, "attempt_id": str(attempt_id)}
+        )
+        await self.uow.commit()
+        return ShownTask(annotator, task, audio, remaining)
 
 
 @dataclass(frozen=True, slots=True)
