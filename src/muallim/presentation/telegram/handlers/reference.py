@@ -14,6 +14,7 @@ from dishka import FromDishka
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.application.use_cases.settings import GetSettings
+from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.domain.report import ReportReason
@@ -22,6 +23,7 @@ from muallim.presentation.telegram import keyboards, texts, views
 from muallim.presentation.telegram.callbacks import Dispute, DisputeReason, Listen
 from muallim.presentation.telegram.callbacks import RecordReference as RecordCallback
 from muallim.presentation.telegram.display import Display, drop_sound, message_of
+from muallim.presentation.telegram.handlers.video import send_articulation
 from muallim.presentation.telegram.screens import Screen
 
 logger: Final = logging.getLogger(__name__)
@@ -58,15 +60,36 @@ async def show_card(
     has_audio: bool,
     view: LearnerSettings,
     reference: GetReferenceAudio,
+    video_key: str | None = None,
+    watch: GetArticulationVideo | None = None,
+    played: RecordVideoPlayed | None = None,
 ) -> None:
     """Показать карточку; с «автозвуком» эталон приходит сам — над карточкой (ADR-0061).
 
     Telegram не собирает картинку, звук и кнопки в одно сообщение, поэтому со звуком карточка —
     новым сообщением под голосовым, прежний экран убирается. Прошлое автоголосовое удаляется.
+    Есть ролик для текста карточки (``video_key``, FR-56) — вместо голосового приходит ролик,
+    каждый раз, как автозвук; от записи «как правильно» он не зависит (ADR-0074).
     """
     bot = msg.bot
     assert bot is not None  # noqa: S101
     await display.drop_sound(bot, msg.chat.id)
+    if video_key is not None:  # где есть ролик — только ролик
+        video = await watch.execute(video_key) if view.auto_reference and watch else None
+        if video is None:
+            await display.show(msg, screen)
+            return
+        with suppress(TelegramBadRequest):
+            await msg.delete()
+        sent = await send_articulation(bot, msg.chat.id, display, video)
+        if sent is not None:
+            display.keep_sound(msg.chat.id, sent.message_id)
+        await display.send(
+            bot, msg.chat.id, screen
+        )  # карточка — до записи события: сбой БД её не съест
+        if sent is not None and played is not None:
+            await played.execute(learner, video.key, source="auto", item_id=item_id)
+        return
     audio = None
     if view.auto_reference and has_audio:
         audio = await reference.execute(learner, item_id, auto=True)

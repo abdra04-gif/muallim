@@ -48,3 +48,29 @@ async def test_container_resolves_every_use_case(tmp_path: Path) -> None:
             assert created and result.attempt.assessment.score == 100
     finally:
         await container.close()
+
+
+async def test_container_resolves_articulation_video(tmp_path: Path) -> None:
+    """FR-56 (ADR-0074): сценарии ролика зарегистрированы, библиотека — curriculum/video/."""
+    from muallim.application.ports.storage import ArticulationVideoLibrary  # noqa: PLC0415
+    from muallim.application.use_cases.video import (  # noqa: PLC0415
+        GetArticulationVideo,
+        RecordVideoPlayed,
+    )
+
+    url = f"sqlite+aiosqlite:///{tmp_path / 'di.sqlite3'}"
+    settings = Settings(
+        bot_token=SecretStr("0:test"),
+        database_url=SecretStr(url),
+        asr_backend="stub",
+        audio_dir=tmp_path / "audio",
+    )
+    container = create_container(settings)
+    try:
+        library = await container.get(ArticulationVideoLibrary)
+        assert library.for_letter("ر") is not None  # ролики أ ر ز лежат в репозитории
+        async with container() as request:
+            for uc in (GetArticulationVideo, RecordVideoPlayed):
+                assert isinstance(await request.get(uc), uc)
+    finally:
+        await container.close()

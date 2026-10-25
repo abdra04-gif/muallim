@@ -29,6 +29,7 @@ from aiogram.methods import (
     SendAudio,
     SendMessage,
     SendPhoto,
+    SendVideo,
     SendVoice,
     TelegramMethod,
 )
@@ -41,6 +42,7 @@ from aiogram.types import (
     PhotoSize,
     Update,
     User,
+    Video,
     Voice,
 )
 from dishka.integrations.aiogram import setup_dishka
@@ -93,6 +95,13 @@ class _Session(BaseSession):
             return File(file_id=method.file_id, file_unique_id="f", file_path="voice/1.oga")
         if isinstance(method, SendMessage | SendPhoto | EditMessageText | EditMessageMedia):
             return self._show(bot, method)
+        if isinstance(method, SendVideo):  # FR-56: ролик — строкой, как голосовое
+            self.log.append("🤖 [видео]")
+            msg = self._message(bot, self._new_id(), None, None, None)
+            clip = Video(
+                file_id=f"v{msg.message_id}", file_unique_id="v", width=1, height=1, duration=1
+            )
+            return msg.model_copy(update={"video": clip})
         if isinstance(method, SendVoice | SendAudio):
             self.log.append("🤖 [голосовое]" if isinstance(method, SendVoice) else "🤖 [аудио]")
             return self._message(bot, self._new_id(), None, None, None)

@@ -14,7 +14,7 @@ from aiogram.types import CallbackQuery, Message
 from dishka import FromDishka
 
 from muallim.application.ports.recognition import RecognitionError
-from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
@@ -52,6 +52,7 @@ async def on_voice(
     screen_state: FromDishka[ScreenState],
     learner_settings: FromDishka[GetSettings],
     quiz: FromDishka[PracticeQuiz],
+    videos: FromDishka[ArticulationVideoLibrary],
 ) -> None:
     assert m.voice is not None  # гарантирует фильтр F.voice  # noqa: S101
     if m.voice.duration < 1:
@@ -120,7 +121,8 @@ async def on_voice(
         await staff_access.is_staff(learner)
     )
     await wait.delete()
-    screen = screens.result(cur, result, library.has(result.item.id), resume, staff=staff)
+    has_audio = library.has(result.item.id)
+    screen = screens.result(cur, result, has_audio, resume, staff=staff, videos=videos)
     # ступень ③ закрепления: попытка — ответ на открытый вопрос этой строки (ADR-0066 п. 8)
     passed = read_passed(attempt.verdict)
     linked = await quiz.attach_attempt(learner, result.item.id, attempt.id, passed=passed)

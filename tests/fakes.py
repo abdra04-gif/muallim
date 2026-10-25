@@ -17,6 +17,7 @@ from muallim.domain.report import LearnerReport
 from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 
 if TYPE_CHECKING:
+    from muallim.application.ports.storage import Video
     from muallim.domain import review
     from muallim.domain.quiz import QuizAnswer
 
@@ -256,6 +257,30 @@ class InMemoryReferenceAudio:
 
     async def save(self, item_id: str, audio: bytes) -> None:
         self.files[item_id] = audio
+
+
+@dataclass
+class InMemoryVideos:
+    """Ролики «🎬 Как произносить» (ADR-0074): текст карточки → ключ, буква → ключ тройки.
+
+    Ролик — 1280×720, 4,5 с; байты — ``b"mp4:" + ключ``.
+    """
+
+    texts: dict[str, str] = field(default_factory=dict)
+    letters: dict[str, str] = field(default_factory=dict)
+
+    def for_text(self, text: str) -> str | None:
+        return self.texts.get(text)
+
+    def for_letter(self, letter: str) -> str | None:
+        return self.letters.get(letter)
+
+    async def get(self, key: str) -> "Video | None":
+        from muallim.application.ports.storage import Video  # noqa: PLC0415 — нет до FR-56
+
+        if key not in {*self.texts.values(), *self.letters.values()}:
+            return None
+        return Video(key=key, data=b"mp4:" + key.encode(), seconds=4.5, width=1280, height=720)
 
 
 @dataclass

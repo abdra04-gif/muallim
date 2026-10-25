@@ -6,7 +6,7 @@ from aiogram import Router
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
-from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
@@ -14,6 +14,7 @@ from muallim.application.use_cases.reading import HowToRead
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.settings import GetSettings
+from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.presentation.telegram import opening, screens, texts
@@ -136,6 +137,9 @@ async def cb_go(
     reading: FromDishka[HowToRead],
     learner_settings: FromDishka[GetSettings],
     reference: FromDishka[GetReferenceAudio],
+    videos: FromDishka[ArticulationVideoLibrary],
+    watch: FromDishka[GetArticulationVideo],
+    played: FromDishka[RecordVideoPlayed],
 ) -> None:
     try:
         # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
@@ -161,10 +165,12 @@ async def cb_go(
             recorder.allowed(learner),
             reading.execute(learner, item),
             view=view,
+            videos=videos,
         )
         await show_card(
             msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,
-            view=view, reference=reference,
+            view=view, reference=reference, video_key=screens.card_video(videos, item),
+            watch=watch, played=played,
         )  # fmt: skip
     await cb.answer()
 

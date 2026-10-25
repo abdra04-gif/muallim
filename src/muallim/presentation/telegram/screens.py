@@ -16,6 +16,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from muallim.application.breakdown import VOWEL_KINDS, Breakdown, ErrorGroup, Place
+from muallim.application.ports.storage import ArticulationVideoLibrary
 from muallim.application.transcription import as_text, plain
 from muallim.application.use_cases.progress import LessonStatus, Progress
 from muallim.application.use_cases.quiz import QuizOverview, QuizRest, QuizResult, QuizView
@@ -65,6 +66,7 @@ from muallim.presentation.telegram.callbacks import (
     ShowProgress,
     ShowSettings,
     Signs,
+    Watch,
 )
 from muallim.presentation.telegram.opening import OPENING_ITEMS
 
@@ -253,8 +255,12 @@ def card(
     reading: CardReading | None = None,
     *,
     view: LearnerSettings | None = None,
+    videos: ArticulationVideoLibrary | None = None,
 ) -> Screen:
-    """``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51)."""
+    """``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51).
+
+    ``videos`` — ролики «🎬 Как произносить» (FR-56, ADR-0074): есть ролик для текста карточки —
+    кнопка ролика вместо 🔊 (решение автора: где есть ролик — только ролик)."""
     view = view or LearnerSettings()
     lesson, i = curriculum.locate(item.id)
     parts = [texts.CARD_HEAD.format(lesson=escape(lesson.title), n=i + 1, total=len(lesson.items))]
@@ -303,19 +309,37 @@ def card(
     if ref:
         parts.append("<i>" + " · ".join(ref) + "</i>")
 
-    kb = _card_keyboard(curriculum, item, has_audio, is_teacher, bool(known))
+    video = card_video(videos, item)
+    kb = _card_keyboard(curriculum, item, has_audio, is_teacher, bool(known), video=video)
     key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
     return Screen("\n\n".join(parts), kb, image, key)
 
 
+def card_video(videos: ArticulationVideoLibrary | None, item: LessonItem) -> str | None:
+    """Ключ ролика «🎬 Как произносить» для текста карточки (ADR-0074); None — ролика нет."""
+    return videos.for_text(item.text) if videos is not None else None
+
+
 def _card_keyboard(
-    curriculum: Curriculum, item: LessonItem, has_audio: bool, is_teacher: bool, sheet: bool
+    curriculum: Curriculum,
+    item: LessonItem,
+    has_audio: bool,
+    is_teacher: bool,
+    sheet: bool,
+    *,
+    video: str | None = None,
 ) -> InlineKeyboardMarkup:
-    """Кнопки карточки; ``sheet`` — есть буквы до урока, кнопка шпаргалки (FR-52)."""
+    """Кнопки карточки; ``sheet`` — есть буквы до урока, кнопка шпаргалки (FR-52); ``video`` —
+    ключ ролика: он вместо 🔊 (FR-56)."""
     lesson, i = curriculum.locate(item.id)
     kb = InlineKeyboardBuilder()
     top = 0
-    if has_audio:  # послушать можно везде, где есть звук: и в правиле, и в слоге (ADR-0032)
+    if video is not None:  # ролик — с тем же звуком, что 🔊 (ADR-0074)
+        kb.button(
+            text=texts.VIDEO_BUTTON, callback_data=Watch(v=video, src="card", item_id=item.id)
+        )
+        top += 1
+    elif has_audio:  # послушать можно везде, где есть звук: и в правиле, и в слоге (ADR-0032)
         kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=item.id))
         top += 1
     if is_teacher and item.kind is not ItemKind.ALPHABET:  # учитель озвучивает и правило
@@ -420,6 +444,8 @@ def result(
     has_audio: bool,
     resume: LessonItem | None = None,
     staff: bool = False,
+    *,
+    videos: ArticulationVideoLibrary | None = None,
 ) -> Screen:
     """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие».
 
@@ -430,6 +456,8 @@ def result(
 
     «Услышано» и блок «Для исследования» с номером попытки видят только учитель и разметчик
     (``staff``): новичку они мешают, номер попытки ученик получает в «🚩 Бот ошибся» (FR-50).
+
+    ``videos`` — ролики (FR-56, ADR-0074): ролик карточки вместо 🔊; к ошибкам разбора роликов нет.
     """
     a = r.attempt.assessment
     lesson, _ = curriculum.locate(r.item.id)
@@ -466,8 +494,10 @@ def result(
         if (hidden := len(groups) - max(legend, shown)) > 0:
             blocks.append(texts.MORE_NOT_SHOWN.format(n=hidden))
     blocks.append(unread)
+    after = card_video(videos, r.item)
+    listen = has_audio and after is None  # 🔊 на экране; с роликом 🔊 нет (ADR-0074)
     if groups or unread:
-        blocks.append(texts.PLAN_LISTEN if has_audio else texts.PLAN_READ)
+        blocks.append(texts.PLAN_LISTEN if listen else texts.PLAN_READ)
     if staff:
         blocks.append(
             texts.RESEARCH_BLOCK.format(
@@ -477,7 +507,7 @@ def result(
             )
         )
     caption, details = _split_caption([b for b in blocks if b])
-    keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume)
+    keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume, after=after)
     return Screen(caption, keyboard, image, details=details)
 
 
@@ -589,10 +619,22 @@ def _result_keyboard(
     lesson: Lesson,
     has_audio: bool,
     resume: LessonItem | None = None,
+    *,
+    after: str | None = None,
 ) -> InlineKeyboardMarkup:
+    """``after`` — ролик карточки (вместо 🔊). Роликов к ошибкам разбора нет: ролики — только
+    на карточках алфавита (решение автора 2026-10-25, ADR-0074)."""
     kb = InlineKeyboardBuilder()
-    if has_audio:
+    item_id = r.item.id
+    top = 0
+    if after is not None:
+        kb.button(
+            text=texts.VIDEO_BUTTON, callback_data=Watch(v=after, src="after", item_id=item_id)
+        )
+        top += 1
+    elif after is None and has_audio:
         kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=r.item.id))
+        top += 1
     # ряд «◀️ Назад · 🔁 Ещё раз · ▶️ Дальше»: обе крайние — на соседние строки, «Ещё раз» —
     # снова карточка этой строки (там видно, что читать, и можно послушать эталон)
     nav = 1
@@ -621,7 +663,7 @@ def _result_keyboard(
     kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
     _home_row(kb)
     rows: Sequence[int] = (
-        *((1,) if has_audio else ()),
+        *([1] * top),
         nav,
         *((1,) if next_row else ()),
         *((1,) if r.lesson_completed else ()),
@@ -896,12 +938,18 @@ SHEET_LISTEN_PER_ROW = 4
 
 
 def letters_sheet(
-    curriculum: Curriculum, lesson_id: str, audio: Collection[str], back_item: str = ""
+    curriculum: Curriculum,
+    lesson_id: str,
+    audio: Collection[str],
+    back_item: str = "",
+    *,
+    videos: ArticulationVideoLibrary | None = None,
 ) -> Screen:
     """Шпаргалка «буква → название → звук → 🔊» по книге строго до урока (FR-52, ADR-0062 п. 7).
 
     ``audio`` — id головных карточек, у которых есть эталон: 🔊 — существующий ``Listen``.
     ``back_item`` — карточка, с которой открыли («◀️ Назад» на неё); пусто — назад на «Знаки».
+    ``videos`` — не используется: роликов в шпаргалке нет (решение автора 2026-10-25, ADR-0074).
     """
     known = letters_before(curriculum, lesson_id)
     lines = []
@@ -1020,8 +1068,9 @@ def _in_program(curriculum: Curriculum, item_id: str) -> bool:
 
 def with_quiz_next(screen: Screen) -> Screen:
     """Разбор голосового на ступени ③: вместо кнопок урока («▶️ Дальше», «◀️ Назад», «🔁 Ещё
-    раз» увели бы из раунда) — «🧠 Дальше по закреплению»; 🔊 эталона и «🚩 Бот ошибся» остаются."""
-    keep = (Listen.__prefix__ + ":", Dispute.__prefix__ + ":")
+    раз» увели бы из раунда) — «🧠 Дальше по закреплению»; 🔊 эталона (и 🎬 ролики, ADR-0074) и
+    «🚩 Бот ошибся» остаются."""
+    keep = (Listen.__prefix__ + ":", Watch.__prefix__ + ":", Dispute.__prefix__ + ":")
     kept = [
         [b for b in row if isinstance(b.callback_data, str) and b.callback_data.startswith(keep)]
         for row in screen.keyboard.inline_keyboard

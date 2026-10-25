@@ -3,7 +3,8 @@
 Новое сообщение — только для /команд и результата голосового; у предыдущего экрана кнопки
 убираются, чтобы не путаться. Память ``Display`` — кэш file_id картинок и номер текущего экрана
 чата; один объект на контейнер DI (bootstrap/di.py), поэтому два бота не мешают друг другу.
-Сбрасывается при перезапуске — это не данные исследования.
+Сбрасывается при перезапуске — это не данные исследования. Там же — file_id роликов
+«🎬 Как произносить» (ключ ``video:<ключ ролика>``, ADR-0074).
 """
 
 import logging
@@ -21,6 +22,7 @@ from aiogram.types import (
     Message,
 )
 
+from muallim.application.ports.storage import Video
 from muallim.presentation.telegram.screens import Screen
 
 logger: Final = logging.getLogger(__name__)
@@ -54,6 +56,32 @@ class Display:
         if old is not None:
             with suppress(TelegramBadRequest):
                 await bot.delete_message(chat_id, old)
+
+    async def send_video(self, bot: Bot, chat_id: int, video: Video) -> Message:
+        """Ролик (ADR-0074): первый раз — файлом, дальше — по file_id. Telegram не узнал
+        file_id (другой бот, файл удалён) — забыть его и загрузить файлом заново."""
+        name = f"video:{video.key}"
+        cached = self.file_ids.get(name)
+        if cached:
+            try:
+                return await self._video(bot, chat_id, video, cached)
+            except TelegramBadRequest as error:
+                logger.info("file_id ролика %s не подошёл (%s) — загружаю файлом", video.key, error)
+                self.file_ids.pop(name, None)
+        upload = BufferedInputFile(video.data, filename=f"{video.key}.mp4")
+        msg = await self._video(bot, chat_id, video, upload)
+        if msg.video:
+            self.file_ids[name] = msg.video.file_id
+        return msg
+
+    @staticmethod
+    async def _video(
+        bot: Bot, chat_id: int, video: Video, file: str | BufferedInputFile
+    ) -> Message:
+        return await bot.send_video(
+            chat_id, file, supports_streaming=True, width=video.width, height=video.height,
+            duration=round(video.seconds),
+        )  # fmt: skip
 
     def _photo(self, screen: Screen) -> str | BufferedInputFile:
         assert screen.image is not None  # noqa: S101

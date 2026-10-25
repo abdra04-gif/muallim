@@ -1,5 +1,6 @@
 """Шпаргалка букв по книге до урока (FR-52, ADR-0062 п. 7): экран меню, «◀️ Назад» — на карточку
-или «🔤 Знаки», 🔊 — существующий ``Listen`` головной карточки буквы (handlers/reference.py)."""
+или «🔤 Знаки», 🔊 — существующий ``Listen`` головной карточки буквы (handlers/reference.py).
+Роликов 🎬 в шпаргалке нет (решение автора 2026-10-25, ADR-0074)."""
 
 from typing import Final
 
@@ -7,7 +8,7 @@ from aiogram import Router
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
-from muallim.application.ports.storage import ReferenceAudioLibrary
+from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
 from muallim.application.use_cases.screen import ScreenState
 from muallim.domain.curriculum import Curriculum, letters_before
 from muallim.domain.learner import Learner
@@ -27,6 +28,7 @@ async def cb_letters_sheet(
     screen_state: FromDishka[ScreenState],
     cur: FromDishka[Curriculum],
     library: FromDishka[ReferenceAudioLibrary],
+    videos: FromDishka[ArticulationVideoLibrary],
 ) -> None:
     """Шпаргалка букв до урока (FR-52): экран меню, 🔊 — обычный ``Listen`` головной карточки."""
     try:
@@ -41,7 +43,7 @@ async def cb_letters_sheet(
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         audio = frozenset(head.id for head in known if library.has(head.id))
         screen = screens.letters_sheet(
-            cur, callback_data.lesson_id, audio, back_item=callback_data.item_id
+            cur, callback_data.lesson_id, audio, back_item=callback_data.item_id, videos=videos
         )
         await display.show(msg, screen)
     await cb.answer()

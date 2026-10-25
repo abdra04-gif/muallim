@@ -144,6 +144,7 @@ async def app(
         bot_token=SecretStr("1:test"), database_url=SecretStr(url), asr_backend="stub",
         audio_dir=tmp_path / "audio", reference_audio_dir=reference,
         recitations_dir=tmp_path / "recitations", teacher_ids=str(TEACHER), log_file=None,
+        video_dir=tmp_path / "video",  # без роликов FR-56: здесь проверяется звук FR-20/FR-52
     )  # fmt: skip
     container = create_container(settings)
     async with container() as request:

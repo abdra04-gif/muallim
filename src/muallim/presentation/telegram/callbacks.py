@@ -141,3 +141,14 @@ class ChangeSetting(CallbackData, prefix="set"):
 
 class Me(CallbackData, prefix="me"):
     """«🪪 Мой ID» — псевдоним ученика, как /me."""
+
+
+class Watch(CallbackData, prefix="watch"):
+    """«🎬 Как произносить» (FR-56, ADR-0074): ``v`` — ключ ролика; ``src`` — откуда (card, after,
+    breakdown, sheet — ``from`` в журнале ``video_played``); ``item_id`` — карточка, ``letter`` —
+    буква шпаргалки."""
+
+    v: str
+    src: str
+    item_id: str = ""
+    letter: str = ""

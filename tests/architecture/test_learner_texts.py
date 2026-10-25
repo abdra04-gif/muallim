@@ -99,6 +99,7 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.Noop: callbacks.Noop(),
         callbacks.Again: callbacks.Again(),
         callbacks.Listen: callbacks.Listen(item_id=item),
+        callbacks.Watch: callbacks.Watch(v="f" * 16, src="breakdown", item_id=item, letter="أ"),
         callbacks.Dispute: callbacks.Dispute(attempt=attempt),
         callbacks.DisputeReason: callbacks.DisputeReason(attempt=attempt, reason=reason),
         callbacks.AnnotateAct: callbacks.AnnotateAct(a=attempt, act="cancel"),

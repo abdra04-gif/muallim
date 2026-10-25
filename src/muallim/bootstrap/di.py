@@ -23,7 +23,11 @@ from muallim.application.ports.repositories import (
     ReminderRecipients,
     UnitOfWork,
 )
-from muallim.application.ports.storage import AudioStore, ReferenceAudioLibrary
+from muallim.application.ports.storage import (
+    ArticulationVideoLibrary,
+    AudioStore,
+    ReferenceAudioLibrary,
+)
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.application.use_cases.annotation import (
     AnnotatorAccess,
@@ -52,6 +56,7 @@ from muallim.application.use_cases.review import GetReview
 from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.settings import ChangeSetting, GetSettings
 from muallim.application.use_cases.staff import StaffAccess
+from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.policy import GradingPolicy
@@ -84,6 +89,7 @@ from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRe
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.erasures import FileErasureLog
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
+from muallim.infrastructure.video.library import VideoLibrary
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.learner import LearnerProvider
 
@@ -127,6 +133,11 @@ class AppProvider(Provider):
             SoundLibrary.load(self.settings.reference_audio_dir / "library"),
             texts,
         )
+
+    @provide
+    def videos(self) -> ArticulationVideoLibrary:
+        """Ролики «🎬 Как произносить» (ADR-0074): манифест читается один раз при запуске."""
+        return VideoLibrary.load(self.settings.video_dir)
 
     @provide
     def display(self) -> Display:
@@ -277,6 +288,8 @@ class RequestProvider(Provider):
         ChangeSetting,
         DueReminders,
         GetReferenceAudio,
+        GetArticulationVideo,
+        RecordVideoPlayed,
         ReportMistake,
         PublishCurriculum,
         RedeemInvite,
