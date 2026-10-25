@@ -26,15 +26,18 @@
 In Russia and Kazakhstan, the ``Second Teacher'' (\emph{al-Muallim ath-Thani}) method of teaching Arabic
 reading is popular: beginners use it to learn to read the Quran from scratch \cite{SRC-040}.
 Independent practice needs automatic reading assessment, but open Quran recitation recognition models are
-trained on expert reciters. On recitations with errors their accuracy drops: the phoneme error rate rises from
-0.54 to 5.78\,\% \cite{SRC-002}. These models have not been measured on beginners learning Arabic as a
-foreign language.
+trained on expert reciters, and their quality depends on the input speech: the phoneme error rate (PER) of Quran
+Muaalem is 0.54\,\% on the authors' test set and 5.78\,\% on qdat\_bench, which contains real recitation
+errors \cite{SRC-002}. For adult beginners learning Arabic reading as a foreign language at early stages, the
+reliability of these models requires separate evaluation.
 
 \textbf{Problem.} Not everyone can study with a teacher: work, distance and the cost of lessons get in the
 way, and a group class has no time to go through each learner's difficulties. Automatic assessment could
-serve as individual practice between lessons. But there is no data on the reading of beginners learning
-Arabic as a foreign language, so the quality of existing models on such learners can be neither measured nor
-improved.
+serve as individual practice between lessons. But existing open datasets, including the recitations of
+non-Arabic speakers in RetaSy \cite{SRC-032}, do not provide data for assessing the reading of Russian-speaking
+adult beginners learning from primer material such as \emph{al-Muallim ath-Thani}, with detailed annotation
+of reading and pronunciation errors. Without such data the quality of existing models on these learners can
+be neither measured nor improved.
 
 \section{Research questions}
 
@@ -43,30 +46,30 @@ agentic loop-engineering can be used to develop an effective tool for beginners'
 
 \begin{rqbox}
 \textbf{RQ-1.} How reliably do existing speech recognition and analysis models detect reading and pronunciation errors in beginners learning Arabic and Quran reading?\\[4pt]
-\textbf{RQ-2.} To what extent does applying agentic loop-engineering to select and combine existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches?\\[4pt]
+\textbf{RQ-2.} To what extent does applying agentic loop-engineering to search for and combine configurations of existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches?\\[4pt]
 \textbf{RQ-3 (supplementary).} To what extent does using the developed tool in out-of-class practice affect how beginners studying with a teacher progress in mastering the course material?
 \end{rqbox}
 
-\textbf{Method.}
-\begin{enumerate}
-  \item \textbf{Bot.} Build a Telegram bot based on the lessons of \emph{The Second Teacher}
-    (\emph{al-Muallim ath-Thani}) \cite{SRC-040}. The learner sends a voice message, and the bot checks the
-    reading and explains the error.
-  \item \textbf{Data collection.} Launch the bot and collect learners' recordings with their consent
-    (pilot: 20--40 adults, 4--6 weeks).
-  \item \textbf{Annotation.} Two teachers mark reading and pronunciation errors in the recordings.
-  \item \textbf{Training.} Fine-tune models on our dataset \cite{SRC-111} and use an AI agent (agentic
-    loop-engineering) to combine them into a system that detects errors more accurately \cite{SRC-067}. The
-    system is compared once with the baselines (Quran Muaalem as is and the best standalone model) on a frozen
-    test set.
-  \item \textbf{Effect on learners (additional).} Check whether the bot helps learners master the material
-    faster: a knowledge tracing model \cite{SRC-124} and a teacher test at three time points.
-\end{enumerate}
+\textbf{Method.} A Telegram bot collects recordings with participants' consent. Pilot: 20--40 adults,
+4--6 weeks. Two teachers annotate the recordings by phoneme and error type: a \emph{reading error} means the
+wrong sign was read (another vowel, a missed sukun, shadda or madd, a look-alike letter); a
+\emph{pronunciation error} means the sign was read correctly but the sound was produced wrongly.
+\begin{itemize}
+  \item \emph{Baselines:} Quran Muaalem as is, and the best standalone off-the-shelf model.
+  \item \emph{Agentic loop-engineering:} an AI agent searches for and combines configurations of off-the-shelf
+    models and components, for example a verifier and adaptation of individual models on teacher-annotated
+    data (such as LoRA fine-tuning \cite{SRC-111}). Tuning
+    uses training learners only, and every configuration tried is recorded in a log \cite{SRC-067}.
+  \item \emph{Evaluation:} the best configuration is compared once with the baselines on a frozen test set.
+  \item \emph{For RQ-3:} a knowledge tracing model \cite{SRC-124} and a teacher test at three time points.
+\end{itemize}
 
 \section{Novelty and contributions}
 
 \begin{enumerate}
-  \item A dataset of beginners' primer reading that separates reading errors from pronunciation errors.
+  \item A curated speech dataset of adult beginners learning Arabic reading as a foreign language, at early
+    stages of primer-based learning, with detailed expert annotation separating reading errors from
+    pronunciation errors.
   \item Measured reliability of off-the-shelf models on beginners against teachers' assessment.
   \item An error detection system assembled with agentic loop-engineering: its gain over the baselines and a
     log of all configurations.
@@ -76,14 +79,15 @@ agentic loop-engineering can be used to develop an effective tool for beginners'
 \section{State of the art}
 
 Quran Muaalem recognises phonemes and articulatory attributes \cite{SRC-002}. The QuranMB and
-IQRA 2026 benchmarks contain fluent recitation \cite{SRC-004,SRC-031}; the closest corpus of
-non-native readers, RetaSy, has no Russian speakers \cite{SRC-032}, and no corpus separates reading errors from
+IQRA 2026 benchmarks address mispronunciation detection \cite{SRC-004,SRC-031}. The closest corpus of
+non-native readers, RetaSy, holds about 7,000 recordings from more than 11 countries; it records the reader's
+country but not the native language \cite{SRC-032}. None of these corpora separates reading errors from
 pronunciation errors. Automatic pronunciation feedback has a medium positive effect ($g=0.69$)
 \cite{SRC-025}, but on accented speech it produces false alarms, so the teacher stays in the loop
-\cite{SRC-026}. Tutors that listen to reading aloud exist for children \cite{SRC-125}. Knowledge
-tracing estimates skill mastery from attempts \cite{SRC-124}, but recogniser errors have not been measured
-against teachers \cite{SRC-125}. No study has measured these models on beginners learning Arabic as a foreign
-language.
+\cite{SRC-026}. Tutors that listen to reading aloud exist for children \cite{SRC-130}. Knowledge
+tracing estimates skill mastery from a sequence of attempts \cite{SRC-124} and has been applied to reading
+skills from speech recogniser output \cite{SRC-125}. For adult beginners learning Arabic reading as a foreign
+language, the reliability of existing models requires separate evaluation.
 
 \section{Goal of the thesis}
 
@@ -97,16 +101,23 @@ system from these models for out-of-class practice, and measure how close it com
 \centering\small
 \begin{tabularx}{\linewidth}{@{}P{3.2cm}L@{}}
 \toprule
-Month & Work \\
+Month & Stage and work \\
 \midrule
-October 2026 & Topic and proposal approved; consent and ethics \\
-November 2026 & Annotation rules and teacher test; pipeline tested on open data \\
-December 2026 & Chapters 1--2 to Moodle (by 10 December); analysis plan fixed \\
-January 2027 & Pilot starts: recruitment, entry teacher test, data collection \\
-February 2027 & Data collection; test set frozen; annotation by two teachers \\
-March 2027 & Pilot ends: final and delayed teacher tests; RQ-1 evaluation \\
-April 2027 & Agentic loop-engineering; single test-set run (RQ-2); RQ-3 analysis \\
-May 2027 & Remaining chapters; full text to the supervisor; pre-defence \\
+October 2026 & \textbf{1. Bot:} development of a Telegram bot based on the lessons of \emph{al-Muallim
+  ath-Thani} \cite{SRC-040}: the learner sends a voice message, the bot checks the reading and explains the
+  error. Topic and proposal approved; consent and ethics. Chapter 1 (Introduction) drafted \\
+Nov--Dec 2026 & \textbf{2. Data collection} starts in a closed pilot (5--10 acquaintances) with consent; the
+  bot is refined based on their feedback \\
+November 2026 & \textbf{3. Annotation} rules and the teacher test prepared. Chapter 2 (Literature Review)
+  drafted; Chapters 1--2 to the supervisor for feedback \\
+December 2026 & Chapters 1--2 revised and submitted to Moodle (deadline 10 December); analysis plan fixed;
+  Chapter 3 (Methodology) started \\
+Jan--Mar 2027 & \textbf{2. Data collection:} pilot with 20--40 adults, 4--6 weeks. \textbf{3. Annotation} by
+  two teachers; test set frozen in February. \textbf{5. Effect on learners:} teacher test at entry, end and
+  delayed. RQ-1 evaluation in March. Chapter 3 finished; Chapter 4 (Implementation) written in parallel \\
+April 2027 & \textbf{4. Training:} fine-tuning and agentic loop-engineering; single test-set run (RQ-2).
+  \textbf{5. Effect on learners:} analysis (RQ-3). Chapter 5 (Results) started \\
+May 2027 & Chapters 5--6; full text to the supervisor; pre-defence \\
 June 2027 & Thesis submitted; defence \\
 \bottomrule
 \end{tabularx}

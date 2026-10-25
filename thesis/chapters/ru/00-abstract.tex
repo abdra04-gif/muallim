@@ -1,46 +1,25 @@
-% Аннотация (русская и английская) и заявление об использовании ИИ. Дописать после пилота:
+% Аннотация (русская и английская) и заявление об ИИ. Abstract — 150–250 слов (лекция ИУ «Writing up BS/MS Thesis», слайд 5); после замены \pending результатами — не больше 250.
 % предложение о результатах помечено \pending, пока у RQ-1…RQ-3 нет чисел с паспортом (docs/thesis/figures.md).
 % Тема, гипотеза и RQ — ADR-0064 (по замечаниям руководителя).
 \chapter*{Аннотация}
 \addcontentsline{toc}{chapter}{Аннотация}
 \thispagestyle{plain}
 
-В России и Казахстане популярна методика обучения чтению на арабском языке «Второй учитель» («Муаллим
-ас-Сани») Ахмад-Хади Максуди: по ней начинающие с нуля учатся читать Коран. Для самостоятельной практики
-нужна автоматическая проверка чтения, но открытые модели распознавания чтения Корана обучены на
-чтецах-экспертах; на чтении с ошибками их точность падает, а на начинающих, изучающих арабский как
-иностранный, они не измерялись. Диссертация собирает небольшой курированный речевой датасет букварного
-чтения начинающих и строит на нём систему обнаружения ошибок. Инструмент сбора --- Telegram-тренажёр,
-который ведёт ученика по книге в её порядке: 125 уроков и 800 карточек, каждая прослеживается до страницы и
-строки издания 2010~г. Ученик присылает голосовое, модель Quran Muaalem распознаёт фонемы, ученик получает
-объяснение на русском, а попытка с полным следом решения попадает в датасет. Два преподавателя размечают
-попытки по фонемам и различают ошибки чтения (прочитан не тот знак) и ошибки произношения (знак верный, звук
-неверный). На этом датасете оцениваются существующие модели распознавания и анализа речи, а agentic
-loop-engineering --- цикл, в котором ИИ-агент выбирает и комбинирует готовые модели и компоненты
-(калиброванный верификатор с исходом «не уверен», дообучение низкого ранга LoRA с пополнением данных по
-минимальным парам книги), --- собирает систему проверки чтения. Модель усвоения по навыкам книги
-(байесовское отслеживание знаний с учётом измеренных ошибок распознавателя) оценивает, что ученик уже освоил.
-
-Работа выполнена в парадигме design science. Гипотеза: собрав небольшой курированный речевой датасет, можно
-оценить существующие решения и с помощью agentic loop-engineering разработать эффективный инструмент для
-внеклассной практики начинающих. Работа отвечает на два основных вопроса и один дополнительный: насколько
-надёжно существующие модели распознавания и анализа речи обнаруживают ошибки чтения и произношения у
-начинающих (RQ-1); насколько применение agentic loop-engineering для выбора и комбинирования существующих
-моделей и компонентов повышает точность обнаружения ошибок по сравнению с базовыми подходами (RQ-2); в
-какой степени использование инструмента во внеклассной практике влияет на динамику освоения учебного
-материала начинающими, обучающимися с преподавателем (RQ-3, дополнительный). Агент подбирает конфигурации
-только кросс-валидацией на обучающих учениках; лучшая конфигурация один раз сравнивается с базовыми
-подходами на замороженном тесте из учеников, не участвовавших в подборе, с разметкой двух преподавателей. Динамика
-освоения описывается оценкой модели усвоения и тестом учителя. Гипотезы, разбиение данных и план анализа
-предрегистрируются до сбора исследовательских данных.
-
-Предварительные проверки показывают, что конвейер отличает верное чтение эксперта от неверного
-(99--100 против 40--67 баллов на семи парах записей эксперта; на начинающих не проверялось) и отвечает быстрее 10 секунд. \pending{результаты пилота и
-agentic loop-engineering по RQ-1--RQ-3}. Вклад работы --- первый датасет букварного чтения начинающих,
-изучающих арабский как иностранный, с разделением ошибок чтения и произношения; измеренная против
-преподавателей надёжность готовых моделей; система обнаружения ошибок, собранная agentic loop-engineering, с
-выигрышем против базовых подходов и журналом всех опробованных конфигураций; дополнительно --- динамика
-освоения материала с инструментом.
+В России и Казахстане популярна методика «Второй учитель» («Муаллим ас-Сани») Ахмад-Хади Максуди: по ней
+начинающие с нуля учатся читать Коран. Для самостоятельной практики нужна автоматическая проверка чтения, но
+открытые модели распознавания чтения Корана обучены на чтецах-экспертах, и их надёжность на взрослых
+начинающих, изучающих арабский как иностранный, требует отдельной оценки. Диссертация собирает небольшой
+курированный речевой датасет букварного чтения с помощью Telegram-тренажёра, который ведёт ученика по книге. Два преподавателя размечают попытки по фонемам и различают ошибки чтения
+(прочитан не тот знак) и ошибки произношения (знак верный, звук неверный). Работа выполнена в парадигме
+design science и отвечает на вопросы: насколько надёжно существующие модели распознавания и анализа речи
+обнаруживают эти ошибки у начинающих (RQ-1); насколько agentic loop-engineering, в котором ИИ-агент ищет и
+комбинирует конфигурации существующих моделей и компонентов, повышает точность по сравнению с базовыми
+подходами (RQ-2); дополнительно --- как инструмент влияет на динамику освоения материала по оценке модели
+отслеживания знаний и тесту учителя (RQ-3). Лучшая конфигурация один раз сравнивается с базовыми подходами на
+замороженном тесте из новых учеников. \pending{результаты пилота и agentic
+loop-engineering по RQ-1--RQ-3}. Вклад работы --- датасет букварного чтения начинающих с разделением ошибок
+чтения и произношения, измеренная против преподавателей надёжность готовых моделей и система обнаружения
+ошибок с выигрышем против базовых подходов и журналом всех опробованных конфигураций.
 
 \medskip
 \noindent\textbf{Ключевые слова:} речевой датасет; обнаружение ошибок чтения; обнаружение ошибок
@@ -51,42 +30,22 @@ agentic loop-engineering по RQ-1--RQ-3}. Вклад работы --- перв�
 \addcontentsline{toc}{chapter}{Abstract (аннотация на английском)}
 \thispagestyle{plain}
 \begin{otherlanguage}{english}
-In Russia and Kazakhstan, Ahmad-Hadi Maksudi's \emph{The Second Teacher} (\emph{al-Muallim ath-Thani}) is a
-popular method for teaching Arabic reading: beginners use it to learn to read the Qur'an from scratch.
-Independent practice requires automatic reading assessment, but open Qur'anic recitation models are trained on
-expert reciters; their accuracy drops on recitations with errors, and they have not been evaluated on beginners
-learning Arabic as a foreign language. This thesis collects a small curated speech dataset of primer-level
-reading by beginners and builds an error-detection system on it. The collection tool is a Telegram tutor that
-follows the book in its own order: 125 lessons and 800 cards, each traceable to a page and line of the 2010
-edition. The learner sends a voice message, the Quran Muaalem model recognises phonemes, the learner receives
-an explanation in Russian, and the attempt, with its full decision trace, enters the dataset. Two teachers
-annotate attempts at the phoneme level, separating reading errors (the wrong sign was read) from pronunciation
-errors (the sign was right, the sound was wrong). On this dataset existing speech recognition and analysis
-models are evaluated, and agentic loop-engineering --- a loop in which an AI agent selects and combines
-off-the-shelf models and components (a calibrated verifier that can answer ``not sure'', low-rank fine-tuning
-(LoRA) with augmentation from the book's minimal pairs) --- builds a reading assessment system. A mastery
-model over the book's skills (Bayesian knowledge tracing that accounts for the recogniser's measured errors)
-estimates what the learner has acquired.
 
-The thesis follows design science research. Hypothesis: by collecting a small curated speech dataset, it is
-possible to evaluate existing solutions and, using agentic loop-engineering, develop an effective tool for
-beginners' out-of-class practice. The thesis answers two main questions and one additional one: how reliably
-existing speech recognition and analysis models detect reading and pronunciation errors in beginners (RQ-1);
-to what extent applying agentic loop-engineering to select and combine existing models and components improves
-error-detection accuracy compared with baseline approaches (RQ-2); and to what extent using the tool for
-out-of-class practice affects the learning dynamics of beginners studying with a teacher (RQ-3, additional).
-The agent searches configurations only by cross-validation on training learners; the best configuration is
-compared once with the baseline approaches on a frozen test set, annotated by two teachers, of learners unseen in the
-search. Learning dynamics are described by the mastery model's estimate and a teacher test. Hypotheses, the
-data split and the analysis plan will be preregistered before research data collection.
-
-Preliminary checks show that the pipeline separates correct from incorrect expert recitation (99--100 versus
-40--67 points on seven pairs of expert recordings; not yet tested on beginners) and answers within the 10-second target. \pending{pilot and agentic
-loop-engineering results for RQ-1--RQ-3}. The contribution is the first dataset of primer-level reading by
-beginners learning Arabic as a foreign language, separating reading from pronunciation errors; the
-reliability of off-the-shelf models measured against teachers; an error-detection system built by agentic
-loop-engineering, with its gain over baseline approaches and a log of every configuration tried; and,
-additionally, the learning dynamics of the material with the tool.
+Ahmad-Hadi Maksudi's \emph{The Second Teacher} (\emph{al-Muallim ath-Thani}) is a popular primer in Russia
+and Kazakhstan for learning to read the Qur'an from scratch. Independent practice requires automatic reading
+assessment, but open Qur'anic recitation models are trained on expert reciters, and their reliability on adult
+beginners learning Arabic as a foreign language requires separate evaluation. This thesis collects a small
+curated speech dataset of primer-level reading through a Telegram tutor that follows the book. Two teachers annotate attempts at the phoneme level, separating reading errors (the wrong sign was
+read) from pronunciation errors (the sign was right, the sound was wrong). Following design science research,
+the thesis answers how reliably existing speech recognition and analysis models detect these errors in
+beginners (RQ-1); to what extent agentic loop-engineering, in which an AI agent searches for and combines
+configurations of existing models and components, improves detection accuracy over baseline approaches
+(RQ-2); and, additionally, how the tool affects beginners' learning dynamics, estimated by knowledge tracing
+and a teacher test (RQ-3). The best configuration is compared once with the baselines on a frozen test set of
+unseen learners. \pending{pilot and agentic loop-engineering results for RQ-1--RQ-3}. The
+contribution is a dataset of beginners' primer-level reading separating reading from pronunciation errors, the
+reliability of off-the-shelf models measured against teachers, and an error-detection system with its gain
+over baselines and a log of every configuration tried.
 
 \medskip
 \noindent\textbf{Keywords:} speech dataset; reading error detection; mispronunciation detection; Qur'anic

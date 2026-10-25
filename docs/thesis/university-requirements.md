@@ -27,8 +27,13 @@
 ## Диссертация по лекции «Writing up BS/MS Thesis» (О. Жирош, F2026)
 Abstract (informative) — 150–250 слов; основной текст (Introduction … Conclusion) — не меньше 40 страниц;
 главы по умолчанию: Introduction, Literature Review, Design & Methodology, Implementation & Results, Analysis
-and Discussion, Conclusion; оригинальность в antiplagiat.ru — не ниже 70 %. Сейчас Abstract ≈ 535 слов,
-главы 3–5 названы иначе — **[решить]** с автором.
+and Discussion, Conclusion; оригинальность в antiplagiat.ru — не ниже 70 %. Abstract — ✅ 222 слова (en),
+204 (ru) на 2026-10-25, запас под предложение с результатами вместо `\pending`. Главы названы иначе
+(Methodology, Implementation, Evaluation and Discussion), но по смыслу совпадают; лекция (слайд 19, «You
+decide») разрешает свою структуру. Оригинальность — проверить перед сдачей.
+
+Аннотация к ВКР (п. 6.10): список источников входит в 4–5 страниц, титул — нет. ✅ титул + 5 страниц
+(2026-10-25).
 
 ## Состав (п. 6.9, 6.10)
 | Элемент | Статус | Где |
