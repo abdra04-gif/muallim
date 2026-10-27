@@ -23,17 +23,22 @@
 
 \section{Introduction and research problem}
 
-In Russia and Kazakhstan, the ``Second Teacher'' (\emph{al-Muallim ath-Thani}) method of teaching Arabic
-reading is popular: beginners use it to learn to read the Quran from scratch \cite{SRC-040}.
-Independent practice needs automatic reading assessment, but open Quran recitation recognition models are
-trained on expert reciters, and their quality depends on the input speech: the phoneme error rate (PER) of Quran
-Muaalem is 0.54\,\% on the authors' test set and 5.78\,\% on qdat\_bench, which contains real recitation
-errors \cite{SRC-002}. For adult beginners learning Arabic reading as a foreign language at early stages, the
-reliability of these models requires separate evaluation.
+People all over the world learn to read Arabic to access the Quran in its original language. One method
+popular in Russia and Kazakhstan is \emph{al-Muallim ath-Thani} (``The Second Teacher'') \cite{SRC-040}: it
+introduces beginners to the letters gradually, one by one, building on Quranic vocabulary. Learning usually
+requires a human instructor, yet progress depends heavily on how much the learner practises between classes.
+We aim to support this out-of-class practice with an AI assistant that checks learners' reading and detects
+mistakes.
 
-\textbf{Problem.} Not everyone can study with a teacher: work, distance and the cost of lessons get in the
-way, and a group class has no time to go through each learner's difficulties. Automatic assessment could
-serve as individual practice between lessons. But existing open datasets, including the recitations of
+Several solutions already check Quranic reading. Commercial apps such as Tarteel highlight mistakes in
+recitation \cite{SRC-046}, but they are closed, so their accuracy on beginners cannot be verified. Open models
+such as Quran Muaalem recognise phonemes, yet they are trained on expert reciters and their quality depends on
+the input speech: the phoneme error rate (PER) is 0.54\,\% on the authors' test set and 5.78\,\% on
+qdat\_bench, which contains real recitation errors \cite{SRC-002}. Whether these solutions are adequate for
+adult beginners reading primer material is unknown; checking this is part of our study (RQ-1).
+
+\textbf{Problem.} Not everyone can study with a teacher often: work, distance and the cost of lessons get in
+the way, and a group class has no time to go through each learner's difficulties. But existing open datasets, including the recitations of
 non-Arabic speakers in RetaSy \cite{SRC-032}, do not provide data for assessing the reading of Russian-speaking
 adult beginners learning from primer material such as \emph{al-Muallim ath-Thani}, with detailed annotation
 of reading and pronunciation errors. Without such data the quality of existing models on these learners can
