@@ -386,6 +386,22 @@ def test_git_guard_allows_clean_commit(repo: Path) -> None:
     assert git_guard(repo, "git commit -m 'docs: ок'").returncode == 0
 
 
+def test_git_guard_asks_author_before_pushing_bot_code(repo: Path) -> None:
+    git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+    (repo / "src/muallim/application/use_cases/learners.py").write_text("x = 2\n", encoding="utf-8")
+    git(repo, "commit", "-qam", "feat: код")
+    result = git_guard(repo, "git push")
+    assert result.returncode == 2 and "CHECK=full" in result.stderr
+    assert git_guard(repo, "CHECK=quick git push").stderr.count("CHECK=full") == 0
+
+
+def test_git_guard_ignores_push_mentioned_inside_text(repo: Path) -> None:
+    git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+    (repo / "src/muallim/application/use_cases/learners.py").write_text("x = 2\n", encoding="utf-8")
+    git(repo, "commit", "-qam", "feat: код")
+    assert git_guard(repo, "python3 - <<'EOF'\nprint('`git push`')\nEOF").returncode == 0
+
+
 # --- ADR-0073: параллельные сессии — одна в основной папке, остальные в своих копиях ---
 def worktree(project: Path, name: str = "w") -> Path:
     tree = project / ".claude" / "worktrees" / name
