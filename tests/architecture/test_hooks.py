@@ -235,6 +235,21 @@ def test_session_context_reports_phase(project: Path) -> None:
     assert "TDD-фаза: impl" in result.stdout
 
 
+def test_session_context_counts_reading_queue(project: Path) -> None:
+    registry = project / "docs" / "research" / "reading" / "README.md"
+    registry.parent.mkdir(parents=True, exist_ok=True)
+    registry.write_text(
+        "| Ключ | Статья | Статус | Оценка |\n"
+        "| SRC-001 | a | 📥 | |\n"
+        "| SRC-002 | b | 📖 | 👍 |\n"
+        "| SRC-003 | c | ✍️ | 👍 |\n"
+        "| — | d | ⛔ | |\n",
+        encoding="utf-8",
+    )
+    result = run_hook(project, "session_context.py", {})
+    assert "📥 ждут чтения: 1; 📖 прочитано, но не в тексте: 1" in result.stdout
+
+
 # --- ADR-0039: сверка документов (doc_sync) и безопасные коммиты (git_guard) ---
 def git(project: Path, *args: str) -> None:
     subprocess.run(  # noqa: S603

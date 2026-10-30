@@ -37,6 +37,22 @@ def last_session() -> str:
     return sessions[-1].relative_to(ROOT).as_posix() if sessions else "нет"
 
 
+def reading() -> str:
+    """Цикл чтения: сколько статей ждёт чтения и сколько прочитанных ещё не в тексте."""
+    try:
+        text = (ROOT / "docs" / "research" / "reading" / "README.md").read_text(encoding="utf-8")
+    except OSError:
+        return "реестра нет"
+    rows = [r for r in text.splitlines() if r.startswith("| SRC") or r.startswith("| —")]
+    todo = sum("📥" in r for r in rows)
+    undrafted = sum("📖" in r and ("👍" in r or "🤔" in r) for r in rows)
+    if not todo and not undrafted:
+        return "пусто — предложи /read-next, когда автор занят дипломом"
+    return (
+        f"📥 ждут чтения: {todo}; 📖 прочитано, но не в тексте: {undrafted} (навык reading-cycle)"
+    )
+
+
 def main() -> None:
     current = phase()
     model = (
@@ -50,6 +66,7 @@ def main() -> None:
         f"- Модель Muaalem: {model}",
         f"- Открытый техдолг T1 (блокирует пилот с незнакомыми): {open_t1()}",
         f"- Последняя сводка сессии: {last_session()}",
+        f"- Чтение статей: {reading()}",
     ]
     print("\n".join(lines))
 
