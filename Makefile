@@ -28,6 +28,9 @@ test: ## Тесты с покрытием
 run: db-sync ## Бот с моделью (нужно uv sync --extra ml)
 	$(LIBS) uv run muallim
 
+videos: ## Ролики «🎬 Как произносить»: make videos a="ر ز" (пусто — все буквы из scripts/video/build.py)
+	uv run --group video python scripts/video/build.py $(a)
+
 try: ## Проверка бота в терминале: make try a='"/start" "✅ Да, разрешаю" "🎤"' (без Telegram и .env)
 	$(LIBS) uv run muallim --test $(if $(a),$(a),"/start")
 

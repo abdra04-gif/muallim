@@ -33,6 +33,7 @@ muallim = "muallim.bootstrap.main:run"
 muallim-research = "muallim.bootstrap.research_cli:main"
 
 [dependency-groups]
+video = ["numpy>=2.0"]  # генератор роликов scripts/video/ (FR-56, ADR-0074); боту не нужен
 dev = [
     "aiosqlite>=0.20",
     "hypothesis==6.168.3",
@@ -111,6 +112,7 @@ ignore = [
 ".claude/hooks/**" = ["T201", "S603", "S607"]
 "migrations/**" = ["E501"]
 "scripts/render_mockups.py" = ["T201", "E501"]  # встроенные CSS и HTML страницы макетов
+"scripts/video/**" = ["T201", "E501", "S311", "PLR0912", "PLR0914", "PLR0915", "PLR0917", "C901"]  # генератор роликов FR-56: случайность с зерном — для частиц, не для безопасности
 "scripts/book/**" = ["T201", "E501", "E402", "PLW2901", "PLR0912", "PLR0915", "C901"]  # данные расшифровки книги и сборка программы
 
 [tool.mypy]
