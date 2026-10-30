@@ -229,6 +229,7 @@
 | Учебная программа | `curriculum/course.ru.yaml` | версия → `attempts.curriculum_version` |
 | Объяснения на языках | `curriculum/lexicon.<язык>.yaml`, `curriculum/feedback.<язык>.yaml` | язык → `attempts.feedback_language` |
 | Эталонные записи | `curriculum/audio/<id>.ogg` | источник — `curriculum/audio/SOURCES.md` |
+| Аяты по слогам (FR-61, ADR-0077) | `curriculum/syllables/ayat.yaml` | генерирует `make syllables` (`scripts/syllables/`); строка — точный текст пункта урока «Суры», `status` (`unchecked` / `ok` / `bad`, ставит человек), `words` — клетки [кусочек, подпись]; `moshaf` — `MOSHAF_PARAMS`. **Не входит в `curriculum.version`**: какую карточку видел ученик, по попытке не восстановить (TD-FN-120) |
 | Пакеты разметки | `data/annotation/<код>_<дата>/` | `tasks.csv` (UTF-8 с BOM) + `audio/` — копии голосов; удалить после загрузки |
 | Выгрузки датасета | `data/exports/<дата>/` | `manifest.jsonl` + `truth.csv`/`predictions.csv` (Iqra'Eval) + `phonemes.csv` (итог по каждому звуку для каждого разметчика, ADR-0056; `docs/data/browsing.md`) + `audio/` |
 | Журнал удалений | `data/erasures/erasures.jsonl` | вне БД (ADR-0054): строка — время UTC, `delete` / `withdraw` / `grant`, UUID ученика; пишется до commit, повторяется после восстановления |

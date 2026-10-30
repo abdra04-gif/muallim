@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-25T10:31:24+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-10-30T19:20:29+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `290f5bdac0d975d1` | 117 |
+| код | `0015d3a1f644d62b` | 119 |
 | программа (книга) | `0fc81446afbea2bd` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
 | миграции | `8d9824574007fee4` | 9 |
-| зависимости | `bcfe92232236f824` | 1 |
+| зависимости | `e33bf9dd0f3b4cc1` | 1 |
 | предрегистрация | `e4898b776c3b8338` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **69 из 70**.
+Проверено зелёными тестами: **70 из 71**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -71,6 +71,7 @@
 | FR-54 | `tests/integration/test_yaml_loader.py`, `tests/unit/test_arabic_text.py`, `tests/unit/test_error_groups.py`, `tests/unit/test_readable_images.py`, `tests/unit/test_result_breakdown_screen.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-55 | `tests/integration/test_metrics_report.py`, `tests/integration/test_pilot_report.py`, `tests/unit/test_metrics_ci.py`, `tests/unit/test_pilot_metrics.py` | ✅ |
 | FR-56 | `tests/integration/test_video_bot.py`, `tests/integration/test_video_library.py`, `tests/unit/test_articulation_video.py` | ✅ |
+| FR-61 | `tests/integration/test_di.py`, `tests/integration/test_syllable_bot.py`, `tests/integration/test_syllable_library.py`, `tests/unit/test_ayah_card.py`, `tests/unit/test_ayah_number.py`, `tests/unit/test_ayah_render.py`, `tests/unit/test_syllables_merge.py` | ✅ |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |

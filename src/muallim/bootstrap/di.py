@@ -11,7 +11,7 @@ from muallim import __version__
 from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
 from muallim.application.ports.erasures import ErasureLog
-from muallim.application.ports.reading import ReadingGuide
+from muallim.application.ports.reading import AyahSyllables, ReadingGuide
 from muallim.application.ports.recognition import PronunciationRecognizer
 from muallim.application.ports.repositories import (
     AttemptRepository,
@@ -70,6 +70,7 @@ from muallim.infrastructure.audio.reference_library import (
     RecitationCache,
     SoundLibrary,
 )
+from muallim.infrastructure.curriculum.syllables import SyllableLibrary
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.db.repositories.annotation import (
@@ -138,6 +139,11 @@ class AppProvider(Provider):
     def videos(self) -> ArticulationVideoLibrary:
         """Ролики «🎬 Как произносить» (ADR-0074): манифест читается один раз при запуске."""
         return VideoLibrary.load(self.settings.video_dir)
+
+    @provide
+    def syllables(self) -> AyahSyllables:
+        """Аяты по слогам (ADR-0077): разбор заранее, файл читается один раз при запуске."""
+        return SyllableLibrary.load(self.settings.curriculum_dir / "syllables" / "ayat.yaml")
 
     @provide
     def display(self) -> Display:

@@ -54,7 +54,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | новый мессенджер / веб | новая папка в `presentation/` | `presentation/web/` |
 | поле в БД | `infrastructure/db/tables.py` → `make migration m="..."` → `docs/data/data-dictionary.md` | |
 | отчёт | `analytics/sql/NN_название.sql` | |
-| урок | `curriculum/course.ru.yaml` (только человек) | |
+| урок | `curriculum/course.ru.yaml` (только человек) | урок «Суры» → `make syllables`, проверить картинки, поставить `status` (ADR-0077) |
 | язык объяснений | `curriculum/lexicon.<код>.yaml` + `feedback.<код>.yaml`, `enabled: true` | узбекский |
 | эталонную запись | `curriculum/audio/<id>.ogg` + строка в `SOURCES.md` | `L02-01.ogg` |
 

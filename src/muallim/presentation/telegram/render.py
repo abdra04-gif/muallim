@@ -22,6 +22,7 @@ from PIL import Image, ImageDraw, ImageFont, features
 from muallim.application.breakdown import VOWEL_KINDS, Breakdown, ErrorGroup
 from muallim.domain import arabic
 from muallim.domain.assessment import ErrorKind
+from muallim.domain.syllables import Ayah
 from muallim.presentation.telegram import texts, views
 
 # Разбор строки — из домена (FR-54): те же объекты, а не копия.
@@ -863,4 +864,150 @@ def opening(lines: Sequence[str]) -> bytes:
             draw.text((WIDTH // 2, y), line, font=font, fill=INK, anchor="mm", direction="rtl")
             y += line_h
         y += gap
+    return _png(img)
+
+
+# ---------- аят по слогам (FR-61, ADR-0077) ----------
+# Аят — из клеток-слогов прямо в слове: кусочек рисуется с ZWJ по краям (буквы в той же форме,
+# что внутри слова), цвет клеток чередуется, под клеткой — как звучит. Слово переносится только
+# целиком; номер аята — в кружке после последнего слова.
+AYAH_SIZE = 78
+SOUND_SIZE = 27
+NUMBER_SIZE = 22
+CELL_A = (222, 235, 210)
+CELL_B = (243, 233, 207)
+SOUND_INK = (70, 64, 56)
+CELL_H = 150  # высота клетки с арабским кусочком
+SOUND_H = 42  # полоса подписи под клеткой
+CELL_PAD = 10  # запас клетки по ширине
+SOUND_PAD = 30  # поля подписи
+WORD_GAP = 22
+ROW_GAP = 14
+NUMBER_W = 60  # место под номер после последнего слова
+NUMBER_R = 22
+AYAH_TOP = 70
+AYAH_BOTTOM = 60  # без точек «шаг k из n»
+AYAH_DOTS = 110  # с точками
+AYAH_NON_JOINING = NON_JOINING | {arabic.ALIF_WASL}  # ٱ тоже не соединяется со следующей
+
+
+@dataclass(frozen=True, slots=True)
+class AyahLayout:
+    """Раскладка аята: ``rows`` — индексы слов по строкам, ``row_widths`` — ширина строк в px
+    (с номером в последней), ``scale`` — масштаб, которым рисовать."""
+
+    rows: tuple[tuple[int, ...], ...]
+    row_widths: tuple[int, ...]
+    scale: float
+
+
+@dataclass(frozen=True, slots=True)
+class _Cell:
+    text: str  # кусочек с ZWJ по краям
+    sound: str
+    width: int
+
+
+SMALL_MADD = frozenset("ۥۦ")  # маленькие و ي после буквы — знак, а не буква (106:2 «إِۦلَـٰفِ»)
+
+
+def _joins(piece: str) -> bool:
+    """Последняя буква кусочка соединяется со следующей."""
+    letters = [c for c in clusters(piece) if c.base not in SMALL_MADD]
+    return bool(letters) and letters[-1].base not in AYAH_NON_JOINING
+
+
+def _shaped(words: Ayah, scale: float) -> list[list[_Cell]]:
+    font, sound_font = _font(round(AYAH_SIZE * scale)), _ui_font(round(SOUND_SIZE * scale))
+    out = []
+    for word in words:
+        cells = []
+        for i, cell in enumerate(word):
+            left = ZWJ if i and _joins(word[i - 1].text) else ""
+            right = ZWJ if i < len(word) - 1 and _joins(cell.text) else ""
+            text = left + cell.text + right
+            width = max(
+                font.getlength(text, direction="rtl"),
+                sound_font.getlength(cell.sound) + SOUND_PAD * scale,
+            )
+            cells.append(_Cell(text, cell.sound, int(width + CELL_PAD * scale)))
+        out.append(cells)
+    return out
+
+
+def _word_widths(shaped: Sequence[Sequence[_Cell]], number: int | None, scale: float) -> list[int]:
+    widths = [sum(c.width for c in word) for word in shaped]
+    if number is not None and widths:
+        widths[-1] += round(NUMBER_W * scale)
+    return widths
+
+
+def _ayah_layout(
+    words: Ayah, number: int | None, scale: float
+) -> tuple[AyahLayout, list[list[_Cell]]]:
+    shaped = _shaped(words, scale)
+    widths = _word_widths(shaped, number, scale)
+    while max(widths, default=0) > TEXT_WIDTH:  # слово шире строки — мельче вся карточка
+        scale *= 0.98 * TEXT_WIDTH / max(widths)
+        shaped = _shaped(words, scale)
+        widths = _word_widths(shaped, number, scale)
+    gap = round(WORD_GAP * scale)
+    rows: list[list[int]] = []
+    row_widths: list[int] = []
+    for k, width in enumerate(widths):
+        if rows and row_widths[-1] + gap + width <= TEXT_WIDTH:
+            rows[-1].append(k)
+            row_widths[-1] += gap + width
+        else:
+            rows.append([k])
+            row_widths.append(width)
+    layout = AyahLayout(tuple(map(tuple, rows)), tuple(row_widths), scale)
+    return layout, shaped
+
+
+def ayah_layout(words: Ayah, number: int | None, scale: float = 1.0) -> AyahLayout:
+    """Как аят ляжет на карточку: слова по строкам, ширины строк, итоговый масштаб."""
+    return _ayah_layout(words, number, scale)[0]
+
+
+def ayah(words: Ayah, number: int | None, position: tuple[int, int], scale: float = 1.0) -> bytes:
+    """Карточка аята по слогам: клетки-слоги с подписью, номер в кружке (если ``number``),
+    точки «шаг k из n» снизу, как у ``card``. ``scale`` — «Крупный шрифт» (ADR-0061)."""
+    layout, shaped = _ayah_layout(words, number, scale)
+    s = layout.scale
+    font, sound_font = _font(round(AYAH_SIZE * s)), _ui_font(round(SOUND_SIZE * s))
+    number_font = _ui_font(round(NUMBER_SIZE * s), bold=True)
+    cell_h, sound_h, gap = round(CELL_H * s), round(SOUND_H * s), round(WORD_GAP * s)
+    row_h = cell_h + sound_h + round(ROW_GAP * s)
+    bottom = AYAH_DOTS if position[1] > 1 else AYAH_BOTTOM
+    img = Image.new("RGB", (WIDTH, AYAH_TOP + row_h * len(layout.rows) + bottom), PAPER)
+    draw = _frame(img)
+    right = (WIDTH + max(layout.row_widths)) // 2  # блок по центру, строки — от правого края
+    y = AYAH_TOP
+    k = 0  # номер клетки во всём аяте — для чередования цвета
+    for row in layout.rows:
+        x = right
+        for n in row:
+            for cell in shaped[n]:
+                box = (x - cell.width, y, x, y + cell_h + sound_h)
+                draw.rectangle(box, fill=CELL_A if k % 2 == 0 else CELL_B)
+                cx = x - cell.width / 2
+                # арабский выше середины клетки: кясра не залезает на подпись
+                draw.text(
+                    (cx, y + cell_h / 2 - 8 * s), cell.text, font=font, fill=INK, anchor="mm",
+                    direction="rtl",
+                )  # fmt: skip
+                draw.text(
+                    (cx, y + cell_h + sound_h / 2 - 6 * s), cell.sound, font=sound_font,
+                    fill=SOUND_INK, anchor="mm",
+                )  # fmt: skip
+                x -= cell.width
+                k += 1
+            if n == len(shaped) - 1 and number is not None:
+                cx, cy, r = x - NUMBER_W * s / 2, y + cell_h / 2 - 6 * s, NUMBER_R * s
+                draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=FRAME, width=3)
+                draw.text((cx, cy), str(number), font=number_font, fill=FRAME, anchor="mm")
+            x -= gap
+        y += row_h
+    _dots(draw, img.height - 64, position[0], position[1])
     return _png(img)

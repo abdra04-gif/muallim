@@ -7,6 +7,7 @@ from aiogram.exceptions import TelegramAPIError
 from aiogram.types import BufferedInputFile, CallbackQuery
 from dishka import FromDishka
 
+from muallim.application.ports.reading import AyahSyllables
 from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress, Progress
@@ -59,6 +60,7 @@ async def cb_opening(
     learner_settings: FromDishka[GetSettings],
     reference: FromDishka[GetReferenceAudio],
     videos: FromDishka[ArticulationVideoLibrary],
+    syllables: FromDishka[AyahSyllables],
     watch: FromDishka[GetArticulationVideo],
     played: FromDishka[RecordVideoPlayed],
 ) -> None:
@@ -84,6 +86,7 @@ async def cb_opening(
             reading.execute(learner, item),
             view=view,
             videos=videos,
+            syllables=syllables,
         )
         await show_card(
             msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,

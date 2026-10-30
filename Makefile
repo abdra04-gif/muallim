@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs try syllables thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -30,6 +30,9 @@ run: db-sync ## Бот с моделью (нужно uv sync --extra ml)
 
 videos: ## Ролики «🎬 Как произносить»: make videos a="ر ز" (пусто — все буквы из scripts/video/build.py)
 	uv run --group video python scripts/video/build.py $(a)
+
+syllables: ## Аяты уроков «Суры» по слогам → curriculum/syllables/ayat.yaml (ADR-0077, нужен extra ml)
+	$(LIBS) uv run --extra ml python scripts/syllables/build.py
 
 try: ## Проверка бота в терминале: make try a='"/start" "✅ Да, разрешаю" "🎤"' (без Telegram и .env)
 	$(LIBS) uv run muallim --test $(if $(a),$(a),"/start")

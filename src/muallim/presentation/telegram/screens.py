@@ -16,6 +16,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from muallim.application.breakdown import VOWEL_KINDS, Breakdown, ErrorGroup, Place
+from muallim.application.ports.reading import AyahSyllables
 from muallim.application.ports.storage import ArticulationVideoLibrary
 from muallim.application.transcription import as_text, plain
 from muallim.application.use_cases.progress import LessonStatus, Progress
@@ -42,6 +43,7 @@ from muallim.domain.settings import (
     LearnerSettings,
     local_minute,
 )
+from muallim.domain.syllables import ayah_number
 from muallim.presentation.telegram import render, texts, views
 from muallim.presentation.telegram.callbacks import (
     ChangeSetting,
@@ -256,18 +258,20 @@ def card(
     *,
     view: LearnerSettings | None = None,
     videos: ArticulationVideoLibrary | None = None,
+    syllables: AyahSyllables | None = None,
 ) -> Screen:
     """``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51).
 
     ``videos`` — ролики «🎬 Как произносить» (FR-56, ADR-0074): есть ролик для текста карточки —
-    кнопка ролика вместо 🔊 (решение автора: где есть ролик — только ролик)."""
+    кнопка ролика вместо 🔊 (решение автора: где есть ролик — только ролик).
+    ``syllables`` — аяты по слогам (FR-61, ADR-0077): аят урока «Суры» рисуется клетками-слогами."""
     view = view or LearnerSettings()
     lesson, i = curriculum.locate(item.id)
     parts = [texts.CARD_HEAD.format(lesson=escape(lesson.title), n=i + 1, total=len(lesson.items))]
     known = letters_before(curriculum, lesson.id)
     if i == 0 and lesson.section == "letter":
         parts.append(_new_letter(curriculum, lesson, known))
-    image = _card_image(lesson, item, i, view.large_font)
+    image = _card_image(lesson, item, i, view.large_font, syllables)
     if image is None:
         parts.append(f"<b>{escape(item.text)}</b>")
     if item.kind is ItemKind.RULE:
@@ -372,11 +376,23 @@ def _new_letter(curriculum: Curriculum, lesson: Lesson, known: Sequence[LessonIt
     return line
 
 
-def _card_image(lesson: Lesson, item: LessonItem, i: int, large: bool = False) -> bytes | None:
-    """``large`` — «Крупный шрифт»: крупнее строка карточки и правила (ADR-0061)."""
+def _card_image(
+    lesson: Lesson,
+    item: LessonItem,
+    i: int,
+    large: bool = False,
+    syllables: AyahSyllables | None = None,
+) -> bytes | None:
+    """``large`` — «Крупный шрифт»: крупнее строка карточки и правила (ADR-0061).
+
+    Аят урока «Суры» с разбором на слоги — клетками-слогами (ADR-0077), иначе — строка целиком."""
     if not render.available():
         return None
     scale = render.LARGE_SCALE if large else 1.0
+    if syllables is not None and lesson.section == "sura" and item.quran:
+        words = syllables.for_text(item.text)
+        if words is not None:
+            return render.ayah(words, ayah_number(lesson, item), (i, len(lesson.items)), scale)
     if item.kind is ItemKind.ALPHABET:
         return render.letters(item.text)
     if item.kind is ItemKind.RULE:
