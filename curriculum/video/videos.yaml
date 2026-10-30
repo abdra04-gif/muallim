@@ -1,5 +1,5 @@
 # Ролики «🎬 Как произносить» (ADR-0074, FR-56): рисунок — SRC-148 (P. J. Lynch, CC BY 2.5),
-# звук — ар-Раи, «Нурания» (SRC-144); слоги вырезаны из троек по паузам (исключение из ADR-0068).
+# звук букв — ар-Раи, «Нурания» (SRC-144), аятов — аль-Афаси (SRC-145, origin — ссылка EveryAyah); слоги вырезаны из троек по паузам (исключение из ADR-0068).
 # status: unchecked → человек смотрит и ставит ok или bad (bad бот не показывает).
 
 - text: أَ
@@ -113,3 +113,48 @@
   source: SRC-144
   picture: SRC-148
   origin: curriculum/audio/library/bfe5f1b72efabd4d.ogg
+- text: ب
+  file: 95486495db4b10a9.mp4
+  seconds: 7.45
+  width: 720
+  height: 1280
+  status: unchecked
+  source: SRC-144
+  picture: SRC-148
+  origin: curriculum/audio/library/5fc1d56c2215096d.ogg
+- text: ت
+  file: 6e0097027bfd6b49.mp4
+  seconds: 7.52
+  width: 720
+  height: 1280
+  status: unchecked
+  source: SRC-144
+  picture: SRC-148
+  origin: curriculum/audio/library/7db3547162df3a79.ogg
+- text: ث
+  file: 0e012131d26ce623.mp4
+  seconds: 7.88
+  width: 720
+  height: 1280
+  status: unchecked
+  source: SRC-144
+  picture: SRC-148
+  origin: curriculum/audio/library/08e564e1f68658a8.ogg
+- text: ج
+  file: 9962d6619de11171.mp4
+  seconds: 7.88
+  width: 720
+  height: 1280
+  status: unchecked
+  source: SRC-144
+  picture: SRC-148
+  origin: curriculum/audio/library/3633cb01f20e7c03.ogg
+- text: بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+  file: 2b689d81b6187f57.mp4
+  seconds: 18.0
+  width: 720
+  height: 1280
+  status: unchecked
+  source: SRC-145
+  picture: SRC-148
+  origin: https://everyayah.com/data/Alafasy_128kbps/001001.mp3
