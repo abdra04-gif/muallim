@@ -99,7 +99,7 @@ def _sura(number: int, lessons: list[Lesson]) -> Sura:
 
 class SuraMode(StrEnum):
     TEXT = "text"  # по тексту: «📖 Вся сура»
-    MEMORY = "memory"  # наизусть: «💭 Наизусть» (🧠 — у «Закрепления»)
+    MEMORY = "memory"  # наизусть: «🎯 Наизусть» (🧠 — у «Закрепления»)
 
 
 @dataclass(frozen=True, slots=True)
