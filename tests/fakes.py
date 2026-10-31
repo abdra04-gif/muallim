@@ -1,13 +1,13 @@
 """Тестовые реализации портов: в памяти, детерминированные."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
 from typing import TYPE_CHECKING
 from uuid import UUID
 
 from muallim.application.ports.erasures import ErasureAction
-from muallim.application.ports.recognition import Recognition, RecognitionError
+from muallim.application.ports.recognition import Recognition, RecognitionError, SuraRecognition
 from muallim.domain.annotation import AnnotationTask, Label, next_annotator_code
 from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
@@ -15,6 +15,7 @@ from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
 from muallim.domain.policy import Verdict
 from muallim.domain.report import LearnerReport
 from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
+from muallim.domain.sura import AyahReference, SuraMode, SuraReading
 
 if TYPE_CHECKING:
     from muallim.application.ports.storage import Video
@@ -84,6 +85,7 @@ class InMemoryProfiles:
 class InMemoryAttempts:
     items: list[tuple[Attempt, tuple[str, ...]]] = field(default_factory=list)
     reports: list[LearnerReport] = field(default_factory=list)
+    suras: "InMemorySuraReadings | None" = None  # сура, сданная целиком по тексту, — зачёт строк
 
     async def owner(self, attempt_id: UUID) -> UUID | None:
         return next((a.learner_id for a, _ in self.items if a.id == attempt_id), None)
@@ -115,6 +117,9 @@ class InMemoryAttempts:
         for a, _ in self.items:
             if a.learner_id == learner_id:
                 best[a.item_id] = max(best.get(a.item_id, 0), a.assessment.score)
+        if self.suras is not None:
+            for item_id in await self.suras.credited(learner_id):
+                best[item_id] = 100
         return best
 
     async def count(self, learner_id: UUID) -> int:
@@ -207,6 +212,73 @@ class ScriptedRecognizer:
             model_version="scripted",
             audio_duration_ms=1500,
             raw={"phonemes": heard},
+        )
+
+
+@dataclass
+class InMemorySuraReadings:
+    """Чтения сур целиком и наизусть (FR-60)."""
+
+    items: list[SuraReading] = field(default_factory=list)
+
+    async def add(self, reading: SuraReading) -> None:
+        self.items.append(reading)
+
+    async def count(self, learner_id: UUID, sura: int, mode: SuraMode) -> int:
+        return sum(
+            r.learner_id == learner_id and r.sura == sura and r.mode is mode for r in self.items
+        )
+
+    async def last_read(self, learner_id: UUID, sura: int) -> datetime | None:
+        times = [r.created_at for r in self.items if r.learner_id == learner_id and r.sura == sura]
+        return max(times, default=None)
+
+    async def memorized(self, learner_id: UUID) -> frozenset[int]:
+        return frozenset(
+            r.sura
+            for r in self.items
+            if r.learner_id == learner_id and r.mode is SuraMode.MEMORY and r.passed
+        )
+
+    async def credited(self, learner_id: UUID) -> frozenset[str]:
+        return frozenset(i for r in self.items if r.learner_id == learner_id for i in r.credited)
+
+    async def audio_hashes(self, learner_id: UUID) -> list[str]:
+        return [r.audio_sha256 for r in self.items if r.learner_id == learner_id and r.audio_sha256]
+
+
+@dataclass
+class ScriptedSuraRecognizer:
+    """Читает суру по сценарию: слова эталона — слова текста; ``skip_ayah`` — пропустить аят."""
+
+    skip_ayah: int | None = None
+    fail: bool = False
+    calls: list[tuple[tuple[str, int, str], ...]] = field(default_factory=list)
+    preambles: list[str] = field(default_factory=list)
+
+    async def recognize_sura(
+        self,
+        audio: bytes,
+        ayahs: Sequence[tuple[str, int, str]],
+        opening: str = "",
+        preamble: str = "",
+    ) -> SuraRecognition:
+        self.calls.append(tuple(ayahs))
+        self.preambles.append(preamble)
+        if self.fail:
+            raise RecognitionError("битая запись")
+        refs = tuple(AyahReference(i, n, tuple(text.split(" "))) for i, n, text in ayahs)
+        heard = "".join(r.text for r in refs if r.number != self.skip_ayah)
+        half = len(heard) // 2
+        return SuraRecognition(
+            heard=heard,
+            ayahs=refs,
+            opening=tuple(opening.split(" ")) if opening else (),
+            preamble=tuple(preamble.split(" ")) if preamble else (),
+            pauses=(),
+            chunks=((0, 6000, 0, half), (6000, 12000, half, len(heard))),
+            model_version="scripted",
+            audio_duration_ms=12000,
         )
 
 

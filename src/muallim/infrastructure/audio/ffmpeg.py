@@ -6,14 +6,16 @@ from typing import Final
 from muallim.application.ports.recognition import RecognitionError
 
 SAMPLE_RATE: Final[int] = 16_000
-MAX_SECONDS: Final[int] = 60  # защита от огромных файлов (NFR-SEC-05)
+MAX_SECONDS: Final[int] = 60  # защита от огромных файлов на карточке строки (NFR-SEC-05)
 
 
-async def decode_to_pcm(audio: bytes) -> bytes:
-    """Возвращает сырые float32 little-endian сэмплы."""
+async def decode_to_pcm(audio: bytes, max_seconds: int | None = MAX_SECONDS) -> bytes:
+    """Возвращает сырые float32 little-endian сэмплы. ``max_seconds=None`` — без ограничения
+    длины: сура целиком бывает длиннее минуты (решение автора 2026-10-31, ADR-0076)."""
+    limit = ["-t", str(max_seconds)] if max_seconds is not None else []
     process = await asyncio.create_subprocess_exec(
-        "ffmpeg", "-nostdin", "-loglevel", "error", "-i", "pipe:0",
-        "-t", str(MAX_SECONDS), "-f", "f32le", "-ac", "1", "-ar", str(SAMPLE_RATE), "pipe:1",
+        "ffmpeg", "-nostdin", "-loglevel", "error", "-i", "pipe:0", *limit,
+        "-f", "f32le", "-ac", "1", "-ar", str(SAMPLE_RATE), "pipe:1",
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,

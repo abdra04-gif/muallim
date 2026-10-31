@@ -7,6 +7,7 @@
 import asyncio
 import json
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass, field, fields, is_dataclass
 from functools import lru_cache
 from typing import Any, Final
@@ -15,7 +16,11 @@ from muallim.application.ports.recognition import (
     PronunciationRecognizer,
     Recognition,
     RecognitionError,
+    SuraRecognition,
+    SuraRecognizer,
 )
+from muallim.domain.sura import AyahReference
+from muallim.infrastructure.asr.chunks import quiet_cuts
 from muallim.infrastructure.asr.script import for_phonetizer
 from muallim.infrastructure.audio.ffmpeg import SAMPLE_RATE, decode_to_pcm
 
@@ -40,7 +45,7 @@ _WASL_SUFFIX = " مَ"
 
 
 @dataclass
-class MuaalemRecognizer(PronunciationRecognizer):
+class MuaalemRecognizer(PronunciationRecognizer, SuraRecognizer):
     device: str = "auto"  # auto | cpu | mps | cuda
     _model: Any = field(default=None, init=False, repr=False)
     _revision: str | None = field(default=None, init=False, repr=False)
@@ -91,6 +96,51 @@ class MuaalemRecognizer(PronunciationRecognizer):
             audio_duration_ms=round(len(wave) / SAMPLE_RATE * 1000),
             raw=raw,
         )
+
+    async def recognize_sura(
+        self,
+        audio: bytes,
+        ayahs: Sequence[tuple[str, int, str]],
+        opening: str = "",
+        preamble: str = "",
+    ) -> SuraRecognition:
+        """Сура целиком (FR-57, ADR-0076): куски 6–10 с, фонемы кусков склеиваются."""
+        import numpy as np  # noqa: PLC0415
+
+        pcm = await decode_to_pcm(audio, max_seconds=None)  # сура — без ограничения длины
+        wave = np.frombuffer(pcm, dtype=np.float32).copy()
+        try:
+            refs = sura_reference(ayahs)
+            words = _ayah_reference("", 0, opening).words if opening else ()
+            before = _ayah_reference("", 0, preamble).words if preamble else ()
+            model_ref = _sura_model_ref(tuple(text for _, _, text in ayahs))
+            heard, chunks = await asyncio.to_thread(self._run_long, wave, model_ref)
+        except Exception as error:  # модель бросает разные исключения на плохом звуке
+            raise RecognitionError(str(error)) from error
+        return SuraRecognition(
+            heard=heard,
+            ayahs=refs,
+            opening=words,
+            preamble=before,
+            pauses=(),  # молчание — после утверждения порога (TD-FN-116)
+            chunks=chunks,
+            model_version=self.model_version,
+            audio_duration_ms=round(len(wave) / SAMPLE_RATE * 1000),
+        )
+
+    def _run_long(
+        self, wave: Any, model_ref: Any
+    ) -> tuple[str, tuple[tuple[int, int, int, int], ...]]:
+        parts: list[str] = []
+        chunks: list[tuple[int, int, int, int]] = []
+        position = 0
+        for start, end in quiet_cuts(wave, SAMPLE_RATE):
+            heard, _ = self._run(wave[start:end], model_ref)
+            ms = (round(start / SAMPLE_RATE * 1000), round(end / SAMPLE_RATE * 1000))
+            chunks.append((*ms, position, position + len(heard)))
+            parts.append(heard)
+            position += len(heard)
+        return "".join(parts), tuple(chunks)
 
     def _run(self, wave: Any, model_ref: Any) -> tuple[str, dict[str, Any]]:
         if self._model is None:
@@ -175,6 +225,49 @@ def _references(text: str) -> tuple[Any, tuple[tuple[str, str], tuple[str, str]]
         ("wasl", "".join(ch for ch in wasl if ch in sounds)),
         ("waqf", "".join(ch for ch in waqf.phonemes if ch in sounds)),
     )
+
+
+def sura_reference(ayahs: Sequence[tuple[str, int, str]]) -> tuple[AyahReference, ...]:
+    """Эталон суры по аятам (FR-57, ADR-0076): (id карточки, номер аята, текст) → фонемы по словам.
+
+    Каждый аят — с остановкой в конце, как читают почти все; ``wasl_last`` — последнее слово без
+    остановки, если ученик читал слитно. Фонетизатор ставит остановку только в конце текста,
+    поэтому аяты фонетизируются по отдельности.
+    """
+    return tuple(_ayah_reference(item_id, number, text) for item_id, number, text in ayahs)
+
+
+@lru_cache(maxsize=64)
+def _sura_model_ref(texts: tuple[str, ...]) -> Any:
+    """Эталон модели для суры: аяты с остановкой в конце, фонемы и сифат подряд (ADR-0076)."""
+    from quran_transcript.phonetics.phonetizer import (  # noqa: PLC0415
+        QuranPhoneticScriptOutput,
+    )
+
+    parts = [_references(text)[0] for text in texts]
+    return QuranPhoneticScriptOutput(
+        phonemes="".join(p.phonemes for p in parts),
+        sifat=[s for p in parts for s in p.sifat],
+        mappings=[],
+    )
+
+
+@lru_cache(maxsize=1024)
+def _ayah_reference(item_id: str, number: int, text: str) -> AyahReference:
+    from quran_transcript import MoshafAttributes, quran_phonetizer  # noqa: PLC0415
+
+    moshaf = MoshafAttributes(**MOSHAF_PARAMS)
+    text = for_phonetizer(text)
+    sounds = _model_sounds()
+
+    def words(phonemes: str) -> list[str]:
+        out = ["".join(ch for ch in w if ch in sounds) for w in phonemes.split(" ")]
+        return [w for w in out if w]
+
+    waqf = words(quran_phonetizer(text, moshaf).phonemes)
+    wasl = words(quran_phonetizer(text + _WASL_SUFFIX, moshaf).phonemes)[:-1]
+    last = wasl[-1] if wasl and wasl[-1] != waqf[-1] else ""
+    return AyahReference(item_id, number, tuple(waqf), wasl_last=last)
 
 
 @lru_cache(maxsize=1)

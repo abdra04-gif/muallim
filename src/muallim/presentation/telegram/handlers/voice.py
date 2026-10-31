@@ -20,9 +20,10 @@ from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.recitation import AssessRecitation
 from muallim.application.use_cases.reference import RecordReference
-from muallim.application.use_cases.screen import ScreenState
+from muallim.application.use_cases.screen import OnScreen, ScreenState
 from muallim.application.use_cases.settings import GetSettings
 from muallim.application.use_cases.staff import StaffAccess
+from muallim.application.use_cases.sura import ReadSura
 from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner
 from muallim.domain.policy import Verdict
@@ -30,9 +31,53 @@ from muallim.domain.quiz import read_passed
 from muallim.presentation.telegram import opening, screens, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
+from muallim.presentation.telegram.handlers.sura import read_sura_voice
 
 logger: Final = logging.getLogger(__name__)
 router: Final = Router(name="learner.voice")
+
+
+async def _teacher_reference(
+    m: Message,
+    bot: Bot,
+    state: FSMContext,
+    buf: io.BytesIO,
+    *,
+    learner: Learner,
+    recorder: RecordReference,
+) -> str | None:
+    """Эталон учителя — с любого экрана; id карточки, если голосовое сохранено эталоном."""
+    item_id = await take_recording(state)
+    if item_id is None or m.voice is None:
+        return None
+    await bot.download(m.voice, destination=buf)
+    return item_id if await recorder.execute(learner, item_id, buf.getvalue()) else None
+
+
+async def _off_card(
+    m: Message,
+    bot: Bot,
+    shown: OnScreen,
+    *,
+    learner: Learner,
+    screen_state: ScreenState,
+    cur: Curriculum,
+    progress: GetProgress,
+    sura_uc: ReadSura,
+    display: Display,
+) -> bool:
+    """На экране не карточка: сура целиком — проверить суру; меню или вчерашнее начало занятия —
+    не оцениваем, предлагаем открыть урок (решение автора). True — голосовое обработано."""
+    if shown.sura is not None:  # FR-57, FR-59
+        await read_sura_voice(m, bot, shown.sura, learner=learner, uc=sura_uc, display=display)
+        return True
+    if shown.item_id is not None and not shown.stale:
+        return False
+    if shown.stale:
+        await screen_state.menu(learner, finish=True)
+    screen = screens.voice_on_home(cur, await progress.execute(learner))
+    await m.answer(screen.caption, reply_markup=screen.keyboard)
+    return True
 
 
 @router.message(F.voice)
@@ -53,29 +98,25 @@ async def on_voice(
     learner_settings: FromDishka[GetSettings],
     quiz: FromDishka[PracticeQuiz],
     videos: FromDishka[ArticulationVideoLibrary],
+    sura_uc: FromDishka[ReadSura],
 ) -> None:
     assert m.voice is not None  # гарантирует фильтр F.voice  # noqa: S101
     if m.voice.duration < 1:
         await m.reply(texts.VOICE_TOO_SHORT)
         return
     buf = io.BytesIO()
-    item_id = await take_recording(state)
-    if item_id is not None:  # эталон учителя — с любого экрана
-        await bot.download(m.voice, destination=buf)
-        if await recorder.execute(learner, item_id, buf.getvalue()):
-            logger.info("Эталон для %s записал учитель %s", item_id, learner.pseudonym)
-            await m.reply(texts.RECORD_SAVED.format(item=item_id))
-            return
-
-    shown = await screen_state.execute(learner)
-    if shown.item_id is None or shown.stale:
-        # на экране меню (или вчерашнее начало занятия) — урок не открыт: не оцениваем,
-        # предлагаем открыть (решение автора)
-        if shown.stale:
-            await screen_state.menu(learner, finish=True)
-        screen = screens.voice_on_home(cur, await progress.execute(learner))
-        await m.answer(screen.caption, reply_markup=screen.keyboard)
+    saved = await _teacher_reference(m, bot, state, buf, learner=learner, recorder=recorder)
+    if saved is not None:
+        logger.info("Эталон для %s записал учитель %s", saved, learner.pseudonym)
+        await m.reply(texts.RECORD_SAVED.format(item=saved))
         return
+    shown = await screen_state.execute(learner)
+    if await _off_card(
+        m, bot, shown, learner=learner, screen_state=screen_state, cur=cur, progress=progress,
+        sura_uc=sura_uc, display=display,
+    ):  # fmt: skip
+        return
+    assert shown.item_id is not None  # noqa: S101 — _off_card обработал экран без карточки
     item = cards.current(learner)
     with suppress(KeyError):  # карточку убрали из программы — карточка курсора
         item = cur.item(shown.item_id)

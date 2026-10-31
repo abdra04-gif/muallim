@@ -50,7 +50,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 |---|---|---|
 | новое правило оценки | `domain/assessment.py` + тест в `tests/unit/test_assessment.py` | новый `ErrorKind` |
 | новый сценарий | `application/use_cases/` → зарегистрировать в `bootstrap/di.py` → обработчик | интервальное повторение |
-| новую модель | класс с методом `recognize` в `infrastructure/asr/` → выбор в `di.py` | Whisper |
+| новую модель | класс с методами `recognize` и `recognize_sura` (порты `PronunciationRecognizer`, `SuraRecognizer`, ADR-0076 п. 10) в `infrastructure/asr/` → выбор в `di.py` | Whisper |
 | новый мессенджер / веб | новая папка в `presentation/` | `presentation/web/` |
 | поле в БД | `infrastructure/db/tables.py` → `make migration m="..."` → `docs/data/data-dictionary.md` | |
 | отчёт | `analytics/sql/NN_название.sql` | |

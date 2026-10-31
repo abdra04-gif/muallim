@@ -37,6 +37,7 @@ def test_home_ends_with_progress_and_settings(curriculum: Curriculum) -> None:
         (texts.SIGNS_BUTTON, cb.Signs().pack()),
         (texts.PROGRESS_BUTTON, cb.ShowProgress().pack()),
         (texts.SETTINGS_BUTTON, cb.ShowSettings().pack()),
+        (texts.MEMORY_BUTTON, cb.SuraList().pack()),  # «Наизусть» — FR-59, ADR-0076
     ]
     assert buttons[0][1] == cb.GoItem(item_id="L006-02").pack()  # ▶️ Продолжить
 

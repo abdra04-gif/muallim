@@ -252,6 +252,7 @@ async def test_home_has_settings_instead_of_help_and_privacy(
         texts.SIGNS_BUTTON,
         texts.PROGRESS_BUTTON,
         texts.SETTINGS_BUTTON,
+        texts.MEMORY_BUTTON,  # «Наизусть» — FR-59, ADR-0076
     ], labels
     assert labels[0].startswith("▶️")  # «Начать первый урок» / «Продолжить: …»
     assert texts.HELP_BUTTON not in labels and texts.PRIVACY_BUTTON not in labels

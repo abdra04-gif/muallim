@@ -47,7 +47,7 @@
 | `research_block` | bool, по умолч. false | показывать блок «Для исследования» (ADR-0057) | 🟢 |
 | `reminder_minute` | smallint, null, CHECK 0…1439 | минута местных суток для напоминания; null — выключено | 🟢 |
 | `utc_offset_min` | smallint, CHECK −720…840, по умолч. 180 | смещение от UTC в минутах по ответу «который у тебя час?»; до ответа — UTC+3 (В3). Не город и не геопозиция | 🟡; 180 у ученика, который не отвечал, — умолчание, а не его часовой пояс. Не выгружается в датасет и отчёты (ADR-0061) |
-| `screen_item_id` | varchar(32), null | карточка на экране; null — меню (голосовое не оценивается, FR-50) | 🟢 |
+| `screen_item_id` | varchar(32), null | карточка на экране; `sura:N:text\|look\|memory` — сура целиком (по тексту / наизусть, текст ещё виден / наизусть после «Готов», ADR-0076 п. 9); null — меню (голосовое не оценивается, FR-50) | 🟢 |
 | `screen_opening` | bool, по умолч. false | карточка открыта как шаг начала занятия | 🟢 |
 | `opening_resume_item` | varchar(32), null | куда вернуться после басмалы; null — начала занятия нет | 🟢 |
 | `opening_day` | date, null | местная дата начала занятия: вчерашнее не действует | 🟢 |
@@ -213,12 +213,70 @@
 | `curriculum_version` | varchar(32) | версия программы при показе |
 | `rule` | varchar(8) | версия правила отбора (`v2` — ADR-0066) |
 
+## `sura_readings` — чтения сур целиком и наизусть (FR-57…FR-60, ADR-0076, миграция 0010)
+Одна строка — одно голосовое со всей сурой. Подробности — в трёх таблицах ниже (по аятам, кускам записи,
+событиям), связаны по `reading_id`; одно чтение — одна попытка в отчётах. Удаляется вместе с учеником.
+Отдельная часть данных: в главные цифры RQ-1/RQ-2 по строкам книги не входит.
+| Поле | Тип | Описание |
+|---|---|---|
+| `id` | UUID, PK | |
+| `learner_id` | UUID → learners, CASCADE | |
+| `sura` | smallint | номер суры (1–114) |
+| `mode` | varchar(8) | `text` — по тексту («📖 Вся сура»), `memory` — наизусть («🧠 Наизусть») |
+| `attempt_number` | int ≥ 1 | какая по счёту попытка этой суры в этом режиме |
+| `days_since_last` | int, NULL | дней с прошлого чтения суры целиком в любом режиме; NULL — впервые |
+| `studied_by_text` | bool | все уроки суры были пройдены до этого чтения |
+| `clean_ayahs`, `total_ayahs` | smallint | сколько аятов чистые / всего (итог для отчётов; тот же расчёт, что в `sura_reading_ayahs`) |
+| `score` | smallint 0–100 | сходство по всей суре без самоисправлений |
+| `passed` | bool | все аяты чистые: по тексту — зачёт уроков, наизусть — отметка «знаю наизусть» (✅ в списке сур) |
+| `credited` | JSON | id карточек, засчитанных этим чтением (только `text` и `passed`); учитываются в лучших баллах строк |
+| `reference_phonemes`, `heard_phonemes` | text | эталон суры и услышанное целиком |
+| `audio_sha256` | varchar(64), NULL | запись — только с согласия; при отзыве согласия обнуляется |
+| `audio_duration_ms`, `processing_ms` | int | длина записи, время проверки |
+| `model_version`, `curriculum_version`, `app_version` | varchar | версии, принявшие решение (ADR-0019) |
+| `policy` | JSON, NULL | порог `GradingPolicy` (`pass_threshold`, `excellent_threshold`), по которому оценено (ADR-0019; порог под вопросом — TD-FN-116) |
+| `created_at` | timestamptz | |
+
+## `sura_reading_ayahs` — аяты в чтении суры (FR-60)
+| Поле | Тип | Описание |
+|---|---|---|
+| `reading_id` | UUID → sura_readings, CASCADE, PK | |
+| `ayah` | smallint, PK | номер аята в суре |
+| `item_id` | varchar(32) | карточка аята в программе |
+| `outcome` | varchar(16) | `clean`, `pronunciation`, `forgot_part`, `skipped`, `not_reached` |
+| `score` | smallint 0–100 | балл аята |
+| `forgotten_words`, `extra_words`, `pronunciation_errors` | smallint | сколько забыто слов, лишних слов, ошибок произношения |
+| `reference_phonemes`, `heard_phonemes` | text | эталон аята и услышанное в нём |
+
+## `sura_reading_chunks` — куски записи 6–10 с (FR-60)
+Строка для разметки и датасета (TD-FN-115): кусок можно вырезать из записи по `start_ms`–`end_ms`.
+| Поле | Тип | Описание |
+|---|---|---|
+| `reading_id` | UUID → sura_readings, CASCADE, PK | |
+| `ordinal` | smallint, PK | порядок куска (с 1) |
+| `start_ms`, `end_ms` | int | границы куска в записи |
+| `first_ayah`, `last_ayah` | smallint, NULL | какие аяты покрывает; NULL — только басмала или тишина |
+| `heard_phonemes` | text | что услышано в куске |
+
+## `sura_reading_events` — события чтения суры (FR-60)
+Где забывают и где ошибаются: одна строка — одна ошибка, заминка или самоисправление.
+| Поле | Тип | Описание |
+|---|---|---|
+| `reading_id` | UUID → sura_readings, CASCADE, PK | |
+| `ordinal` | smallint, PK | порядок события |
+| `kind` | varchar(16) | `pronunciation`, `forgot_word`, `extra`, `self_corrected` (не ошибка), `pause` (не ошибка) |
+| `ayah` | smallint | номер аята |
+| `word` | smallint, NULL | слово в аяте (с нуля) |
+| `expected`, `heard` | text | что нужно и что прозвучало |
+| `error_kind` | varchar(32), NULL | вид ошибки произношения (как `detected_errors.kind`) |
+| `duration_ms` | int, NULL | длина молчания (`pause`) |
+
 ## `interaction_events` — журнал действий
 | Поле | Тип | Описание |
 |---|---|---|
 | `id` | int, PK | |
 | `learner_id` | UUID → learners, SET NULL | после удаления ученика событие остаётся обезличенным |
-| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `reference_played`, `reference_recorded`, `video_played` (ролик «🎬 Как произносить», FR-56, ADR-0074; payload: `video` — ключ ролика (имя mp4 без расширения из `curriculum/video/videos.yaml`), `item_id` карточки, `from` = `card` / `auto` / `after` (`breakdown` / `sheet` и `letter` — только со старых кнопок; ролики там больше не показываются, ADR-0074); только после успешной отправки в Telegram), `attempt_disputed`, `quiz_skipped` (payload: `letter_id`, `item_id`, `step`, `position`), `quiz_answered` (payload: `letter_id`, `item_id`, `step`, `vowel`, `position`, `correct`; до ADR-0066 — `item_id`, `vowel`, `correct`; источник правды — `quiz_answers`), `feedback_language_set`, `learner_deleted`; разметка (FR-17, `learner_id` — сам разметчик): `annotation_shown`, `annotation_submitted` (payload: `annotator`, `attempt_id`, `status`), `annotator_invite_redeemed`, `annotator_invite_failed` (для ограничения подбора кода) |
+| `event` | varchar(48) | `learner_registered`, `consent_changed` (payload: `granted`, `audio_deleted`), `item_opened`, `attempt_assessed`, `recognition_failed` (payload: `item_id`, `stage` = `decode` / `model`, `processing_ms`; без текста ошибки), `sura_read` (payload: `sura`, `mode`, `clean`, `total`, `passed`), `sura_recognition_failed` (payload: `sura`, `mode`, `stage`, `processing_ms`; ADR-0076), `reference_played`, `reference_recorded`, `video_played` (ролик «🎬 Как произносить», FR-56, ADR-0074; payload: `video` — ключ ролика (имя mp4 без расширения из `curriculum/video/videos.yaml`), `item_id` карточки, `from` = `card` / `auto` / `after` (`breakdown` / `sheet` и `letter` — только со старых кнопок; ролики там больше не показываются, ADR-0074); только после успешной отправки в Telegram), `attempt_disputed`, `quiz_skipped` (payload: `letter_id`, `item_id`, `step`, `position`), `quiz_answered` (payload: `letter_id`, `item_id`, `step`, `vowel`, `position`, `correct`; до ADR-0066 — `item_id`, `vowel`, `correct`; источник правды — `quiz_answers`), `feedback_language_set`, `learner_deleted`; разметка (FR-17, `learner_id` — сам разметчик): `annotation_shown`, `annotation_submitted` (payload: `annotator`, `attempt_id`, `status`), `annotator_invite_redeemed`, `annotator_invite_failed` (для ограничения подбора кода) |
 | `payload` | JSON | только ID карточек, баллы, флаги; **никогда** — текст сообщений |
 | `created_at` | timestamptz | |
 

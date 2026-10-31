@@ -23,6 +23,7 @@ from muallim.application.use_cases.progress import LessonStatus, Progress
 from muallim.application.use_cases.quiz import QuizOverview, QuizRest, QuizResult, QuizView
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.recitation import RecitationResult
+from muallim.application.use_cases.sura import SuraReadingResult
 from muallim.domain import arabic
 from muallim.domain.assessment import ErrorKind
 from muallim.domain.curriculum import (
@@ -43,6 +44,7 @@ from muallim.domain.settings import (
     LearnerSettings,
     local_minute,
 )
+from muallim.domain.sura import AyahOutcome, Sura, SuraMode, find_sura, suras
 from muallim.domain.syllables import ayah_number
 from muallim.presentation.telegram import render, texts, views
 from muallim.presentation.telegram.callbacks import (
@@ -68,6 +70,9 @@ from muallim.presentation.telegram.callbacks import (
     ShowProgress,
     ShowSettings,
     Signs,
+    SuraList,
+    SuraOpen,
+    SuraReady,
     Watch,
 )
 from muallim.presentation.telegram.opening import OPENING_ITEMS
@@ -175,7 +180,8 @@ def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> S
     kb.button(text=texts.SIGNS_BUTTON, callback_data=Signs())
     kb.button(text=texts.PROGRESS_BUTTON, callback_data=ShowProgress())
     kb.button(text=texts.SETTINGS_BUTTON, callback_data=ShowSettings())  # FR-51
-    kb.adjust(1, 2, 2, 1)
+    kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraList())  # FR-59
+    kb.adjust(1, 2, 2, 2)
     image, key = _alphabet_map(curriculum, progress)
     return Screen(caption, kb.as_markup(), image, key)
 
@@ -355,12 +361,16 @@ def _card_keyboard(
             callback_data=LettersSheet(lesson_id=lesson.id, item_id=item.id),
         )
         top += 1
+    sura = find_sura(curriculum, lesson.id) if lesson.section == "sura" else None
+    if sura is not None:  # сура целиком и наизусть (FR-57, FR-59)
+        kb.button(text=texts.WHOLE_SURA_BUTTON, callback_data=SuraOpen(n=sura.number, m="t"))
+        kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraOpen(n=sura.number, m="m"))
     nav = _nav(kb, curriculum, item)
     # первый шаг: назад — только «⬅️ Предыдущий урок», без «◀️ Назад» на шаг (FR-50)
     prev = i == 0 and _previous_lesson_button(kb, curriculum, lesson)
     kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     _home_row(kb)
-    kb.adjust(*([1] * top), *nav, *((1,) if prev else ()), 2)
+    kb.adjust(*([1] * top), *((2,) if sura else ()), *nav, *((1,) if prev else ()), 2)
     return kb.as_markup()
 
 
@@ -1112,3 +1122,109 @@ def quiz_unavailable(curriculum: Curriculum, progress: Progress) -> Screen:
     if opens is None or here.number >= opens.number:
         return Screen(texts.QUIZ_LOCKED_MORE, kb.as_markup())
     return Screen(texts.QUIZ_LOCKED.format(lesson=escape(opens.title)), kb.as_markup())
+
+
+# ---------- сура целиком и наизусть (FR-57, FR-59, ADR-0076) ----------
+def _sura_block(sura: Sura) -> str:
+    """Текст суры: басмала перед сурой и аяты, у каждого — знак конца аята с номером."""
+    lines = [f"<b>{escape(sura.opening.text)}</b>"] if sura.opening else []
+    lines += [f"{escape(a.text)} ۝{a.quran.split(':')[1]}" for a in sura.ayahs]
+    return "\n".join(lines)
+
+
+def _sura_back(kb: InlineKeyboardBuilder, sura: Sura, mode: SuraMode) -> None:
+    """Назад: наизусть — к списку сур, по тексту — к первой карточке аята; и 🏠."""
+    if mode is SuraMode.MEMORY:
+        _home_row(kb, (texts.SURA_BACK_TO_LIST_BUTTON, SuraList()))
+    else:
+        _home_row(kb, (texts.SURA_BACK_TO_LESSON_BUTTON, GoItem(item_id=sura.ayahs[0].id)))
+
+
+def sura_list(curriculum: Curriculum, memorized: Collection[int]) -> Screen:
+    kb = InlineKeyboardBuilder()
+    found = suras(curriculum)
+    for sura in found:
+        mark = "✅ " if sura.number in memorized else ""
+        kb.button(text=f"{mark}{sura.name}", callback_data=SuraOpen(n=sura.number, m="m"))
+    _home_row(kb)
+    kb.adjust(*([2] * (len(found) // 2)), *([1] * (len(found) % 2)), 1)
+    return Screen(texts.SURA_LIST, kb.as_markup())
+
+
+def sura_text(sura: Sura) -> Screen:
+    """«📖 Вся сура»: текст всех аятов, голосовое — целиком (текстом: подпись к фото короче)."""
+    caption = "\n\n".join(
+        (
+            texts.SURA_TEXT_HEAD.format(name=escape(sura.name)),
+            _sura_block(sura),
+            texts.SURA_TEXT_HINT,
+        )
+    )
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraOpen(n=sura.number, m="m"))
+    _sura_back(kb, sura, SuraMode.TEXT)
+    kb.adjust(1, 2)
+    return Screen(caption, kb.as_markup())
+
+
+def sura_memory(sura: Sura) -> Screen:
+    """Наизусть, шаг 1: текст виден, пока ученик не нажмёт «Готов»."""
+    caption = "\n\n".join(
+        (
+            texts.SURA_MEMORY_HEAD.format(name=escape(sura.name)),
+            _sura_block(sura),
+            texts.SURA_MEMORY_HINT,
+        )
+    )
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.SURA_READY_BUTTON, callback_data=SuraReady(n=sura.number))
+    _sura_back(kb, sura, SuraMode.MEMORY)
+    kb.adjust(1, 2)
+    return Screen(caption, kb.as_markup())
+
+
+def sura_memory_ready(sura: Sura) -> Screen:
+    """Наизусть, шаг 2: текста нет — только название; ждём голосовое."""
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.SURA_SHOW_TEXT_BUTTON, callback_data=SuraOpen(n=sura.number, m="m"))
+    _sura_back(kb, sura, SuraMode.MEMORY)
+    kb.adjust(1, 2)
+    return Screen(texts.SURA_MEMORY_READY.format(name=escape(sura.name)), kb.as_markup())
+
+
+SURA_BAD_SHOWN: Final = 8  # строк про аяты с ошибками в разборе
+SURA_BAD_BUTTONS: Final = 4  # кнопок «🔁 Аят N»
+
+
+def sura_result(result: SuraReadingResult) -> Screen:
+    """Разбор чтения суры по аятам: итог, аяты с ошибками, переход к их карточкам."""
+    reading, sura = result.reading, result.sura
+    a = reading.assessment
+    parts = [
+        texts.SURA_RESULT_HEAD[reading.mode.value].format(name=escape(sura.name)),
+        texts.SURA_SUMMARY.format(clean=a.clean_count, total=len(a.ayahs)),
+    ]
+    bad = [x for x in a.ayahs if x.outcome is not AyahOutcome.CLEAN]
+    if reading.passed:
+        parts.append(
+            texts.SURA_PASSED_TEXT if reading.mode is SuraMode.TEXT else texts.SURA_PASSED_MEMORY
+        )
+    else:
+        lines = [
+            texts.SURA_AYAH_LINE.format(n=x.number, outcome=texts.SURA_OUTCOME[x.outcome.value])
+            for x in bad[:SURA_BAD_SHOWN]
+        ]
+        if len(bad) > SURA_BAD_SHOWN:
+            lines.append(texts.SURA_MORE.format(n=len(bad) - SURA_BAD_SHOWN))
+        parts += ["\n".join(lines), texts.SURA_NOT_PASSED]
+    kb = InlineKeyboardBuilder()
+    shown = bad[:SURA_BAD_BUTTONS]
+    for x in shown:
+        kb.button(
+            text=texts.SURA_AYAH_BUTTON.format(n=x.number), callback_data=GoItem(item_id=x.item_id)
+        )
+    mode = "t" if reading.mode is SuraMode.TEXT else "m"
+    kb.button(text=texts.SURA_AGAIN_BUTTON, callback_data=SuraOpen(n=sura.number, m=mode))
+    _sura_back(kb, sura, reading.mode)
+    kb.adjust(*([2] * (len(shown) // 2)), *([1] * (len(shown) % 2)), 1, 2)
+    return Screen("\n\n".join(parts), kb.as_markup())

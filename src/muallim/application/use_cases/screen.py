@@ -27,6 +27,7 @@ class OnScreen:
     opening: bool  # карточка открыта как шаг начала занятия
     opening_active: bool  # начало занятия идёт сегодня (местная дата)
     resume_item: str | None  # куда вернуться после басмалы
+    sura: tuple[int, str] | None = None  # открыта сура целиком: (номер, text | look | memory)
 
     @property
     def stale(self) -> bool:
@@ -55,6 +56,16 @@ def offer_opening(progress: Progress, settings: LearnerSettings) -> bool:
     )
 
 
+SURA_SCREEN: Final = "sura:"  # экран суры хранится в том же поле, что карточка
+
+
+def _sura_of(screen_item_id: str | None) -> tuple[int, str] | None:
+    if not screen_item_id or not screen_item_id.startswith(SURA_SCREEN):
+        return None
+    number, _, mode = screen_item_id.removeprefix(SURA_SCREEN).partition(":")
+    return (int(number), mode) if number.isdigit() and mode else None
+
+
 _FINISHED: Final[dict[str, Any]] = {"opening_resume_item": None, "opening_day": None}
 _MENU: Final[dict[str, Any]] = {"screen_item_id": None, "screen_opening": False}
 
@@ -69,7 +80,15 @@ class ScreenState:
         """Что сейчас на экране ученика."""
         s = await self.settings.get(learner.id)
         active = s.opening_resume_item is not None and s.opening_day == self._today(s)
-        return OnScreen(s.screen_item_id, s.screen_opening, active, s.opening_resume_item)
+        sura = _sura_of(s.screen_item_id)
+        item_id = None if sura is not None else s.screen_item_id
+        return OnScreen(item_id, s.screen_opening, active, s.opening_resume_item, sura)
+
+    async def sura(self, learner: Learner, number: int, mode: str) -> None:
+        """Открыта сура целиком (FR-57, FR-59): ``text`` — голосовое по тексту, ``look`` —
+        наизусть, текст ещё виден (голосовое не принимаем), ``memory`` — наизусть после «Готов»."""
+        change = {"screen_item_id": f"{SURA_SCREEN}{number}:{mode}", "screen_opening": False}
+        await self._change(learner, change | _FINISHED)
 
     async def needs_opening(self, learner: Learner, progress: Progress) -> bool:
         return offer_opening(progress, await self.settings.get(learner.id))

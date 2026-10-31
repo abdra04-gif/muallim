@@ -25,7 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.erasures import ErasureAction
 from muallim.infrastructure.audio.file_store import FileAudioStore
-from muallim.infrastructure.db.tables import attempts, learners
+from muallim.infrastructure.db.tables import attempts, learners, sura_readings
 from muallim.infrastructure.erasures import read_erasures
 
 
@@ -63,6 +63,44 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+# Все таблицы со ссылкой на запись голоса: попытки по карточкам и чтения сур (FR-60, ADR-0076).
+# Новая таблица с audio_sha256 — сюда, иначе verify сочтёт её записи лишними.
+_VOICE_TABLES = (attempts, sura_readings)
+
+
+async def _hashes(session: AsyncSession, consent: bool | None = None) -> set[str]:
+    """Хеши всех записей; ``consent`` — только у учеников с согласием (True) или без (False)."""
+    found: set[str] = set()
+    for table in _VOICE_TABLES:
+        query = select(table.c.audio_sha256).where(table.c.audio_sha256.is_not(None))
+        if consent is not None:
+            query = query.join(learners, learners.c.id == table.c.learner_id).where(
+                learners.c.research_consent.is_(consent)
+            )
+        found.update((await session.scalars(query)).all())
+    return found
+
+
+async def _count(session: AsyncSession, *, consent: bool | None = None) -> int:
+    total = 0
+    for table in _VOICE_TABLES:
+        query = select(func.count()).select_from(table).where(table.c.audio_sha256.is_not(None))
+        if consent is not None:
+            query = query.join(learners, learners.c.id == table.c.learner_id).where(
+                learners.c.research_consent.is_(consent)
+            )
+        total += int(await session.scalar(query) or 0)
+    return total
+
+
+async def _in_use(session: AsyncSession, sha: str) -> bool:
+    for table in _VOICE_TABLES:
+        query = select(table.c.id).where(table.c.audio_sha256 == sha).limit(1)
+        if await session.scalar(query) is not None:
+            return True
+    return False
+
+
 async def check(
     session: AsyncSession,
     audio_root: Path,
@@ -70,15 +108,7 @@ async def check(
     erasure_log: Path | None = None,
 ) -> IntegrityReport:
     """``copies`` — папки с копиями записей (data/annotation, data/exports)."""
-    consented = set(
-        (
-            await session.scalars(
-                select(attempts.c.audio_sha256)
-                .join(learners, learners.c.id == attempts.c.learner_id)
-                .where(attempts.c.audio_sha256.is_not(None), learners.c.research_consent.is_(True))
-            )
-        ).all()
-    )
+    consented = await _hashes(session, consent=True)
     stale = sorted(
         str(p)
         for root in copies
@@ -86,19 +116,8 @@ async def check(
         for p in root.rglob("*.ogg")
         if _SHA.fullmatch(p.stem) and p.stem not in consented
     )
-    referenced = set(
-        (
-            await session.scalars(
-                select(attempts.c.audio_sha256).where(attempts.c.audio_sha256.is_not(None))
-            )
-        ).all()
-    )
-    without_consent = await session.scalar(
-        select(func.count())
-        .select_from(attempts)
-        .join(learners, learners.c.id == attempts.c.learner_id)
-        .where(attempts.c.audio_sha256.is_not(None), learners.c.research_consent.is_(False))
-    )
+    referenced = await _hashes(session)
+    without_consent = await _count(session, consent=False)
     files = _stored(audio_root)
     return IntegrityReport(
         missing=sorted(referenced - files.keys()),
@@ -125,15 +144,20 @@ async def _pending(session: AsyncSession, erasure_log: Path) -> int:
         if entry.action is ErasureAction.DELETE:
             pending += 1
         elif entry.action is ErasureAction.WITHDRAW:
-            kept = await session.scalar(
-                select(func.count())
-                .select_from(attempts)
-                .where(
-                    attempts.c.learner_id == learner_id,
-                    attempts.c.audio_sha256.is_not(None),
-                    attempts.c.created_at <= entry.at,
+            kept = 0
+            for table in _VOICE_TABLES:
+                kept += int(
+                    await session.scalar(
+                        select(func.count())
+                        .select_from(table)
+                        .where(
+                            table.c.learner_id == learner_id,
+                            table.c.audio_sha256.is_not(None),
+                            table.c.created_at <= entry.at,
+                        )
+                    )
+                    or 0
                 )
-            )
             pending += bool(consent or kept)
     return pending
 
@@ -154,10 +178,7 @@ async def delete_orphans(
         path = store.path_for(sha)
         if not path.exists() or now - path.stat().st_mtime < min_age_s:
             continue
-        in_use = await session.scalar(
-            select(attempts.c.id).where(attempts.c.audio_sha256 == sha).limit(1)
-        )
-        if in_use is None:
+        if not await _in_use(session, sha):
             path.unlink(missing_ok=True)
             deleted += 1
     return deleted

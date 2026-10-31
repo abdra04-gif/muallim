@@ -115,6 +115,10 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.LettersSheet: callbacks.LettersSheet(
             lesson_id=max((les.id for les in curriculum.lessons), key=len), item_id=item
         ),
+        # 📖 Вся сура и 💭 Наизусть (FR-57, FR-59, ADR-0076)
+        callbacks.SuraList: callbacks.SuraList(),
+        callbacks.SuraOpen: callbacks.SuraOpen(n=114, m="m"),
+        callbacks.SuraReady: callbacks.SuraReady(n=114),
     }
 
 
