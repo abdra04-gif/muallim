@@ -1,0 +1,26 @@
+name: Версия модели Muaalem
+
+# Раз в неделю сверяет модель obadx/muaalem-model-v3_2 на Hugging Face с ревизией, на которой сделаны
+# замеры (EXPECTED_MODEL_REVISION, TD-FN-121). Вышла новая → проверка падает, GitHub присылает
+# письмо, список изменений — в сводке запуска; «проверка не состоялась» в сводке — сбой сети, не
+# обновление. GitHub отключает расписание после 60 дней без коммитов. Вручную: make model-check.
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # понедельник, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  revision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Сверить ревизию
+        run: |
+          set -o pipefail
+          python3 scripts/model/check_revision.py | tee -a "$GITHUB_STEP_SUMMARY"

@@ -73,7 +73,7 @@
 | `learner_id` | UUID → learners, CASCADE | |
 | `item_id` | varchar(32) | карточка из `curriculum/course.ru.yaml` |
 | `curriculum_version` | varchar(32) | `version` из YAML на момент попытки |
-| `model_version` | varchar(128) | пакет модели, версия и параметры чтения; `stub` — заглушка, исключается из отчётов |
+| `model_version` | varchar(128) | пакет модели, версия, короткая ревизия модели на Hugging Face (`@01a1ef9`, с 2026-10-31, TD-FN-121) и параметры чтения; `stub` — заглушка, исключается из отчётов |
 | `reference_phonemes` | text | эталон, по которому оценено (лучший из вакф/васл) |
 | `heard_phonemes` | text | что распознала модель |
 | `score` | smallint 0–100 | сходство последовательностей фонем (`difflib.SequenceMatcher.ratio`) |

@@ -6,9 +6,10 @@
 
 import asyncio
 import json
+import logging
 from dataclasses import dataclass, field, fields, is_dataclass
 from functools import lru_cache
-from typing import Any
+from typing import Any, Final
 
 from muallim.application.ports.recognition import (
     PronunciationRecognizer,
@@ -27,6 +28,13 @@ MOSHAF_PARAMS: dict[str, Any] = {
     "madd_mottasel_waqf": 4,
     "madd_aared_len": 4,
 }
+# Ревизия модели obadx/muaalem-model-v3_2 на Hugging Face, на которой сделаны замеры (SRC-003).
+# Библиотека берёт последнюю версию; другую замечаем при старте и пишем в лог (TD-FN-121).
+EXPECTED_MODEL_REVISION: Final = "01a1ef9fbe40d144ef845101e89ff924aed3fef5"
+_UNKNOWN_REVISION: Final = "unknown"
+
+logger: Final = logging.getLogger(__name__)
+
 # Слог, который дописываем, чтобы получить чтение без остановки (васл) — см. ADR-0007.
 _WASL_SUFFIX = " مَ"
 
@@ -35,13 +43,15 @@ _WASL_SUFFIX = " مَ"
 class MuaalemRecognizer(PronunciationRecognizer):
     device: str = "auto"  # auto | cpu | mps | cuda
     _model: Any = field(default=None, init=False, repr=False)
+    _revision: str | None = field(default=None, init=False, repr=False)
 
     @property
     def model_version(self) -> str:
-        from importlib.metadata import version  # noqa: PLC0415
-
+        """Пишется в каждую попытку (attempts.model_version, ≤ 128 знаков): версия библиотеки,
+        короткая ревизия модели (7 знаков, как в git), параметры чтения."""
         params = ",".join(f"{k}={v}" for k, v in MOSHAF_PARAMS.items())
-        return f"quran-muaalem=={version('quran-muaalem')};{params}"
+        model = f"@{self._revision[:7]}" if self._revision else ""
+        return f"quran-muaalem=={_library_version()}{model};{params}"
 
     def load(self) -> None:
         """Загрузить и прогреть модель при старте бота, а не на первом голосовом."""
@@ -58,6 +68,7 @@ class MuaalemRecognizer(PronunciationRecognizer):
                 else "cpu"
             )
         self._model = Muaalem(device=self.device, dtype=torch.float32)
+        self._revision = _loaded_revision(self._model)
         model_ref, _ = _references("بَ")
         self._run(
             np.zeros(SAMPLE_RATE, dtype=np.float32), model_ref
@@ -86,6 +97,28 @@ class MuaalemRecognizer(PronunciationRecognizer):
             self.load()
         output = self._model([wave], [model_ref], sampling_rate=SAMPLE_RATE)[0]
         return str(output.phonemes.text), _raw_output(output)
+
+
+def _library_version() -> str:
+    from importlib.metadata import version  # noqa: PLC0415
+
+    return version("quran-muaalem")
+
+
+def _loaded_revision(model: Any) -> str:
+    """Ревизия загруженной модели (коммит на Hugging Face); не та, что ожидали, — в лог."""
+    config = getattr(getattr(model, "model", None), "config", None)
+    revision = getattr(config, "_commit_hash", None) or _UNKNOWN_REVISION
+    if revision != EXPECTED_MODEL_REVISION:
+        logger.warning(
+            "Модель Muaalem другой ревизии: %s, ожидали %s — цифры могут не совпасть с замерами"
+            " (TD-FN-121)",
+            revision,
+            EXPECTED_MODEL_REVISION,
+        )
+    else:
+        logger.info("Модель Muaalem, ревизия %s", revision)
+    return str(revision)
 
 
 def _raw_output(output: Any) -> dict[str, Any]:
