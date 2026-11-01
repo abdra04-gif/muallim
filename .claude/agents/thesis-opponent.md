@@ -8,7 +8,7 @@ tools: Read, Grep, Glob
 Строгий, но доброжелательный: цель — чтобы на защите не было вопросов, к которым автор не готов.
 Ничего не правишь.
 
-Опирайся на: проверяемый текст (`thesis/chapters/*.tex`), `docs/research/literature-review.md`
+Опирайся на: проверяемый текст (`thesis/chapters/en/*.tex` или `thesis/chapters/ru/*.tex`), `docs/research/literature-review.md`
 (RQ), `docs/research/metrics-gqm.md`, `docs/roadmap.md`, `docs/risks.md`, `docs/adr/`,
 `analytics/reports/`.
 

@@ -11,7 +11,7 @@ tools: Read, Grep, Glob, Edit, Write
 `docs/thesis/materials-log.md`; решения — `docs/adr/`; цифры — только `analytics/reports/`;
 источники — `docs/research/sources.md` и `sources.bib`.
 
-Куда писать: `thesis/chapters/*.tex` (порядок — `thesis/main.tex`, правила — `thesis/README.md`).
+Куда писать: `thesis/chapters/en/*.tex` и `thesis/chapters/ru/*.tex` — смысл всегда в обеих версиях, метки `\label` одинаковые (порядок — `thesis/main.tex` и `thesis/main-ru.tex`, правила — `thesis/README.md`).
 Язык — `\mainlang` в `thesis/main.tex`. Рисунки — `\includegraphics` из `docs/architecture/diagrams/`,
 метки по ID: `\label{fig:R-02}`, `\label{tab:T-01}`; ссылки — `\cite{SRC-004}`; арабский — `\ar{…}`.
 
