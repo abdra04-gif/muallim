@@ -20,6 +20,7 @@ from typing import Any
 import pytest
 
 from muallim.application.breakdown import Breakdown, ErrorGroup, build_breakdown
+from muallim.domain import arabic
 from muallim.domain.assessment import Assessment, ErrorKind, assess, unread_from
 from muallim.domain.curriculum import Curriculum, Lexicon
 from muallim.domain.phonetics import syllables
@@ -538,3 +539,25 @@ def test_missing_tanwin_n_is_named_as_n() -> None:
     (g,) = _review(lexicon, text, ref.replace("بَن", "بَ", 1), reference=ref).groups
     assert [p.word_index for p in g.places] == [0]
     assert "«н»" in g.need_label and "на" not in g.need_label
+
+
+@pytest.mark.parametrize(
+    ("heard", "kind"),
+    [
+        (L024_07_PHONEMES.replace("ءَحسَنَ", "عَحسَنَ"), ErrorKind.LETTER_SUBSTITUTION),
+        (L024_07_PHONEMES.replace("ءَحسَنَ", "َحسَنَ"), ErrorKind.SOUND_MISSING),
+    ],
+)
+def test_hamza_error_points_at_the_hamza_letter(
+    lexicon: Lexicon, heard: str, kind: ErrorKind
+) -> None:
+    """TD-FN-112: ошибка в «أ» (в фонемах модели — «ء») подсвечивает саму «أ» в «أَحْسَنَ», а не
+    соседний слог. Баг воспроизводился только с эталоном-текстом, которого у модели не бывает."""
+    b = _review(lexicon, L024_07, heard, reference=L024_07_PHONEMES)
+    (g,) = [g for g in b.groups if g.expected == "ء"]
+    assert g.kind is kind
+    assert g.letter == "أ"
+    (place,) = g.places
+    assert (place.word_index, place.word_text) == (4, "أَحْسَنَ")
+    hamza = next(n for n, c in enumerate(arabic.clusters(L024_07)) if c.base == "أ")
+    assert place.clusters == (hamza,)
