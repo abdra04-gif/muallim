@@ -1,1 +1,5 @@
 {"ts": "2026-11-01T15:43:58+00:00", "hook": "guard", "kind": "block", "reason": "Фазу меняют только через scripts/phase."}
+{"ts": "2026-11-01T16:16:11+00:00", "hook": "git_guard", "kind": "block", "reason": "Проверки перед push не уложились во время — запустите make check вручную."}
+{"ts": "2026-11-01T16:21:09+00:00", "hook": "git_guard", "kind": "block", "reason": "Проверки перед push не уложились во время — запустите make check вручную."}
+{"ts": "2026-11-01T16:22:33+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (проверки агента): .claude/hooks/git_guard.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-11-01T16:22:48+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (проверки и права агента): .claude/settings.json. Подтвердите правку — CLAUDE.md, «Только человек»."}
