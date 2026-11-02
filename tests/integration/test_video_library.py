@@ -162,8 +162,9 @@ def test_every_manifest_row_has_a_720p_file_under_20_mb(row: dict[str, Any]) -> 
     assert Path(str(row["file"])).name == row["file"]  # только имя, без папок
     assert path.is_file(), path
     assert path.stat().st_size <= MAX_BYTES
-    assert (row["width"], row["height"]) == (1280, 720)
-    assert _mp4_size(path) == (1280, 720)
+    size = (row["width"], row["height"])
+    assert size in {(1280, 720), (720, 1280)}  # 720p, вертикальный — решение автора 2026-10-31
+    assert _mp4_size(path) == size
     assert 0 < float(row["seconds"]) < 60
     assert row["status"] in {"ok", "unchecked", "bad"}
 
@@ -171,9 +172,12 @@ def test_every_manifest_row_has_a_720p_file_under_20_mb(row: dict[str, Any]) -> 
 @pytest.mark.parametrize("row", _rows(), ids=lambda r: str(r.get("file")))
 def test_every_video_points_to_known_sources(row: dict[str, Any]) -> None:
     keys = _source_keys()
-    assert row["source"] in keys and row["source"] == "SRC-144"  # звук ар-Раи
     assert row["picture"] in keys and row["picture"] == "SRC-148"  # рисунок Lynch, CC BY 2.5
-    assert (ROOT / str(row["origin"])).is_file(), row["origin"]  # запись, из которой звук
+    assert row["source"] in keys and row["source"] in {"SRC-144", "SRC-145"}
+    if row["source"] == "SRC-145":  # аят — аль-Афаси, как 🔊 у аятов (автор, 2026-10-31)
+        assert str(row["origin"]).startswith("https://everyayah.com/data/Alafasy_128kbps/")
+    else:  # буква — ар-Раи, запись из библиотеки звуков
+        assert (ROOT / str(row["origin"])).is_file(), row["origin"]
 
 
 def test_every_video_text_is_a_card_text(curriculum: Curriculum) -> None:

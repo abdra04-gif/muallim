@@ -235,6 +235,21 @@ def test_session_context_reports_phase(project: Path) -> None:
     assert "TDD-фаза: impl" in result.stdout
 
 
+def test_session_context_counts_reading_queue(project: Path) -> None:
+    registry = project / "docs" / "research" / "reading" / "README.md"
+    registry.parent.mkdir(parents=True, exist_ok=True)
+    registry.write_text(
+        "| Ключ | Статья | Статус | Оценка |\n"
+        "| SRC-001 | a | 📥 | |\n"
+        "| SRC-002 | b | 📖 | 👍 |\n"
+        "| SRC-003 | c | ✍️ | 👍 |\n"
+        "| — | d | ⛔ | |\n",
+        encoding="utf-8",
+    )
+    result = run_hook(project, "session_context.py", {})
+    assert "📥 ждут чтения: 1; 📖 прочитано, но не в тексте: 1" in result.stdout
+
+
 # --- ADR-0039: сверка документов (doc_sync) и безопасные коммиты (git_guard) ---
 def git(project: Path, *args: str) -> None:
     subprocess.run(  # noqa: S603
@@ -369,6 +384,22 @@ def test_git_guard_allows_clean_commit(repo: Path) -> None:
     (repo / "CHANGELOG.md").write_text("# log\n- ок\n", encoding="utf-8")
     git(repo, "add", "CHANGELOG.md")
     assert git_guard(repo, "git commit -m 'docs: ок'").returncode == 0
+
+
+def test_git_guard_asks_author_before_pushing_bot_code(repo: Path) -> None:
+    git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+    (repo / "src/muallim/application/use_cases/learners.py").write_text("x = 2\n", encoding="utf-8")
+    git(repo, "commit", "-qam", "feat: код")
+    result = git_guard(repo, "git push")
+    assert result.returncode == 2 and "CHECK=full" in result.stderr
+    assert git_guard(repo, "CHECK=quick git push").stderr.count("CHECK=full") == 0
+
+
+def test_git_guard_ignores_push_mentioned_inside_text(repo: Path) -> None:
+    git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+    (repo / "src/muallim/application/use_cases/learners.py").write_text("x = 2\n", encoding="utf-8")
+    git(repo, "commit", "-qam", "feat: код")
+    assert git_guard(repo, "python3 - <<'EOF'\nprint('`git push`')\nEOF").returncode == 0
 
 
 # --- ADR-0073: параллельные сессии — одна в основной папке, остальные в своих копиях ---

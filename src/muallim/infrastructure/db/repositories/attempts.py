@@ -20,6 +20,7 @@ from muallim.infrastructure.db.tables import (
     detected_errors,
     learner_reports,
     learner_settings,
+    sura_readings,
 )
 
 
@@ -86,7 +87,14 @@ class SqlAttemptRepository(AttemptRepository):
             .where(attempts.c.learner_id == learner_id)
             .group_by(attempts.c.item_id)
         )
-        return dict((await self.session.execute(query)).all())
+        best: dict[str, int] = dict((await self.session.execute(query)).all())
+        # Сура, прочитанная целиком по тексту без ошибок, засчитывает все свои карточки (FR-58)
+        passed = select(sura_readings.c.credited).where(
+            sura_readings.c.learner_id == learner_id, sura_readings.c.passed.is_(True)
+        )
+        for credited in (await self.session.scalars(passed)).all():
+            best.update(dict.fromkeys(credited, 100))
+        return best
 
     async def last_assessment(self, learner_id: UUID, item_id: str) -> Assessment | None:
         query = (
@@ -117,10 +125,17 @@ class SqlAttemptRepository(AttemptRepository):
         return int(await self.session.scalar(query) or 0)
 
     async def audio_hashes(self, learner_id: UUID) -> list[str]:
+        """Все записи ученика: попытки по карточкам и чтения сур целиком (FR-60)."""
         query = select(attempts.c.audio_sha256).where(
             attempts.c.learner_id == learner_id, attempts.c.audio_sha256.is_not(None)
         )
-        return list((await self.session.scalars(query)).all())
+        suras = select(sura_readings.c.audio_sha256).where(
+            sura_readings.c.learner_id == learner_id, sura_readings.c.audio_sha256.is_not(None)
+        )
+        return [
+            *(await self.session.scalars(query)).all(),
+            *(await self.session.scalars(suras)).all(),
+        ]
 
     async def forget_audio(self, learner_id: UUID, until: datetime | None = None) -> list[str]:
         scope = attempts.c.learner_id == learner_id
@@ -134,11 +149,27 @@ class SqlAttemptRepository(AttemptRepository):
         # Разметка — производная от голоса (метки ставились, слушая запись): удаляется с ней.
         await self.session.execute(delete(annotations).where(annotations.c.attempt_id.in_(own)))
         await self.session.execute(update(attempts).where(scope).values(audio_sha256=None))
+        # Чтения сур целиком (FR-60): отзыв согласия стирает и их записи
+        sura_scope = sura_readings.c.learner_id == learner_id
+        if until is not None:
+            sura_scope = sura_scope & (sura_readings.c.created_at <= until)
+        sura_hashes = await self.session.scalars(
+            select(sura_readings.c.audio_sha256).where(
+                sura_scope, sura_readings.c.audio_sha256.is_not(None)
+            )
+        )
+        found = sorted({*found, *sura_hashes.all()})
+        await self.session.execute(
+            update(sura_readings).where(sura_scope).values(audio_sha256=None)
+        )
         return found
 
     async def audio_in_use(self, sha256: str) -> bool:
         query = select(attempts.c.id).where(attempts.c.audio_sha256 == sha256).limit(1)
-        return await self.session.scalar(query) is not None
+        if await self.session.scalar(query) is not None:
+            return True
+        suras = select(sura_readings.c.id).where(sura_readings.c.audio_sha256 == sha256).limit(1)
+        return await self.session.scalar(suras) is not None
 
     async def activity(self, learner_id: UUID) -> Mapping[date, int]:
         # Дату считаем в Python: так одинаково в PostgreSQL и SQLite (ADR-0004); день — местный
@@ -150,8 +181,14 @@ class SqlAttemptRepository(AttemptRepository):
         )
         shift = DEFAULT_UTC_OFFSET_MIN if offset is None else offset
         query = select(attempts.c.created_at).where(attempts.c.learner_id == learner_id)
+        # чтение суры целиком — тоже занятие: серия и «сегодня попыток» (автор 2026-10-31)
+        suras = select(sura_readings.c.created_at).where(sura_readings.c.learner_id == learner_id)
         days: dict[date, int] = {}
-        for created in (await self.session.scalars(query)).all():
+        times = [
+            *(await self.session.scalars(query)).all(),
+            *(await self.session.scalars(suras)).all(),
+        ]
+        for created in times:
             day = local_date(created, shift)
             days[day] = days.get(day, 0) + 1
         return days

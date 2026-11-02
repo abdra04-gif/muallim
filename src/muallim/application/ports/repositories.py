@@ -13,6 +13,7 @@ from muallim.domain.quiz import QuizAnswer
 from muallim.domain.report import LearnerReport
 from muallim.domain.review import Outcome
 from muallim.domain.settings import LearnerSettings
+from muallim.domain.sura import SuraMode, SuraReading
 
 
 class LearnerRepository(Protocol):
@@ -40,7 +41,8 @@ class AttemptRepository(Protocol):
     async def add(self, attempt: Attempt, feedback: tuple[str, ...]) -> None: ...
 
     async def best_scores(self, learner_id: UUID) -> Mapping[str, int]:
-        """Лучший балл по каждой карточке: item_id -> score."""
+        """Лучший балл по каждой карточке: item_id -> score. Карточки суры, прочитанной целиком
+        по тексту без ошибок, — 100 (FR-58, ADR-0076 п. 8)."""
 
     async def count(self, learner_id: UUID) -> int: ...
 
@@ -80,6 +82,25 @@ class AttemptRepository(Protocol):
 
     async def recent_errors(self, learner_id: UUID, attempts: int, /) -> list[PronunciationError]:
         """Ошибки последних ``attempts`` попыток ученика (по времени) — для частых букв."""
+
+
+class SuraReadingRepository(Protocol):
+    """Чтения сур целиком и наизусть (FR-60, ADR-0076)."""
+
+    async def add(self, reading: SuraReading) -> None: ...
+
+    async def count(self, learner_id: UUID, sura: int, mode: SuraMode) -> int: ...
+
+    async def last_read(self, learner_id: UUID, sura: int) -> datetime | None:
+        """Когда ученик последний раз читал эту суру целиком (любой режим)."""
+
+    async def memorized(self, learner_id: UUID) -> frozenset[int]:
+        """Суры, прочитанные наизусть без ошибок (отметка 🧠)."""
+
+    async def credited(self, learner_id: UUID) -> frozenset[str]:
+        """Карточки, засчитанные чтением суры целиком по тексту (FR-58)."""
+
+    async def audio_hashes(self, learner_id: UUID) -> list[str]: ...
 
 
 class QuizAnswerRepository(Protocol):

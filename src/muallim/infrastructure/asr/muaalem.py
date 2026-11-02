@@ -6,15 +6,21 @@
 
 import asyncio
 import json
+import logging
+from collections.abc import Sequence
 from dataclasses import dataclass, field, fields, is_dataclass
 from functools import lru_cache
-from typing import Any
+from typing import Any, Final
 
 from muallim.application.ports.recognition import (
     PronunciationRecognizer,
     Recognition,
     RecognitionError,
+    SuraRecognition,
+    SuraRecognizer,
 )
+from muallim.domain.sura import AyahReference
+from muallim.infrastructure.asr.chunks import quiet_cuts
 from muallim.infrastructure.asr.script import for_phonetizer
 from muallim.infrastructure.audio.ffmpeg import SAMPLE_RATE, decode_to_pcm
 
@@ -27,21 +33,30 @@ MOSHAF_PARAMS: dict[str, Any] = {
     "madd_mottasel_waqf": 4,
     "madd_aared_len": 4,
 }
+# Ревизия модели obadx/muaalem-model-v3_2 на Hugging Face, на которой сделаны замеры (SRC-003).
+# Библиотека берёт последнюю версию; другую замечаем при старте и пишем в лог (TD-FN-121).
+EXPECTED_MODEL_REVISION: Final = "01a1ef9fbe40d144ef845101e89ff924aed3fef5"
+_UNKNOWN_REVISION: Final = "unknown"
+
+logger: Final = logging.getLogger(__name__)
+
 # Слог, который дописываем, чтобы получить чтение без остановки (васл) — см. ADR-0007.
 _WASL_SUFFIX = " مَ"
 
 
 @dataclass
-class MuaalemRecognizer(PronunciationRecognizer):
+class MuaalemRecognizer(PronunciationRecognizer, SuraRecognizer):
     device: str = "auto"  # auto | cpu | mps | cuda
     _model: Any = field(default=None, init=False, repr=False)
+    _revision: str | None = field(default=None, init=False, repr=False)
 
     @property
     def model_version(self) -> str:
-        from importlib.metadata import version  # noqa: PLC0415
-
+        """Пишется в каждую попытку (attempts.model_version, ≤ 128 знаков): версия библиотеки,
+        короткая ревизия модели (7 знаков, как в git), параметры чтения."""
         params = ",".join(f"{k}={v}" for k, v in MOSHAF_PARAMS.items())
-        return f"quran-muaalem=={version('quran-muaalem')};{params}"
+        model = f"@{self._revision[:7]}" if self._revision else ""
+        return f"quran-muaalem=={_library_version()}{model};{params}"
 
     def load(self) -> None:
         """Загрузить и прогреть модель при старте бота, а не на первом голосовом."""
@@ -58,6 +73,7 @@ class MuaalemRecognizer(PronunciationRecognizer):
                 else "cpu"
             )
         self._model = Muaalem(device=self.device, dtype=torch.float32)
+        self._revision = _loaded_revision(self._model)
         model_ref, _ = _references("بَ")
         self._run(
             np.zeros(SAMPLE_RATE, dtype=np.float32), model_ref
@@ -81,11 +97,78 @@ class MuaalemRecognizer(PronunciationRecognizer):
             raw=raw,
         )
 
+    async def recognize_sura(
+        self,
+        audio: bytes,
+        ayahs: Sequence[tuple[str, int, str]],
+        opening: str = "",
+        preamble: str = "",
+    ) -> SuraRecognition:
+        """Сура целиком (FR-57, ADR-0076): куски 6–10 с, фонемы кусков склеиваются."""
+        import numpy as np  # noqa: PLC0415
+
+        pcm = await decode_to_pcm(audio, max_seconds=None)  # сура — без ограничения длины
+        wave = np.frombuffer(pcm, dtype=np.float32).copy()
+        try:
+            refs = sura_reference(ayahs)
+            words = _ayah_reference("", 0, opening).words if opening else ()
+            before = _ayah_reference("", 0, preamble).words if preamble else ()
+            model_ref = _sura_model_ref(tuple(text for _, _, text in ayahs))
+            heard, chunks = await asyncio.to_thread(self._run_long, wave, model_ref)
+        except Exception as error:  # модель бросает разные исключения на плохом звуке
+            raise RecognitionError(str(error)) from error
+        return SuraRecognition(
+            heard=heard,
+            ayahs=refs,
+            opening=words,
+            preamble=before,
+            pauses=(),  # молчание — после утверждения порога (TD-FN-116)
+            chunks=chunks,
+            model_version=self.model_version,
+            audio_duration_ms=round(len(wave) / SAMPLE_RATE * 1000),
+        )
+
+    def _run_long(
+        self, wave: Any, model_ref: Any
+    ) -> tuple[str, tuple[tuple[int, int, int, int], ...]]:
+        parts: list[str] = []
+        chunks: list[tuple[int, int, int, int]] = []
+        position = 0
+        for start, end in quiet_cuts(wave, SAMPLE_RATE):
+            heard, _ = self._run(wave[start:end], model_ref)
+            ms = (round(start / SAMPLE_RATE * 1000), round(end / SAMPLE_RATE * 1000))
+            chunks.append((*ms, position, position + len(heard)))
+            parts.append(heard)
+            position += len(heard)
+        return "".join(parts), tuple(chunks)
+
     def _run(self, wave: Any, model_ref: Any) -> tuple[str, dict[str, Any]]:
         if self._model is None:
             self.load()
         output = self._model([wave], [model_ref], sampling_rate=SAMPLE_RATE)[0]
         return str(output.phonemes.text), _raw_output(output)
+
+
+def _library_version() -> str:
+    from importlib.metadata import version  # noqa: PLC0415
+
+    return version("quran-muaalem")
+
+
+def _loaded_revision(model: Any) -> str:
+    """Ревизия загруженной модели (коммит на Hugging Face); не та, что ожидали, — в лог."""
+    config = getattr(getattr(model, "model", None), "config", None)
+    revision = getattr(config, "_commit_hash", None) or _UNKNOWN_REVISION
+    if revision != EXPECTED_MODEL_REVISION:
+        logger.warning(
+            "Модель Muaalem другой ревизии: %s, ожидали %s — цифры могут не совпасть с замерами"
+            " (TD-FN-121)",
+            revision,
+            EXPECTED_MODEL_REVISION,
+        )
+    else:
+        logger.info("Модель Muaalem, ревизия %s", revision)
+    return str(revision)
 
 
 def _raw_output(output: Any) -> dict[str, Any]:
@@ -142,6 +225,49 @@ def _references(text: str) -> tuple[Any, tuple[tuple[str, str], tuple[str, str]]
         ("wasl", "".join(ch for ch in wasl if ch in sounds)),
         ("waqf", "".join(ch for ch in waqf.phonemes if ch in sounds)),
     )
+
+
+def sura_reference(ayahs: Sequence[tuple[str, int, str]]) -> tuple[AyahReference, ...]:
+    """Эталон суры по аятам (FR-57, ADR-0076): (id карточки, номер аята, текст) → фонемы по словам.
+
+    Каждый аят — с остановкой в конце, как читают почти все; ``wasl_last`` — последнее слово без
+    остановки, если ученик читал слитно. Фонетизатор ставит остановку только в конце текста,
+    поэтому аяты фонетизируются по отдельности.
+    """
+    return tuple(_ayah_reference(item_id, number, text) for item_id, number, text in ayahs)
+
+
+@lru_cache(maxsize=64)
+def _sura_model_ref(texts: tuple[str, ...]) -> Any:
+    """Эталон модели для суры: аяты с остановкой в конце, фонемы и сифат подряд (ADR-0076)."""
+    from quran_transcript.phonetics.phonetizer import (  # noqa: PLC0415
+        QuranPhoneticScriptOutput,
+    )
+
+    parts = [_references(text)[0] for text in texts]
+    return QuranPhoneticScriptOutput(
+        phonemes="".join(p.phonemes for p in parts),
+        sifat=[s for p in parts for s in p.sifat],
+        mappings=[],
+    )
+
+
+@lru_cache(maxsize=1024)
+def _ayah_reference(item_id: str, number: int, text: str) -> AyahReference:
+    from quran_transcript import MoshafAttributes, quran_phonetizer  # noqa: PLC0415
+
+    moshaf = MoshafAttributes(**MOSHAF_PARAMS)
+    text = for_phonetizer(text)
+    sounds = _model_sounds()
+
+    def words(phonemes: str) -> list[str]:
+        out = ["".join(ch for ch in w if ch in sounds) for w in phonemes.split(" ")]
+        return [w for w in out if w]
+
+    waqf = words(quran_phonetizer(text, moshaf).phonemes)
+    wasl = words(quran_phonetizer(text + _WASL_SUFFIX, moshaf).phonemes)[:-1]
+    last = wasl[-1] if wasl and wasl[-1] != waqf[-1] else ""
+    return AyahReference(item_id, number, tuple(waqf), wasl_last=last)
 
 
 @lru_cache(maxsize=1)

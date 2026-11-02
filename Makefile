@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs try thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs model-check try syllables thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -27,6 +27,12 @@ test: ## Тесты с покрытием
 
 run: db-sync ## Бот с моделью (нужно uv sync --extra ml)
 	$(LIBS) uv run muallim
+
+videos: ## Ролики «🎬 Как произносить»: make videos a="ر ز" (пусто — все буквы из scripts/video/build.py)
+	uv run --group video python scripts/video/build.py $(a)
+
+syllables: ## Аяты уроков «Суры» по слогам → curriculum/syllables/ayat.yaml (ADR-0077, нужен extra ml)
+	$(LIBS) uv run --extra ml python scripts/syllables/build.py
 
 try: ## Проверка бота в терминале: make try a='"/start" "✅ Да, разрешаю" "🎤"' (без Telegram и .env)
 	$(LIBS) uv run muallim --test $(if $(a),$(a),"/start")
@@ -79,6 +85,9 @@ verify: ## Сверка БД и файлов записей: потери, ли�
 
 logs: ## Последние строки лога бота (logs/bot.log, ADR-0048); n=200 — больше строк
 	@tail -n $(if $(n),$(n),50) logs/bot.log 2>/dev/null || echo "Лога ещё нет: бот не запускался через make run"
+
+model-check: ## Не обновилась ли модель Muaalem на Hugging Face (TD-FN-121; в GitHub — раз в неделю)
+	python3 scripts/model/check_revision.py
 
 report: ## Отчёт по данным исследования
 	uv run muallim-research report

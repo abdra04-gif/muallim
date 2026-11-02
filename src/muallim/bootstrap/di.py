@@ -11,8 +11,8 @@ from muallim import __version__
 from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
 from muallim.application.ports.erasures import ErasureLog
-from muallim.application.ports.reading import ReadingGuide
-from muallim.application.ports.recognition import PronunciationRecognizer
+from muallim.application.ports.reading import AyahSyllables, ReadingGuide
+from muallim.application.ports.recognition import PronunciationRecognizer, SuraRecognizer
 from muallim.application.ports.repositories import (
     AttemptRepository,
     CurriculumSnapshots,
@@ -21,6 +21,7 @@ from muallim.application.ports.repositories import (
     LearnerSettingsRepository,
     QuizAnswerRepository,
     ReminderRecipients,
+    SuraReadingRepository,
     UnitOfWork,
 )
 from muallim.application.ports.storage import (
@@ -56,6 +57,7 @@ from muallim.application.use_cases.review import GetReview
 from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.settings import ChangeSetting, GetSettings
 from muallim.application.use_cases.staff import StaffAccess
+from muallim.application.use_cases.sura import ReadSura
 from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
@@ -70,6 +72,7 @@ from muallim.infrastructure.audio.reference_library import (
     RecitationCache,
     SoundLibrary,
 )
+from muallim.infrastructure.curriculum.syllables import SyllableLibrary
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.db.repositories.annotation import (
@@ -86,6 +89,7 @@ from muallim.infrastructure.db.repositories.learners import (
 from muallim.infrastructure.db.repositories.quiz import SqlQuizAnswerRepository
 from muallim.infrastructure.db.repositories.reminders import SqlReminderRecipients
 from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRepository
+from muallim.infrastructure.db.repositories.suras import SqlSuraReadingRepository
 from muallim.infrastructure.db.uow import SqlUnitOfWork
 from muallim.infrastructure.erasures import FileErasureLog
 from muallim.infrastructure.system import RandomIdGenerator, SystemClock
@@ -140,6 +144,11 @@ class AppProvider(Provider):
         return VideoLibrary.load(self.settings.video_dir)
 
     @provide
+    def syllables(self) -> AyahSyllables:
+        """Аяты по слогам (ADR-0077): разбор заранее, файл читается один раз при запуске."""
+        return SyllableLibrary.load(self.settings.curriculum_dir / "syllables" / "ayat.yaml")
+
+    @provide
     def display(self) -> Display:
         """Кэш экранов Telegram — один на контейнер: у каждого бота (и теста) свой."""
         return Display()
@@ -156,6 +165,13 @@ class AppProvider(Provider):
 
         recognizer = MuaalemRecognizer(device=self.settings.asr_device)
         recognizer.load()
+        return recognizer
+
+    @provide
+    def sura_recognizer(self, recognizer: PronunciationRecognizer) -> SuraRecognizer:
+        """Та же модель: и заглушка, и Muaalem умеют читать суру целиком (ADR-0076)."""
+        if not isinstance(recognizer, SuraRecognizer):
+            raise TypeError(f"{type(recognizer).__name__} не умеет проверять суру целиком")
         return recognizer
 
     @provide
@@ -204,6 +220,7 @@ class RequestProvider(Provider):
     learner_settings = provide(SqlLearnerSettingsRepository, provides=LearnerSettingsRepository)
     quiz_answers = provide(SqlQuizAnswerRepository, provides=QuizAnswerRepository)
     attempts = provide(SqlAttemptRepository, provides=AttemptRepository)
+    sura_readings = provide(SqlSuraReadingRepository, provides=SuraReadingRepository)
     reminder_recipients = provide(SqlReminderRecipients, provides=ReminderRecipients)
     events = provide(SqlEventLog, provides=EventLog)
     snapshots = provide(SqlCurriculumSnapshots, provides=CurriculumSnapshots)
@@ -282,6 +299,7 @@ class RequestProvider(Provider):
         DeleteMyData,
         OpenItem,
         AssessRecitation,
+        ReadSura,
         HowToRead,
         ScreenState,
         GetSettings,

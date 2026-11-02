@@ -18,6 +18,7 @@ from muallim.presentation.telegram.handlers import (
     quiz,
     reference,
     settings,
+    sura,
     video,
     voice,
 )
@@ -32,6 +33,7 @@ router.include_routers(
     data.router,
     reference.router,
     settings.router,
+    sura.router,
     video.router,
     voice.router,
 )

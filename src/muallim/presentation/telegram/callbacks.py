@@ -152,3 +152,20 @@ class Watch(CallbackData, prefix="watch"):
     src: str
     item_id: str = ""
     letter: str = ""
+
+
+class SuraList(CallbackData, prefix="suras"):
+    """Список сур для чтения наизусть (FR-59, ADR-0076)."""
+
+
+class SuraOpen(CallbackData, prefix="sura"):
+    """Сура целиком: ``m`` = ``t`` — по тексту («📖 Вся сура»), ``m`` — наизусть (сначала текст)."""
+
+    n: int
+    m: str
+
+
+class SuraReady(CallbackData, prefix="suraok"):
+    """«Готов» в чтении наизусть: текст скрывается, ждём голосовое."""
+
+    n: int

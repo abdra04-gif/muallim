@@ -12,6 +12,10 @@ erDiagram
     curriculum_items |o--o{ attempts : "строка книги (item_id + curriculum_version)"
     learners ||--o{ quiz_answers : "закрепление (ADR-0066)"
     attempts |o--o{ quiz_answers : "чтение на ступени ③"
+    learners ||--o{ sura_readings : "сура целиком / наизусть (ADR-0076)"
+    sura_readings ||--o{ sura_reading_ayahs : "по аятам"
+    sura_readings ||--o{ sura_reading_chunks : "куски 6–10 с"
+    sura_readings ||--o{ sura_reading_events : "ошибки, заминки"
 
     learners {
         uuid id PK

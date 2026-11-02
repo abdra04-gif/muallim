@@ -46,3 +46,21 @@ async def test_trim_silence_cuts_quiet_edges_and_keeps_the_sound(tmp_path: objec
     assert await seconds(mp3) > 2.4
     assert 0.4 < await seconds(trimmed) < 0.9
     assert await trim_silence(b"not audio") == b"not audio"
+
+
+async def test_whole_sura_is_not_cut_at_a_minute() -> None:
+    """Суры длиннее минуты (аль-Алак, аль-Баййина) — без ограничения длины (решение автора
+    2026-10-31); карточка строки по-прежнему режется на MAX_SECONDS (NFR-SEC-05)."""
+    import asyncio  # noqa: PLC0415
+
+    from muallim.infrastructure.audio.ffmpeg import MAX_SECONDS, SAMPLE_RATE  # noqa: PLC0415
+
+    proc = await asyncio.create_subprocess_exec(
+        "ffmpeg", "-v", "quiet", "-f", "lavfi", "-i", "sine=f=440:d=65:r=16000",
+        "-c:a", "libopus", "-f", "ogg", "pipe:1",
+        stdout=asyncio.subprocess.PIPE,
+    )  # fmt: skip
+    ogg, _ = await proc.communicate()
+    seconds = 4 * SAMPLE_RATE  # float32 — 4 байта на отсчёт
+    assert len(await decode_to_pcm(ogg)) / seconds <= MAX_SECONDS + 0.1
+    assert len(await decode_to_pcm(ogg, max_seconds=None)) / seconds >= 64.9

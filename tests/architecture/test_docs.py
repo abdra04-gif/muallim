@@ -64,6 +64,7 @@ _SKIP_DIRS = {
     ".ruff_cache",
     "node_modules",
     "external",
+    "worktrees",  # копии параллельных сессий (.claude/worktrees, ADR-0073) — вне git
 }
 _MARKDOWN = sorted(
     p

@@ -38,8 +38,8 @@ Refs: FR-…, ADR-…, TD-…
 |---|---|---|
 | каждое завершение ответа агента | архитектура, типы, тесты (если менялся код); связанные документы | `stop_gate`, `doc_sync` |
 | перед коммитом | запрещённые пути, секреты | `git_guard`, pre-commit |
-| перед push | архитектура, типы, тесты | `git_guard` |
-| после push | всё, как `make check`, + gitleaks, pip-audit, `make hygiene` | GitHub Actions (`.github/workflows/ci.yml`) |
+| перед push | быстрая: слои, ruff и тесты изменённых файлов; правки кода бота — сначала вопрос автору, полная (`CHECK=full`) только по его «да» (ADR-0075) | `git_guard` |
+| после push, если менялся код (`src/`, `tests/`, миграции, программа, зависимости) | всё, как `make check`, + gitleaks, pip-audit, `make hygiene` | GitHub Actions (`.github/workflows/ci.yml`) |
 | перед коммитом, смысл | документы правдивы, ничего не потеряно | агент `consistency-auditor` в `/ship` |
 
 ## Параллельные сессии (ADR-0073)
@@ -53,7 +53,7 @@ Refs: FR-…, ADR-…, TD-…
   окружение `uv run` создаёт при первом запуске. Копия начинается от `origin/main`.
 - **Хуки** проверяют копию сессии, а не основную папку (`_common.ROOT` по `cwd` события).
 - **Слияние** — `/ship` в копии: коммит в ветку → `git fetch` → `git rebase origin/main` →
-  `make check` → `git push origin HEAD:main`. Журналы и CHANGELOG склеиваются без конфликтов
+  проверки (ADR-0075) → `git push origin HEAD:main`. Журналы и CHANGELOG склеиваются без конфликтов
   (`.gitattributes`, `merge=union`). Два ADR с одним номером ловит `doc_sync`.
 - **Общее, чего в копии нет:** бот с настоящим токеном (`make run`), миграции и база — только
   в основной сессии. В копии бот проверяется через `make try`.

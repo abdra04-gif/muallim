@@ -40,6 +40,7 @@ from muallim.domain.settings import (
     MINUTES_PER_DAY,
     HowToRead,
 )
+from muallim.domain.sura import AyahOutcome, EventKind, SuraMode
 
 # Метки руководства 1.0 (ADR-0040): больше не ставятся, но могли остаться в БД — CHECK их пускает.
 LEGACY_LABELS = ("correct", "false_alarm", "missed_error", "wrong_error")
@@ -337,6 +338,104 @@ quiz_answers = Table(
     CheckConstraint("picked IS NULL OR picked BETWEEN 0 AND 3", name="picked_range"),
     # одно место раунда — один вопрос: двойное нажатие не даёт раунд из 11 (автор 2026-10-23)
     UniqueConstraint("learner_id", "round_no", "position"),
+)
+
+# Чтения сур целиком и наизусть (FR-60, ADR-0076). Одно голосовое — строка sura_readings,
+# подробности — по аятам, кускам записи и событиям; всё удаляется вместе с учеником.
+sura_readings = Table(
+    "sura_readings",
+    metadata,
+    Column("id", Uuid, primary_key=True),
+    Column(
+        "learner_id",
+        Uuid,
+        ForeignKey("learners.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    ),
+    Column("sura", SmallInteger, nullable=False),
+    Column("mode", String(8), nullable=False),
+    Column("attempt_number", Integer, nullable=False),
+    Column("days_since_last", Integer),
+    Column("studied_by_text", Boolean, nullable=False),
+    Column("clean_ayahs", SmallInteger, nullable=False),
+    Column("total_ayahs", SmallInteger, nullable=False),
+    Column("score", SmallInteger, nullable=False),
+    Column("passed", Boolean, nullable=False),
+    Column("credited", JSON, nullable=False),
+    Column("reference_phonemes", Text, nullable=False),
+    Column("heard_phonemes", Text, nullable=False),
+    Column("audio_sha256", String(64)),
+    Column("audio_duration_ms", Integer, nullable=False),
+    Column("processing_ms", Integer, nullable=False),
+    Column("model_version", String(128), nullable=False),
+    Column("curriculum_version", String(32), nullable=False),
+    Column("app_version", String(64), nullable=False),
+    Column("policy", JSON),  # порог GradingPolicy, по которому оценено (ADR-0019)
+    Column("created_at", UtcDateTime(), nullable=False, index=True),
+    CheckConstraint(_one_of("mode", SuraMode), name="mode_values"),
+    CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
+    CheckConstraint("attempt_number >= 1", name="attempt_number_positive"),
+)
+
+sura_reading_ayahs = Table(
+    "sura_reading_ayahs",
+    metadata,
+    Column(
+        "reading_id",
+        Uuid,
+        ForeignKey("sura_readings.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column("ayah", SmallInteger, primary_key=True),
+    Column("item_id", String(32), nullable=False, index=True),
+    Column("outcome", String(16), nullable=False),
+    Column("score", SmallInteger, nullable=False),
+    Column("forgotten_words", SmallInteger, nullable=False),
+    Column("extra_words", SmallInteger, nullable=False),
+    Column("pronunciation_errors", SmallInteger, nullable=False),
+    Column("reference_phonemes", Text, nullable=False),
+    Column("heard_phonemes", Text, nullable=False),
+    CheckConstraint(_one_of("outcome", AyahOutcome), name="outcome_values"),
+    CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
+)
+
+sura_reading_chunks = Table(
+    "sura_reading_chunks",
+    metadata,
+    Column(
+        "reading_id",
+        Uuid,
+        ForeignKey("sura_readings.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column("ordinal", SmallInteger, primary_key=True),
+    Column("start_ms", Integer, nullable=False),
+    Column("end_ms", Integer, nullable=False),
+    Column("first_ayah", SmallInteger),
+    Column("last_ayah", SmallInteger),
+    Column("heard_phonemes", Text, nullable=False),
+    CheckConstraint("end_ms >= start_ms", name="span_order"),
+)
+
+sura_reading_events = Table(
+    "sura_reading_events",
+    metadata,
+    Column(
+        "reading_id",
+        Uuid,
+        ForeignKey("sura_readings.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column("ordinal", SmallInteger, primary_key=True),
+    Column("kind", String(16), nullable=False, index=True),
+    Column("ayah", SmallInteger, nullable=False),
+    Column("word", SmallInteger),
+    Column("expected", Text, nullable=False),
+    Column("heard", Text, nullable=False),
+    Column("error_kind", String(32)),
+    Column("duration_ms", Integer),
+    CheckConstraint(_one_of("kind", EventKind), name="kind_values"),
 )
 
 interaction_events = Table(
