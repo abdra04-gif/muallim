@@ -23,7 +23,7 @@ COMMIT = re.compile(r"\bgit\s+commit\b")
 PUSH = re.compile(r"\bgit\s+push\b")
 
 
-def run(*cmd: str, timeout: int = 900) -> tuple[bool, str]:  # облачный контейнер: тесты 8–13 мин
+def run(*cmd: str, timeout: int = 280) -> tuple[bool, str]:
     result = subprocess.run(
         cmd, cwd=ROOT, capture_output=True, text=True, check=False, timeout=timeout
     )  # fmt: skip

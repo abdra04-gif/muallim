@@ -134,7 +134,7 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/git_guard.py\"",
-            "timeout": 1800
+            "timeout": 300
           }
         ]
       }
