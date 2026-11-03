@@ -7,6 +7,7 @@
 | понять, как архитектура выросла из требований качества | `architecture/design-iterations.md` |
 | узнать, **почему** сделано так и что отбросили | `adr/README.md` |
 | понять, откуда взялась строка / цифра / идея | `research/sources.md` (ключи `SRC-NNN`) |
+| какие ошибки бывают, как их классифицируют до нас и что из них проверяем | `research/error-taxonomy.md` (ADR-0078) |
 | что я прочитал, что думаю о статье, какие статьи читать дальше | `research/reading/README.md` (`/read-next`, `/read-note`, `/read-draft`) |
 | чем обосновано каждое методическое решение, где дыры | `research/justification.md` (`/justify`) |
 | что решили с руководителем и когда | `thesis/supervisor/` (`/supervisor`) |

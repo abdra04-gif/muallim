@@ -1,7 +1,9 @@
 % Master's thesis proposal (English). Build: make proposal → thesis/build/proposal-en.pdf
 % Format — IU "Thesis Project" course, Step 2 "Completing a research proposal": 4–5 pages; sections in the
-% slide's order. Text — the title, thesis and proposal approved by the author 2026-10-25. Full previous version — git history.
-% Topic, hypothesis and RQs — ADR-0064. Sources — SRC-NNN in sources.bib.
+% slide's order. Revised 2026-11-02/03 after the external reviews (ADR-0078): RQ-3 dropped, RQ-1 split into
+% reading/pronunciation errors, RQ-2 under a fixed budget, scope of checks by error taxonomy
+% (docs/research/error-taxonomy.md). Previous version — git history.
+% Topic, hypothesis and RQs — ADR-0064, ADR-0078. Sources — SRC-NNN in sources.bib.
 % Layout as the thesis (IU GIA Regulations, cl. 6.8): 14 pt, black Times, margins 25/20 mm.
 \documentclass[a4paper,14pt]{extarticle}
 \newcommand{\mainlang}{english}
@@ -18,87 +20,140 @@
 {\small \thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Master's Thesis Proposal}\\[8pt]
 {\large\bfseries \thesisTopicEn\par}
 \vspace{6pt}
-{\thesisAuthorEn} · Supervisor: \thesisSupervisorEn{} · October 2026
+{\thesisAuthorEn} · Supervisor: \thesisSupervisorEn{} · November 2026
 \end{center}
 
 \section{Introduction and research problem}
 
-People all over the world learn to read Arabic to access the Quran in its original language. One method
-popular in Russia and Kazakhstan is \emph{al-Muallim ath-Thani} (``The Second Teacher'') \cite{SRC-040}: it
-introduces beginners to the letters gradually, one by one, building on Quranic vocabulary. Learning usually
-requires a human instructor, yet progress depends heavily on how much the learner practises between classes.
-We aim to support this out-of-class practice with an AI assistant that checks learners' reading and detects
-mistakes.
+People all over the world are learning to read Arabic to access the Quran in its original language. One
+methodology popular in Russia and Kazakhstan is called \emph{al-Muallim ath-Thani} (``The Second Teacher'')
+\cite{SRC-040}. It introduces beginners to the letters gradually, one by one, building on Quranic vocabulary.
+Learning usually requires a human instructor, yet progress depends very much on how much the learner practises
+between classes. We would like to support this out-of-class practice with an AI assistant that checks the
+learner's reading and detects mistakes.
 
-Several solutions already check Quranic reading. Commercial apps such as Tarteel highlight mistakes in
-recitation \cite{SRC-046}, but they are closed, so their accuracy on beginners cannot be verified. Open models
-such as Quran Muaalem recognise phonemes, yet they are trained on expert reciters and their quality depends on
-the input speech: the phoneme error rate (PER) is 0.54\,\% on the authors' test set and 5.78\,\% on
-qdat\_bench, which contains real recitation errors \cite{SRC-002}. Whether these solutions are adequate for
-adult beginners reading primer material is unknown; checking this is part of our study (RQ-1).
+Checking reading is more than speech-to-text. Current work treats it as \emph{mispronunciation detection and
+diagnosis}: the system knows the text the learner should read, recognises the phonemes actually spoken and
+aligns the two to find where they differ \cite{SRC-031}. Several tools already do this. Tarteel highlights
+mistakes in recitation, but it is closed, so its accuracy on beginners cannot be verified \cite{SRC-046}.
+QVoice gives non-native learners character-level feedback on Arabic pronunciation \cite{SRC-150}. Open models
+such as Quran Muaalem recognise phonemes, yet they are trained on expert reciters and their quality drops on
+speech with errors: the phoneme error rate (PER) is 0.54\,\% on the authors' test set and 5.78\,\% on
+qdat\_bench, which contains real recitation errors \cite{SRC-002}. Whether these tools work for adult
+beginners reading primer material is unknown; checking this is the first research question.
 
 \textbf{Problem.} Not everyone can study with a teacher often: work, distance and the cost of lessons get in
-the way, and a group class has no time to go through each learner's difficulties. But existing open datasets, including the recitations of
-non-Arabic speakers in RetaSy \cite{SRC-032}, do not provide data for assessing the reading of Russian-speaking
-adult beginners learning from primer material such as \emph{al-Muallim ath-Thani}, with detailed annotation
-of reading and pronunciation errors. Without such data the quality of existing models on these learners can
-be neither measured nor improved.
+the way, and a group class has no time to go through each learner's difficulties. To our knowledge, no
+existing dataset or benchmark covers adult beginners learning to read Arabic as a foreign language at the
+primer stage, with phoneme-level teacher annotation that separates reading errors from pronunciation errors.
+The closest corpus, RetaSy, contains recitations of non-Arabic speakers but records only the reader's
+country, not their native language \cite{SRC-032}. Without such data, the quality of existing models on these
+learners can be neither measured nor improved.
 
 \section{Research questions}
 
-\textbf{Hypothesis.} By collecting a small curated speech dataset, existing solutions can be evaluated, and
-agentic loop-engineering can be used to develop an effective tool for beginners' out-of-class practice.
+\textbf{Hypothesis.} A small curated dataset of beginners' speech, annotated by teachers, is enough to show
+where existing models fail on these learners and, through model adaptation and agentic pipeline
+optimization, to build a more accurate error detection tool for out-of-class practice.
 
 \begin{rqbox}
-\textbf{RQ-1.} How reliably do existing speech recognition and analysis models detect reading and pronunciation errors in beginners learning Arabic and Quran reading?\\[4pt]
-\textbf{RQ-2.} To what extent does applying agentic loop-engineering to search for and combine configurations of existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches?\\[4pt]
-\textbf{RQ-3 (supplementary).} To what extent does using the developed tool in out-of-class practice affect how beginners studying with a teacher progress in mastering the course material?
+\textbf{RQ-1.} How accurately do existing Arabic and Quranic speech models detect and locate the errors of
+adult beginners: (a) reading errors and (b) pronunciation errors?\\[4pt]
+\textbf{RQ-2.} Under a fixed experimental budget, to what extent does agentic pipeline optimization, which
+searches for and combines configurations of existing models and components, improve error detection
+compared with predefined baseline configurations?
 \end{rqbox}
 
-\textbf{Method.} A Telegram bot collects recordings with participants' consent. Pilot: 20--40 adults,
-4--6 weeks. Two teachers annotate the recordings by phoneme and error type: a \emph{reading error} means the
-wrong sign was read (another vowel, a missed sukun, shadda or madd, a look-alike letter); a
-\emph{pronunciation error} means the sign was read correctly but the sound was produced wrongly.
+\textbf{What we check.} Recitation errors were classified long before speech models. The classical
+tradition separates a \emph{clear error} (lahn jali), which changes a letter or a vowel, from a \emph{hidden
+error} (lahn khafi), which breaks a letter's attribute or a tajweed rule \cite{SRC-153}. In an empirical study
+of students' recitation, errors of makhraj and letter attributes (sifat) formed the largest group, and qalqala
+was the most frequent error within it \cite{SRC-152}. Speech benchmarks either leave tajweed out
+\cite{SRC-004} or encode all of it \cite{SRC-002}. \emph{Al-Muallim ath-Thani} starts with letters and vowel
+signs and later teaches basic tajweed. We list everything the book teaches and fix in advance what is checked:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}P{3.3cm}LP{2.6cm}@{}}
+\toprule
+Scope & What & Lessons \\
+\midrule
+Core (RQ-1, RQ-2) & letters, vowel signs, sukun, shadda, tanwin, natural madd, spelling rules (hamza,
+  hamzat al-wasl, ta marbuta, the article); makhraj; qalqala; tafkhim and tarqiq & 1--53, 70--85 \\
+Reported separately & ghunna; mim and nun with sukun (izhar, idgham, ikhfa, iqlab); forms at a stop;
+  other sifat & 38--41, 54--69, 86--88 \\
+Out of scope & lengths of derived madd, sakt, imala, choice of where to stop & 89--96, suras \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+A \emph{reading error} means the wrong sign was read: another vowel, a missed sukun or shadda, a
+look-alike letter. A \emph{pronunciation error} means the sign was read correctly but the letter was produced
+from the wrong makhraj \cite{SRC-059} or with the wrong attribute, for example \ar{ح} pronounced like
+\ar{ه}, or a qalqala letter with sukun without its echo. The two can sound the same (\ar{ق} read as \ar{ك} may
+be either), so the annotation records what was heard and whether the error is clear or hidden, and the
+teacher adds the cause.
+
+\textbf{Method.}
 \begin{itemize}
-  \item \emph{Baselines:} Quran Muaalem as is, and the best standalone off-the-shelf model.
-  \item \emph{Agentic loop-engineering:} an AI agent searches for and combines configurations of off-the-shelf
-    models and components, for example a verifier and adaptation of individual models on teacher-annotated
-    data (such as LoRA fine-tuning \cite{SRC-111}). Tuning
-    uses training learners only, and every configuration tried is recorded in a log \cite{SRC-067}.
-  \item \emph{Evaluation:} the best configuration is compared once with the baselines on a frozen test set.
-  \item \emph{For RQ-3:} a knowledge tracing model \cite{SRC-124} and a teacher test at three time points.
+  \item \emph{Data:} a Telegram bot built on the lessons of \emph{al-Muallim ath-Thani} collects recordings
+    with participants' consent; pilot with 20--40 adults over 4--6 weeks. Two teachers annotate each
+    recording phoneme by phoneme: the expected sign, what was heard (substitution, deletion, insertion
+    or a wrong attribute) and its position; for each error, clear or hidden, and the cause. Learners are split into training, development and test sets, so no learner appears in two
+    sets.
+  \item \emph{Baselines}, fixed in advance: (B0) a Quran speech-to-text model whose transcript is compared
+    with the reference text; (B1) the IQRA 2026 phoneme recognition baseline \cite{SRC-031,SRC-066};
+    (B2) a Harf-Speech-style pipeline: phonetizer, speech-to-phoneme model and alignment \cite{SRC-149};
+    (B3) Quran Muaalem as is \cite{SRC-002}.
+  \item \emph{Agentic pipeline optimization:} a coding agent repeatedly changes the pipeline, evaluates it
+    on the development set and keeps what improves it \cite{SRC-067}. It searches over the speech model,
+    phoneme representation, alignment, decision thresholds, a verifier and adaptation of models on the
+    training learners (such as LoRA fine-tuning \cite{SRC-111}). The number of runs is fixed in advance, the
+    agent has no access to the test set, and every configuration tried is logged: without a held-out set,
+    agents tend to maximise the metric by memorising the data \cite{SRC-067}.
+  \item \emph{Evaluation:} the best configuration is compared with the baselines once, on the frozen test
+    set. The main metric is the F1 score of error detection against the teachers' annotation, as in
+    IQRA 2026 \cite{SRC-031}. We also report precision, recall, false rejections (correct reading flagged as
+    wrong), false acceptances (missed errors) and PER, for reading and pronunciation errors separately and
+    for isolated letters, syllables, words and Quranic text: isolated letters are much harder for
+    off-the-shelf models \cite{SRC-151}.
 \end{itemize}
 
 \section{Novelty and contributions}
 
 \begin{enumerate}
-  \item A curated speech dataset of adult beginners learning Arabic reading as a foreign language, at early
-    stages of primer-based learning, with detailed expert annotation separating reading errors from
-    pronunciation errors.
-  \item Measured reliability of off-the-shelf models on beginners against teachers' assessment.
-  \item An error detection system assembled with agentic loop-engineering: its gain over the baselines and a
-    log of all configurations.
-  \item Supplementary: how learners progress through the material when using the tool.
+  \item \emph{Dataset:} a curated speech dataset of adult beginners learning to read Arabic as a foreign
+    language at the primer stage, with the learners' native language and phoneme-level teacher
+    annotation. The annotation scheme combines the classical clear/hidden distinction with the cause of
+    the error: reading or pronunciation (makhraj and sifat).
+  \item \emph{Benchmark:} measured accuracy of existing Arabic and Quranic speech models on real beginner
+    speech, by error type and by level (letter, syllable, word, Quranic text).
+  \item \emph{Pipeline:} an error detection pipeline assembled by agentic pipeline optimization, its gain
+    over the baselines on learners it has never seen, and the log of all configurations tried.
+  \item \emph{Tool:} a Telegram bot that uses the pipeline to support practice between classes.
 \end{enumerate}
 
 \section{State of the art}
 
-Quran Muaalem recognises phonemes and articulatory attributes \cite{SRC-002}. The QuranMB and
-IQRA 2026 benchmarks address mispronunciation detection \cite{SRC-004,SRC-031}. The closest corpus of
-non-native readers, RetaSy, holds about 7,000 recordings from more than 11 countries; it records the reader's
-country but not the native language \cite{SRC-032}. None of these corpora separates reading errors from
-pronunciation errors. Automatic pronunciation feedback has a medium positive effect ($g=0.69$)
-\cite{SRC-025}, but on accented speech it produces false alarms, so the teacher stays in the loop
-\cite{SRC-026}. Tutors that listen to reading aloud exist for children \cite{SRC-130}. Knowledge
-tracing estimates skill mastery from a sequence of attempts \cite{SRC-124} and has been applied to reading
-skills from speech recogniser output \cite{SRC-125}. For adult beginners learning Arabic reading as a foreign
-language, the reliability of existing models requires separate evaluation.
+Quran Muaalem recognises phonemes and articulatory attributes of Quranic recitation \cite{SRC-002}. The
+QuranMB and IQRA 2026 benchmarks address Arabic mispronunciation detection \cite{SRC-004,SRC-031}. In
+IQRA 2026 the best system reached $F1=0.72$ against 0.44 for the baseline, and systems that used real
+mispronounced speech, only 1,333 utterances or about 1.5 hours, outperformed those relying on synthetic errors
+alone \cite{SRC-031}; this supports our bet on a small curated dataset. Harf-Speech assembles the whole
+pipeline from the reference text to phoneme alignment, and its scores correlate with the ratings of speech
+therapists at $r=0.79$ \cite{SRC-149}. QVoice already offers non-native learners pronunciation practice with
+feedback \cite{SRC-150}, so a practice tool by itself is not new. On isolated Arabic letters, an off-the-shelf
+wav2vec~2.0 model reaches only 35\,\% accuracy \cite{SRC-151}. The closest corpus of non-native readers,
+RetaSy, holds about 7,000 recordings from more than 11 countries \cite{SRC-032}. Automatic pronunciation
+feedback has a medium positive effect ($g=0.69$) \cite{SRC-025}, but on accented speech it produces false
+alarms, so the teacher stays in the loop \cite{SRC-026}. None of these works targets adult beginners at the
+primer stage or separates reading errors from pronunciation errors in its annotation.
 
 \section{Goal of the thesis}
 
 Collect a small curated speech dataset of beginners' primer reading, annotated by teachers, and evaluate
-existing models on it. Use agentic loop-engineering to build a reading and pronunciation error detection
-system from these models for out-of-class practice, and measure how close it comes to the teacher.
+existing models on it. Use agentic pipeline optimization to assemble from these models a reading and
+pronunciation error detection system for out-of-class practice, and measure how close it comes to the
+teacher.
 
 \section{Work plan and schedule}
 
@@ -113,15 +168,15 @@ October 2026 & \textbf{1. Bot:} development of a Telegram bot based on the lesso
   error. Topic and proposal approved; consent and ethics. Chapter 1 (Introduction) drafted \\
 Nov--Dec 2026 & \textbf{2. Data collection} starts in a closed pilot (5--10 acquaintances) with consent; the
   bot is refined based on their feedback \\
-November 2026 & \textbf{3. Annotation} rules and the teacher test prepared. Chapter 2 (Literature Review)
-  drafted; Chapters 1--2 to the supervisor for feedback \\
-December 2026 & Chapters 1--2 revised and submitted to Moodle (deadline 10 December); analysis plan fixed;
-  Chapter 3 (Methodology) started \\
+November 2026 & \textbf{3. Annotation} rules prepared. Chapter 2 (Literature Review) drafted; Chapters 1--2
+  to the supervisor for feedback \\
+December 2026 & Chapters 1--2 revised and submitted to Moodle (deadline 10 December); baselines, budget and
+  analysis plan fixed; Chapter 3 (Methodology) started \\
 Jan--Mar 2027 & \textbf{2. Data collection:} pilot with 20--40 adults, 4--6 weeks. \textbf{3. Annotation} by
-  two teachers; test set frozen in February. \textbf{5. Effect on learners:} teacher test at entry, end and
-  delayed. RQ-1 evaluation in March. Chapter 3 finished; Chapter 4 (Implementation) written in parallel \\
-April 2027 & \textbf{4. Training:} fine-tuning and agentic loop-engineering; single test-set run (RQ-2).
-  \textbf{5. Effect on learners:} analysis (RQ-3). Chapter 5 (Results) started \\
+  two teachers; test set frozen in February. RQ-1 evaluation in March. Chapter 3 finished; Chapter 4
+  (Implementation) written in parallel \\
+April 2027 & \textbf{4. Optimization:} model adaptation and agentic pipeline optimization; single test-set
+  run (RQ-2). Chapter 5 (Results) started \\
 May 2027 & Chapters 5--6; full text to the supervisor; pre-defence \\
 June 2027 & Thesis submitted; defence \\
 \bottomrule
