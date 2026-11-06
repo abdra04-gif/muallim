@@ -6,7 +6,9 @@
 «Как читается» под спойлером остаётся; «Крупный шрифт» — ``render.LARGE_SCALE`` и свой ключ экрана.
 
 Разбор — фейк порта ``AyahSyllables`` (каждое слово — одна клетка); рисование подменено шпионами,
-пиксели не проверяются. Тексты — из curriculum/course.ru.yaml.
+пиксели не проверяются. Тексты — из curriculum/course.ru.yaml. Статус строки (``bad`` и др.)
+экран не видит: с FR-62 (ADR-0079 п. 7) библиотека отдаёт и ``bad`` — это проверяют
+tests/integration/test_syllable_library.py и test_syllable_bot.py.
 """
 
 from collections.abc import Iterable

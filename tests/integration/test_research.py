@@ -451,3 +451,63 @@ async def test_per_sound_file_marks_self_corrected_attempts(
     dataset.write_phonemes(await dataset.dataset_rows(session), tmp_path / "phonemes.csv")
     marked = {r["attempt_id"][-2:]: r["self_corrected"] for r in _read(tmp_path / "phonemes.csv")}
     assert marked == {"0a": "true", "0b": "false"}
+
+
+# ---------- FR-62 (ADR-0079 п. 6): метки по клеткам в датасете ----------
+async def test_dataset_carries_entry_and_cell_marks_of_each_label(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """У метки — как введена (``entry``) и её клетки; у метки из пакета Excel клеток нет."""
+    from sqlalchemy import insert  # noqa: PLC0415
+
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    for row in rows:
+        row["status"] = "agree"
+    await annotation.import_package(
+        session, _save_like_excel(rows, tmp_path / "A1.csv"), "A1", FixedClock()
+    )
+    await session.execute(
+        insert(annotations).values(
+            id=100, attempt_id=UUID(int=10), annotator="A2", label="fix", corrected_phonemes=None,
+            comment="", guide_version="3.0", created_at=FixedClock().now(), source="telegram",
+            entry="cells",
+        )
+    )  # fmt: skip
+    await session.execute(
+        insert(annotation_marks),
+        [
+            {"annotation_id": 100, "cell": 0, "layout": "letters", "char_start": 0,
+             "char_end": 2, "piece": "صَ", "kind": "letter", "heard_letter": "س",
+             "bot_flagged": True},
+            {"annotation_id": 100, "cell": 0, "layout": "letters", "char_start": 0,
+             "char_end": 2, "piece": "صَ", "kind": "tafkhim", "heard_letter": None,
+             "bot_flagged": True},
+        ],
+    )  # fmt: skip
+    await session.commit()
+
+    by_id = {r["attempt_id"]: r for r in await dataset.dataset_rows(session)}
+    excel, cells = by_id[str(UUID(int=10))]["annotations"]
+    assert (excel["annotator"], excel["entry"], excel["marks"]) == ("A1", "phonemes", [])
+    assert (cells["annotator"], cells["entry"], cells["actual_phonemes"]) == ("A2", "cells", None)
+    assert sorted(cells["marks"], key=lambda m: m["kind"]) == [
+        {"cell": 0, "char_start": 0, "char_end": 2, "piece": "صَ", "kind": "letter",
+         "heard_letter": "س", "bot_flagged": True},
+        {"cell": 0, "char_start": 0, "char_end": 2, "piece": "صَ", "kind": "tafkhim",
+         "heard_letter": None, "bot_flagged": True},
+    ]  # fmt: skip
+    dataset.write_jsonl(list(by_id.values()), tmp_path / "manifest.jsonl")  # клетки — в JSON
+    assert '"tafkhim"' in (tmp_path / "manifest.jsonl").read_text(encoding="utf-8")
+
+
+async def test_excel_package_columns_do_not_change_with_cell_marks(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """ADR-0079 п. 6: пакет Excel не меняется — импорт фонемами, клеток в нём нет."""
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    assert tuple(rows[0]) == annotation.PACKAGE_COLUMNS
+    assert not [c for c in annotation.PACKAGE_COLUMNS if "mark" in c or "cell" in c]

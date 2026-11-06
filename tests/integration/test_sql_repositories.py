@@ -119,6 +119,39 @@ async def test_delete_learner_cascades(session: AsyncSession) -> None:
     assert event["learner_id"] is None and event["payload"] == {"k": 1}
 
 
+async def test_delete_learner_removes_teacher_cell_marks(session: AsyncSession) -> None:
+    """FR-62 (ADR-0079 п. 3): клетки меток учителя уходят вместе с данными ученика (/delete)."""
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    clock = FixedClock()
+    learner = _learner(clock)
+    learners = SqlLearnerRepository(session)
+    await learners.add(learner)
+    await SqlAttemptRepository(session).add(_attempt(learner, 1, "سَ", clock), ("m",))
+    await session.execute(
+        insert(annotations).values(
+            id=1, attempt_id=UUID(int=101), annotator="A1", label="fix", corrected_phonemes=None,
+            comment="", guide_version="3.0", created_at=clock.now(), source="telegram",
+            entry="cells",
+        )
+    )  # fmt: skip
+    await session.execute(
+        insert(annotation_marks),
+        [
+            {"annotation_id": 1, "cell": 0, "layout": "letters", "char_start": 0, "char_end": 2,
+             "piece": "صَ", "kind": kind, "heard_letter": letter, "bot_flagged": True}
+            for kind, letter in (("letter", "س"), ("vowel", None))
+        ],
+    )  # fmt: skip
+    await session.commit()
+
+    await learners.delete(learner.id)
+    await session.commit()
+
+    for table in (annotations, annotation_marks):
+        assert await session.scalar(select(func.count()).select_from(table)) == 0
+
+
 async def test_feedback_language_roundtrip(session: AsyncSession) -> None:
     clock, repo = FixedClock(), SqlLearnerRepository(session)
     learner = _learner(clock)

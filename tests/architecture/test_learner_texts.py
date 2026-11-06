@@ -103,6 +103,8 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.Dispute: callbacks.Dispute(attempt=attempt),
         callbacks.DisputeReason: callbacks.DisputeReason(attempt=attempt, reason=reason),
         callbacks.AnnotateAct: callbacks.AnnotateAct(a=attempt, act="cancel"),
+        # клетка разметки (ADR-0079): самый длинный шаг, номер клетки, код вида, буква
+        callbacks.AnnotateMark: callbacks.AnnotateMark(a=attempt, s="h", c=99, k="sss", h="ض"),
         callbacks.Opening: callbacks.Opening(act="start"),
         callbacks.ShareLesson: callbacks.ShareLesson(
             lesson=max((les.id for les in curriculum.lessons), key=len)

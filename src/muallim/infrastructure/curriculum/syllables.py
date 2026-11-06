@@ -1,7 +1,8 @@
 """Аяты по слогам (FR-61, ADR-0077): curriculum/syllables/ayat.yaml.
 
-Устроено как ``VideoLibrary`` (ADR-0074): поиск по точному тексту пункта; ``status: bad`` —
-человек посмотрел и отклонил, не отдаём; ``unchecked`` отдаём. Нет файла — пустая библиотека.
+Устроено как ``VideoLibrary`` (ADR-0074): поиск по точному тексту пункта; отдаётся любой статус:
+``unchecked`` и ``bad`` тоже — ``bad`` только пометка «поправить разбор», карточку по слогам она
+не прячет (FR-62, ADR-0079 п. 7, решение автора 2026-10-31). Нет файла — пустая библиотека.
 Строка, чьи кусочки не складываются ровно в ``text`` (файл устарел или правлен руками), —
 пропускается: бот покажет прежнюю карточку. Файл собирает ``scripts/syllables/build.py``.
 """
@@ -53,8 +54,6 @@ class SyllableLibrary(AyahSyllables):
         for row in rows if isinstance(rows, list) else []:
             if not isinstance(row, dict) or not isinstance(row.get("text"), str):
                 continue  # строка испорчена ручной правкой — пропуск
-            if row.get("status") == "bad":
-                continue
             ayah = _ayah(row)
             if ayah is not None:
                 ayat[str(row["text"])] = ayah

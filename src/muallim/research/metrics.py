@@ -21,12 +21,20 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, select
+from sqlalchemy import ColumnElement, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from muallim.domain.assessment import ErrorKind, assess
+from muallim.application.ports.reading import AyahSyllables
+from muallim.domain.annotation import Entry, MarkKind, annotation_cells, bot_cells
+from muallim.domain.assessment import ErrorKind, assess, phoneme_errors
 from muallim.domain.policy import GradingPolicy, Verdict
-from muallim.infrastructure.db.tables import annotations, attempts, interaction_events
+from muallim.infrastructure.db.tables import (
+    annotation_marks,
+    annotations,
+    attempts,
+    curriculum_items,
+    interaction_events,
+)
 from muallim.research.reports import to_markdown_table
 
 STUB = "stub"
@@ -60,19 +68,6 @@ class PhonemeCounts:
             self.ta + other.ta, self.fr + other.fr, self.fa + other.fa, self.tr + other.tr,
             self.correct_diagnosis + other.correct_diagnosis,
         )  # fmt: skip
-
-
-def phoneme_errors(reference: str, heard: str) -> dict[int, tuple[ErrorKind, str]]:
-    """Позиции эталона с ошибкой → (тип, что прозвучало). Те же правила, что у бота
-    (``domain.assessment``: калькаля при остановке — не ошибка). Замена нескольких звуков
-    отмечает каждую фонему; вставка относится к фонеме, перед которой вставлено (в конце строки
-    — к последней)."""
-    marks: dict[int, tuple[ErrorKind, str]] = {}
-    last = max(len(reference) - 1, 0)
-    for error in assess(reference, heard).errors:
-        for k in range(max(len(error.expected), 1)):
-            marks.setdefault(min(error.position + k, last), (error.kind, error.heard))
-    return marks
 
 
 class Outcome(StrEnum):
@@ -370,6 +365,92 @@ class SelfCorrection:
     quality: MddQuality
 
 
+# ---------- по клеткам (FR-62, ADR-0079 п. 5) ----------
+@dataclass(frozen=True, slots=True)
+class CellLabel:
+    """Метка клетками: сколько клеток в строке, где ошибку нашла модель, где и что — учитель."""
+
+    learner: UUID
+    attempt: UUID
+    annotator: str
+    cells: int
+    model: frozenset[int]
+    teacher: Mapping[int, frozenset[str]]  # клетка → виды ошибки учителя
+
+
+@dataclass(frozen=True, slots=True)
+class CellMetrics:
+    """Точность по клеткам: единица крупнее фонемы — с Iqra'Eval напрямую не сравнивать."""
+
+    labels: int
+    counts: PhonemeCounts  # TA/FR/FA/TR по клеткам (correct_diagnosis не считается)
+    quality: MddQuality
+    recall_by_kind: dict[str, float | None]  # по виду ошибки учителя
+    alpha_cells: float | None  # согласие учителей «ошибка / нет» по клеткам
+    alpha_units: int
+    alpha_kinds: float | None  # по паре (клетка, вид): «отмечен / нет»
+    alpha_kind_units: int
+    ci: dict[str, tuple[float, float] | None]
+
+
+def _cell_counts(labels: Iterable[CellLabel]) -> PhonemeCounts:
+    total = PhonemeCounts()
+    for lab in labels:
+        teacher = set(lab.teacher)
+        tr = len(lab.model & teacher)
+        fr, fa = len(lab.model - teacher), len(teacher - lab.model)
+        total += PhonemeCounts(lab.cells - tr - fr - fa, fr, fa, tr)
+    return total
+
+
+_CELL_CI: dict[str, Callable[[Sequence[CellLabel]], float | None]] = {
+    "precision": lambda u: mdd_quality(_cell_counts(u)).precision,
+    "recall": lambda u: mdd_quality(_cell_counts(u)).recall,
+    "F1": lambda u: mdd_quality(_cell_counts(u)).f1,
+}
+
+
+def cell_metrics(labels: Sequence[CellLabel]) -> CellMetrics:
+    """Исход клетки по схеме MDD (SRC-064): модель отметила клетку × учитель отметил клетку.
+
+    Recall по виду — сколько клеток с этим видом ошибки учителя отметила и модель. α
+    Криппендорфа (SRC-065) — по попыткам с двумя и более разметчиками. ДИ — бутстрэп по ученикам.
+    """
+    counts = _cell_counts(labels)
+    errors, caught = Counter[str](), Counter[str]()
+    for lab in labels:
+        for cell, kinds in lab.teacher.items():
+            for kind in kinds:
+                errors[kind] += 1
+                caught[kind] += cell in lab.model
+    by_attempt: dict[UUID, list[CellLabel]] = defaultdict(list)
+    for lab in labels:
+        by_attempt[lab.attempt].append(lab)
+    shared = [raters for raters in by_attempt.values() if len(raters) >= 2]
+    cell_units = [
+        ["err" if pos in r.teacher else "ok" for r in raters]
+        for raters in shared
+        for pos in range(max(r.cells for r in raters))
+    ]
+    kind_units = [
+        [kind in r.teacher.get(pos, frozenset()) for r in raters]
+        for raters in shared
+        for pos in range(max(r.cells for r in raters))
+        for kind in MarkKind
+    ]
+    learners: dict[UUID, list[CellLabel]] = defaultdict(list)
+    for lab in labels:
+        learners[lab.learner].append(lab)
+    groups = list(learners.values())
+    return CellMetrics(
+        labels=len(labels), counts=counts, quality=mdd_quality(counts),
+        recall_by_kind={k: _ratio(caught[k], errors[k]) for k in sorted(errors)},
+        alpha_cells=krippendorff_alpha_nominal(cell_units), alpha_units=len(cell_units),
+        alpha_kinds=krippendorff_alpha_nominal(kind_units), alpha_kind_units=len(kind_units),
+        ci={name: cluster_bootstrap(groups, stat) for name, stat in _CELL_CI.items()},
+    )  # fmt: skip
+
+
 @dataclass(frozen=True, slots=True)
 class Metrics:
     phonemes: PhonemeCounts
@@ -391,6 +472,7 @@ class Metrics:
     self_corrected: SelfCorrection
     ci: dict[str, tuple[float, float] | None]  # 95 % ДИ бутстрэпом по ученикам
     by_sound: dict[str, KindQuality]  # Q1.5: по звуку эталона
+    cells: CellMetrics  # FR-62: метки клетками — отдельно от фонемных цифр
 
 
 @dataclass(frozen=True, slots=True)
@@ -451,7 +533,10 @@ class _Label:
     self_corrected: bool
 
 
-async def collect(session: AsyncSession, today: date) -> Metrics:
+async def collect(
+    session: AsyncSession, today: date, syllables: AyahSyllables | None = None
+) -> Metrics:
+    """``syllables`` — разбор аятов (``ayat.yaml``): клетки сур — слоги, как у разметчика."""
     real = attempts.c.model_version != STUB
     labels = await _latest_labels(session, real)
     counts = PhonemeCounts()
@@ -543,6 +628,7 @@ async def collect(session: AsyncSession, today: date) -> Metrics:
                                                                "caught")))
             for sound in sounds
         },
+        cell_metrics(await _cell_labels(session, real, syllables)),
     )  # fmt: skip
 
 
@@ -580,6 +666,64 @@ async def _latest_labels(
             bool(own),
         )  # fmt: skip
     return latest
+
+
+async def _cell_labels(
+    session: AsyncSession, real: ColumnElement[bool], syllables: AyahSyllables | None
+) -> list[CellLabel]:
+    """Последняя метка каждого разметчика на попытку, если она поставлена клетками.
+
+    Где ошибку нашла модель — заново из ``heard_phonemes`` тем же ``bot_cells``, что у бота
+    (``bot_flagged`` хранит ⚠️ только на отмеченных клетках). Клетка учителя — по позиции
+    кусочка в тексте (переживает пересборку ``ayat.yaml``); нет текста пункта — по номеру.
+    """
+    rows = await session.execute(
+        select(
+            annotations.c.id, annotations.c.attempt_id, annotations.c.annotator,
+            annotations.c.label, annotations.c.entry, attempts.c.learner_id,
+            attempts.c.reference_phonemes, attempts.c.heard_phonemes, curriculum_items.c.text,
+        )
+        .join(attempts, attempts.c.id == annotations.c.attempt_id)
+        .outerjoin(
+            curriculum_items,
+            and_(
+                curriculum_items.c.item_id == attempts.c.item_id,
+                curriculum_items.c.curriculum_version == attempts.c.curriculum_version,
+            ),
+        )
+        .where(real, annotations.c.label.in_(STATUSES))
+        .order_by(annotations.c.created_at, annotations.c.id)
+    )  # fmt: skip
+    latest = {(r.attempt_id, r.annotator): r for r in rows.all()}
+    chosen = [r for r in latest.values() if r.entry == Entry.CELLS and r.label in USABLE]
+    if not chosen:
+        return []
+    marks = await session.execute(
+        select(
+            annotation_marks.c.annotation_id, annotation_marks.c.cell,
+            annotation_marks.c.char_start, annotation_marks.c.kind,
+        ).where(annotation_marks.c.annotation_id.in_([r.id for r in chosen]))
+    )  # fmt: skip
+    by_label: dict[int, list[tuple[int, int, str]]] = defaultdict(list)
+    for annotation_id, cell, char_start, kind in marks.all():
+        by_label[annotation_id].append((cell, char_start, kind))
+    out = []
+    for r in chosen:
+        text = r.text or ""
+        cells = annotation_cells(text, syllables.for_text(text) if syllables and text else None)
+        teacher: dict[int, set[str]] = defaultdict(set)
+        for cell, char_start, kind in by_label[r.id]:
+            at = next((c.index for c in cells if c.start <= char_start < c.end), cell)
+            teacher[at].add(kind)
+        model = bot_cells(text, r.reference_phonemes, r.heard_phonemes, cells) if text else None
+        size = max([len(cells), *(c + 1 for c in teacher)])
+        out.append(
+            CellLabel(
+                learner=r.learner_id, attempt=r.attempt_id, annotator=r.annotator, cells=size,
+                model=model or frozenset(), teacher={c: frozenset(k) for c, k in teacher.items()},
+            )
+        )  # fmt: skip
+    return out
 
 
 def _policy(stored: Mapping[str, Any] | None) -> GradingPolicy:
@@ -695,6 +839,7 @@ def render(m: Metrics) -> str:
             "",
             to_markdown_table(("метрика", "значение", "из чего"), own),
             "",
+            *_render_cells(m.cells),
             "## Согласие разметчиков с ботом",
             "",
             "Последняя метка каждого разметчика на попытку: `agree` — бот услышал верно, `fix` — "
@@ -736,6 +881,40 @@ def render(m: Metrics) -> str:
             "",
         ]
     )
+
+
+def _render_cells(c: CellMetrics) -> list[str]:
+    """Блок FR-62 (ADR-0079 п. 5): отдельно от фонемных цифр — единица крупнее фонемы."""
+    n, q = c.counts, c.quality
+    quality = [
+        ("precision", _num(q.precision), f"TR {n.tr}, FR {n.fr}"),
+        ("recall", _num(q.recall), f"TR {n.tr}, FA {n.fa}"),
+        ("F1", _num(q.f1), ""),
+        ("α учитель — учитель (клетки)", _num(c.alpha_cells), f"клеток: {c.alpha_units}"),
+        ("α учитель — учитель (вид)", _num(c.alpha_kinds), f"пар клетка × вид: "
+         f"{c.alpha_kind_units}"),
+    ]  # fmt: skip
+    intervals = [(name, _interval(value)) for name, value in c.ci.items()]
+    kinds = [(kind, _num(recall)) for kind, recall in c.recall_by_kind.items()]
+    return [
+        "## Точность по клеткам (FR-62)",
+        "",
+        "Метки, поставленные клетками (слоги аята суры, буквы остальных строк): модель отметила "
+        "клетку × учитель отметил клетку (TA/FR/FA/TR). Единица крупнее фонемы — с цифрами выше "
+        "и с Iqra'Eval напрямую не сравнивать. Где ошибку нашла модель — пересчёт из того, что "
+        "она услышала.",
+        "",
+        f"Меток: {c.labels}. Клеток: TA {n.ta}, FR {n.fr}, FA {n.fa}, TR {n.tr}.",
+        "",
+        to_markdown_table(("метрика", "значение", "из чего"), quality),
+        "",
+        to_markdown_table(("метрика", "95 % ДИ"), intervals),
+        "",
+        "Recall по виду ошибки учителя:",
+        "",
+        to_markdown_table(("вид", "recall"), kinds),
+        "",
+    ]
 
 
 def _interval(value: tuple[float, float] | None) -> str:

@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-import pytest
 import yaml
 from pydantic import SecretStr
 
@@ -96,10 +95,32 @@ async def test_container_resolves_ayah_syllables(tmp_path: Path) -> None:
         curriculum = await container.get(Curriculum)
         path = PROJECT_ROOT / "curriculum" / "syllables" / "ayat.yaml"
         rows = yaml.safe_load(path.read_text(encoding="utf-8"))["ayat"]
-        good = [r["text"] for r in rows if r["status"] != "bad"]  # статус ставит человек
-        if not good:
-            pytest.skip("все строки ayat.yaml помечены bad")
-        assert library.for_text(good[0]) is not None
+        # любой статус, и «bad» тоже, — слоги отдаются (FR-62, ADR-0079 п. 7)
+        assert all(library.for_text(r["text"]) is not None for r in rows)
         assert library.for_text(curriculum.item("L001-02").text) is None  # не сура
+    finally:
+        await container.close()
+
+
+async def test_container_resolves_submit_marks(tmp_path: Path) -> None:
+    """FR-62 (ADR-0079): сценарий разметки по клеткам зарегистрирован в bootstrap/di.py."""
+    from muallim.application.use_cases import annotation  # noqa: PLC0415
+
+    url = f"sqlite+aiosqlite:///{tmp_path / 'di.sqlite3'}"
+    engine = create_engine(url)
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
+    await engine.dispose()
+    settings = Settings(
+        bot_token=SecretStr("0:test"),
+        database_url=SecretStr(url),
+        asr_backend="stub",
+        audio_dir=tmp_path / "audio",
+    )
+    container = create_container(settings)
+    try:
+        submit_marks = annotation.SubmitMarks
+        async with container() as request:
+            assert isinstance(await request.get(submit_marks), submit_marks)
     finally:
         await container.close()

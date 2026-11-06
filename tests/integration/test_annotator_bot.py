@@ -1,7 +1,14 @@
 """Разметка в Telegram через настоящие обработчики (FR-17): кто может войти и что сохраняется.
 
 Как tests/integration/test_bot_flow.py: настоящие диспетчер, роутеры, DI, SQLite; вместо
-серверов Telegram — сессия в памяти, которая ещё умеет «отправить голосовое».
+серверов Telegram — сессия в памяти, которая ещё умеет «отправить голосовое» и запоминает
+клавиатуру, изменённую на месте (``editMessageReplyMarkup``).
+
+FR-62 (ADR-0079, дополнено 2026-11-01): один экран — учитель оценивает чтение ученика: «Чисто»
+(эталон; ``agree``, только если и бот не нашёл ошибок) или слоги с отметками и «Готово»; прежний
+ввод фонем — «Фонемы вручную». В записи ниже бот услышал «سَ» вместо «صَ», поэтому «Прочитал
+чисто» сохраняется как ``fix`` с эталоном. Разметка клетками — tests/integration/
+test_annotator_marks_bot.py.
 """
 
 from collections.abc import AsyncIterator, Callable
@@ -11,8 +18,8 @@ from uuid import UUID
 
 import pytest
 from aiogram import Bot, Dispatcher
-from aiogram.methods import SendVoice, TelegramMethod
-from aiogram.types import Chat, Message, User
+from aiogram.methods import EditMessageReplyMarkup, SendVoice, TelegramMethod
+from aiogram.types import Chat, InlineKeyboardMarkup, Message, User
 from dishka import AsyncContainer
 from dishka.integrations.aiogram import setup_dishka
 from pydantic import SecretStr
@@ -34,6 +41,7 @@ from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
 from muallim.infrastructure.db.tables import annotations, metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.infrastructure.system import SystemClock
+from muallim.presentation.telegram import annotator_texts as t
 from muallim.presentation.telegram.callbacks import AnnotateAct
 from muallim.research import annotators
 from tests.fakes import FixedClock
@@ -45,7 +53,8 @@ ANNOTATOR_TG, STRANGER_TG, INVITED_TG = 900, 901, 902
 
 
 class VoiceTelegram(FakeTelegram):
-    """Ещё и голосовые: запоминает, с защитой ли от пересылки они отправлены."""
+    """Ещё и голосовые: запоминает, с защитой ли от пересылки они отправлены. Клавиатура,
+    изменённая на месте, — новый экран с теми же номером сообщения и кнопками (FR-62)."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -63,6 +72,17 @@ class VoiceTelegram(FakeTelegram):
                 message_id=self._next_id, date=NOW, chat=Chat(id=method.chat_id, type="private"),
                 from_user=BOT_USER,
             ).as_(bot)  # fmt: skip
+        if isinstance(method, EditMessageReplyMarkup):
+            self.calls.append(method)
+            assert isinstance(method.chat_id, int) and isinstance(method.message_id, int)
+            markup = method.reply_markup
+            edited = Message(
+                message_id=method.message_id, date=NOW,
+                chat=Chat(id=method.chat_id, type="private"), from_user=BOT_USER,
+                reply_markup=markup if isinstance(markup, InlineKeyboardMarkup) else None,
+            ).as_(bot)  # fmt: skip
+            self.shown.append(edited)
+            return edited
         return await super().make_request(bot, method, timeout)
 
 
@@ -143,6 +163,22 @@ def _act(act: str) -> str:
     return AnnotateAct(a=UUID(int=10).hex, act=act).pack()
 
 
+def tap(person: Learner, text: str) -> str:
+    """Кнопка с этим текстом на последнем экране (тексты — annotator_texts, утверждает автор)."""
+    markup = person.last_screen().reply_markup
+    assert markup is not None
+    for row in markup.inline_keyboard:
+        for b in row:
+            if b.text == text and b.callback_data:
+                return b.callback_data
+    raise AssertionError(f"на экране нет кнопки «{text}»")
+
+
+async def manual_entry(person: Learner) -> None:
+    """«Фонемы вручную» на том же экране: прежний ввод фонем текстом."""
+    await person.press(tap(person, t.BTN_MANUAL))
+
+
 async def test_anyone_who_writes_annotate_can_annotate(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:
@@ -152,12 +188,11 @@ async def test_anyone_who_writes_annotate_can_annotate(
     await newcomer.write("/annotate")
     shown = "\n".join(tg.texts())
     assert "A2" in shown  # A1 занят в настройках — новичок получает следующий код
-    assert "Бот прав" in shown or "Бот прав" in str(newcomer.last_screen().reply_markup)
     (voice,) = tg.voices
     assert voice.protect_content is True
-    await newcomer.press(_act("ok"))
+    await newcomer.press(tap(newcomer, t.BTN_CLEAN))
     (label,) = await _labels(container)
-    assert (label["annotator"], label["label"]) == ("A2", "agree")
+    assert (label["annotator"], label["label"]) == ("A2", "fix")  # бот ошибся, ученик — нет
 
 
 async def test_welcome_is_shown_only_on_first_join(
@@ -174,13 +209,18 @@ async def test_welcome_is_shown_only_on_first_join(
 async def test_button_without_joining_does_nothing(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:
-    """Подделанная кнопка от того, кто не писал /annotate, ничего не сохраняет."""
+    """Настоящая кнопка разметчика, нажатая тем, кто не писал /annotate: молча ничего."""
     _, container = app
+    annotator, _ = person(ANNOTATOR_TG)
+    await annotator.write("/annotate")
+    clean, mark = tap(annotator, t.BTN_CLEAN), tap(annotator, t.BTN_DONE)
     stranger, tg = person(STRANGER_TG)
     await stranger.write("/start")  # обычный ученик: экран с кнопками есть, /annotate не было
-    await stranger.press(_act("ok"))
+    shown = len(tg.shown)
+    for data in (clean, mark):
+        await stranger.press(data)
     assert await _labels(container) == []
-    assert tg.voices == []
+    assert tg.voices == [] and len(tg.shown) == shown and tg.alerts() == []
 
 
 async def test_revoked_annotator_cannot_come_back_with_annotate(
@@ -200,23 +240,26 @@ async def test_revoked_annotator_cannot_come_back_with_annotate(
 async def test_annotator_can_redo_previous_answer(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:
-    """Нажал «Бот прав» по ошибке — «↩️ Переделать» показывает ту же запись снова."""
+    """Нажал «Чисто» по ошибке — «Переделать» показывает ту же запись снова."""
     _, container = app
     annotator, tg = person(ANNOTATOR_TG)
     await annotator.write("/annotate")
-    await annotator.press(_act("ok"))
+    await annotator.press(tap(annotator, t.BTN_CLEAN))
     assert "Переделать" in str(annotator.last_screen().reply_markup)
     await annotator.press(_act("redo"))
     assert len(tg.voices) == 2  # та же запись ещё раз
-    await annotator.press(_act("fix"))
-    await annotator.write("صَ")
+    await manual_entry(annotator)
+    await annotator.write("سَ")  # ученик и правда сказал «س» — как услышал бот
     labels = await _labels(container)
-    assert [(lb["annotator"], lb["label"]) for lb in labels] == [("A1", "agree"), ("A1", "fix")]
+    # Учитель оценивает чтение (ADR-0079, автор 2026-11-01): совпало с ботом — «бот прав» само
+    assert [(lb["annotator"], lb["label"]) for lb in labels] == [("A1", "fix"), ("A1", "agree")]
+    assert [lb["corrected_phonemes"] for lb in labels] == ["صَ", "سَ"]
 
 
-async def test_annotator_from_settings_confirms_bot(
+async def test_annotator_from_settings_marks_clean_reading(
     app: tuple[Dispatcher, AsyncContainer], person: Callable[[int], tuple[Learner, VoiceTelegram]]
 ) -> None:
+    """FR-62: «Чисто» — что прозвучало = эталон; бот нашёл ошибку — значит ``fix``."""
     _, container = app
     annotator, tg = person(ANNOTATOR_TG)
     await annotator.write("/annotate")
@@ -226,10 +269,11 @@ async def test_annotator_from_settings_confirms_bot(
     assert "ص → س" in shown and "سَ" in shown  # видит, что нашёл и что услышал бот
     assert "L-aaaa" not in shown and "111" not in shown  # и не видит, кто ученик
 
-    await annotator.press(annotator.button(AnnotateAct))  # первая кнопка — «бот прав»
+    await annotator.press(tap(annotator, t.BTN_CLEAN))
     (label,) = await _labels(container)
-    assert (label["annotator"], label["label"], label["corrected_phonemes"]) == ("A1", "agree", "سَ")
+    assert (label["annotator"], label["label"], label["corrected_phonemes"]) == ("A1", "fix", "صَ")
     assert label["source"] == "telegram" and label["seconds_spent"] is not None
+    assert label["entry"] == "cells"
 
 
 async def test_annotator_fixes_phonemes_with_hints(
@@ -238,13 +282,13 @@ async def test_annotator_fixes_phonemes_with_hints(
     _, container = app
     annotator, tg = person(ANNOTATOR_TG)
     await annotator.write("/annotate")
-    await annotator.press(_act("fix"))
+    await manual_entry(annotator)  # FR-62: прежний ввод — «Фонемы вручную»
     await annotator.write("أَ")  # описка: хамза другим знаком
     assert "хамза пишется одним знаком «ء»" in tg.texts()[-1]
     assert await _labels(container) == []
     await annotator.write("صَ")
     (label,) = await _labels(container)
-    assert (label["label"], label["corrected_phonemes"]) == ("fix", "صَ")
+    assert (label["label"], label["corrected_phonemes"], label["entry"]) == ("fix", "صَ", "phonemes")
 
 
 @pytest.mark.parametrize(("presses", "expected"), [(1, True), (2, False)])
@@ -262,9 +306,9 @@ async def test_annotator_marks_self_correction(
     for _ in range(presses):
         await annotator.press(_act("self"))
     assert await _labels(container) == []  # отметка сама по себе — ещё не метка
-    await annotator.press(_act("ok"))
+    await annotator.press(tap(annotator, t.BTN_CLEAN))
     (label,) = await _labels(container)
-    assert (label["label"], label["self_corrected"]) == ("agree", expected)
+    assert (label["label"], label["self_corrected"]) == ("fix", expected)
 
 
 async def test_self_correction_kept_when_fixing_phonemes(
@@ -274,7 +318,7 @@ async def test_self_correction_kept_when_fixing_phonemes(
     annotator, _ = person(ANNOTATOR_TG)
     await annotator.write("/annotate")
     await annotator.press(_act("self"))
-    await annotator.press(_act("fix"))
+    await manual_entry(annotator)
     await annotator.write("صَ")
     (label,) = await _labels(container)
     assert (label["label"], label["self_corrected"]) == ("fix", True)
@@ -312,7 +356,7 @@ async def test_revoked_annotator_loses_access_immediately(
         session = await request.get(AsyncSession)
         await annotators.revoke(session, "A1", FixedClock())
         await session.commit()
-    await annotator.press(_act("ok"))
+    await annotator.press(tap(annotator, t.BTN_CLEAN))
     assert await _labels(container) == []
 
 
@@ -349,14 +393,13 @@ async def test_redo_keeps_current_card_and_its_fix(
     _, container = app
     await _second_attempt(container)
     annotator, tg = person(ANNOTATOR_TG)
-    second = AnnotateAct(a=UUID(int=11).hex, act="fix").pack()
     await annotator.write("/annotate")
-    await annotator.press(_act("ok"))  # 10 — бот прав; бот показывает 11
-    await annotator.press(second)  # 11 — бот ошибся, жду фонемы
+    await annotator.press(tap(annotator, t.BTN_CLEAN))  # 10 — прочитал чисто; бот показывает 11
+    await manual_entry(annotator)  # 11 — ввожу фонемы вручную, жду их
     await annotator.press(_act("redo"))  # вспомнил про 10
     await annotator.press(_act("bad"))  # 10 — плохая запись
     assert len(tg.voices) == 3  # 10, 11, снова 10 — без второй 11
     await annotator.write("صَ")  # фонемы для 11
     labels = [(lb["attempt_id"], lb["label"]) for lb in await _labels(container)]
-    assert labels == [(UUID(int=10), "agree"), (UUID(int=10), "audio_unusable"),
+    assert labels == [(UUID(int=10), "fix"), (UUID(int=10), "audio_unusable"),
                       (UUID(int=11), "fix")]  # fmt: skip

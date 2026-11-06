@@ -20,6 +20,7 @@ from muallim.domain.sura import AyahReference, SuraMode, SuraReading
 if TYPE_CHECKING:
     from muallim.application.ports.storage import Video
     from muallim.domain import review
+    from muallim.domain.annotation import CellMark
     from muallim.domain.quiz import QuizAnswer
 
 
@@ -408,10 +409,12 @@ class InMemoryAnnotators:
 
 @dataclass
 class InMemoryAnnotationTasks:
-    """Очередь разметки: задачи по порядку; метки копятся списком."""
+    """Очередь разметки: задачи по порядку; метки копятся списком. Клетки меток (FR-62) — по
+    попытке, список на каждую метку по порядку: новая метка не стирает клетки прежней."""
 
     tasks: list[AnnotationTask] = field(default_factory=list)
     labels: list[Label] = field(default_factory=list)
+    marks: dict[UUID, list[list["CellMark"]]] = field(default_factory=dict)
 
     def _open(self, annotator: str) -> list[AnnotationTask]:
         done = {label.attempt_id for label in self.labels if label.annotator == annotator}
@@ -426,8 +429,9 @@ class InMemoryAnnotationTasks:
     async def remaining(self, annotator: str) -> int:
         return len(self._open(annotator))
 
-    async def add(self, label: Label) -> None:
+    async def add(self, label: Label, marks: Sequence["CellMark"] = ()) -> None:
         self.labels.append(label)
+        self.marks.setdefault(label.attempt_id, []).append(list(marks))
 
 
 @dataclass

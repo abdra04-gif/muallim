@@ -137,3 +137,116 @@ def test_migration_0008_adds_learner_settings_one_to_one(tmp_path: Path) -> None
     command.downgrade(cfg, "0007")
     with create_engine(f"sqlite:///{db}").connect() as conn:
         assert not inspect(conn).has_table("learner_settings")
+
+
+# ---------- FR-62 (ADR-0079 п. 3): клетки меток учителя ----------
+MARK_COLUMNS = {
+    "id", "annotation_id", "cell", "layout", "char_start", "char_end", "piece", "kind",
+    "heard_letter", "bot_flagged",
+}  # fmt: skip
+_INSERT_MARK = (
+    "INSERT INTO annotation_marks (annotation_id, cell, layout, char_start, char_end, piece,"
+    " kind, heard_letter, bot_flagged) VALUES (1, ?, ?, 0, 3, 'x', ?, NULL, 0)"
+)
+
+
+def _seed_annotation(conn: Any) -> None:
+    """Ученик, попытка и одна метка — как до миграции 0011 (без ``entry``)."""
+    conn.exec_driver_sql(
+        "INSERT INTO learners (id, telegram_user_id, pseudonym, language, research_consent,"
+        " blocked_bot, created_at) VALUES ('00000000000000000000000000000001', 5, 'L-1', 'ru',"
+        " 1, 0, '2026-10-31 12:00:00')"
+    )
+    conn.exec_driver_sql(
+        "INSERT INTO attempts (id, learner_id, item_id, curriculum_version, model_version,"
+        " reference_phonemes, heard_phonemes, score, verdict, processing_ms, created_at) VALUES"
+        " ('00000000000000000000000000000002', '00000000000000000000000000000001', 'L097-03',"
+        " 'v1', 'm', 'a', 'a', 100, 'excellent', 1, '2026-10-31 12:00:00')"
+    )
+    conn.exec_driver_sql(
+        "INSERT INTO annotations (id, attempt_id, annotator, label, corrected_phonemes, comment,"
+        " guide_version, created_at, source) VALUES (1, '00000000000000000000000000000002', 'A1',"
+        " 'agree', 'a', '', '2.1', '2026-10-31 12:00:00', 'telegram')"
+    )
+
+
+def test_migration_0011_adds_annotation_marks_and_entry(tmp_path: Path) -> None:
+    """Клетки метки — отдельная таблица со ссылкой на метку; прежние метки не трогаются."""
+    from sqlalchemy import inspect  # noqa: PLC0415
+
+    db = tmp_path / "marks.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0010")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+    command.upgrade(cfg, "0011")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        info = inspect(conn)
+        columns = {c["name"]: c for c in info.get_columns("annotation_marks")}
+        (fk,) = info.get_foreign_keys("annotation_marks")
+        uniques = [u["column_names"] for u in info.get_unique_constraints("annotation_marks")]
+        entry = {c["name"]: c for c in info.get_columns("annotations")}["entry"]
+        old = conn.exec_driver_sql("SELECT label, entry FROM annotations").all()
+    assert set(columns) == MARK_COLUMNS
+    assert not [c for c in columns if "telegram" in c]
+    assert (fk["referred_table"], fk["referred_columns"]) == ("annotations", ["id"])
+    assert fk["constrained_columns"] == ["annotation_id"]
+    assert fk["options"].get("ondelete") == "CASCADE"
+    assert ["annotation_id", "cell", "kind"] in uniques
+    assert {name for name, c in columns.items() if c["nullable"]} == {"heard_letter"}
+    assert entry["nullable"] is True
+    assert old == [("agree", None)]  # entry у прежних меток — NULL
+
+    command.downgrade(cfg, "0010")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        info = inspect(conn)
+        assert not info.has_table("annotation_marks")
+        assert "entry" not in {c["name"] for c in info.get_columns("annotations")}
+        assert conn.exec_driver_sql("SELECT count(*) FROM annotations").scalar() == 1
+
+
+@pytest.mark.parametrize(
+    ("sql", "params"),
+    [
+        (_INSERT_MARK, (20, "syllables", "unsure")),  # «не уверен» отклонён автором
+        (_INSERT_MARK, (20, "words", "vowel")),  # раскладки: syllables | letters
+        (_INSERT_MARK, (30, "syllables", "letter")),  # UNIQUE (annotation_id, cell, kind)
+        ("UPDATE annotations SET entry = 'buttons'", ()),  # entry: cells | phonemes | NULL
+    ],
+)
+def test_migration_0011_rejects_values_outside_the_code(
+    tmp_path: Path, sql: str, params: tuple[object, ...]
+) -> None:
+    """CHECK — те же 11 видов (``MarkKind``), две раскладки и два способа ввода, что в коде."""
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+
+    db = tmp_path / "check.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0011")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+        for cell, kind in enumerate(ann.MarkKind):  # каждый вид из кода проходит CHECK
+            conn.exec_driver_sql(_INSERT_MARK, (cell, "syllables", str(kind)))
+        conn.exec_driver_sql(_INSERT_MARK, (30, "letters", "letter"))
+        for entry in ("cells", "phonemes"):
+            conn.exec_driver_sql("UPDATE annotations SET entry = ?", (entry,))
+    with pytest.raises(IntegrityError), create_engine(f"sqlite:///{db}").begin() as conn:
+        conn.exec_driver_sql(sql, params)
+
+
+def test_annotation_marks_go_away_with_their_annotation(tmp_path: Path) -> None:
+    """ON DELETE CASCADE: метку удалили (и при /delete ученика) — её клеток не осталось."""
+    from sqlalchemy import event  # noqa: PLC0415
+
+    db = tmp_path / "cascade.sqlite3"
+    command.upgrade(_config(f"sqlite+aiosqlite:///{db}"), "head")
+    engine = create_engine(f"sqlite:///{db}")
+    event.listen(engine, "connect", lambda dbapi, _: dbapi.execute("PRAGMA foreign_keys=ON"))
+    with engine.begin() as conn:
+        _seed_annotation(conn)
+        conn.exec_driver_sql(_INSERT_MARK, (0, "syllables", "letter"))
+        conn.exec_driver_sql(_INSERT_MARK, (1, "syllables", "missing"))
+        conn.exec_driver_sql("DELETE FROM annotations WHERE id = 1")
+        assert conn.exec_driver_sql("SELECT count(*) FROM annotation_marks").scalar() == 0

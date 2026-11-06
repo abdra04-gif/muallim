@@ -104,11 +104,24 @@ class DisputeReason(CallbackData, prefix="dreason"):
 
 
 class AnnotateAct(CallbackData, prefix="ann"):
-    """Разметчик (FR-17): ok — бот прав, fix — исправить, bad — плохая запись, off — читал не то,
-    skip — пропустить, stop — закончить, cancel — отменить исправление, ref — эталон."""
+    """Разметчик (FR-17, FR-62): clean — чисто, fix — фонемы вручную, bad — плохая запись,
+    off — читал не то, self — сам исправился, comment — комментарий, skip — пропустить,
+    cancel — отменить ввод фонем, ref — эталон, redo — переделать."""
 
     a: str  # UUID.hex попытки — 32 символа
     act: str
+
+
+class AnnotateMark(CallbackData, prefix="am"):
+    """Разметка клетками (FR-62, ADR-0079). ``s`` — шаг: c — выбрать слог, k — вид вкл/выкл,
+    l — какая буква, o — все буквы, h — буква, n — «не знаю», d — готово. Самая длинная —
+    ≈ 48 байт (≤ 64)."""
+
+    a: str  # UUID.hex попытки — 32 символа
+    s: str
+    c: int = 0  # номер клетки
+    k: str = ""  # код вида (MarkKind.code)
+    h: str = ""  # буква (фонема)
 
 
 class Opening(CallbackData, prefix="open"):

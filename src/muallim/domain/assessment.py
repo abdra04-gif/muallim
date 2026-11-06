@@ -94,6 +94,21 @@ def assess(reference: str, heard: str) -> Assessment:
     return Assessment(reference, heard, score, tuple(errors))
 
 
+def phoneme_errors(reference: str, heard: str) -> dict[int, tuple[ErrorKind, str]]:
+    """Позиции эталона с ошибкой → (тип, что прозвучало). Те же правила, что у бота
+    (``assess``: калькаля при остановке — не ошибка). Замена нескольких звуков отмечает каждую
+    фонему; вставка относится к фонеме, перед которой вставлено (в конце строки — к последней).
+
+    Общий разбор для метрик (``research.metrics``) и клеток разметки (``domain.annotation``).
+    """
+    marks: dict[int, tuple[ErrorKind, str]] = {}
+    last = max(len(reference) - 1, 0)
+    for error in assess(reference, heard).errors:
+        for k in range(max(len(error.expected), 1)):
+            marks.setdefault(min(error.position + k, last), (error.kind, error.heard))
+    return marks
+
+
 def unread_from(reference: str, heard: str) -> int | None:
     """С какого слога (индекс в ``syllables(reference)``) строка не дочитана; None — дочитана.
 

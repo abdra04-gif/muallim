@@ -23,7 +23,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from muallim.infrastructure.db.tables import annotations, attempts, learners
+from muallim.infrastructure.db.tables import annotation_marks, annotations, attempts, learners
 from muallim.research.annotation import USABLE, AttemptStatus
 from muallim.research.metrics import COMPARISON_VERSION, phoneme_outcomes
 
@@ -61,20 +61,35 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
         select(
             annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
             annotations.c.corrected_phonemes, annotations.c.guide_version,
-            annotations.c.self_corrected,
+            annotations.c.self_corrected, annotations.c.entry, annotations.c.id,
         )
         .join(attempts, attempts.c.id == annotations.c.attempt_id)
         .join(learners, learners.c.id == attempts.c.learner_id)
         .where(*consenting_real, annotations.c.label.in_(_STATUSES))
         .order_by(annotations.c.created_at, annotations.c.id)
     )  # fmt: skip
-    latest: dict[UUID, dict[str, dict[str, str | bool | None]]] = defaultdict(dict)
-    for attempt_id, annotator, status, actual, guide, self_corrected in labels.all():
+    latest: dict[UUID, dict[str, dict[str, Any]]] = defaultdict(dict)
+    for (
+        attempt_id,
+        annotator,
+        status,
+        actual,
+        guide,
+        self_corrected,
+        entry,
+        label_id,
+    ) in labels.all():
         latest[attempt_id][annotator] = {
             "annotator": annotator, "status": status, "actual_phonemes": actual,
             "guide_version": guide,
             "self_corrected": self_corrected,  # None — метка до руководства 2.1 (не спрашивали)
+            "entry": entry,  # cells | phonemes; None — до FR-62 или «плохая запись», «не то»
+            "marks": label_id,  # заменяется списком клеток ниже
         }  # fmt: skip
+    cells = await _cell_marks(session, [m["marks"] for by in latest.values() for m in by.values()])
+    for by in latest.values():
+        for m in by.values():
+            m["marks"] = cells.get(m["marks"], [])
     rows = []
     for r in (await session.execute(query)).mappings():
         row = dict(r)
@@ -89,9 +104,31 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
     return rows
 
 
-def _consensus(marks: list[dict[str, str | bool | None]]) -> str | None:
+async def _cell_marks(session: AsyncSession, ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """Клетки меток (FR-62, ADR-0079 п. 6) по номеру метки, по порядку клеток."""
+    if not ids:
+        return {}
+    c = annotation_marks.c
+    rows = await session.execute(
+        select(
+            c.annotation_id, c.cell, c.char_start, c.char_end, c.piece, c.kind, c.heard_letter,
+            c.bot_flagged,
+        )
+        .where(c.annotation_id.in_(ids))
+        .order_by(c.annotation_id, c.cell, c.kind)
+    )  # fmt: skip
+    out: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for r in rows.mappings():
+        mark = dict(r)
+        out[mark.pop("annotation_id")].append(mark)
+    return out
+
+
+def _consensus(marks: list[dict[str, Any]]) -> str | None:
+    """Согласие — только если все разметчики записали фонемы (метка клетками без фонем — нет)."""
     actual = {str(m["actual_phonemes"]) for m in marks if m["actual_phonemes"] is not None}
-    usable = len(marks) >= 2 and all(m["status"] in USABLE for m in marks)
+    complete = all(m["actual_phonemes"] is not None for m in marks)
+    usable = len(marks) >= 2 and complete and all(m["status"] in USABLE for m in marks)
     return actual.pop() if usable and len(actual) == 1 else None
 
 

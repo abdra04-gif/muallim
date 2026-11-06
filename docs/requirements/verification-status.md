@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-10-30T19:20:29+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-11-06T12:31:41+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `0015d3a1f644d62b` | 119 |
+| код | `17d065d9d071772d` | 124 |
 | программа (книга) | `0fc81446afbea2bd` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
-| миграции | `8d9824574007fee4` | 9 |
+| миграции | `21febe56a874d855` | 11 |
 | зависимости | `e33bf9dd0f3b4cc1` | 1 |
 | предрегистрация | `e4898b776c3b8338` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **70 из 71**.
+Проверено зелёными тестами: **75 из 76**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -27,8 +27,8 @@
 | FR-06 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py` | ✅ |
 | FR-07 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-08 | `tests/unit/test_use_cases.py` | ✅ |
-| FR-09 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-10 | `tests/integration/test_bot_flow.py`, `tests/integration/test_erasures.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-09 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_sura_audio_privacy.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-10 | `tests/integration/test_bot_flow.py`, `tests/integration/test_erasures.py`, `tests/integration/test_sql_repositories.py`, `tests/integration/test_sura_audio_privacy.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-11 | `tests/integration/test_research.py` | ✅ |
 | FR-12 | `tests/unit/test_use_cases.py` | ✅ |
 | FR-13 | `tests/integration/test_research.py` | ✅ |
@@ -49,7 +49,7 @@
 | FR-32 | `tests/unit/test_curriculum_model.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-33 | `tests/unit/test_render.py` | ✅ |
 | FR-34 | `tests/unit/test_curriculum_content.py` | ✅ |
-| FR-35 | `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-35 | `tests/integration/test_sql_repositories.py`, `tests/integration/test_sura_readings_sql.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-36 | `tests/unit/test_curriculum_content.py` | ✅ |
 | FR-37 | `tests/unit/test_curriculum_content.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-38 | `tests/unit/test_render.py`, `tests/unit/test_screens.py` | ✅ |
@@ -71,10 +71,15 @@
 | FR-54 | `tests/integration/test_yaml_loader.py`, `tests/unit/test_arabic_text.py`, `tests/unit/test_error_groups.py`, `tests/unit/test_readable_images.py`, `tests/unit/test_result_breakdown_screen.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-55 | `tests/integration/test_metrics_report.py`, `tests/integration/test_pilot_report.py`, `tests/unit/test_metrics_ci.py`, `tests/unit/test_pilot_metrics.py` | ✅ |
 | FR-56 | `tests/integration/test_video_bot.py`, `tests/integration/test_video_library.py`, `tests/unit/test_articulation_video.py` | ✅ |
+| FR-57 | `tests/architecture/test_learner_texts.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_sura_bot.py`, `tests/unit/test_sura.py`, `tests/unit/test_sura_audio.py`, `tests/unit/test_sura_reading.py`, `tests/unit/test_sura_screens.py` | ✅ |
+| FR-58 | `tests/integration/test_sura_bot.py`, `tests/integration/test_sura_readings_sql.py`, `tests/unit/test_sura_reading.py` | ✅ |
+| FR-59 | `tests/integration/test_settings_bot.py`, `tests/integration/test_sura_bot.py`, `tests/unit/test_settings_screens.py`, `tests/unit/test_sura.py`, `tests/unit/test_sura_reading.py`, `tests/unit/test_sura_screens.py` | ✅ |
+| FR-60 | `tests/integration/test_sura_audio_privacy.py`, `tests/integration/test_sura_readings_sql.py` | ✅ |
 | FR-61 | `tests/integration/test_di.py`, `tests/integration/test_syllable_bot.py`, `tests/integration/test_syllable_library.py`, `tests/unit/test_ayah_card.py`, `tests/unit/test_ayah_number.py`, `tests/unit/test_ayah_render.py`, `tests/unit/test_syllables_merge.py` | ✅ |
+| FR-62 | `tests/architecture/test_migrations.py`, `tests/integration/test_annotator_bot.py`, `tests/integration/test_annotator_marks_bot.py`, `tests/integration/test_annotators_sql.py`, `tests/integration/test_metrics_report.py`, `tests/integration/test_research.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_annotation_marks.py`, `tests/unit/test_cell_metrics.py` | ✅ |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
-| NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py` | ✅ |
+| NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py`, `tests/integration/test_sura_audio_privacy.py` | ✅ |
 | NFR-TR-04 | `tests/architecture/test_hooks.py` | ✅ |
 | NFR-REL-02 | `tests/architecture/test_logging.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
 | NFR-ACC-01 | `tests/integration/test_metrics_report.py`, `tests/unit/test_metrics.py` | ✅ |

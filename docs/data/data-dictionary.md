@@ -141,16 +141,38 @@
 | `annotator` | varchar(64) | **код** разметчика (A1, T2), не имя; латиница, цифры, `-`, `_` |
 | `label` | varchar(32) | с 2.0: `agree` (бот услышал верно), `fix` (исправлено), `audio_unusable`, `off_task`; метки 1.0 (`correct`, `false_alarm`, …) в метрики не входят |
 | `corrected_phonemes` | text, null | что прозвучало на самом деле (Quran Phonetic Script): при `agree` — то, что услышал бот, при `fix` — исправленное; `null` — `audio_unusable` / `off_task` |
-| `comment` | text | |
+| `comment` | text | свободный текст разметчика: столбец пакета Excel или «Комментарий» в Telegram (FR-62) — уходит со следующим ответом на запись; пусто — не писал |
 | `guide_version` | varchar(16) | версия руководства по разметке |
 | `created_at` | timestamptz | |
 | `source` | varchar(16), null | откуда метка: `excel` (пакет `tasks.csv`) или `telegram` (кнопки в боте, FR-17); `null` — метки до миграции 0005 (все из Excel) |
 | `seconds_spent` | int, null | секунд от показа записи до ответа — только Telegram; при исправлении фонем — до отправки исправления |
 | `self_corrected` | boolean, null | ученик ошибся и сам перечитал верно — отдельная категория (руководство 2.1, ADR-0043); только при `agree`/`fix`; `null` — метки до миграции 0006 (не спрашивали) |
+| `entry` | varchar(16), null | как введено «что прозвучало» (FR-62, ADR-0079): `cells` — клетками в Telegram (отметки — в `annotation_marks`), `phonemes` — фонемами (пакет Excel, «Фонемы вручную»); `null` — метки до миграции 0011, «Плохая запись», «Читал не то» |
+
+При `entry = 'cells'` `label` считается сам: `agree` — чтение по учителю совпало с тем, что услышал
+бот; `corrected_phonemes` у `fix` бывает `null`, если отметки не сводятся к фонемам (огласовка,
+мадд, таджвид и т. п., ADR-0079).
 
 Строки не изменяются и не удаляются при исправлении: исправленная метка — новая строка, в
 метриках и датасете берётся **последняя метка каждого разметчика** на попытку (история
 сохраняется). Удаляются вместе с попыткой (CASCADE) и при отзыве согласия на запись голоса.
+
+## `annotation_marks` — отметки учителя по клеткам (FR-62, ADR-0079)
+| Поле | Тип | Описание |
+|---|---|---|
+| `id` | int, PK | |
+| `annotation_id` | int → annotations, CASCADE, индекс | метка, к которой относится отметка |
+| `cell` | smallint | номер клетки с 0 (в порядке чтения) |
+| `layout` | varchar(16) | `syllables` — слоги аята суры (`curriculum/syllables/ayat.yaml`), `letters` — буквы со знаками |
+| `char_start`, `char_end` | smallint | позиция кусочка в тексте пункта (`curriculum_items.text`) — не зависит от пересборки `ayat.yaml` |
+| `piece` | text | кусочек, как его видел учитель |
+| `kind` | varchar(32) | вид ошибки: `letter`, `vowel`, `madd`, `shadda_sukun`, `missing` (не прочитана вся клетка), `extra`; `tafkhim`, `ghunna`, `qalqala`; `halting`, `wrong_stop` |
+| `heard_letter` | varchar(4), null | какая буква прозвучала (фонема) — только у `letter`; `null` — не указал или «не знаю» |
+| `bot_flagged` | boolean | стояла ли на клетке «!» бота (оценка эффекта подсказки, `preregistration.md` §5) |
+
+Строка — одна отметка «клетка × вид»; в одной клетке может быть несколько видов. Метрики по
+клеткам (`research/metrics.py`) считают, где ошибку нашла модель, заново из `attempts.heard_phonemes`,
+а не из `bot_flagged`.
 
 ## `annotators` — разметчики по приглашению, вошедшие по `/annotate` и отозванные (FR-17, ADR-0041, ADR-0072)
 | Поле | Тип | Описание |
@@ -172,7 +194,7 @@
 | `used_at` | timestamptz, null | погашено при входе (один раз); неиспользованные удаляются при отзыве |
 
 ## Ограничения в самой БД (ADR-0055)
-- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `learner_reports.reason` ∈ read_correctly / wrong_error / other.
+- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 11 видов `MarkKind`, уникально `(annotation_id, cell, kind)` (миграция 0011); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
 - Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
 - `annotations.detected_error_id` удалено миграцией 0007.
 - `learner_settings` (миграция 0008): `how_to_read` ∈ spoiler / shown / hidden; `reminder_minute` NULL или 0…1439; `utc_offset_min` −720…840; одна строка на ученика (PK `learner_id`).

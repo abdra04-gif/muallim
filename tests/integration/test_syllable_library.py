@@ -1,8 +1,10 @@
 """FR-61 (ADR-0077): разбор аятов на слоги — файл curriculum/syllables/ayat.yaml и его адаптер.
 
 ``SyllableLibrary.load(path)`` (``path`` — сам файл ``ayat.yaml``) повторяет ``VideoLibrary``
-(ADR-0074): поиск по точному тексту пункта, ``status: bad`` не отдаётся, ``unchecked`` — отдаётся,
-нет файла — пустая библиотека, строка, чьи кусочки не складываются в ``text``, пропускается.
+(ADR-0074): поиск по точному тексту пункта, ``unchecked`` — отдаётся, нет файла — пустая
+библиотека, строка, чьи кусочки не складываются в ``text``, пропускается. ``status: bad`` тоже
+отдаётся (FR-62, ADR-0079 п. 7, решение автора 2026-10-31): это пометка «поправить разбор»,
+карточку по слогам она не прячет.
 Первая часть — временный yaml, вторая — настоящие данные репозитория (без extra ``ml``, модели и
 сети): файл ↔ программа, ``moshaf`` == ``MOSHAF_PARAMS``, якорные проверки правил разбора.
 
@@ -90,8 +92,12 @@ def test_unchecked_row_is_given_like_unchecked_video(library: Any, texts: dict[s
     )
 
 
-def test_rejected_row_is_not_given(library: Any, texts: dict[str, str]) -> None:
-    assert library.for_text(texts[DHALIKA]) is None
+def test_row_marked_bad_is_still_given(library: Any, texts: dict[str, str]) -> None:
+    """ADR-0079 п. 7: ``bad`` — только пометка «поправить разбор», ученик видит слоги."""
+    from muallim.domain.syllables import SyllableCell  # noqa: PLC0415
+
+    words = library.for_text(texts[DHALIKA])
+    assert words == tuple((SyllableCell(w, "звук"),) for w in texts[DHALIKA].split(" "))
 
 
 def test_row_whose_pieces_do_not_add_up_to_text_is_skipped(
@@ -234,11 +240,11 @@ def test_file_was_built_with_the_bot_moshaf_params() -> None:
     assert _data()["moshaf"] == MOSHAF_PARAMS
 
 
-def test_repository_file_is_read_by_the_library_for_every_good_row() -> None:
+def test_repository_file_is_read_by_the_library_for_every_row() -> None:
+    """Каждая строка файла — и ``bad`` (ADR-0079 п. 7) — даёт карточку по слогам."""
     library = _load(AYAT)
-    for row in _rows():
-        found = library.for_text(row["text"])
-        assert (found is None) == (row["status"] == "bad"), row["text"]
+    missing = [row["text"] for row in _rows() if library.for_text(row["text"]) is None]
+    assert not missing, missing
 
 
 # ---------- якорные проверки правил разбора (регрессия генератора) ----------

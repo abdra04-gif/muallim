@@ -917,15 +917,22 @@ def _joins(piece: str) -> bool:
     return bool(letters) and letters[-1].base not in AYAH_NON_JOINING
 
 
+def in_word(pieces: Sequence[str], i: int) -> str:
+    """Кусочек слова с ZWJ по краям: буквы в той же форме, что внутри слова (и на кнопках
+    разметки, FR-62)."""
+    left = ZWJ if i and _joins(pieces[i - 1]) else ""
+    right = ZWJ if i < len(pieces) - 1 and _joins(pieces[i]) else ""
+    return left + pieces[i] + right
+
+
 def _shaped(words: Ayah, scale: float) -> list[list[_Cell]]:
     font, sound_font = _font(round(AYAH_SIZE * scale)), _ui_font(round(SOUND_SIZE * scale))
     out = []
     for word in words:
         cells = []
+        pieces = [cell.text for cell in word]
         for i, cell in enumerate(word):
-            left = ZWJ if i and _joins(word[i - 1].text) else ""
-            right = ZWJ if i < len(word) - 1 and _joins(cell.text) else ""
-            text = left + cell.text + right
+            text = in_word(pieces, i)
             width = max(
                 font.getlength(text, direction="rtl"),
                 sound_font.getlength(cell.sound) + SOUND_PAD * scale,

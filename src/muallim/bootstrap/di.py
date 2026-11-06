@@ -36,6 +36,7 @@ from muallim.application.use_cases.annotation import (
     NextAnnotation,
     RedeemInvite,
     SubmitAnnotation,
+    SubmitMarks,
 )
 from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.curriculum import PublishCurriculum
@@ -234,6 +235,34 @@ class RequestProvider(Provider):
         return AnnotatorAccess(directory, settings.annotators)
 
     @provide
+    def next_annotation(
+        self,
+        *,
+        access: AnnotatorAccess,
+        tasks: AnnotationTasks,
+        audio: AudioStore,
+        events: EventLog,
+        uow: UnitOfWork,
+        syllables: AyahSyllables,
+    ) -> NextAnnotation:
+        """Очередь разметки; клетки аята — из того же разбора, что карточка суры (ADR-0079)."""
+        return NextAnnotation(access, tasks, audio, events, uow, syllables)
+
+    @provide
+    def submit_marks(
+        self,
+        *,
+        access: AnnotatorAccess,
+        tasks: AnnotationTasks,
+        uow: UnitOfWork,
+        events: EventLog,
+        clock: Clock,
+        syllables: AyahSyllables,
+    ) -> SubmitMarks:
+        """Разметка по клеткам (FR-62, ADR-0079)."""
+        return SubmitMarks(access, tasks, uow, events, clock, syllables)
+
+    @provide
     def staff_access(self, settings: Settings, annotators: AnnotatorAccess) -> StaffAccess:
         return StaffAccess(settings.teachers, annotators)
 
@@ -312,7 +341,6 @@ class RequestProvider(Provider):
         PublishCurriculum,
         RedeemInvite,
         JoinAnnotation,
-        NextAnnotation,
         SubmitAnnotation,
     )
 

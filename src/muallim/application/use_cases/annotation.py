@@ -6,12 +6,13 @@ ADR-0072). Прежние пути — ANNOTATOR_IDS и приглашение �
 входе: кнопка того, кто не входил или отозван, ничего не сделает.
 """
 
-from collections.abc import Mapping
-from dataclasses import dataclass
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from uuid import UUID
 
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
+from muallim.application.ports.reading import AyahSyllables
 from muallim.application.ports.repositories import UnitOfWork
 from muallim.application.ports.storage import AudioStore
 from muallim.application.ports.system import Clock, EventLog
@@ -22,12 +23,21 @@ from muallim.domain.annotation import (
     AnnotationSource,
     AnnotationStatus,
     AnnotationTask,
+    CellMark,
+    Entry,
     Label,
+    Mark,
+    annotation_cells,
+    apply_marks,
+    bot_cells,
     check_label,
+    check_marks,
     check_phonemes,
     check_self_correction,
     clean_phonemes,
     invite_digest,
+    layout_of,
+    marks_status,
 )
 from muallim.domain.learner import Learner
 
@@ -122,6 +132,16 @@ class ShownTask:
     remaining: int  # сколько ещё в очереди, включая эту
 
 
+def with_cells(task: AnnotationTask, syllables: AyahSyllables | None) -> AnnotationTask:
+    """Задача с клетками разметки (FR-62): слоги аята из ``ayat.yaml`` или буквы строки, и
+    клетки, где ошибку нашла модель."""
+    cells = annotation_cells(
+        task.item_text, syllables.for_text(task.item_text) if syllables else None
+    )
+    found = bot_cells(task.item_text, task.reference_phonemes, task.bot_heard, cells)
+    return replace(task, cells=cells, bot_cells=found)
+
+
 @dataclass(frozen=True, slots=True)
 class NextAnnotation:
     access: AnnotatorAccess
@@ -129,6 +149,7 @@ class NextAnnotation:
     audio: AudioStore
     events: EventLog
     uow: UnitOfWork
+    syllables: AyahSyllables | None = None
 
     async def execute(
         self, learner: Learner, exclude: frozenset[UUID] = frozenset()
@@ -144,7 +165,7 @@ class NextAnnotation:
                     {"annotator": annotator, "attempt_id": str(task.attempt_id)},
                 )  # fmt: skip
                 await self.uow.commit()
-                return ShownTask(annotator, task, audio, remaining)
+                return ShownTask(annotator, with_cells(task, self.syllables), audio, remaining)
             skipped.add(task.attempt_id)  # файла нет — покажет muallim-research verify
         return None
 
@@ -163,7 +184,7 @@ class NextAnnotation:
             "annotation_redo", learner.id, {"annotator": annotator, "attempt_id": str(attempt_id)}
         )
         await self.uow.commit()
-        return ShownTask(annotator, task, audio, remaining)
+        return ShownTask(annotator, with_cells(task, self.syllables), audio, remaining)
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,10 +205,13 @@ class SubmitAnnotation:
         comment: str = "",
         seconds_spent: int | None = None,
         self_corrected: bool = False,
+        reading: bool = False,
     ) -> bool:
         """Сохраняет метку. False — попытки больше нет (ученик удалил данные или отозвал согласие).
 
         LabelError — метка противоречит руководству (текст — подсказка разметчику).
+        ``reading`` — учитель прислал, что прозвучало, а не судил бота (Telegram, ADR-0079):
+        совпало с тем, что услышал бот, — метка ``agree`` сама.
         """
         annotator = await self.access.require(learner)
         task = await self.tasks.get(attempt_id)
@@ -199,17 +223,93 @@ class SubmitAnnotation:
         elif status in USABLE:
             phonemes = clean_phonemes(actual or "")
             check_phonemes(phonemes)
+            if reading:  # одно правило «бот прав» с клетками (дополнено 2026-11-01, п. 5)
+                status = marks_status(task.bot_heard, task.reference_phonemes, phonemes, ())
+                if status is AnnotationStatus.AGREE:
+                    phonemes = task.bot_heard
         check_label(status, phonemes, task.bot_heard)
         check_self_correction(status, self_corrected=self_corrected)
         await self.tasks.add(
             Label(
                 attempt_id, annotator, status, phonemes, comment.strip(),
                 AnnotationSource.TELEGRAM, seconds_spent, self.clock.now(), self_corrected,
+                Entry.PHONEMES if phonemes is not None else None,
             )
         )  # fmt: skip
         await self.events.record(
             "annotation_submitted", learner.id,
             {"annotator": annotator, "attempt_id": str(attempt_id), "status": str(status)},
+        )  # fmt: skip
+        await self.uow.commit()
+        return True
+
+
+@dataclass(frozen=True, slots=True)
+class SubmitMarks:
+    """Разметка по клеткам (FR-62, ADR-0079): учитель оценивает чтение ученика.
+
+    Без отметок — «✅ Прочитал чисто» (что прозвучало = эталон). Фонемы выводятся из отметок, где
+    это однозначно (``apply_marks``); ``agree``/``fix`` — само (``marks_status``). Метка и клетки
+    пишутся вместе.
+    """
+
+    access: AnnotatorAccess
+    tasks: AnnotationTasks
+    uow: UnitOfWork
+    events: EventLog
+    clock: Clock
+    syllables: AyahSyllables | None = None
+
+    async def task(self, attempt_id: UUID) -> AnnotationTask | None:
+        """Задача с клетками — для экранов разметки. None — записи больше нет."""
+        task = await self.tasks.get(attempt_id)
+        return with_cells(task, self.syllables) if task is not None else None
+
+    async def execute(
+        self,
+        learner: Learner,
+        attempt_id: UUID,
+        marks: Sequence[Mark],
+        *,
+        seconds_spent: int | None = None,
+        self_corrected: bool = False,
+        comment: str = "",
+    ) -> bool:
+        """Сохраняет метку с клетками. False — попытки больше нет.
+
+        LabelError — отметки противоречат руководству (текст — подсказка разметчику). При
+        ``agree`` в «что прозвучало» — что услышал бот (``check_label``, как в пакете Excel).
+        """
+        annotator = await self.access.require(learner)
+        task = await self.task(attempt_id)
+        if task is None:
+            return False
+        text, reference, cells = task.item_text, task.reference_phonemes, task.cells
+        check_marks(cells, marks)
+        actual = apply_marks(text, reference, cells, marks)
+        status = marks_status(task.bot_heard, reference, actual, marks)
+        if status is AnnotationStatus.AGREE:
+            actual = task.bot_heard
+        check_label(status, actual, task.bot_heard)
+        layout = layout_of(text, cells)
+        saved = [
+            CellMark(
+                cell=m.cell, layout=layout, char_start=cells[m.cell].start,
+                char_end=cells[m.cell].end, piece=cells[m.cell].piece, kind=m.kind,
+                heard_letter=m.heard_letter, bot_flagged=m.cell in task.bot_cells,
+            )
+            for m in marks
+        ]  # fmt: skip
+        label = Label(
+            attempt_id, annotator, status, actual, comment.strip(), AnnotationSource.TELEGRAM,
+            seconds_spent,
+            self.clock.now(), self_corrected, Entry.CELLS,
+        )  # fmt: skip
+        await self.tasks.add(label, saved)
+        await self.events.record(
+            "annotation_submitted", learner.id,
+            {"annotator": annotator, "attempt_id": str(attempt_id), "status": str(status),
+             "entry": str(Entry.CELLS), "marks": len(saved)},
         )  # fmt: skip
         await self.uow.commit()
         return True

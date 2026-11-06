@@ -28,6 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from muallim.application.ports.system import Clock
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.infrastructure.audio.file_store import FileAudioStore
+from muallim.infrastructure.curriculum.syllables import SyllableLibrary
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.system import SystemClock
 from muallim.research import (
@@ -56,7 +57,8 @@ async def _run(args: argparse.Namespace) -> str:
             )
             async with create_session_factory(engine)() as session:
                 today = clock.now().date()
-                gqm = metrics.render(await metrics.collect(session, today))
+                ayat = SyllableLibrary.load(settings.curriculum_dir / "syllables" / "ayat.yaml")
+                gqm = metrics.render(await metrics.collect(session, today, ayat))
                 pilot_md = pilot.render(await pilot.collect(session, today))
             out.write_text(f"{sql}\n{gqm}\n{pilot_md}", encoding="utf-8")
             return f"Отчёт: {out}"

@@ -7,6 +7,7 @@ erDiagram
     learners |o--o{ interaction_events : "действия"
     attempts ||--o{ detected_errors : "найдено моделью"
     attempts ||--o{ annotations : "размечено человеком"
+    annotations ||--o{ annotation_marks : "отметки по клеткам (CASCADE, FR-62)"
     attempts ||--o{ learner_reports : "«бот ошибся»"
     learners ||--o{ learner_reports : "оспаривает"
     curriculum_items |o--o{ attempts : "строка книги (item_id + curriculum_version)"
@@ -104,6 +105,20 @@ erDiagram
         string source "excel | telegram"
         int seconds_spent
         bool self_corrected "сам исправился (2.1)"
+        string entry "cells | phonemes (FR-62)"
+        text comment
+    }
+    annotation_marks {
+        int id PK
+        int annotation_id FK
+        int cell
+        string layout "syllables | letters"
+        int char_start
+        int char_end
+        text piece
+        string kind "11 видов"
+        string heard_letter
+        bool bot_flagged "стоял «!» бота"
     }
     interaction_events {
         int id PK

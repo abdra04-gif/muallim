@@ -1,10 +1,11 @@
 """Порты разметки в Telegram (FR-17): кто разметчик и что ему размечать."""
 
+from collections.abc import Sequence
 from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
-from muallim.domain.annotation import AnnotationTask, Label
+from muallim.domain.annotation import AnnotationTask, CellMark, Label
 
 
 class AnnotatorDirectory(Protocol):
@@ -39,4 +40,5 @@ class AnnotationTasks(Protocol):
 
     async def remaining(self, annotator: str) -> int: ...
 
-    async def add(self, label: Label) -> None: ...
+    async def add(self, label: Label, marks: Sequence[CellMark] = ()) -> None:
+        """Метка и её клетки (FR-62) — в одной транзакции: не записались клетки — нет и метки."""

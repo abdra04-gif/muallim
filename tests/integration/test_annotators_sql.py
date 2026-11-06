@@ -3,6 +3,7 @@
 import csv
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import pytest
@@ -222,3 +223,74 @@ async def test_excel_import_marks_source(session: AsyncSession, tmp_path: Path) 
     await annotation.import_package(session, out / "tasks.csv", "A1", FixedClock())
     row = (await session.execute(select(annotations))).mappings().one()
     assert row["source"] == "excel" and row["seconds_spent"] is None
+    assert row["entry"] == "phonemes"  # FR-62: пакет Excel — по-прежнему фонемами
+
+
+# ---------- FR-62 (ADR-0079): метка по клеткам ----------
+def _cell_mark(cell: int, kind: str, letter: str | None = None, *, flagged: bool = False) -> Any:
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+
+    return ann.CellMark(
+        cell=cell, layout=ann.Layout("syllables"), char_start=2 * cell, char_end=2 * cell + 2,
+        piece="صَ", kind=ann.MarkKind(kind), heard_letter=letter, bot_flagged=flagged,
+    )  # fmt: skip
+
+
+async def test_label_and_its_cells_are_written_together(session: AsyncSession) -> None:
+    from dataclasses import replace  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    tasks = SqlAnnotationTasks(session)
+    label = replace(_label(10), status=AnnotationStatus.FIX, actual=None, entry=ann.Entry("cells"))
+    marks = [_cell_mark(0, "letter", "س", flagged=True), _cell_mark(0, "vowel"),
+             _cell_mark(3, "halting")]  # fmt: skip
+    await tasks.add(label, marks)
+    await session.commit()
+    row = (await session.execute(select(annotations))).mappings().one()
+    assert (row["label"], row["corrected_phonemes"], row["entry"]) == ("fix", None, "cells")
+    saved = (await session.execute(select(annotation_marks))).mappings().all()
+    assert {(m["annotation_id"], m["cell"], m["kind"], m["heard_letter"], m["bot_flagged"])
+            for m in saved} == {
+        (row["id"], 0, "letter", "س", True), (row["id"], 0, "vowel", None, False),
+        (row["id"], 3, "halting", None, False),
+    }  # fmt: skip
+    assert {(m["layout"], m["char_start"], m["char_end"], m["piece"]) for m in saved} == {
+        ("syllables", 0, 2, "صَ"),
+        ("syllables", 6, 8, "صَ"),
+    }
+
+
+async def test_label_without_cells_writes_no_cells(session: AsyncSession) -> None:
+    """Прежний вызов ``add(label)`` (кнопки «🔇», «🙅», ручной ввод) — клеток нет."""
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    await SqlAnnotationTasks(session).add(_label(10))
+    await session.commit()
+    assert (await session.execute(select(annotation_marks))).all() == []
+
+
+async def test_label_is_not_left_when_its_cells_fail_to_save(session: AsyncSession) -> None:
+    """Метка и клетки — одна транзакция (ADR-0079 п. 2): клетки не записались — метки нет, а
+    сессия годна для следующей работы (вставка — в точке сохранения)."""
+    from dataclasses import replace  # noqa: PLC0415
+
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    tasks = SqlAnnotationTasks(session)
+    label = replace(_label(10), status=AnnotationStatus.FIX, actual=None, entry=ann.Entry("cells"))
+    twice = [_cell_mark(0, "vowel"), _cell_mark(0, "vowel")]  # UNIQUE (annotation_id, cell, kind)
+    with pytest.raises(IntegrityError):
+        await tasks.add(label, twice)
+    await tasks.add(_label(11))  # следующая метка в той же сессии пишется
+    await session.commit()
+    rows = (await session.execute(select(annotations.c.attempt_id))).scalars().all()
+    assert rows == [UUID(int=11)]
+    assert (await session.execute(select(annotation_marks))).all() == []

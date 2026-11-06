@@ -29,6 +29,7 @@ from muallim.domain.annotation import (
     PHONEME_ALPHABET,
     USABLE,
     AnnotationSource,
+    Entry,
     LabelError,
     check_label,
     check_phonemes,
@@ -254,7 +255,7 @@ async def import_package(
                 attempt_id=label.attempt_id, annotator=annotator, label=label.status,
                 corrected_phonemes=label.actual, comment=label.comment,
                 guide_version=GUIDE_VERSION, source=AnnotationSource.EXCEL, created_at=clock.now(),
-                self_corrected=label.self_corrected,
+                self_corrected=label.self_corrected, entry=Entry.PHONEMES,
             )
         )  # fmt: skip
         latest[label.attempt_id] = mark

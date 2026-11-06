@@ -7,8 +7,10 @@ import pytest
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.domain import arabic
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
+from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.domain.policy import GradingPolicy
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
@@ -278,3 +280,103 @@ async def test_render_shows_intervals_and_sounds(session: AsyncSession) -> None:
     md = metrics.render(await metrics.collect(session, TODAY))
     assert "95 % ДИ" in md and "бутстрэп" in md
     assert "По звуку эталона" in md
+
+
+# ---------- FR-62 (ADR-0079 п. 5): метки по клеткам ----------
+async def _cell_label(session: AsyncSession) -> None:
+    """T3 отметил клетками попытку 3: вид «таджвид» — к фонемам не сводится (без фонем)."""
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await session.execute(
+        insert(annotations).values(
+            id=500, attempt_id=UUID(int=3), annotator="T3", label="fix", corrected_phonemes=None,
+            comment="", guide_version="3.0", created_at=_at(17), entry="cells",
+        )
+    )  # fmt: skip
+    await session.execute(
+        insert(annotation_marks).values(
+            annotation_id=500, cell=0, layout="letters", char_start=0, char_end=2, piece="صَ",
+            kind="tafkhim", heard_letter=None, bot_flagged=False,
+        )
+    )  # fmt: skip
+    await session.commit()
+
+
+async def test_cell_labels_do_not_change_phoneme_metrics(session: AsyncSession) -> None:
+    """Фонемные цифры RQ-1 — только по меткам с фонемами; метка клетками без фонем их не меняет."""
+    await _seed(session)
+    await _cell_label(session)
+    m = await metrics.collect(session, TODAY)
+    assert m.phonemes == metrics.PhonemeCounts(ta=8, fr=1, fa=1, tr=2, correct_diagnosis=2)
+    assert m.pairs_bot_teacher == 6
+
+
+async def test_render_has_a_separate_block_by_cells(session: AsyncSession) -> None:
+    """Блок «по клеткам» — отдельно от фонемных цифр и с пометкой, что единица крупнее фонемы."""
+    await _seed(session)
+    await _cell_label(session)
+    m = await metrics.collect(session, TODAY)
+    md = metrics.render(m)
+    assert m.cells.labels == 1
+    assert "по клеткам" in md.lower()
+    cells = md.lower().split("по клеткам", 1)[1]
+    assert "precision" in cells and "recall" in cells and "iqra" in cells
+
+
+async def test_cell_outcomes_are_counted_from_the_database(
+    session: AsyncSession, curriculum: Curriculum
+) -> None:
+    """Где ошибку нашла модель — пересчёт из ``heard_phonemes`` тем же ``bot_cells``, что у бота,
+    а не из ``bot_flagged`` (в нём только клетки с отметкой учителя).
+
+    L024-07 (не сура — клетки по буквам, 20 букв): модель услышала ه вместо ح в «مَحْشَرُ»
+    (клетка 5). Учитель отметил клетку 5 (не та буква) и клетку 0 (огласовка). ``bot_flagged`` в
+    строках нарочно неверный — счёт от него не зависит. Итог: TR 1, FA 1, FR 0, TA 18.
+    """
+    from muallim.infrastructure.db.tables import (  # noqa: PLC0415
+        annotation_marks,
+        curriculum_items,
+    )
+
+    item = curriculum.item("L024-07")
+    reference = "مُحسِنُمَحشَرُمِنحَرُمَحفَلُءَحسَنَ"
+    heard = reference[:9] + "ه" + reference[10:]
+    learner = Learner(UUID(int=7), 765432198, "L-cccc", "ru", _at(10))
+    await SqlLearnerRepository(session).add(learner)
+    await session.execute(
+        insert(curriculum_items).values(
+            curriculum_version="v1", item_id=item.id, lesson_id="L024", lesson_number=24,
+            lesson_title="ح", position=7, kind="line", text=item.text, published_at=_at(1),
+        )
+    )  # fmt: skip
+    result = assess(reference, heard)
+    await SqlAttemptRepository(session).add(
+        Attempt(UUID(int=60), learner.id, item.id, "v1", "muaalem", result,
+                GradingPolicy().verdict(result), None, 900, 1000, _at(10)),
+        tuple("msg" for _ in result.errors),
+    )  # fmt: skip
+    await session.execute(
+        insert(annotations).values(
+            id=600, attempt_id=UUID(int=60), annotator="T1", label="fix", corrected_phonemes=None,
+            comment="", guide_version="3.0", created_at=_at(17), entry="cells",
+        )
+    )  # fmt: skip
+    letters = arabic.clusters(item.text)
+
+    def cell(n: int) -> dict[str, object]:
+        c = letters[n]
+        return {"char_start": c.start, "char_end": c.end, "piece": item.text[c.start : c.end]}
+
+    await session.execute(
+        insert(annotation_marks),
+        [
+            {"annotation_id": 600, "cell": 5, "layout": "letters", **cell(5), "kind": "letter",
+             "heard_letter": "ه", "bot_flagged": False},
+            {"annotation_id": 600, "cell": 0, "layout": "letters", **cell(0), "kind": "vowel",
+             "heard_letter": None, "bot_flagged": True},
+        ],
+    )  # fmt: skip
+    await session.commit()
+    c = (await metrics.collect(session, TODAY)).cells
+    assert (c.labels, c.counts.ta, c.counts.fr, c.counts.fa, c.counts.tr) == (1, 18, 0, 1, 1)
+    assert c.recall_by_kind == {"letter": pytest.approx(1.0), "vowel": pytest.approx(0.0)}

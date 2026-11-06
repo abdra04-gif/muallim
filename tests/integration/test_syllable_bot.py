@@ -2,10 +2,10 @@
 
 ``navigation.py`` получает ``AyahSyllables`` из Dishka и передаёт
 ``screens.card(..., syllables=...)``. Чтобы не зависеть от статусов, которые человек ставит в
-curriculum/syllables/ayat.yaml, ``SyllableLibrary.load`` читает временный файл (все строки ``ok``)
-или отсутствующий файл (прежняя карточка). Окружение — как в test_settings_bot (SQLite, заглушка
-распознавания); ``render.ayah`` подменён шпионом, который рисует прежнюю карточку, — пиксели
-не проверяются.
+curriculum/syllables/ayat.yaml, ``SyllableLibrary.load`` читает временный файл (строки ``ok``;
+в одном тесте — ``bad``: слоги всё равно видны, FR-62) или отсутствующий файл (прежняя
+карточка). Окружение — как в test_settings_bot (SQLite, заглушка распознавания);
+``render.ayah`` подменён шпионом, который рисует прежнюю карточку, — пиксели не проверяются.
 """
 
 from collections.abc import Callable
@@ -86,6 +86,27 @@ async def test_sura_card_in_bot_is_drawn_by_syllables(
     [call] = ayah_calls
     assert call["number"] == 1 and call["scale"] == 1.0
     assert texts.CARD_HOW_TO_READ.split("{")[0] in _card_caption(ali)  # спойлер остался
+
+
+async def test_sura_card_marked_bad_is_still_drawn_by_syllables(
+    tmp_path: Path,
+    curriculum: Curriculum,
+    syllables_from: Callable[[Path], None],
+    app: tuple[Dispatcher, AsyncContainer],
+    ayah_calls: list[dict[str, Any]],
+) -> None:
+    """FR-62 (ADR-0079 п. 7): ``status: bad`` — пометка «поправить разбор», слоги не прячет."""
+    text = curriculum.item(FATIHA_BASMALA).text
+    rows = [{"text": text, "status": "bad", "words": [[[w, "звук"]] for w in text.split(" ")]}]
+    path = tmp_path / "syllables" / "ayat.yaml"
+    path.parent.mkdir()
+    path.write_text(yaml.safe_dump({"ayat": rows}, allow_unicode=True), encoding="utf-8")
+    syllables_from(path)
+    dp, _ = app
+    ali = await _on_home(dp)
+    await ali.press(GoItem(item_id=FATIHA_BASMALA))
+    [call] = ayah_calls
+    assert call["number"] == 1
 
 
 async def test_basmala_before_sura_in_bot_has_no_number(

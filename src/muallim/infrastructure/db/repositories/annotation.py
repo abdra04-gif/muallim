@@ -5,6 +5,7 @@
 (ADR-0020), потом где бот нашёл ошибки, затем новые.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -29,11 +30,13 @@ from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirec
 from muallim.domain.annotation import (
     GUIDE_VERSION,
     AnnotationTask,
+    CellMark,
     Label,
     next_annotator_code,
 )
 from muallim.domain.policy import Verdict
 from muallim.infrastructure.db.tables import (
+    annotation_marks,
     annotations,
     annotator_invites,
     annotators,
@@ -145,16 +148,33 @@ class SqlAnnotationTasks(AnnotationTasks):
         query = select(func.count()).select_from(queue_query(annotator).order_by(None).subquery())
         return int((await self.session.execute(query)).scalar_one())
 
-    async def add(self, label: Label) -> None:
-        await self.session.execute(
-            insert(annotations).values(
-                attempt_id=label.attempt_id, annotator=label.annotator, label=label.status,
-                corrected_phonemes=label.actual, comment=label.comment,
-                guide_version=GUIDE_VERSION, source=label.source,
-                seconds_spent=label.seconds_spent, created_at=label.created_at,
-                self_corrected=label.self_corrected,
-            )
-        )  # fmt: skip
+    async def add(self, label: Label, marks: Sequence[CellMark] = ()) -> None:
+        """Метка и клетки — в точке сохранения: не записались клетки — нет и метки, а сессия
+        годна дальше (ADR-0079 п. 2)."""
+        async with self.session.begin_nested():
+            annotation_id = await self.session.scalar(
+                insert(annotations).values(
+                    attempt_id=label.attempt_id, annotator=label.annotator, label=label.status,
+                    corrected_phonemes=label.actual, comment=label.comment,
+                    guide_version=GUIDE_VERSION, source=label.source,
+                    seconds_spent=label.seconds_spent, created_at=label.created_at,
+                    self_corrected=label.self_corrected, entry=label.entry,
+                ).returning(annotations.c.id)
+            )  # fmt: skip
+            if not marks:
+                return
+            await self.session.execute(
+                insert(annotation_marks),
+                [
+                    {
+                        "annotation_id": annotation_id, "cell": m.cell, "layout": m.layout,
+                        "char_start": m.char_start, "char_end": m.char_end, "piece": m.piece,
+                        "kind": m.kind, "heard_letter": m.heard_letter,
+                        "bot_flagged": m.bot_flagged,
+                    }
+                    for m in marks
+                ],
+            )  # fmt: skip
 
 
 @dataclass(frozen=True, slots=True)

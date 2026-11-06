@@ -30,7 +30,7 @@ from sqlalchemy.engine import Dialect
 from sqlalchemy.sql.expression import false, true
 from sqlalchemy.types import TypeDecorator
 
-from muallim.domain.annotation import AnnotationSource, AnnotationStatus
+from muallim.domain.annotation import AnnotationSource, AnnotationStatus, Entry, Layout, MarkKind
 from muallim.domain.policy import Verdict
 from muallim.domain.report import ReportReason
 from muallim.domain.settings import (
@@ -216,10 +216,40 @@ annotations = Table(
     Column("seconds_spent", Integer),  # от показа записи до ответа; только Telegram
     # ученик ошибся и сам перечитал верно — отдельная категория; NULL — до руководства 2.1
     Column("self_corrected", Boolean),
+    # как введено «что прозвучало» (FR-62): cells | phonemes;
+    # NULL — до миграции 0011, «Плохая запись», «Читал не то»
+    Column("entry", String(16)),
     CheckConstraint(_one_of("label", [*AnnotationStatus, *LEGACY_LABELS]), name="label_values"),
     CheckConstraint(
         "source IS NULL OR " + _one_of("source", AnnotationSource), name="source_values"
     ),
+    CheckConstraint("entry IS NULL OR " + _one_of("entry", Entry), name="entry_values"),
+)
+
+# Клетки метки учителя (FR-62, ADR-0079): строка на отметку «клетка × вид ошибки». Позиция
+# кусочка — в символах item_text (не зависит от пересборки ayat.yaml). Уходит вместе с меткой.
+annotation_marks = Table(
+    "annotation_marks",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column(
+        "annotation_id",
+        Integer,
+        ForeignKey("annotations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    ),
+    Column("cell", SmallInteger, nullable=False),  # номер клетки с 0
+    Column("layout", String(16), nullable=False),  # syllables | letters
+    Column("char_start", SmallInteger, nullable=False),
+    Column("char_end", SmallInteger, nullable=False),
+    Column("piece", Text, nullable=False),  # кусочек, как его видел учитель
+    Column("kind", String(32), nullable=False),
+    Column("heard_letter", String(4)),  # фонема у «не та буква»; NULL — не указал или «не знаю»
+    Column("bot_flagged", Boolean, nullable=False),  # стояла ли на клетке «!» бота
+    UniqueConstraint("annotation_id", "cell", "kind"),
+    CheckConstraint(_one_of("layout", Layout), name="layout_values"),
+    CheckConstraint(_one_of("kind", MarkKind), name="kind_values"),
 )
 
 # Разметчики по приглашению и отозванные (FR-17). Разметчики из ANNOTATOR_IDS живут в настройках;
