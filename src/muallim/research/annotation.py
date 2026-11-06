@@ -31,6 +31,7 @@ from muallim.domain.annotation import (
     AnnotationSource,
     Entry,
     LabelError,
+    PhonemesSource,
     check_label,
     check_phonemes,
     check_self_correction,
@@ -204,6 +205,13 @@ def _read(path: Path) -> list[dict[str, str]]:
     return list(reader)
 
 
+def _source(status: AttemptStatus, actual: str | None) -> PhonemesSource | None:
+    """Откуда строка: «agree» — подтверждён ответ бота, «fix» — учитель набрал сам (FR-63)."""
+    if actual is None:
+        return None
+    return PhonemesSource.CONFIRMED if status is AttemptStatus.AGREE else PhonemesSource.TYPED
+
+
 async def import_package(
     session: AsyncSession, path: Path, annotator: str, clock: Clock
 ) -> ImportResult:
@@ -256,6 +264,7 @@ async def import_package(
                 corrected_phonemes=label.actual, comment=label.comment,
                 guide_version=GUIDE_VERSION, source=AnnotationSource.EXCEL, created_at=clock.now(),
                 self_corrected=label.self_corrected, entry=Entry.PHONEMES,
+                phonemes_source=_source(label.status, label.actual),
             )
         )  # fmt: skip
         latest[label.attempt_id] = mark

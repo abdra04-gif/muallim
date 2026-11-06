@@ -11,7 +11,7 @@
 
 import hashlib
 import re
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import StrEnum
@@ -19,12 +19,12 @@ from typing import Final
 from uuid import UUID
 
 from muallim.domain import arabic
-from muallim.domain.assessment import assess, phoneme_errors
-from muallim.domain.phonetics import CONSONANTS, SPECIAL, VOWELS
+from muallim.domain.assessment import ErrorKind, PronunciationError, assess, phoneme_errors
+from muallim.domain.phonetics import CONSONANTS, LONG_VOWELS, QALQALA, SHORT_VOWELS, SPECIAL, VOWELS
 from muallim.domain.syllables import Ayah
 
 # Версия docs/data/annotation-guide.md — пишется в каждую метку (это проверяет тест).
-GUIDE_VERSION: Final = "2.1"
+GUIDE_VERSION: Final = "3.0"
 
 
 class AnnotationStatus(StrEnum):
@@ -49,6 +49,15 @@ class Entry(StrEnum):
     PHONEMES = "phonemes"
 
 
+class PhonemesSource(StrEnum):
+    """Откуда строка «что прозвучало» — надёжность для обучения (FR-63, ADR-0080)."""
+
+    TYPED = "typed"  # введена учителем (пакет Excel, «Фонемы вручную»)
+    MARKS = "marks"  # собрана из отметок учителя (``apply_marks``)
+    CONFIRMED = "confirmed"  # «Бот прав»: ответ бота
+    REFERENCE = "reference"  # «Чисто»: эталон
+
+
 class Layout(StrEnum):
     """Раскладка клеток: слоги аята суры (``ayat.yaml``) или буквы со знаками."""
 
@@ -63,12 +72,18 @@ class MarkGroup(StrEnum):
 
 
 class MarkKind(StrEnum):
-    """Вид ошибки в клетке (решение автора 2026-10-31): 11 видов в трёх группах."""
+    """Вид ошибки в клетке (решение автора 2026-10-31): три группы.
+
+    FR-63 (ADR-0080): на экране шесть главных видов (``MAIN_KINDS``) и шесть прочих
+    (``MORE_KINDS``, кнопка «Ещё»); ``shadda_sukun`` — только у прежних меток.
+    """
 
     LETTER = "letter"  # не та буква
     VOWEL = "vowel"  # огласовка
     MADD = "madd"  # коротко / долго
-    SHADDA_SUKUN = "shadda_sukun"
+    SHADDA_SUKUN = "shadda_sukun"  # прежний вид (до FR-63): на экране не предлагается
+    SHADDA = "shadda"  # удвоение не то (прозвучало / нет)
+    SUKUN = "sukun"  # на месте сукуна прозвучала гласная
     MISSING = "missing"  # не прочитана вся клетка
     EXTRA = "extra"  # лишний звук
     TAFKHIM = "tafkhim"  # твёрдо / мягко
@@ -91,7 +106,7 @@ class MarkKind(StrEnum):
         return _CODE_KIND.get(code)
 
 
-_SAID: Final = ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra")
+_SAID: Final = ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra", "shadda", "sukun")
 _TAJWID: Final = ("tafkhim", "ghunna", "qalqala")
 _KIND_GROUP: Final = {
     k: MarkGroup.SAID if k in _SAID else MarkGroup.TAJWID if k in _TAJWID else MarkGroup.READING
@@ -101,8 +116,22 @@ _KIND_CODE: Final = {
     MarkKind.LETTER: "l", MarkKind.VOWEL: "v", MarkKind.MADD: "md", MarkKind.SHADDA_SUKUN: "ss",
     MarkKind.MISSING: "mi", MarkKind.EXTRA: "ex", MarkKind.TAFKHIM: "tf", MarkKind.GHUNNA: "gh",
     MarkKind.QALQALA: "qq", MarkKind.HALTING: "ht", MarkKind.WRONG_STOP: "ws",
+    MarkKind.SHADDA: "sd", MarkKind.SUKUN: "sk",
 }  # fmt: skip
 _CODE_KIND: Final = {code: kind for kind, code in _KIND_CODE.items()}
+
+# Главный экран разметки (по порядку на экране) и панель «Ещё» (FR-63).
+MAIN_KINDS: Final = (
+    MarkKind.LETTER, MarkKind.MISSING, MarkKind.VOWEL, MarkKind.EXTRA, MarkKind.SHADDA,
+    MarkKind.SUKUN,
+)  # fmt: skip
+MORE_KINDS: Final = (
+    MarkKind.MADD, MarkKind.TAFKHIM, MarkKind.GHUNNA, MarkKind.QALQALA, MarkKind.HALTING,
+    MarkKind.WRONG_STOP,
+)  # fmt: skip
+NO_VOWEL: Final = (
+    "-"  # у «Огласовка»: гласной не было совсем; не фонема, чтобы не спутать со звуком
+)
 
 
 PHONEME_ALPHABET: Final = CONSONANTS | VOWELS | SPECIAL
@@ -368,40 +397,210 @@ def pair_letters(written: str, pairs: Iterable[frozenset[str]]) -> list[str]:
     return out
 
 
+def _cell_positions(where: Sequence[int], cell: int) -> list[int]:
+    return [pos for pos, c in enumerate(where) if c == cell]
+
+
+def cell_sounds(text: str, reference: str, cells: Sequence[Cell], cell: int) -> str:
+    """Звуки эталона в клетке без повторов, по порядку — варианты для «Пропуск» (FR-63)."""
+    where = phoneme_cells(text, reference, cells)
+    out: list[str] = []
+    for pos, owner in enumerate(where):
+        if owner == cell and reference[pos] != QALQALA and reference[pos] not in out:
+            out.append(reference[pos])
+    return "".join(out)
+
+
+def _vowel_after(reference: str, pos: int) -> bool:
+    """После фонемы ``pos`` стоит гласная или мадд — тогда у согласной нет сукуна."""
+    nxt = reference[pos + 1 : pos + 2]
+    return bool(nxt) and (nxt in SHORT_VOWELS or nxt in LONG_VOWELS)
+
+
+def _consonants(reference: str, positions: Sequence[int]) -> list[int]:
+    return [pos for pos in positions if reference[pos] in CONSONANTS]
+
+
+def _from_letter(
+    reference: str, heard: str | None, positions: Sequence[int], out: "_Edits"
+) -> bool:
+    consonants = _consonants(reference, positions)
+    if heard is None or len({reference[pos] for pos in consonants}) != 1:
+        return False
+    out.replace.update(dict.fromkeys(consonants, heard))
+    return True
+
+
+def _from_missing(
+    reference: str, heard: str | None, positions: Sequence[int], out: "_Edits"
+) -> bool:
+    if heard is None:  # весь слог
+        out.replace.update(dict.fromkeys(positions, ""))
+        return bool(positions)
+    found = [pos for pos in positions if reference[pos] == heard]
+    doubled = len(found) == 2 and found[1] == found[0] + 1 and heard in CONSONANTS
+    if len(found) != 1 and not doubled:
+        return False
+    out.replace.update(dict.fromkeys(found, ""))
+    return True
+
+
+def _from_vowel(reference: str, heard: str | None, positions: Sequence[int], out: "_Edits") -> bool:
+    vowels = [pos for pos in positions if reference[pos] in SHORT_VOWELS]
+    if heard is None or len(vowels) != 1 or not (heard in SHORT_VOWELS or heard == NO_VOWEL):
+        return False
+    out.replace[vowels[0]] = "" if heard == NO_VOWEL else heard
+    return True
+
+
+def _from_sukun(reference: str, heard: str | None, positions: Sequence[int], out: "_Edits") -> bool:
+    silent = [
+        pos for pos in _consonants(reference, positions)
+        if not _vowel_after(reference, pos) and reference[pos + 1 : pos + 2] != reference[pos]
+    ]  # fmt: skip
+    if heard is None or heard not in SHORT_VOWELS or len(silent) != 1:
+        return False
+    out.after[silent[0]] = heard
+    return True
+
+
+def _from_shadda(
+    reference: str, heard: str | None, positions: Sequence[int], out: "_Edits"
+) -> bool:
+    consonants = _consonants(reference, positions)
+    if heard is not None or len({reference[pos] for pos in consonants}) != 1:
+        return False
+    if len(consonants) == 1:  # удвоения не было — прозвучало
+        out.replace[consonants[0]] = reference[consonants[0]] * 2
+        return True
+    if len(consonants) == 2 and consonants[1] == consonants[0] + 1:  # удвоение потеряно
+        out.replace[consonants[1]] = ""
+        return True
+    return False
+
+
+def _from_extra(reference: str, heard: str | None, positions: Sequence[int], out: "_Edits") -> bool:
+    del reference
+    if heard is None or not positions:
+        return False
+    out.after[positions[-1]] = heard
+    return True
+
+
+@dataclass(slots=True)
+class _Edits:
+    """Правки эталона: ``replace[поз]`` — вместо фонемы, ``after[поз]`` — вставка после неё."""
+
+    replace: dict[int, str] = field(default_factory=dict)
+    after: dict[int, str] = field(default_factory=dict)
+
+
+_DERIVE: Final = {
+    MarkKind.LETTER: _from_letter,
+    MarkKind.MISSING: _from_missing,
+    MarkKind.VOWEL: _from_vowel,
+    MarkKind.SUKUN: _from_sukun,
+    MarkKind.SHADDA: _from_shadda,
+    MarkKind.EXTRA: _from_extra,
+}  # остальные виды (прочие шесть и прежний «Шадда/сукун») строки не дают
+
+
 def apply_marks(
     text: str, reference: str, cells: Sequence[Cell], marks: Sequence[Mark]
 ) -> str | None:
-    """«Что прозвучало» из отметок — только где однозначно, иначе None.
+    """«Что прозвучало» из отметок — только где однозначно, иначе None (FR-63, ADR-0080).
 
-    Нет отметок — эталон. «Не та буква» с указанной буквой в клетке ровно с одной звучащей
-    согласной — она заменена (обе половины шадды). «Пропустил» — удалены все фонемы клетки.
-    Любой другой вид или несколько видов в клетке — фонемы не выводятся.
+    Нет отметок — эталон. По одной отметке в слоге из шести главных видов: «Буква» с буквой —
+    согласная заменена (обе половины шадды); «Пропуск» — убран названный звук (без названия —
+    весь слог); «Огласовка» — краткая заменена названной или убрана (``NO_VOWEL``); «Лишний звук»
+    — вставлен после звуков слога; «Шадда» — удвоение единственной согласной переворачивается;
+    «Сукун» — гласная вставлена после согласной без гласной. Любой другой вид, отметка без ответа
+    или две отметки в одном слоге — строка не выводится.
     """
     if not marks:
         return reference
     where = phoneme_cells(text, reference, cells)
+    if not where:
+        return None
     by_cell: dict[int, list[Mark]] = {}
     for mark in marks:
         by_cell.setdefault(mark.cell, []).append(mark)
-    if not where:
-        return None
-    replace: dict[int, str] = {}
-    drop: set[int] = set()
+    edits = _Edits()
     for cell, given in by_cell.items():
-        if len(given) != 1:
-            return None
         mark = given[0]
-        positions = [pos for pos, c in enumerate(where) if c == cell]
-        if mark.kind is MarkKind.MISSING:
-            drop.update(positions)
-        elif mark.kind is MarkKind.LETTER and mark.heard_letter is not None:
-            consonants = [pos for pos in positions if reference[pos] in CONSONANTS]
-            if len({reference[pos] for pos in consonants}) != 1:
-                return None
-            replace.update(dict.fromkeys(consonants, mark.heard_letter))
-        else:
+        derive = _DERIVE.get(mark.kind)
+        if len(given) != 1 or derive is None:
             return None
-    return "".join(replace.get(pos, ch) for pos, ch in enumerate(reference) if pos not in drop)
+        if not derive(reference, mark.heard_letter, _cell_positions(where, cell), edits):
+            return None
+    return "".join(
+        edits.replace.get(pos, ch) + edits.after.get(pos, "") for pos, ch in enumerate(reference)
+    )
+
+
+def marks_from_bot(
+    text: str, reference: str, heard: str, cells: Sequence[Cell]
+) -> tuple[Mark, ...]:
+    """Ошибки бота как отметки по клеткам — для «Бот прав» и черновика «Исправить» (FR-63).
+
+    Замена нескольких звуков и прочие замены, не сводимые к виду, отмечают клетку видом «Буква»
+    без ответа: ошибка бота не теряется, но вид неточный. Один вид в клетке — один раз.
+    """
+    where = phoneme_cells(text, reference, cells)
+    if not where:
+        return ()
+    errors = assess(reference, heard).errors
+    deleted: dict[int, set[int]] = {}  # клетка → позиции пропущенных звуков
+    for error in errors:
+        if error.kind in (ErrorKind.SOUND_MISSING, ErrorKind.VOWEL_MISSING):
+            cell = where[min(error.position, len(where) - 1)]
+            deleted.setdefault(cell, set()).add(error.position)
+    whole = {
+        cell for cell, gone in deleted.items()
+        if gone and gone >= set(_cell_positions(where, cell))
+    }  # fmt: skip
+    found: dict[tuple[int, MarkKind], Mark] = {}
+    last = len(where) - 1
+    for error in errors:
+        # Замена нескольких звуков может лечь на границу слогов: отмечаем каждую клетку (как «!»).
+        spanned = sorted(
+            {where[min(error.position + k, last)] for k in range(max(len(error.expected), 1))}
+        )
+        for cell in spanned:
+            mark = _mark_of(error, cell, whole)
+            found.setdefault((mark.cell, mark.kind), mark)
+    return tuple(sorted(found.values(), key=lambda m: m.cell))
+
+
+def _extra_mark(cell: int, error: PronunciationError) -> Mark:
+    one = len(error.heard) == 1 and (error.heard in CONSONANTS or error.heard in LONG_VOWELS)
+    return Mark(cell, MarkKind.EXTRA, error.heard if one else None)
+
+
+def _vowel_mark(cell: int, error: PronunciationError) -> Mark:
+    if error.heard in SHORT_VOWELS:
+        return Mark(cell, MarkKind.VOWEL, error.heard)
+    return Mark(cell, MarkKind.LETTER)  # долгая вместо краткой: вид приблизительный
+
+
+_BOT_MARKS: Final[dict[ErrorKind, Callable[[int, PronunciationError], Mark]]] = {
+    ErrorKind.LETTER_SUBSTITUTION: lambda c, e: Mark(c, MarkKind.LETTER, e.heard),
+    ErrorKind.VOWEL_SUBSTITUTION: _vowel_mark,
+    ErrorKind.VOWEL_MISSING: lambda c, _: Mark(c, MarkKind.VOWEL, NO_VOWEL),
+    ErrorKind.SOUND_MISSING: lambda c, e: Mark(c, MarkKind.MISSING, e.expected),
+    ErrorKind.SHADDA_MISSING: lambda c, _: Mark(c, MarkKind.SHADDA),
+    ErrorKind.MADD_TOO_SHORT: lambda c, _: Mark(c, MarkKind.MADD),
+    ErrorKind.MADD_TOO_LONG: lambda c, _: Mark(c, MarkKind.MADD),
+    ErrorKind.EXTRA_SOUND: _extra_mark,
+}
+
+
+def _mark_of(error: PronunciationError, cell: int, whole: set[int]) -> Mark:
+    if error.kind in (ErrorKind.SOUND_MISSING, ErrorKind.VOWEL_MISSING) and cell in whole:
+        return Mark(cell, MarkKind.MISSING)  # слог пропущен целиком — одна отметка на слог
+    make = _BOT_MARKS.get(error.kind)
+    # Прочие замены (звук вместо гласной, несколько звуков): клетка отмечена, вид приблизительный.
+    return make(cell, error) if make else Mark(cell, MarkKind.LETTER)
 
 
 def marks_status(
@@ -419,9 +618,49 @@ def marks_status(
     return AnnotationStatus.AGREE if same else AnnotationStatus.FIX
 
 
+_ANSWERS: Final[dict[MarkKind, tuple[Callable[[str], bool], str]]] = {
+    MarkKind.VOWEL: (
+        lambda h: h in SHORT_VOWELS or h == NO_VOWEL,
+        "у «Огласовка» ответ — фатха, кясра, дамма или «никакой»",
+    ),
+    MarkKind.SUKUN: (
+        lambda h: h in SHORT_VOWELS,
+        "у «Сукун» ответ — какая гласная прозвучала: фатха, кясра или дамма",
+    ),
+    MarkKind.EXTRA: (
+        lambda h: len(h) == 1 and (h in CONSONANTS or h in LONG_VOWELS),
+        "у «Лишний звук» ответ — одна согласная или долгая гласная",
+    ),
+    MarkKind.MISSING: (
+        lambda h: len(h) == 1 and h in PHONEME_ALPHABET,
+        "у «Пропуск» ответ — один звук фонетического алфавита",
+    ),
+}
+
+
+def _check_answer(mark: Mark, cells: Sequence[Cell]) -> None:
+    """Ответ «что прозвучало» (``heard_letter``) подходит к виду (FR-63, ADR-0080)."""
+    kind, heard = mark.kind, mark.heard_letter
+    if heard is None:
+        return
+    if kind is MarkKind.LETTER:
+        if heard not in CONSONANTS:
+            hint = _HINTS.get(heard, "нужна одна согласная фонетического алфавита")
+            raise LabelError(f"«{heard}» — не согласная: {hint}")
+        if written_letters(cells[mark.cell].piece) == heard:
+            raise LabelError(f"в клетке и так написана «{heard}» — это не «не та буква»")
+        return
+    rule = _ANSWERS.get(kind)
+    if rule is None:
+        raise LabelError("ответ «что прозвучало» есть только у видов с вопросом")
+    ok, hint = rule
+    if not ok(heard):
+        raise LabelError(hint)
+
+
 def check_marks(cells: Sequence[Cell], marks: Sequence[Mark]) -> None:
-    """Отметки по правилам руководства: клетка есть в раскладке, вид в клетке — один раз, буква —
-    только у «не та буква», согласная фонетического алфавита и не та, что написана в клетке."""
+    """Отметки по правилам руководства: клетка есть в раскладке, вид в клетке — один раз и ответ
+    «что прозвучало» подходит к виду (буква — у «Буква», гласная — у «Огласовка» и «Сукун»…)."""
     seen: set[tuple[int, MarkKind]] = set()
     for mark in marks:
         if not 0 <= mark.cell < len(cells):
@@ -429,16 +668,7 @@ def check_marks(cells: Sequence[Cell], marks: Sequence[Mark]) -> None:
         if (mark.cell, mark.kind) in seen:
             raise LabelError("один и тот же вид ошибки отмечен в клетке дважды")
         seen.add((mark.cell, mark.kind))
-        letter = mark.heard_letter
-        if letter is None:
-            continue
-        if mark.kind is not MarkKind.LETTER:
-            raise LabelError("букву указывают только у «не та буква»")
-        if letter not in CONSONANTS:
-            hint = _HINTS.get(letter, "нужна одна согласная фонетического алфавита")
-            raise LabelError(f"«{letter}» — не согласная: {hint}")
-        if written_letters(cells[mark.cell].piece) == letter:
-            raise LabelError(f"в клетке и так написана «{letter}» — это не «не та буква»")
+        _check_answer(mark, cells)
 
 
 @dataclass(frozen=True, slots=True)
@@ -472,3 +702,4 @@ class Label:
     created_at: datetime
     self_corrected: bool = False  # ученик ошибся и сам перечитал верно (руководство 2.1)
     entry: Entry | None = None  # клетками или фонемами (FR-62); None — плохая запись, не то
+    phonemes_source: PhonemesSource | None = None  # откуда ``actual`` (FR-63); None — нет строки

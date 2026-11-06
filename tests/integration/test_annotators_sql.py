@@ -197,6 +197,37 @@ async def test_labelled_attempt_leaves_only_that_annotators_queue(session: Async
     )  # fmt: skip
 
 
+async def test_queue_closes_pairs_first_so_two_annotators_label_the_same_attempts(
+    session: AsyncSession,
+) -> None:
+    """FR-63 (ADR-0080): записи, уже размеченные другим, идут первыми — иначе разметчики,
+    заходящие в разное время, получают разные записи и согласие считать не по чему."""
+    await _seed(session)
+    tasks = SqlAnnotationTasks(session)
+    await tasks.add(_label(11))  # A1 разметил запись без ошибок бота (обычно она позже)
+    await session.commit()
+    second = await tasks.next_for("A2", frozenset())
+    assert second is not None and second.attempt_id == UUID(int=11)
+    mine = await tasks.next_for("A1", frozenset())
+    assert mine is not None and mine.attempt_id == UUID(int=10)  # у A1 прежний порядок
+    await tasks.add(_label(11, "A2"))
+    await session.commit()
+    after = await tasks.next_for("A2", frozenset())
+    assert after is not None and after.attempt_id == UUID(int=10)
+
+
+async def test_queue_still_puts_disputed_first_among_attempts_nobody_labelled(
+    session: AsyncSession,
+) -> None:
+    await _seed(session)
+    report = LearnerReport(
+        UUID(int=11), UUID(int=1), ReportReason.READ_CORRECTLY, FixedClock().now()
+    )
+    await SqlAttemptRepository(session).add_report(report)
+    first = await SqlAnnotationTasks(session).next_for("A2", frozenset())
+    assert first is not None and first.attempt_id == UUID(int=11)
+
+
 async def test_get_hides_attempts_without_consent(session: AsyncSession) -> None:
     await _seed(session)
     tasks = SqlAnnotationTasks(session)
@@ -294,3 +325,38 @@ async def test_label_is_not_left_when_its_cells_fail_to_save(session: AsyncSessi
     rows = (await session.execute(select(annotations.c.attempt_id))).scalars().all()
     assert rows == [UUID(int=11)]
     assert (await session.execute(select(annotation_marks))).all() == []
+
+
+# ---------- FR-63 (ADR-0080): надёжность строки и новые виды ----------
+async def test_label_keeps_where_its_phonemes_come_from(session: AsyncSession) -> None:
+    from dataclasses import replace  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+
+    await _seed(session)
+    tasks = SqlAnnotationTasks(session)
+    await tasks.add(replace(_label(10), phonemes_source=ann.PhonemesSource("confirmed")))
+    await tasks.add(_label(11))  # источник не указан — NULL (как у прежних меток)
+    await session.commit()
+    rows = (await session.execute(select(annotations))).mappings().all()
+    assert {r["attempt_id"]: r["phonemes_source"] for r in rows} == {
+        UUID(int=10): "confirmed", UUID(int=11): None,
+    }  # fmt: skip
+
+
+async def test_new_kinds_and_their_answers_are_stored(session: AsyncSession) -> None:
+    from dataclasses import replace  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    label = replace(_label(10), status=AnnotationStatus.FIX, entry=ann.Entry("cells"))
+    marks = [_cell_mark(0, "sukun", "ُ"), _cell_mark(1, "shadda"),
+             _cell_mark(2, "vowel", "-"), _cell_mark(3, "missing", "ب")]  # fmt: skip
+    await SqlAnnotationTasks(session).add(label, marks)
+    await session.commit()
+    saved = (await session.execute(select(annotation_marks))).mappings().all()
+    assert {(m["cell"], m["kind"], m["heard_letter"]) for m in saved} == {
+        (0, "sukun", "ُ"), (1, "shadda", None), (2, "vowel", "-"), (3, "missing", "ب"),
+    }  # fmt: skip

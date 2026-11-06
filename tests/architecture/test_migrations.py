@@ -217,7 +217,7 @@ def test_migration_0011_adds_annotation_marks_and_entry(tmp_path: Path) -> None:
 def test_migration_0011_rejects_values_outside_the_code(
     tmp_path: Path, sql: str, params: tuple[object, ...]
 ) -> None:
-    """CHECK — те же 11 видов (``MarkKind``), две раскладки и два способа ввода, что в коде."""
+    """CHECK миграции 0011: 11 видов, две раскладки и два способа ввода."""
     from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
 
     import muallim.domain.annotation as ann  # noqa: PLC0415
@@ -227,7 +227,9 @@ def test_migration_0011_rejects_values_outside_the_code(
     command.upgrade(cfg, "0011")
     with create_engine(f"sqlite:///{db}").begin() as conn:
         _seed_annotation(conn)
-        for cell, kind in enumerate(ann.MarkKind):  # каждый вид из кода проходит CHECK
+        # каждый вид, что был до FR-63, проходит CHECK (shadda и sukun добавляет миграция 0012)
+        before = [k for k in ann.MarkKind if str(k) not in ("shadda", "sukun")]
+        for cell, kind in enumerate(before):
             conn.exec_driver_sql(_INSERT_MARK, (cell, "syllables", str(kind)))
         conn.exec_driver_sql(_INSERT_MARK, (30, "letters", "letter"))
         for entry in ("cells", "phonemes"):
@@ -250,3 +252,76 @@ def test_annotation_marks_go_away_with_their_annotation(tmp_path: Path) -> None:
         conn.exec_driver_sql(_INSERT_MARK, (1, "syllables", "missing"))
         conn.exec_driver_sql("DELETE FROM annotations WHERE id = 1")
         assert conn.exec_driver_sql("SELECT count(*) FROM annotation_marks").scalar() == 0
+
+
+# ---------- FR-63 (ADR-0080): «shadda» и «sukun», надёжность строки ----------
+_SOURCES = ("typed", "marks", "confirmed", "reference")
+
+
+def test_migration_0012_adds_phonemes_source_and_the_two_new_kinds(tmp_path: Path) -> None:
+    """Прежние метки не трогаются (``phonemes_source`` — NULL); CHECK пускает все виды из кода."""
+    from sqlalchemy import inspect  # noqa: PLC0415
+
+    import muallim.domain.annotation as ann  # noqa: PLC0415
+
+    db = tmp_path / "v3.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0011")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+        conn.exec_driver_sql(_INSERT_MARK, (0, "syllables", "shadda_sukun"))
+    command.upgrade(cfg, "0012")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        columns = {c["name"]: c for c in inspect(conn).get_columns("annotations")}
+        assert columns["phonemes_source"]["nullable"] is True
+        assert conn.exec_driver_sql("SELECT label, phonemes_source FROM annotations").all() == [
+            ("agree", None)
+        ]
+        old = conn.exec_driver_sql("SELECT cell, kind FROM annotation_marks").all()
+        assert old == [(0, "shadda_sukun")]  # прежняя метка читается
+        for cell, kind in enumerate(ann.MarkKind, start=10):
+            conn.exec_driver_sql(_INSERT_MARK, (cell, "syllables", str(kind)))
+        for source in _SOURCES:
+            conn.exec_driver_sql("UPDATE annotations SET phonemes_source = ?", (source,))
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "UPDATE annotations SET phonemes_source = 'guess'",
+        "INSERT INTO annotation_marks (annotation_id, cell, layout, char_start, char_end, piece,"
+        " kind, heard_letter, bot_flagged)"
+        " VALUES (1, 40, 'syllables', 0, 3, 'x', 'unsure', NULL, 0)",
+    ],
+)
+def test_migration_0012_rejects_values_outside_the_code(tmp_path: Path, sql: str) -> None:
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    db = tmp_path / "v3-check.sqlite3"
+    command.upgrade(_config(f"sqlite+aiosqlite:///{db}"), "0012")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+    with pytest.raises(IntegrityError), create_engine(f"sqlite:///{db}").begin() as conn:
+        conn.exec_driver_sql(sql)
+
+
+def test_migration_0012_downgrade_keeps_labels_and_folds_new_kinds_into_the_old_one(
+    tmp_path: Path,
+) -> None:
+    """Откат: метки целы, «shadda» и «sukun» становятся прежним «shadda_sukun»."""
+    db = tmp_path / "v3-down.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0012")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+        conn.exec_driver_sql("UPDATE annotations SET phonemes_source = 'confirmed'")
+        conn.exec_driver_sql(_INSERT_MARK, (0, "syllables", "shadda"))
+        conn.exec_driver_sql(_INSERT_MARK, (1, "syllables", "sukun"))
+        conn.exec_driver_sql(_INSERT_MARK, (2, "syllables", "vowel"))
+    command.downgrade(cfg, "0011")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        assert conn.exec_driver_sql("SELECT label FROM annotations").all() == [("agree",)]
+        marks = conn.exec_driver_sql("SELECT cell, kind FROM annotation_marks ORDER BY cell").all()
+        columns = [r[1] for r in conn.exec_driver_sql("PRAGMA table_info(annotations)").all()]
+    assert marks == [(0, "shadda_sukun"), (1, "shadda_sukun"), (2, "vowel")]
+    assert "phonemes_source" not in columns

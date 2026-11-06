@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-11-06T12:31:41+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-11-06T22:01:05+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `17d065d9d071772d` | 124 |
+| код | `89f45b048be67054` | 124 |
 | программа (книга) | `0fc81446afbea2bd` | 3 |
 | SQL-отчёты | `35bb9e9f17483fc5` | 11 |
-| миграции | `21febe56a874d855` | 11 |
+| миграции | `803b7dd86241f0a6` | 12 |
 | зависимости | `e33bf9dd0f3b4cc1` | 1 |
 | предрегистрация | `e4898b776c3b8338` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **75 из 76**.
+Проверено зелёными тестами: **76 из 77**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -77,6 +77,7 @@
 | FR-60 | `tests/integration/test_sura_audio_privacy.py`, `tests/integration/test_sura_readings_sql.py` | ✅ |
 | FR-61 | `tests/integration/test_di.py`, `tests/integration/test_syllable_bot.py`, `tests/integration/test_syllable_library.py`, `tests/unit/test_ayah_card.py`, `tests/unit/test_ayah_number.py`, `tests/unit/test_ayah_render.py`, `tests/unit/test_syllables_merge.py` | ✅ |
 | FR-62 | `tests/architecture/test_migrations.py`, `tests/integration/test_annotator_bot.py`, `tests/integration/test_annotator_marks_bot.py`, `tests/integration/test_annotators_sql.py`, `tests/integration/test_metrics_report.py`, `tests/integration/test_research.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_annotation_marks.py`, `tests/unit/test_cell_metrics.py` | ✅ |
+| FR-63 | `tests/architecture/test_migrations.py`, `tests/integration/test_annotator_marks_bot.py`, `tests/integration/test_annotators_sql.py`, `tests/integration/test_metrics_report.py`, `tests/integration/test_research.py`, `tests/unit/test_annotation_marks.py`, `tests/unit/test_annotation_v3.py`, `tests/unit/test_cell_metrics.py` | ✅ |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
 | NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py`, `tests/integration/test_sura_audio_privacy.py` | ✅ |

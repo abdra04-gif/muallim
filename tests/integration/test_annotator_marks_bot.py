@@ -68,6 +68,8 @@ FATIHA_2 = "L097-03"  # ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَ�
 P = "ءَلحَمدُلِللَااهِرَببِلعَاالَمِۦۦن"  # её эталон (waqf)
 SUB_AIN = P[:23] + "ء" + P[24:]  # бот услышал ء вместо ع в слоге «عَـٰ» (клетка 9)
 NO_DAL = P[:6] + P[8:]  # без слога «دُ» (клетка 2)
+WRONG_VOWEL = P[:7] + "\u064e" + P[8:]  # «دُ» прочитан с фатхой (клетка 2)
+NO_SHADDA = P[:20] + P[21:]  # шадда «بِّ» не выдержана (клетка 7)
 L024_07 = "L024-07"  # مُحْسِنُ مَحْشَرُ مِنْحَرُ مَحْفَلُ أَحْسَنَ — не сура: по буквам
 L024_07_PHONEMES = "مُحسِنُمَحشَرُمِنحَرُمَحفَلُءَحسَنَ"
 
@@ -274,6 +276,22 @@ def _texts(person: Learner) -> list[str]:
     return [b.text for row in _keyboard(person) for b in row]
 
 
+async def _mark_kind(person: Learner, kind: str, choice: str | None = None) -> None:
+    """Нажать вид (FR-63): прочие виды — через «Ещё»; если открылся вопрос «что прозвучало»,
+    ответить ``choice`` (фонема), а без него — «не знаю» (у «Пропуск» — «весь слог»)."""
+    if kind not in _kind_buttons(person):
+        await person.press(tap(person, t.BTN_MORE))
+    await person.press(_kind(person, kind))
+    if t.BTN_DONE in _texts(person):
+        return  # вид без вопроса, или повторное нажатие сняло отметку
+    if choice is not None:
+        await person.press(_letter(person, choice))
+    elif kind == "missing":
+        await person.press(tap(person, t.BTN_WHOLE_CELL))
+    else:
+        await person.press(tap(person, t.BTN_DONT_KNOW))
+
+
 def _on_one_screen(person: Learner) -> None:
     """После шага «буква» — снова один экран (слоги, виды, действия)."""
     assert t.BTN_DONE in _texts(person) and t.BTN_CLEAN in _texts(person)
@@ -316,10 +334,15 @@ def test_annotator_buttons_use_the_words_approved_by_the_author() -> None:
         "Чисто", "Готово", "Эталон", "Сам исправился", "Комментарий", "Плохая запись",
         "Читал не то", "Фонемы вручную", "Пропустить",
     )  # fmt: skip
+    # FR-63 (ADR-0080): «Бот прав» и «Исправить» — по пожеланию руководителя; «Ещё» прячет 6 видов
+    assert (t.BTN_BOT_RIGHT, t.BTN_FIX_BOT, t.BTN_MORE, t.BTN_BACK, t.BTN_WHOLE_CELL) == (
+        "Бот прав", "Исправить", "Ещё", "Назад", "весь слог",
+    )  # fmt: skip
     assert t.KIND_BUTTONS == {
         "letter": "Буква", "vowel": "Огласовка", "madd": "Длина", "shadda_sukun": "Шадда/сукун",
         "missing": "Пропуск", "extra": "Лишний звук", "tafkhim": "Твёрдость", "ghunna": "Гунна",
         "qalqala": "Калькаля", "halting": "Запинка", "wrong_stop": "Пауза не там",
+        "shadda": "Шадда", "sukun": "Сукун",
     }  # fmt: skip
 
 
@@ -327,7 +350,8 @@ def test_annotator_buttons_use_the_words_approved_by_the_author() -> None:
 async def test_one_screen_has_syllables_kinds_and_actions_without_emoji(
     tmp_path: Path, seed: Seed, person: Callable[[int], Learner]
 ) -> None:
-    """Сверху слоги (ряд на слово, первый справа), под ними 11 видов по 2 в ряд, внизу действия."""
+    """Сверху слоги (ряд на слово, первый справа), под ними шесть видов по 2 в ряд и «Ещё»,
+    внизу действия (FR-63)."""
     (tmp_path / "reference").mkdir()
     (tmp_path / "reference" / f"{FATIHA_2}.ogg").write_bytes(b"OggS-teacher")
     text = await seed(FATIHA_2, P, SUB_AIN)
@@ -340,7 +364,10 @@ async def test_one_screen_has_syllables_kinds_and_actions_without_emoji(
     rows = _keyboard(teacher)
     kinds = {b.callback_data for b in _kind_buttons(teacher).values()}
     kind_rows = [r for r in rows if any(b.callback_data in kinds for b in r)]
-    assert len(kinds) == 11 and len(kind_rows) == 6
+    assert set(_kind_buttons(teacher)) == {
+        "letter", "missing", "vowel", "extra", "shadda", "sukun",
+    }  # fmt: skip
+    assert len(kinds) == 6 and len(kind_rows) == 3
     assert all(len(r) <= 2 and all(b.callback_data in kinds for b in r) for r in kind_rows)
     mark = callbacks.AnnotateMark
     cell_rows = [
@@ -352,8 +379,8 @@ async def test_one_screen_has_syllables_kinds_and_actions_without_emoji(
     assert cell_rows and all(i < first_kind_row for i in cell_rows)  # слоги выше видов
     texts = _texts(teacher)
     for button in (
-        t.BTN_CLEAN, t.BTN_DONE, t.BTN_REF, t.BTN_SELF, t.BTN_COMMENT, t.BTN_BAD, t.BTN_OFF,
-        t.BTN_MANUAL, t.BTN_SKIP,
+        t.BTN_BOT_RIGHT, t.BTN_FIX_BOT, t.BTN_MORE, t.BTN_CLEAN, t.BTN_DONE, t.BTN_REF,
+        t.BTN_SELF, t.BTN_COMMENT, t.BTN_BAD, t.BTN_OFF, t.BTN_MANUAL, t.BTN_SKIP,
     ):  # fmt: skip
         assert button in texts, button
     emoji = [x for x in texts if _has_emoji(x)]
@@ -477,7 +504,7 @@ async def test_missing_syllable_is_saved_with_phonemes_without_it(
     teacher = person(ANNOTATOR_TG)
     await _open(teacher)
     await teacher.press(_cell(teacher, 2, _pieces(text)[2]))
-    await teacher.press(_kind(teacher, "missing"))
+    await _mark_kind(teacher, "missing")
     await teacher.press(tap(teacher, t.BTN_DONE))
     (label,) = await _rows(container, annotations)
     assert (label["label"], label["corrected_phonemes"]) == ("fix", NO_DAL)
@@ -498,13 +525,13 @@ async def test_several_kinds_and_second_press_removes_exactly_that_kind(
     await _open(teacher)
     await teacher.press(_cell(teacher, 5, pieces[5]))
     for kind in ("vowel", "tafkhim", "madd", "madd"):  # мадд нажат дважды — снят
-        await teacher.press(_kind(teacher, kind))
+        await _mark_kind(teacher, kind)
     screen = _screen_text(teacher).lower()
     for kind in ("vowel", "tafkhim"):
         assert t.KIND_BUTTONS[kind].lower() in screen
     assert t.KIND_BUTTONS["madd"].lower() not in screen
     await teacher.press(_cell(teacher, 3, pieces[3]))  # другой слог: отметки 5 на месте
-    await teacher.press(_kind(teacher, "halting"))
+    await _mark_kind(teacher, "halting")
     await teacher.press(tap(teacher, t.BTN_DONE))
     (label,) = await _rows(container, annotations)
     assert (label["label"], label["corrected_phonemes"]) == ("fix", None)  # не сводится к фонемам
@@ -526,8 +553,8 @@ async def test_done_without_marks_hints_and_saves_nothing(
         before = len(teacher.tg.texts())
         if unmark:
             await teacher.press(_cell(teacher, 3, _pieces(text)[3]))
-            await teacher.press(_kind(teacher, "vowel"))
-            await teacher.press(_kind(teacher, "vowel"))
+            await _mark_kind(teacher, "vowel")
+            await _mark_kind(teacher, "vowel")
         await teacher.press(tap(teacher, t.BTN_DONE))
         hints = teacher.tg.alerts() + teacher.tg.texts()[before:]
         assert any(t.BTN_CLEAN in h for h in hints), hints  # «…или нажмите «Чисто»»
@@ -583,7 +610,7 @@ async def test_new_annotate_discards_the_draft(
     teacher = person(ANNOTATOR_TG)
     await _open(teacher)
     await teacher.press(_cell(teacher, 9, pieces[9]))
-    await teacher.press(_kind(teacher, "vowel"))
+    await _mark_kind(teacher, "vowel")
     await _open(teacher)
     assert not [b for b, d in _mark_buttons(teacher) if _is_cell(b, d, pieces) and "×" in b.text]
     assert await _rows(container, annotations) == []
@@ -599,7 +626,7 @@ async def test_skip_discards_the_draft(
     teacher = person(ANNOTATOR_TG)
     await _open(teacher)
     await teacher.press(_cell(teacher, 9, pieces[9]))
-    await teacher.press(_kind(teacher, "vowel"))
+    await _mark_kind(teacher, "vowel")
     await teacher.press(tap(teacher, t.BTN_SKIP))
     assert await _rows(container, annotations) == []
     await _open(teacher)  # новый заход: пропущенная снова в очереди
@@ -618,7 +645,7 @@ async def test_drafts_of_two_records_do_not_mix_after_redo(
     await _open(teacher)
     await teacher.press(tap(teacher, t.BTN_CLEAN))  # 20 — чисто; на экране 21
     await teacher.press(_cell(teacher, 2, pieces[2]))
-    await teacher.press(_kind(teacher, "missing"))
+    await _mark_kind(teacher, "missing")
     done_21 = tap(teacher, t.BTN_DONE)
     await teacher.press(AnnotateAct(a=UUID(int=20).hex, act="redo").pack())
     assert not [b for b, d in _mark_buttons(teacher) if _is_cell(b, d, pieces) and "×" in b.text]
@@ -650,7 +677,7 @@ async def test_second_done_and_old_cell_button_save_nothing_more(
     await _open(teacher)
     old_cell = _cell(teacher, 3, pieces[3])
     await teacher.press(_cell(teacher, 2, pieces[2]))
-    await teacher.press(_kind(teacher, "missing"))
+    await _mark_kind(teacher, "missing")
     done = tap(teacher, t.BTN_DONE)
     await teacher.press(done)
     await teacher.press(done)
@@ -691,6 +718,8 @@ async def test_mark_buttons_of_stranger_or_unknown_attempt_do_nothing(
         await stranger.press(str(button.callback_data))
     await stranger.press(tap(teacher, t.BTN_DONE))
     await stranger.press(tap(teacher, t.BTN_CLEAN))
+    await stranger.press(tap(teacher, t.BTN_BOT_RIGHT))  # FR-63: и «Бот прав», и «Исправить»
+    await stranger.press(tap(teacher, t.BTN_FIX_BOT))
     assert len(stranger.tg.shown) == shown and stranger.tg.alerts() == []  # молча
     gone = callbacks.AnnotateMark.unpack(pressed)
     await teacher.press(gone.model_copy(update={"a": UUID(int=99).hex}).pack())
@@ -707,7 +736,7 @@ async def test_revoked_teacher_cannot_save_cells(
     await _open(teacher)
     done = tap(teacher, t.BTN_DONE)
     await teacher.press(_cell(teacher, 9, _pieces(text)[9]))
-    await teacher.press(_kind(teacher, "vowel"))
+    await _mark_kind(teacher, "vowel")
     async with container() as request:
         session = await request.get(AsyncSession)
         await annotators.revoke(session, "A1", FixedClock())
@@ -758,7 +787,7 @@ async def test_keyboards_of_the_longest_line_fit_telegram_limits(
     await teacher.press(_cell(teacher, last, pieces[last]))
     _fits_telegram(teacher)  # один экран: слоги + виды + действия
     assert sorted(n for row in _cell_rows(teacher, pieces) for n in row) == list(range(len(pieces)))
-    assert len(_kind_buttons(teacher)) == 11
+    assert len(_kind_buttons(teacher)) == 6
     await teacher.press(_kind(teacher, "letter"))
     _fits_telegram(teacher)  # шаг «буква»
     assert t.BTN_DONT_KNOW in _texts(teacher)
@@ -770,3 +799,290 @@ async def test_keyboards_of_the_longest_line_fit_telegram_limits(
 def test_longest_mark_callback_fits_64_bytes() -> None:
     data = callbacks.AnnotateMark(a=UUID(int=2**128 - 1).hex, s="h", c=99, k="sss", h="ض")
     assert len(data.pack().encode()) <= 64
+
+
+# ---------- FR-63 (ADR-0080): «Бот прав», шесть главных видов, вопрос «что прозвучало» ----------
+FATHA, KASRA, DAMMA = "َ", "ِ", "ُ"
+MAIN = {"letter", "missing", "vowel", "extra", "shadda", "sukun"}
+MORE = {"madd", "tafkhim", "ghunna", "qalqala", "halting", "wrong_stop"}
+
+
+async def test_main_screen_has_six_kinds_and_more_opens_the_other_six(
+    seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    await seed(FATIHA_2, P, SUB_AIN)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    assert set(_kind_buttons(teacher)) == MAIN
+    await teacher.press(tap(teacher, t.BTN_MORE))
+    assert set(_kind_buttons(teacher)) == MORE
+    assert t.BTN_BACK in _texts(teacher) and t.BTN_DONE in _texts(
+        teacher
+    )  # слоги и действия на месте
+    await teacher.press(tap(teacher, t.BTN_BACK))
+    assert set(_kind_buttons(teacher)) == MAIN
+    assert "shadda_sukun" not in set(_kind_buttons(teacher)) | MORE  # прежний вид не предлагается
+
+
+async def test_a_kind_from_more_marks_the_cell_and_returns_to_the_main_kinds(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    pieces = _pieces(text)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 5, pieces[5]))
+    await _mark_kind(teacher, "madd")
+    assert set(_kind_buttons(teacher)) == MAIN  # после отметки — снова главные виды
+    assert "×" in _cell_button(teacher, 5, pieces[5]).text
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"]) == ("fix", None)  # строки нет
+    assert [(m["cell"], m["kind"]) for m in await _marks(container)] == [(5, "madd")]
+
+
+async def test_bot_right_saves_the_bot_answer_and_shows_the_next_record(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    await seed(FATIHA_2, P, SUB_AIN, n=20)  # бот нашёл ошибку — первая в очереди
+    await seed(FATIHA_2, P, P, n=21)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(tap(teacher, t.BTN_BOT_RIGHT))
+    (label,) = await _rows(container, annotations)
+    assert (label["attempt_id"], label["label"], label["corrected_phonemes"]) == (
+        UUID(int=20), "agree", SUB_AIN,
+    )  # fmt: skip
+    assert (label["entry"], label["phonemes_source"]) == ("cells", "confirmed")
+    (mark,) = await _marks(container)
+    assert (mark["cell"], mark["kind"], mark["heard_letter"], mark["bot_flagged"]) == (
+        9, "letter", "ء", True,
+    )  # fmt: skip
+    assert "не нашёл" in "\n".join(teacher.tg.texts())  # следующая запись (21) уже на экране
+    assert t.BTN_BOT_RIGHT in _texts(teacher)
+
+
+async def test_bot_right_when_the_bot_found_nothing_saves_the_reference_as_agree(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    assert t.BTN_FIX_BOT not in _texts(teacher)  # исправлять нечего: отметок бота нет
+    assert t.BTN_CLEAN in _texts(teacher)  # «Чисто» остаётся всегда
+    await teacher.press(tap(teacher, t.BTN_BOT_RIGHT))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"], label["phonemes_source"]) == (
+        "agree", P, "confirmed",
+    )  # fmt: skip
+    assert await _marks(container) == []
+
+
+async def test_clean_when_the_bot_found_an_error_is_the_reference_from_the_reference(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    await seed(FATIHA_2, P, SUB_AIN)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(tap(teacher, t.BTN_CLEAN))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"], label["phonemes_source"]) == (
+        "fix", P, "reference",
+    )  # fmt: skip
+
+
+async def test_double_bot_right_and_old_button_save_one_label(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    await seed(FATIHA_2, P, SUB_AIN)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    right = tap(teacher, t.BTN_BOT_RIGHT)
+    await teacher.press(right)
+    await teacher.press(right)
+    assert len(await _rows(container, annotations)) == 1
+
+
+async def test_fix_loads_the_bot_marks_as_a_draft_and_done_saves_them(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, SUB_AIN)
+    piece = _pieces(text)[9]
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    assert "×" not in _cell_button(teacher, 9, piece).text  # пока черновик пуст
+    await teacher.press(tap(teacher, t.BTN_FIX_BOT))
+    assert "×" in _cell_button(teacher, 9, piece).text  # отметка бота стала черновиком
+    assert t.KIND_BUTTONS["letter"].lower() in _screen_text(teacher).lower()
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"], label["phonemes_source"]) == (
+        "agree", SUB_AIN, "marks",
+    )  # fmt: skip
+    assert [(m["cell"], m["kind"], m["heard_letter"]) for m in await _marks(container)] == [
+        (9, "letter", "ء")
+    ]
+
+
+async def test_fix_then_one_more_mark_is_fix_with_the_derived_string(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, SUB_AIN)
+    pieces = _pieces(text)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(tap(teacher, t.BTN_FIX_BOT))
+    await teacher.press(_cell(teacher, 2, pieces[2]))
+    await _mark_kind(teacher, "vowel", FATHA)
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"]) == (
+        "fix", SUB_AIN[:7] + FATHA + SUB_AIN[8:],
+    )  # fmt: skip
+    marks = sorted((m["cell"], m["kind"], m["bot_flagged"]) for m in await _marks(container))
+    assert marks == [(2, "vowel", False), (9, "letter", True)]
+
+
+async def test_vowel_asks_which_vowel_and_none_is_an_answer(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    pieces = _pieces(text)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 2, pieces[2]))
+    await teacher.press(_kind(teacher, "vowel"))
+    offered = {d.h for _, d in _mark_buttons(teacher) if d.h}
+    assert offered >= {FATHA, KASRA, DAMMA, "-"}  # а / и / у / никакой
+    assert t.BTN_DONT_KNOW in _texts(teacher)
+    await teacher.press(_letter(teacher, FATHA))
+    _on_one_screen(teacher)
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"]) == ("fix", WRONG_VOWEL)
+    assert [(m["cell"], m["kind"], m["heard_letter"]) for m in await _marks(container)] == [
+        (2, "vowel", FATHA)
+    ]
+
+
+async def test_vowel_none_removes_the_vowel_from_the_string(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 2, _pieces(text)[2]))
+    await _mark_kind(teacher, "vowel", "-")
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert label["corrected_phonemes"] == P[:7] + P[8:]
+
+
+async def test_sukun_asks_which_vowel_was_heard(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 1, _pieces(text)[1]))  # «حَمْ»
+    await teacher.press(_kind(teacher, "sukun"))
+    offered = {d.h for _, d in _mark_buttons(teacher) if d.h}
+    assert offered >= {FATHA, KASRA, DAMMA} and "-" not in offered  # «никакой» — это и есть сукун
+    await teacher.press(_letter(teacher, DAMMA))
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert label["corrected_phonemes"] == P[:6] + DAMMA + P[6:]
+    assert [(m["cell"], m["kind"], m["heard_letter"]) for m in await _marks(container)] == [
+        (1, "sukun", DAMMA)
+    ]
+
+
+async def test_shadda_is_one_tap_without_a_question(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 7, _pieces(text)[7]))  # «بِّ»
+    await teacher.press(_kind(teacher, "shadda"))
+    _on_one_screen(teacher)  # вопроса нет: сразу один экран
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"]) == ("fix", NO_SHADDA)
+    assert [(m["cell"], m["kind"], m["heard_letter"]) for m in await _marks(container)] == [
+        (7, "shadda", None)
+    ]
+
+
+async def test_extra_sound_offers_the_usual_sounds_and_any_other(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 11, _pieces(text)[11]))
+    await teacher.press(_kind(teacher, "extra"))
+    assert {d.h for _, d in _mark_buttons(teacher) if d.h} >= set("اوين")
+    assert t.BTN_OTHER_LETTER in _texts(teacher)
+    await teacher.press(_letter(teacher, "ن"))
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert (label["label"], label["corrected_phonemes"]) == ("fix", P + "ن")
+
+
+async def test_missing_asks_which_sound_or_the_whole_syllable(
+    app: tuple[Dispatcher, AsyncContainer], seed: Seed, person: Callable[[int], Learner]
+) -> None:
+    _, container = app
+    text = await seed(FATIHA_2, P, P)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    await teacher.press(_cell(teacher, 2, _pieces(text)[2]))  # «دُ»
+    await teacher.press(_kind(teacher, "missing"))
+    assert t.BTN_WHOLE_CELL in _texts(teacher)
+    assert {d.h for _, d in _mark_buttons(teacher) if d.h} >= {"د", DAMMA}  # звуки слога
+    await teacher.press(_letter(teacher, "د"))
+    await teacher.press(tap(teacher, t.BTN_DONE))
+    (label,) = await _rows(container, annotations)
+    assert label["corrected_phonemes"] == P[:6] + P[7:]
+    assert [(m["cell"], m["kind"], m["heard_letter"]) for m in await _marks(container)] == [
+        (2, "missing", "د")
+    ]
+
+
+@pytest.mark.parametrize("syllables", [True, False], ids=["longest-ayah", "longest-letters"])
+async def test_new_steps_fit_telegram_limits_on_the_longest_line(
+    curriculum: Curriculum, seed: Seed, person: Callable[[int], Learner], syllables: bool
+) -> None:
+    """Вопросы «что прозвучало» и панель «Ещё»: ≤ 100 кнопок, ≤ 8 в ряду, ``callback_data`` ≤ 64."""
+    item = _longest(curriculum, syllables=syllables)
+    text = curriculum.item(item).text
+    reference = text.replace(" ", "")
+    await seed(item, reference, reference)
+    pieces = _pieces(text) if syllables else _letter_pieces(text)
+    teacher = person(ANNOTATOR_TG)
+    await _open(teacher)
+    last = len(pieces) - 1
+    await teacher.press(_cell(teacher, last, pieces[last]))
+    await teacher.press(tap(teacher, t.BTN_MORE))
+    _fits_telegram(teacher)
+    await teacher.press(tap(teacher, t.BTN_BACK))
+    for kind in ("vowel", "sukun", "extra", "missing"):
+        await teacher.press(_kind(teacher, kind))
+        _fits_telegram(teacher)
+        await teacher.press(
+            tap(teacher, t.BTN_WHOLE_CELL if kind == "missing" else t.BTN_DONT_KNOW)
+        )
+        await teacher.press(_kind(teacher, kind))  # снять, чтобы не копились отметки

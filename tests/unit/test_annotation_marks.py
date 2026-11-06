@@ -69,8 +69,9 @@ L024_07_PHONEMES = "مُحسِنُمَحشَرُمِنحَرُمَحفَلُءَ
 L024_07_HA_AS_HA = L024_07_PHONEMES[:9] + "ه" + L024_07_PHONEMES[10:]  # ح → ه в «مَحْشَرُ»
 
 ANNOTATOR_TG, STRANGER_TG = 900, 901
+# FR-63: «shadda» и «sukun» заменили «shadda_sukun» на экране; тот остаётся для прежних меток.
 ALL_KINDS = {
-    "letter", "vowel", "madd", "shadda_sukun", "missing", "extra",
+    "letter", "vowel", "madd", "shadda_sukun", "missing", "extra", "shadda", "sukun",
     "tafkhim", "ghunna", "qalqala", "halting", "wrong_stop",
 }  # fmt: skip
 
@@ -98,14 +99,17 @@ def _mark(cell: int, kind: str, letter: str | None = None) -> Any:
 
 
 # ---------- виды ошибок ----------
-def test_there_are_eleven_mark_kinds() -> None:
+def test_there_are_thirteen_mark_kinds_in_the_database() -> None:
     assert {str(k) for k in ann.MarkKind} == ALL_KINDS
 
 
 def test_mark_kinds_fall_into_three_groups_as_approved() -> None:
     """Сказал неправильно · таджвид · как читает (решение автора 2026-10-31)."""
     group = {str(k): k.group for k in ann.MarkKind}
-    said = {group[k] for k in ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra")}
+    said = {
+        group[k]
+        for k in ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra", "shadda", "sukun")
+    }
     tajwid = {group[k] for k in ("tafkhim", "ghunna", "qalqala")}
     reading = {group[k] for k in ("halting", "wrong_stop")}
     assert len(said) == len(tajwid) == len(reading) == 1
@@ -114,7 +118,7 @@ def test_mark_kinds_fall_into_three_groups_as_approved() -> None:
 
 def test_mark_kind_codes_are_short_unique_and_fit_a_button() -> None:
     codes = [k.code for k in ann.MarkKind]
-    assert len(set(codes)) == len(codes) == 11
+    assert len(set(codes)) == len(codes) == 13
     assert all(1 <= len(c) <= 3 and c.isascii() and ":" not in c for c in codes)
 
 
@@ -285,7 +289,6 @@ def test_valid_marks_pass_the_check() -> None:
         [(12, "vowel", None)],  # клеток всего 12: номера 0–11
         [(-1, "vowel", None)],
         [(2, "vowel", "ء")],  # буква — только у «не та буква»
-        [(2, "missing", "د")],
         [(9, "letter", "َ")],  # огласовка — не согласная
         [(9, "letter", "أ")],  # не фонема: хамза пишется «ء»
         [(9, "letter", "x")],

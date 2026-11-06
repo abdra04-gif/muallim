@@ -15,7 +15,7 @@ import math
 import random
 from collections import Counter, defaultdict
 from collections.abc import Callable, Hashable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from enum import StrEnum
 from typing import Any
@@ -391,6 +391,9 @@ class CellMetrics:
     alpha_kinds: float | None  # по паре (клетка, вид): «отмечен / нет»
     alpha_kind_units: int
     ci: dict[str, tuple[float, float] | None]
+    marks_by_kind: dict[str, int] = field(
+        default_factory=dict
+    )  # FR-63: сколько отметок каждого вида
 
 
 def _cell_counts(labels: Iterable[CellLabel]) -> PhonemeCounts:
@@ -417,11 +420,12 @@ def cell_metrics(labels: Sequence[CellLabel]) -> CellMetrics:
     Криппендорфа (SRC-065) — по попыткам с двумя и более разметчиками. ДИ — бутстрэп по ученикам.
     """
     counts = _cell_counts(labels)
-    errors, caught = Counter[str](), Counter[str]()
+    errors, caught, marks = Counter[str](), Counter[str](), Counter[str]()
     for lab in labels:
         for cell, kinds in lab.teacher.items():
             for kind in kinds:
                 errors[kind] += 1
+                marks[kind] += 1
                 caught[kind] += cell in lab.model
     by_attempt: dict[UUID, list[CellLabel]] = defaultdict(list)
     for lab in labels:
@@ -448,6 +452,7 @@ def cell_metrics(labels: Sequence[CellLabel]) -> CellMetrics:
         alpha_cells=krippendorff_alpha_nominal(cell_units), alpha_units=len(cell_units),
         alpha_kinds=krippendorff_alpha_nominal(kind_units), alpha_kind_units=len(kind_units),
         ci={name: cluster_bootstrap(groups, stat) for name, stat in _CELL_CI.items()},
+        marks_by_kind=dict(marks),
     )  # fmt: skip
 
 
@@ -473,6 +478,7 @@ class Metrics:
     ci: dict[str, tuple[float, float] | None]  # 95 % ДИ бутстрэпом по ученикам
     by_sound: dict[str, KindQuality]  # Q1.5: по звуку эталона
     cells: CellMetrics  # FR-62: метки клетками — отдельно от фонемных цифр
+    sources: dict[str, int] = field(default_factory=dict)  # FR-63: откуда строка «что прозвучало»
 
 
 @dataclass(frozen=True, slots=True)
@@ -531,6 +537,7 @@ class _Label:
     bot_passed: bool
     policy: GradingPolicy
     self_corrected: bool
+    phonemes_source: str | None = None
 
 
 async def collect(
@@ -629,6 +636,7 @@ async def collect(
             for sound in sounds
         },
         cell_metrics(await _cell_labels(session, real, syllables)),
+        Counter(lab.phonemes_source for lab in labels.values() if lab.phonemes_source),
     )  # fmt: skip
 
 
@@ -642,7 +650,7 @@ async def _latest_labels(
             annotations.c.label,
             annotations.c.corrected_phonemes, attempts.c.reference_phonemes,
             attempts.c.heard_phonemes, attempts.c.verdict, attempts.c.policy,
-            annotations.c.self_corrected,
+            annotations.c.self_corrected, annotations.c.phonemes_source,
         )
         .join(attempts, attempts.c.id == annotations.c.attempt_id)
         .where(real, annotations.c.label.in_(STATUSES))
@@ -660,10 +668,11 @@ async def _latest_labels(
         verdict,
         policy,
         own,
+        source,
     ) in rows.all():
         latest[(attempt_id, annotator)] = _Label(
             learner, status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy),
-            bool(own),
+            bool(own), source,
         )  # fmt: skip
     return latest
 
@@ -814,7 +823,8 @@ def render(m: Metrics) -> str:
             "Заглушка, `audio_unusable` и `off_task` не входят.",
             "",
             f"Размечено попыток: {m.annotated_attempts}, из них двумя и более разметчиками: "
-            f"{m.double_annotated}. Фонем: TA {c.ta}, FR {c.fr}, FA {c.fa}, TR {c.tr}.",
+            f"{m.double_annotated}{_share(m.double_annotated, m.annotated_attempts)}. "
+            f"Фонем: TA {c.ta}, FR {c.fr}, FA {c.fa}, TR {c.tr}.",
             "",
             to_markdown_table(("метрика", "значение", "из чего"), quality),
             "",
@@ -840,6 +850,7 @@ def render(m: Metrics) -> str:
             to_markdown_table(("метрика", "значение", "из чего"), own),
             "",
             *_render_cells(m.cells),
+            *_render_sources(m.sources),
             "## Согласие разметчиков с ботом",
             "",
             "Последняя метка каждого разметчика на попытку: `agree` — бот услышал верно, `fix` — "
@@ -883,6 +894,26 @@ def render(m: Metrics) -> str:
     )
 
 
+def _share(part: int, whole: int) -> str:
+    return f" ({round(100 * part / whole)} %)" if whole else ""
+
+
+def _render_sources(sources: Mapping[str, int]) -> list[str]:
+    """Откуда строка «что прозвучало» (FR-63): для обучения надёжнее введённая и из отметок."""
+    rows = [
+        (name, str(sources.get(name, 0))) for name in ("typed", "marks", "confirmed", "reference")
+    ]
+    return [
+        "## Откуда строка «что прозвучало» (FR-63)",
+        "",
+        "`typed` — введена учителем; `marks` — собрана из отметок; `confirmed` — «Бот прав» "
+        "(подсказана ботом); `reference` — «Чисто». Считаются последние метки каждого разметчика.",
+        "",
+        to_markdown_table(("источник", "меток"), rows),
+        "",
+    ]
+
+
 def _render_cells(c: CellMetrics) -> list[str]:
     """Блок FR-62 (ADR-0079 п. 5): отдельно от фонемных цифр — единица крупнее фонемы."""
     n, q = c.counts, c.quality
@@ -913,6 +944,12 @@ def _render_cells(c: CellMetrics) -> list[str]:
         "Recall по виду ошибки учителя:",
         "",
         to_markdown_table(("вид", "recall"), kinds),
+        "",
+        "Меток по видам ошибки (сколько примеров каждого — до обучения видно, чего мало):",
+        "",
+        to_markdown_table(
+            ("вид", "меток"), [(k, str(n)) for k, n in sorted(c.marks_by_kind.items())]
+        ),
         "",
     ]
 
