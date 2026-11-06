@@ -6,7 +6,7 @@ This chapter reviews seven areas underlying the thesis: the primer and its metho
 (Section~\ref{sec:lr-primer}), the learners and their difficulties (Section~\ref{sec:lr-learners}),
 research on computer-assisted pronunciation training (Section~\ref{sec:lr-capt}), automatic assessment of
 Qur'anic recitation (Section~\ref{sec:lr-mdd}), methods for adapting a speech model to a new population
-(Section~\ref{sec:lr-adapt}), tutors that listen to reading and knowledge tracing
+(Section~\ref{sec:lr-adapt}), tutors that listen to reading
 (Section~\ref{sec:lr-tutors}), and software engineering with AI coding agents (Section~\ref{sec:lr-agents}). Section~\ref{sec:lr-related} compares existing tools, and
 Section~\ref{sec:lr-gap} summarises the gap. The review is narrative and scoping; searches were run in
 October 2026, and every source carries a reliability grade in the project registry \cite{SRC-038}.
@@ -165,6 +165,21 @@ Diagnosis accuracy additionally checks whether the recognised substitute matches
 tutor the two error types have different costs: a missed error slows learning; a false alarm on correct
 reading undermines trust.
 
+\subsection{Classifications of reading errors}
+
+Errors in reading the Qur'an were described long before speech models, and existing classifications divide them on
+different grounds. The classical division into \emph{clear} (lahn jali) and \emph{hidden} (lahn khafi) errors looks
+at the consequence: a letter or vowel changed, or only an attribute or a rule was broken \cite{SRC-153}. An
+empirical study of students' recitation groups errors by tajweed rule; the largest group was makhraj and letter
+attributes, and qalqala was the most frequent error within it \cite{SRC-152}. For phoneme-level annotation of speech,
+L2-ARCTIC sets the standard: substitution, deletion or insertion with an ``expected --- produced'' pair
+\cite{SRC-154}. Benchmarks for pronunciation error detection take phonemes and do not assess tajweed
+\cite{SRC-004}, while Quran Muaalem encodes Hafs rules and ten letter attributes \cite{SRC-002}. None of them
+answers the question a beginner's teacher cares about: did the learner err in the \emph{sign} (read the wrong
+thing) or in the \emph{sound} (the sign was right, the sound was wrong). The thesis therefore takes two axes: the
+cause (reading or pronunciation) and the consequence (clear or hidden), and ties the scope of checks to the
+book's lessons (Section~\ref{sec:method-scope}).
+
 \subsection{Benchmarks}
 
 QuranMB.v1, presented at Interspeech 2025, was the first open benchmark for Arabic mispronunciation
@@ -257,7 +272,7 @@ set by two teachers, and a single run on it. The supervisor's group formulated t
 which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
 following Gebru and colleagues \cite{SRC-123}.
 
-\section{Tutors that listen to reading, and measuring mastery}\label{sec:lr-tutors}
+\section{Tutors that listen to reading}\label{sec:lr-tutors}
 
 \subsection{Learning to read, not only pronunciation}
 
@@ -277,38 +292,11 @@ two look-alike letters --- or read the sign correctly but produce the sound wron
 readers find more errors on vowels than on consonants and confusions between letters that differ only in
 dots, but these are native-speaking children. No dataset makes this distinction for adult non-Arabs.
 
-\subsection{Knowledge tracing}
-
-Bayesian knowledge tracing (BKT) models each skill as a hidden ``mastered / not mastered'' state and updates
-the probability of mastery after every attempt; guess and slip parameters allow a learner who has mastered a
-skill to err sometimes and one who has not to guess \cite{SRC-124}. Pel\'anek's review compares BKT with
-logistic models and recommends evaluating learner models by how well they predict the next attempt (AUC) and
-by calibration \cite{SRC-126}. Deep knowledge tracing \cite{SRC-127} is more accurate on large data but on a
-few dozen learners is justified only as exploration. The additive factors model draws learning curves per
-skill and checks whether the skills themselves are well chosen \cite{SRC-128}; half-life regression models
-forgetting from logs \cite{SRC-129}.
-
-The closest publication is Beck and Sison \cite{SRC-125}: they estimated children's mastery of 80
-letter--sound correspondences from the output of a speech recogniser that itself errs. The recogniser's noise
-was absorbed into the guess and slip parameters; it was not measured against teachers. If the recogniser's
-per-phoneme false acceptances and rejections are measured on annotated data, they can be built into the model
-explicitly, and adapting the recogniser should make the mastery estimate more accurate. This has not been
-tested.
-
-\subsection{Evaluating by mastery}
-
-A systematic review of educational recommender systems found that they are usually evaluated by clicks and
-ratings, and by learning outcomes in only about a third of studies \cite{SRC-135}. The OBER recommender stores
-learning outcomes in its data schema and compares algorithms by mastery; in a randomised trial with 5{,}700
-learners, the algorithm that kept learners engaged longest did not produce the best mastery \cite{SRC-134}.
-For a tutor this means judging by what the learner has mastered, not by how much they practised.
-
 \begin{keybox}[Implication]
-Tutors that listen to reading exist, but for children and their native script. Knowledge tracing can work with
-noisy recognition but does not account for recogniser errors measured against teachers. The lessons of
-\emph{al-Muallim ath-Thani} provide a ready-made skill map. Hence the additional question of the thesis: how the
-tool affects learning dynamics (RQ-3), which can be measured by mastery estimation over the book's skills that
-accounts for recogniser errors.
+Tutors that listen to reading exist, but for children and their native script. None separates a reading error
+from a pronunciation error, and none targets adults learning to read a foreign script. The lessons of
+\emph{al-Muallim ath-Thani} provide a ready-made skill map, so errors can be tied to a letter, a vowel sign and a
+lesson.
 \end{keybox}
 
 \section{Related systems}\label{sec:lr-related}
@@ -393,19 +381,15 @@ checks enforced by the environment, and every enforcement should leave a trace t
 
 The method of \emph{al-Muallim ath-Thani} --- sound-based, incremental, built on immediate correction ---
 fits automatic feedback well, and its lessons provide a ready-made skill map. An open phoneme-level model
-exists, and reading tutors and mastery models work for children. What is missing is evidence on four points, which set the questions of the thesis:
+exists, and reading tutors work for children. What is missing is evidence on two points, which set the questions of the thesis:
 \begin{enumerate}
   \item there are no data: no dataset of primer-level reading by beginners learning Arabic as a foreign language
     that separates reading errors from pronunciation errors, and it is unknown how reliably existing models
     detect these errors (RQ-1);
   \item it is unknown whether a system built from off-the-shelf models and components on a small dataset from
-    this population comes closer to a teacher on new learners than baseline approaches, under an evaluation
-    free of leakage; agentic loop-engineering has not been applied to such a search (RQ-2)
-    \pending{confirm with a literature review on agentic loop-engineering};
-  \item speech-based mastery models do not account for recogniser errors measured against teachers, so there
-    is as yet no instrument to measure learning dynamics from speech (instrument for RQ-3);
-  \item it has not been measured how mastery of Arabic reading changes for beginners who study with a teacher
-    and practise with a tool outside lessons (RQ-3, additional).
+    this population comes closer to a teacher on new learners than predefined baseline configurations, under an evaluation
+    free of leakage and a fixed experimental budget; agentic pipeline optimization has not been applied to such a search (RQ-2)
+    \pending{confirm with a literature review on agentic pipeline optimization}.
 \end{enumerate}
 The effect of explanations in the learner's language remains a PhD question, and the AI-agent harness a means of
 validity described in the methodology. The next chapter describes how the thesis collects this evidence.

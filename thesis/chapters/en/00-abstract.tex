@@ -1,5 +1,5 @@
 % Abstract (English and Russian) and the statement on AI tools. Abstract — 150–250 words (IU lecture "Writing up BS/MS Thesis", slide 5); keep ≤ 250 when the results sentence replaces \pending.
-% the results sentence is marked \pending until RQ-1…RQ-3 have numbers with a passport (docs/thesis/figures.md).
+% the results sentence is marked \pending until RQ-1 and RQ-2 have numbers with a passport (docs/thesis/figures.md).
 % Topic, hypothesis and RQs — ADR-0064 (per the supervisor's comments).
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
@@ -12,18 +12,18 @@ beginners learning Arabic as a foreign language requires separate evaluation. Th
 curated speech dataset of primer-level reading through a Telegram tutor that follows the book. Two teachers annotate attempts at the phoneme level, separating reading errors (the wrong sign was
 read) from pronunciation errors (the sign was right, the sound was wrong). Following design science research,
 the thesis answers how reliably existing speech recognition and analysis models detect these errors in
-beginners (RQ-1); to what extent agentic loop-engineering, in which an AI agent searches for and combines
-configurations of existing models and components, improves detection accuracy over baseline approaches
-(RQ-2); and, additionally, how the tool affects beginners' learning dynamics, estimated by knowledge tracing
-and a teacher test (RQ-3). The best configuration is compared once with the baselines on a frozen test set of
-unseen learners. \pending{pilot and agentic loop-engineering results for RQ-1--RQ-3}. The
+beginners (RQ-1), separately for reading and pronunciation errors; and, under a fixed experimental budget, to what extent
+agentic pipeline optimization, in which an AI agent searches for and combines configurations of existing models
+and components, improves detection over predefined baseline configurations (RQ-2). The best configuration is
+compared once with the baselines on a frozen test set of unseen learners.
+\pending{pilot and agentic pipeline optimization results for RQ-1 and RQ-2}. The
 contribution is a dataset of beginners' primer-level reading separating reading from pronunciation errors, the
 reliability of off-the-shelf models measured against teachers, and an error-detection system with its gain
-over baselines and a log of every configuration tried.
+over baseline configurations and a log of every configuration tried.
 
 \medskip
 \noindent\textbf{Keywords:} speech dataset; reading error detection; mispronunciation detection; Qur'anic
-Arabic; Arabic as a foreign language; agentic loop-engineering; LoRA; calibration; knowledge tracing; design
+Arabic; Arabic as a foreign language; agentic pipeline optimization; LoRA; calibration; design
 science; AI coding agents.
 
 \chapter*{\textrussian{Аннотация}}
@@ -38,19 +38,18 @@ science; AI coding agents.
 курированный речевой датасет букварного чтения с помощью Telegram-тренажёра, который ведёт ученика по книге. Два преподавателя размечают попытки по фонемам и различают ошибки чтения
 (прочитан не тот знак) и ошибки произношения (знак верный, звук неверный). Работа выполнена в парадигме
 design science и отвечает на вопросы: насколько надёжно существующие модели распознавания и анализа речи
-обнаруживают эти ошибки у начинающих (RQ-1); насколько agentic loop-engineering, в котором ИИ-агент ищет и
-комбинирует конфигурации существующих моделей и компонентов, повышает точность по сравнению с базовыми
-подходами (RQ-2); дополнительно --- как инструмент влияет на динамику освоения материала по оценке модели
-отслеживания знаний и тесту учителя (RQ-3). Лучшая конфигурация один раз сравнивается с базовыми подходами на
-замороженном тесте из новых учеников. \pending{результаты пилота и agentic
-loop-engineering по RQ-1--RQ-3}. Вклад работы --- датасет букварного чтения начинающих с разделением ошибок
+обнаруживают эти ошибки у начинающих (RQ-1), отдельно для ошибок чтения и произношения; и насколько при
+фиксированном бюджете экспериментов агентная оптимизация конвейера (agentic pipeline optimization), в которой
+ИИ-агент ищет и комбинирует конфигурации существующих моделей и компонентов, улучшает обнаружение по сравнению
+с заранее заданными базовыми конфигурациями (RQ-2). Лучшая конфигурация один раз сравнивается с базовыми на
+замороженном тесте из новых учеников. \pending{результаты пилота и агентной оптимизации конвейера по RQ-1 и RQ-2}. Вклад работы --- датасет букварного чтения начинающих с разделением ошибок
 чтения и произношения, измеренная против преподавателей надёжность готовых моделей и система обнаружения
-ошибок с выигрышем против базовых подходов и журналом всех опробованных конфигураций.
+ошибок с выигрышем против базовых конфигураций и журналом всех опробованных конфигураций.
 
 \medskip
 \noindent\textbf{Ключевые слова:} речевой датасет; обнаружение ошибок чтения; обнаружение ошибок
-произношения; чтение Корана; арабский как иностранный; agentic loop-engineering; LoRA; калибровка;
-отслеживание знаний; design science; ИИ-агенты.
+произношения; чтение Корана; арабский как иностранный; agentic pipeline optimization; LoRA; калибровка;
+design science; ИИ-агенты.
 \end{otherlanguage}
 
 \chapter*{Statement on the use of AI tools}

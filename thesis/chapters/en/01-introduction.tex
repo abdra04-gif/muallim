@@ -56,23 +56,20 @@ such a learner or whether it can be adapted to them. The methods exist --- low-r
 \cite{SRC-111}, calibration and abstention \cite{SRC-112,SRC-117} --- but they need data from the new
 population, and there are none.
 
-The second reason is what the model sees. It scores one attempt, while a teacher cares about something else:
-\emph{what the learner has already mastered}. Knowledge tracing can answer that question from a sequence of
-attempts \cite{SRC-124}, including from noisy recogniser output \cite{SRC-125}, but recogniser errors measured
-against teachers have not been built into such models, and nobody has built them for adults learning to read
-Arabic script.
+The second reason is what the model has to find. A beginner makes two different kinds of error: a \emph{reading
+error} (reading the wrong letter or vowel sign) and a \emph{pronunciation error} (recognising the letter but
+producing it from the wrong place, that is, a makhraj error). Off-the-shelf models and benchmarks do not separate
+them, while a teacher corrects them differently.
 
 Both reasons come down to one thing: there is no dataset. Without it one cannot measure how wrong off-the-shelf
-models are on beginners learning Arabic as a foreign language, cannot build a more accurate system from them,
-and cannot check whether it estimates mastery correctly. The supervisor puts it
+models are on beginners learning Arabic as a foreign language, and cannot build a more accurate system from them. The supervisor puts it
 this way: what can be measured can be solved.
 
 \section{Aim and objectives}
 
 The aim is \emph{to collect a small curated speech dataset of primer-level reading by beginners annotated by
-teachers, to evaluate existing speech recognition and analysis models on it, and to use agentic loop-engineering
-to build from them a reading and pronunciation error-detection system for an out-of-class practice tool};
-additionally, \emph{to assess how the tool affects learning dynamics.}
+teachers, to evaluate existing speech recognition and analysis models on it, and to use agentic pipeline optimization
+to build from them a reading and pronunciation error-detection system for an out-of-class practice tool}.
 
 Objectives:
 \begin{enumerate}[label=O\arabic*.]
@@ -81,44 +78,41 @@ Objectives:
   \item build a tutor as the data-collection tool: it recognises phonemes, explains errors in Russian for a
     learner starting from zero and keeps a full decision trace for every attempt;
   \item collect the dataset: consent, including consent to model training, and pseudonyms; a closed pilot with
-    20--40 learners over 4--6 weeks; phoneme-level and error-type annotation by two teachers; a teacher test at three points; a datasheet;
+    20--40 learners over 4--6 weeks; phoneme-level and error-type annotation (reading / pronunciation) by two teachers; a split of learners into training, validation and test parts without overlap; a datasheet;
   \item evaluate existing speech recognition and analysis models against teacher annotation;
-  \item build agentic loop-engineering, in which an AI agent searches for and combines configurations of off-the-shelf models and
-    components (including a fine-tuned model) by cross-validation on the training part, and compare the best
-    configuration once with baseline approaches on a frozen test set of new learners;
-  \item additionally, build a mastery model for the book's skills that accounts for the recogniser's measured
-    errors and, with it and the teacher test, describe learning dynamics with the tool;
+  \item build agentic pipeline optimization, in which an AI agent, under a fixed experimental budget, searches for and
+    combines configurations of off-the-shelf models and components (including a fine-tuned model) on the
+    validation part, and compare the best configuration once with the predefined baseline configurations B0--B3
+    on a frozen test set of new learners;
   \item answer the research questions with effect sizes and confidence intervals under a preregistered plan.
 \end{enumerate}
 
 \section{Hypothesis and research questions}\label{sec:rq}
 
 \begin{rqbox}
-\textbf{Main hypothesis.} By collecting a small curated speech dataset, it is possible to evaluate existing solutions and, using agentic loop-engineering, develop an effective tool for beginners' out-of-class practice.\\[6pt]
-\textbf{RQ-1.} How reliably do existing speech recognition and analysis models detect reading and pronunciation errors in beginners learning Arabic and Quran reading?\\[4pt]
-\textbf{RQ-2.} To what extent does applying agentic loop-engineering to search for and combine configurations of existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches?\\[4pt]
-\textbf{RQ-3 (additional).} To what extent does using the developed tool for out-of-class practice affect the learning dynamics of beginners studying with a teacher?
+\textbf{Main hypothesis.} A small curated speech dataset of beginners, annotated by teachers, is enough to show where existing models fail on these learners and, through model adaptation and agentic pipeline optimization, to build a more accurate error-detection tool for out-of-class practice.\\[6pt]
+\textbf{RQ-1.} How accurately do existing Arabic and Quranic speech models detect and locate the errors of adult beginners: (a) reading errors and (b) pronunciation errors?\\[4pt]
+\textbf{RQ-2.} Under a fixed experimental budget, to what extent does agentic pipeline optimization, which searches for and combines configurations of existing models and components, improve error detection compared with predefined baseline configurations?
 \end{rqbox}
 
 The questions form a chain. RQ-1 checks what can be relied on: whether the annotation is reliable and how far
-off-the-shelf models are from a teacher. RQ-2 measures how much agentic loop-engineering, building a system from
-the same off-the-shelf models and components, narrows this gap compared with baseline approaches. RQ-3, an
-additional question, tests the tool on people: how mastery of the material changes for learners who study with
-a teacher and practise with the tool outside lessons. Confirmatory hypotheses for RQ-1 are listed in
-Section~\ref{sec:method-hyp}; hypotheses for RQ-2 and RQ-3 are formulated with the supervisor before the
-preregistration is frozen; everything else is reported as exploratory.
+off-the-shelf models are from a teacher, separately for reading and pronunciation errors. RQ-2 measures how much
+agentic pipeline optimization, building a system from the same off-the-shelf models and components, narrows this
+gap compared with baseline configurations at the same budget. Confirmatory hypotheses for RQ-1 are listed in
+Section~\ref{sec:method-hyp}; hypotheses for RQ-2 are formulated with the supervisor before the preregistration
+is frozen; everything else is reported as exploratory. The metrics are F1, false acceptance and rejection rates
+and the phoneme error rate (PER), by error type and by level (letter, syllable, word, text).
 
 \section{Approach}
 
-The thesis follows design science research \cite{SRC-100,SRC-101}. It builds three artefacts, and each claim is
+The thesis follows design science research \cite{SRC-100,SRC-101}. It builds two artefacts, and each claim is
 evaluated with a suitable method. The dataset with its collection tool (Artefact A) is evaluated by measuring
 annotation reliability, and the reliability of off-the-shelf models is measured on it. The error-detection
-system built by agentic loop-engineering (Artefact B) is evaluated by a controlled experiment against baseline
-approaches on a frozen test set of new learners. The mastery model (Artefact C) serves, together with the
-teacher test, as the instrument for measuring learning dynamics, which are described longitudinally.
+system built by agentic pipeline optimization (Artefact B) is evaluated by a controlled experiment against
+baseline configurations on a frozen test set of new learners.
 Requirements are written as quality-attribute scenarios \cite{SRC-047}, metrics are derived with the
 Goal--Question--Metric method \cite{SRC-048}, and the analysis plan and data split will be preregistered and
-fingerprinted before research data collection and before the agentic loop first runs. The system is built by
+fingerprinted before research data collection and before the agentic optimization first runs. The system is built by
 the author with an AI agent under mechanical checks that protect both the code and the experiments
 \cite{SRC-067}.
 
@@ -132,24 +126,22 @@ the author with an AI agent under mechanical checks that protect both the code a
   \item[\textbf{C2.}] \textbf{Evaluation of off-the-shelf models.} The reliability of open speech recognition and
     analysis models on beginners, measured against teachers: precision, recall, F1, false acceptance and
     rejection rates, and ``model -- teacher'' against ``teacher -- teacher'' agreement.
-  \item[\textbf{C3.}] \textbf{A system built by agentic loop-engineering.} A configuration of off-the-shelf models
+  \item[\textbf{C3.}] \textbf{A system built by agentic pipeline optimization.} A configuration of off-the-shelf models
     and components (a calibrated verifier, LoRA fine-tuning with augmentation from the book's minimal pairs),
     its gain over baseline approaches on a frozen test set, and a log of every configuration tried.
-  \item[\textbf{C4.}] \textbf{Additionally --- learning dynamics.} How mastery of the material changes with the
-    tool, by a mastery model that accounts for recogniser errors and by the teacher test.
 \end{enumerate}
 
-The engineering result is a reproducible ``collect $\to$ annotate $\to$ agentic loop $\to$ evaluate'' pipeline
+The contribution is a chain ``dataset $\to$ benchmark $\to$ pipeline $\to$ tool''. The engineering result is a reproducible ``collect $\to$ annotate $\to$ agentic optimization $\to$ evaluate'' pipeline
 with replaceable models, database and messenger.
 
 \section{Object of research and novelty}\label{sec:novelty}
 % Требование Положения о ГИА (п. 6.9): во введении — объект исследования и новизна.
-% Формулировки — из вкладов C1--C4 и обзора (глава 2); [утвердить] с руководителем.
+% Формулировки — из вкладов C1--C3 и обзора (глава 2); [утвердить] с руководителем.
 
 The \emph{object of research} is a speech dataset of primer-level reading by beginners learning Arabic as a
 foreign language and a reading and pronunciation error-detection system built from off-the-shelf models; the
 Telegram tutor is the instrument that collects the data, not the object. The \emph{subject of research} is how
-accurately off-the-shelf models and a system built by agentic loop-engineering detect reading and pronunciation
+accurately off-the-shelf models and a system built by agentic pipeline optimization detect reading and pronunciation
 errors compared with teachers.
 
 The novelty of the thesis, as far as the review in Chapter~\ref{ch:review} shows, is as follows:
@@ -159,32 +151,26 @@ The novelty of the thesis, as far as the review in Chapter~\ref{ch:review} shows
     pronunciation errors;
   \item the reliability of open Qur'anic recitation models is measured on beginners against teachers for the
     first time (C2);
-  \item the error-detection system is built by agentic loop-engineering from off-the-shelf models and
-    components, with a log of every configuration tried and a test set protected from overfitting (C3)
-    \pending{check the novelty of agentic loop-engineering for this task in the review, Chapter~\ref{ch:review}};
-  \item additionally, learning dynamics with the tool are described by a mastery model that accounts for
-    recogniser errors measured against teachers (C4).
+  \item the error-detection system is built by agentic pipeline optimization from off-the-shelf models and
+    components under a fixed budget, with a log of every configuration tried and a test set protected from overfitting (C3)
+    \pending{check the novelty of agentic pipeline optimization for this task in the review, Chapter~\ref{ch:review}};
 \end{enumerate}
 
 \section{Scope and limitations}
 
 The curriculum covers the whole book (pp.~10--85), but evaluation focuses on the letter and vowel lessons
-(pp.~10--24): learners start there, and they hold the most errors and skills. Tajweed rules such as
-\emph{ikhfa} and \emph{idgham}, other first languages, choosing the next card from estimated mastery and a
-controlled experiment on explanations are left for future work, as are the earlier questions on how the AI
-learns, how to measure mastery and how people learn (their strength is to be re-checked). Models are not trained
-from scratch: agentic loop-engineering selects, combines and, with enough data, fine-tunes off-the-shelf models.
-Without a control group, RQ-3 describes learning dynamics with the tool but does not prove that the tool caused
-them. The
+(pp.~10--24): learners start there, and they hold the most errors and skills. What exactly is checked is set out in Section~\ref{sec:method-scope}: a core (letters, vowel signs, makhraj, qalqala, tafkhim and tarqiq and others), a separate report (\emph{ghunna}, \emph{ikhfa}, \emph{idgham}, forms at a stop) and what is outside the thesis (length of derived madd, saktah, imalah); other first languages, choosing the next card from estimated mastery and a
+controlled experiment on explanations are left for future work, as are knowledge tracing and the mastery model, learning dynamics, and the earlier questions on how the AI
+learns and how people learn (their strength is to be re-checked). Models are not trained
+from scratch: agentic pipeline optimization selects, combines and, with enough data, fine-tunes off-the-shelf models.
+The effect of the tool on learning is not measured in the thesis. The
 tutor is meant to complement a teacher; the thesis does not claim that it can replace one --- and the book itself
 says it cannot.
 
 \section{Structure of the thesis}
 
 Chapter~\ref{ch:review} reviews the primer and its method, the learners, research on pronunciation feedback,
-automatic assessment of Qur'anic recitation, methods for adapting speech models, reading tutors and knowledge
-tracing, and software engineering with AI agents. Chapter~\ref{ch:method} sets out the methodology:
-requirements, metrics, three studies, preregistration and threats to validity. Chapter~\ref{ch:impl} describes
-the implementation --- from the curriculum and skill map to the collection tool, agentic loop-engineering, the
-mastery model and the development harness. Chapter~\ref{ch:eval} presents and discusses the evaluation, and
+automatic assessment of Qur'anic recitation, methods for adapting speech models, reading tutors, and software engineering with AI agents. Chapter~\ref{ch:method} sets out the methodology:
+requirements, metrics, studies, preregistration and threats to validity. Chapter~\ref{ch:impl} describes
+the implementation --- from the curriculum and skill map to the collection tool, agentic pipeline optimization and the development harness. Chapter~\ref{ch:eval} presents and discusses the evaluation, and
 Chapter~\ref{ch:concl} concludes with answers and directions for the PhD.

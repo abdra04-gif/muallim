@@ -16,7 +16,7 @@
 {\headfamily\small\color{textmuted}\thesisUniversityEn{} · MSc in \thesisSpecialtyEn{} · Research review for the master's thesis}\\[10pt]
 {\headfamily\LARGE\bfseries\color{textaccent}Teaching Machines to Listen Like a Primer Teacher\par}
 \vspace{4pt}
-{\headfamily\large\color{textaccent}Reading-error detection, model adaptation and mastery estimation for beginners reading Qur'anic Arabic with \emph{al-Muallim ath-Thani}: state of the art and research gaps\par}
+{\headfamily\large\color{textaccent}Reading-error detection, model adaptation and error diagnosis for beginners reading Qur'anic Arabic with \emph{al-Muallim ath-Thani}: state of the art and research gaps\par}
 \vspace{10pt}
 {\color{textrule}\rule{0.35\linewidth}{1pt}}\\[8pt]
 {\large \thesisAuthorEn}\\[2pt]
@@ -28,16 +28,14 @@
 This review brings together seven bodies of knowledge underlying the thesis ``\thesisTopicEn'': the history and method of the book, the phonetic difficulties of
 Russian-speaking beginners, research on computer-assisted pronunciation training, the state of automatic
 assessment of Qur'anic recitation, ways to adapt a speech model to a new population with little data,
-tutors that listen to reading together with models of learner mastery, and the emerging practice of building
+tutors that listen to reading, and the emerging practice of building
 software with AI coding agents.
 It also summarises the legal and ethical constraints on collecting voice data. The evidence supports a
 narrow claim: automatic feedback can multiply practice and first-line correction for beginners, but it
 cannot yet replace a teacher. The best open model, Quran Muaalem, was trained on expert male reciters, and
 no study has measured it on primer-level reading by second-language beginners or tried to adapt it to
 them, although the methods --- low-rank fine-tuning, calibration, abstention with guarantees --- exist and
-work with little data, provided that the evaluation is not spoiled by leakage. Knowledge tracing can estimate
-skill mastery from noisy recogniser output, but recogniser errors measured against teachers have not yet been
-built into such models. Explicit,
+work with little data, provided that the evaluation is not spoiled by leakage. Existing models and benchmarks do not separate reading errors from pronunciation errors. Explicit,
 segment-level feedback is the condition under which pronunciation training works best, and it is what a
 primer requires. Development with AI agents is productive but prone to gaming its own tests, which argues
 for mechanical guard-rails rather than written rules. The review ends with a map of gaps and the research
@@ -45,8 +43,7 @@ questions they generate for the thesis.
 
 \smallskip
 \textbf{Keywords:} computer-assisted pronunciation training; mispronunciation detection and diagnosis;
-Qur'anic recitation; Arabic as a second language; model adaptation; LoRA; calibration; conformal
-prediction; knowledge tracing; reading tutor; speech dataset; design science; AI coding agents.
+Qur'anic recitation; Arabic as a second language; model adaptation; LoRA; calibration; conformal prediction; reading tutor; speech dataset; design science; AI coding agents.
 \end{keybox}
 
 \section{Introduction}
@@ -62,8 +59,7 @@ half of the method.
 This review asks whether that half can be supplied by a machine, and under what conditions. It is the
 research background for a master's thesis whose object is a speech dataset and the models trained on it. A tutor that follows the
 book page by page serves as the collection tool: with consent it gathers primer-level reading, teachers
-annotate it, an open model is adapted on these data to Russian-speaking beginners, and on top of it a mastery
-model estimates which skills of the book the learner has already acquired. Six questions guide the review:
+annotate it, an open model is adapted on these data to Russian-speaking beginners, and an agentic optimization of the pipeline is compared with predefined baselines. Six questions guide the review:
 
 \begin{enumerate}[label=\textbf{Q\arabic*.}]
   \item What do the book and its teaching tradition require from a tutor?
@@ -370,7 +366,7 @@ set by two teachers, and a single run on it. The supervisor's group formulated t
 which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
 following Gebru and colleagues \cite{SRC-123}.
 
-\section{Tutors that listen to reading, and measuring mastery}
+\section{Tutors that listen to reading}
 
 \subsection{Learning to read, not only pronunciation}
 
@@ -390,38 +386,11 @@ two look-alike letters --- or read the sign correctly but produce the sound wron
 readers find more errors on vowels than on consonants and confusions between letters that differ only in
 dots, but these are native-speaking children. No dataset makes this distinction for adult non-Arabs.
 
-\subsection{Knowledge tracing}
-
-Bayesian knowledge tracing (BKT) models each skill as a hidden ``mastered / not mastered'' state and updates
-the probability of mastery after every attempt; guess and slip parameters allow a learner who has mastered a
-skill to err sometimes and one who has not to guess \cite{SRC-124}. Pel\'anek's review compares BKT with
-logistic models and recommends evaluating learner models by how well they predict the next attempt (AUC) and
-by calibration \cite{SRC-126}. Deep knowledge tracing \cite{SRC-127} is more accurate on large data but on a
-few dozen learners is justified only as exploration. The additive factors model draws learning curves per
-skill and checks whether the skills themselves are well chosen \cite{SRC-128}; half-life regression models
-forgetting from logs \cite{SRC-129}.
-
-The closest publication is Beck and Sison \cite{SRC-125}: they estimated children's mastery of 80
-letter--sound correspondences from the output of a speech recogniser that itself errs. The recogniser's noise
-was absorbed into the guess and slip parameters; it was not measured against teachers. If the recogniser's
-per-phoneme false acceptances and rejections are measured on annotated data, they can be built into the model
-explicitly, and adapting the recogniser should make the mastery estimate more accurate. This has not been
-tested.
-
-\subsection{Evaluating by mastery}
-
-A systematic review of educational recommender systems found that they are usually evaluated by clicks and
-ratings, and by learning outcomes in only about a third of studies \cite{SRC-135}. The OBER recommender stores
-learning outcomes in its data schema and compares algorithms by mastery; in a randomised trial with 5{,}700
-learners, the algorithm that kept learners engaged longest did not produce the best mastery \cite{SRC-134}.
-For a tutor this means judging by what the learner has mastered, not by how much they practised.
-
 \begin{keybox}[Implication]
-Tutors that listen to reading exist, but for children and their native script. Knowledge tracing can work with
-noisy recognition but does not account for recogniser errors measured against teachers. The lessons of
-\emph{al-Muallim ath-Thani} provide a ready-made skill map. Hence the additional question of the thesis: how the
-tool affects learning dynamics (RQ-3), which can be measured by mastery estimation over the book's skills that
-accounts for recogniser errors.
+Tutors that listen to reading exist, but for children and their native script. None separates a reading error
+from a pronunciation error, and none targets adults learning to read a foreign script. The lessons of
+\emph{al-Muallim ath-Thani} provide a ready-made skill map, so errors can be tied to a letter, a vowel sign and a
+lesson.
 \end{keybox}
 
 \section{Building research software with AI coding agents}
@@ -502,13 +471,7 @@ Primer-level reading by beginners learning Arabic as a foreign language; reading
 pronunciation errors & RQ-1, Artefact A \\
 Models & Strong on experts; F1 0.72 on benchmark \cite{SRC-002,SRC-031} & Accuracy on beginners,
 false-rejection rate, agreement with teachers & RQ-1 \\
-Adaptation & LoRA, calibration, conformal guarantees \cite{SRC-111,SRC-112,SRC-114} & A system built by
-agentic loop-engineering from off-the-shelf models and components, honestly evaluated on unseen learners against
-baselines & RQ-2 \\
-Mastery & BKT with noisy recognition for children \cite{SRC-124,SRC-125} & Accounting for recogniser errors
-measured against teachers; a primer's skill map & instrument for RQ-3 \\
-Learners & Difficult sounds from other L1 \cite{SRC-034,SRC-035} & How Russian-speaking adults acquire the
-book's skills with the tool, what they forget & RQ-3 (add.) \\
+Adaptation & LoRA, calibration, conformal guarantees \cite{SRC-111,SRC-112,SRC-114} & A system built by agentic pipeline optimization from off-the-shelf models and components under a fixed budget, honestly evaluated on unseen learners against predefined baselines & RQ-2 \\
 Feedback & Medium effect; explicit and segmental works best \cite{SRC-025,SRC-026} & Effect for Arabic
 letters; trials of primer methods & exploratory, PhD \\
 Agents & Test gaming; rules decay; checks help \cite{SRC-027,SRC-076,SRC-078} & Whole-project evidence
@@ -517,7 +480,7 @@ on guarded harnesses & methodology \\
 \end{tabularx}
 \end{table}
 
-From this map follow the hypothesis and the questions of the thesis. Hypothesis: by collecting a small curated speech dataset, it is possible to evaluate existing solutions and, using agentic loop-engineering, develop an effective tool for beginners' out-of-class practice. RQ-1: how reliably do existing speech recognition and analysis models detect reading and pronunciation errors in beginners learning Arabic and Quran reading? RQ-2: to what extent does applying agentic loop-engineering to search for and combine configurations of existing models and components improve the accuracy of reading and pronunciation error detection compared with baseline approaches? RQ-3 (additional): to what extent does using the developed tool for out-of-class practice affect the learning dynamics of beginners studying with a teacher? The effect of explanations remains exploratory
+From this map follow the hypothesis and the questions of the thesis. Hypothesis: a small curated speech dataset of beginners, annotated by teachers, is enough to show where existing models fail on these learners and, through model adaptation and agentic pipeline optimization, to build a more accurate error-detection tool for out-of-class practice. RQ-1: how accurately do existing Arabic and Quranic speech models detect and locate the errors of adult beginners: (a) reading errors and (b) pronunciation errors? RQ-2: under a fixed experimental budget, to what extent does agentic pipeline optimization, which searches for and combines configurations of existing models and components, improve error detection compared with predefined baseline configurations? The effect of explanations remains exploratory
 and a PhD question, and the agent harness a means of validity.
 
 \section{Conclusion}
@@ -527,9 +490,8 @@ compatible with automatic feedback: it is sound-based, incremental and built on 
 The conditions under which pronunciation training works best, segmental targets and explicit feedback,
 are exactly those of a primer. The model exists and is open. What is missing is measurement: how often the
 model is right about a Russian-speaking adult reading a syllable for the first time and how often it rejects
-a correct reading; how much more accurate an assessment built by agentic loop-engineering from off-the-shelf
-models on the new population's own data can be; and how mastery of the material changes with such a tool. A small, honestly annotated dataset, a frozen test set and a transparent table of
-precision and recall against teachers before and after agentic loop-engineering would be worth more than another claim
+a correct reading; and how much more accurate an assessment built by agentic pipeline optimization from off-the-shelf models on the new population's own data can be. A small, honestly annotated dataset, a frozen test set and a transparent table of
+precision and recall against teachers before and after agentic pipeline optimization would be worth more than another claim
 of ``AI checking''. The same dataset, test set and skill map become the starting point of doctoral work on
 teaching the AI and learning with it. In the same spirit, the development method should be judged by what its logs show, not
 by how fast it felt.
