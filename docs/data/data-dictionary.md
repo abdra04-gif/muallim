@@ -148,6 +148,7 @@
 | `seconds_spent` | int, null | секунд от показа записи до ответа — только Telegram; при исправлении фонем — до отправки исправления |
 | `self_corrected` | boolean, null | ученик ошибся и сам перечитал верно — отдельная категория (руководство 2.1, ADR-0043); только при `agree`/`fix`; `null` — метки до миграции 0006 (не спрашивали) |
 | `entry` | varchar(16), null | как введено «что прозвучало» (FR-62, ADR-0079): `cells` — клетками в Telegram (отметки — в `annotation_marks`), `phonemes` — фонемами (пакет Excel, «Фонемы вручную»); `null` — метки до миграции 0011, «Плохая запись», «Читал не то» |
+| `phonemes_source` | varchar(16), null | откуда строка `corrected_phonemes` (FR-63, ADR-0080, миграция 0012): `typed` — введена (Excel `fix`, «Фонемы вручную»); `marks` — собрана из отметок; `confirmed` — «Бот прав» (Excel `agree`) — подсказана ботом; `reference` — «Чисто»; `null` — метки до 0012 или строки нет. Для обучения надёжнее `typed` и `marks` |
 
 При `entry = 'cells'` `label` считается сам: `agree` — чтение по учителю совпало с тем, что услышал
 бот; `corrected_phonemes` у `fix` бывает `null`, если отметки не сводятся к фонемам (огласовка,
@@ -166,8 +167,8 @@
 | `layout` | varchar(16) | `syllables` — слоги аята суры (`curriculum/syllables/ayat.yaml`), `letters` — буквы со знаками |
 | `char_start`, `char_end` | smallint | позиция кусочка в тексте пункта (`curriculum_items.text`) — не зависит от пересборки `ayat.yaml` |
 | `piece` | text | кусочек, как его видел учитель |
-| `kind` | varchar(32) | вид ошибки: `letter`, `vowel`, `madd`, `shadda_sukun`, `missing` (не прочитана вся клетка), `extra`; `tafkhim`, `ghunna`, `qalqala`; `halting`, `wrong_stop` |
-| `heard_letter` | varchar(4), null | какая буква прозвучала (фонема) — только у `letter`; `null` — не указал или «не знаю» |
+| `kind` | varchar(32) | вид ошибки. Главные (FR-63): `letter`, `missing`, `vowel`, `extra`, `shadda`, `sukun`; прочие («Ещё»): `madd`, `tafkhim`, `ghunna`, `qalqala`, `halting`, `wrong_stop`; `shadda_sukun` — прежний вид (до 0012), на экране не предлагается |
+| `heard_letter` | varchar(4), null | что прозвучало на этом месте (фонема); смысл зависит от вида (FR-63): `letter` — согласная; `vowel` — гласная (َ ِ ُ) или `-` («никакой»); `sukun` — гласная; `extra` — добавленный звук; `missing` — пропущенный звук, `null` — весь слог; `shadda` и прочие виды — `null`. У видов с вопросом `null` ещё и «не знаю». Имя столбца осталось от первых версий |
 | `bot_flagged` | boolean | стояла ли на клетке «!» бота (оценка эффекта подсказки, `preregistration.md` §5) |
 
 Строка — одна отметка «клетка × вид»; в одной клетке может быть несколько видов. Метрики по
@@ -194,7 +195,7 @@
 | `used_at` | timestamptz, null | погашено при входе (один раз); неиспользованные удаляются при отзыве |
 
 ## Ограничения в самой БД (ADR-0055)
-- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 11 видов `MarkKind`, уникально `(annotation_id, cell, kind)` (миграция 0011); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
+- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 13 видов `MarkKind` (миграции 0011 и 0012), уникально `(annotation_id, cell, kind)`; `annotations.phonemes_source` ∈ typed / marks / confirmed / reference или NULL (миграция 0012); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
 - Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
 - `annotations.detected_error_id` удалено миграцией 0007.
 - `learner_settings` (миграция 0008): `how_to_read` ∈ spoiler / shown / hidden; `reminder_minute` NULL или 0…1439; `utc_offset_min` −720…840; одна строка на ученика (PK `learner_id`).

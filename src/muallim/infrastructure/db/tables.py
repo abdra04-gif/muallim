@@ -30,7 +30,14 @@ from sqlalchemy.engine import Dialect
 from sqlalchemy.sql.expression import false, true
 from sqlalchemy.types import TypeDecorator
 
-from muallim.domain.annotation import AnnotationSource, AnnotationStatus, Entry, Layout, MarkKind
+from muallim.domain.annotation import (
+    AnnotationSource,
+    AnnotationStatus,
+    Entry,
+    Layout,
+    MarkKind,
+    PhonemesSource,
+)
 from muallim.domain.policy import Verdict
 from muallim.domain.report import ReportReason
 from muallim.domain.settings import (
@@ -219,11 +226,18 @@ annotations = Table(
     # как введено «что прозвучало» (FR-62): cells | phonemes;
     # NULL — до миграции 0011, «Плохая запись», «Читал не то»
     Column("entry", String(16)),
+    # откуда строка «что прозвучало» (FR-63): typed | marks | confirmed | reference;
+    # NULL — до миграции 0012 или строки нет
+    Column("phonemes_source", String(16)),
     CheckConstraint(_one_of("label", [*AnnotationStatus, *LEGACY_LABELS]), name="label_values"),
     CheckConstraint(
         "source IS NULL OR " + _one_of("source", AnnotationSource), name="source_values"
     ),
     CheckConstraint("entry IS NULL OR " + _one_of("entry", Entry), name="entry_values"),
+    CheckConstraint(
+        "phonemes_source IS NULL OR " + _one_of("phonemes_source", PhonemesSource),
+        name="phonemes_source_values",
+    ),
 )
 
 # Клетки метки учителя (FR-62, ADR-0079): строка на отметку «клетка × вид ошибки». Позиция

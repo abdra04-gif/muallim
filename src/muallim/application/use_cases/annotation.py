@@ -27,6 +27,7 @@ from muallim.domain.annotation import (
     Entry,
     Label,
     Mark,
+    PhonemesSource,
     annotation_cells,
     apply_marks,
     bot_cells,
@@ -37,6 +38,7 @@ from muallim.domain.annotation import (
     clean_phonemes,
     invite_digest,
     layout_of,
+    marks_from_bot,
     marks_status,
 )
 from muallim.domain.learner import Learner
@@ -218,11 +220,13 @@ class SubmitAnnotation:
         if task is None:
             return False
         phonemes: str | None = None
+        source: PhonemesSource | None = None
         if status is AnnotationStatus.AGREE:
-            phonemes = task.bot_heard
+            phonemes, source = task.bot_heard, PhonemesSource.CONFIRMED
         elif status in USABLE:
             phonemes = clean_phonemes(actual or "")
             check_phonemes(phonemes)
+            source = PhonemesSource.TYPED
             if reading:  # одно правило «бот прав» с клетками (дополнено 2026-11-01, п. 5)
                 status = marks_status(task.bot_heard, task.reference_phonemes, phonemes, ())
                 if status is AnnotationStatus.AGREE:
@@ -233,7 +237,7 @@ class SubmitAnnotation:
             Label(
                 attempt_id, annotator, status, phonemes, comment.strip(),
                 AnnotationSource.TELEGRAM, seconds_spent, self.clock.now(), self_corrected,
-                Entry.PHONEMES if phonemes is not None else None,
+                Entry.PHONEMES if phonemes is not None else None, source,
             )
         )  # fmt: skip
         await self.events.record(
@@ -246,11 +250,11 @@ class SubmitAnnotation:
 
 @dataclass(frozen=True, slots=True)
 class SubmitMarks:
-    """Разметка по клеткам (FR-62, ADR-0079): учитель оценивает чтение ученика.
+    """Разметка по клеткам (FR-62, ADR-0079; FR-63, ADR-0080): учитель оценивает чтение ученика.
 
-    Без отметок — «✅ Прочитал чисто» (что прозвучало = эталон). Фонемы выводятся из отметок, где
-    это однозначно (``apply_marks``); ``agree``/``fix`` — само (``marks_status``). Метка и клетки
-    пишутся вместе.
+    Без отметок — «Чисто» (что прозвучало = эталон). Фонемы выводятся из отметок, где это
+    однозначно (``apply_marks``); ``agree``/``fix`` — само (``marks_status``). «Бот прав»
+    (``confirm_bot``) сохраняет ответ бота. Метка и клетки пишутся вместе.
     """
 
     access: AnnotatorAccess
@@ -288,10 +292,57 @@ class SubmitMarks:
         check_marks(cells, marks)
         actual = apply_marks(text, reference, cells, marks)
         status = marks_status(task.bot_heard, reference, actual, marks)
+        source = None
+        if actual is not None:
+            source = PhonemesSource.MARKS if marks else PhonemesSource.REFERENCE
         if status is AnnotationStatus.AGREE:
             actual = task.bot_heard
+        return await self._save(
+            learner, annotator, task, marks=marks, status=status, actual=actual, source=source,
+            seconds_spent=seconds_spent, self_corrected=self_corrected, comment=comment,
+        )  # fmt: skip
+
+    async def confirm_bot(
+        self,
+        learner: Learner,
+        attempt_id: UUID,
+        *,
+        seconds_spent: int | None = None,
+        self_corrected: bool = False,
+        comment: str = "",
+    ) -> bool:
+        """«Бот прав» (FR-63): метка ``agree``, «что прозвучало» — ответ бота, отметки — его ошибки.
+
+        False — попытки больше нет. Строка помечена ``confirmed``: её подсказал бот.
+        """
+        annotator = await self.access.require(learner)
+        task = await self.task(attempt_id)
+        if task is None:
+            return False
+        marks = marks_from_bot(task.item_text, task.reference_phonemes, task.bot_heard, task.cells)
+        return await self._save(
+            learner, annotator, task, marks=marks, status=AnnotationStatus.AGREE,
+            actual=task.bot_heard, source=PhonemesSource.CONFIRMED,
+            seconds_spent=seconds_spent, self_corrected=self_corrected, comment=comment,
+        )  # fmt: skip
+
+    async def _save(
+        self,
+        learner: Learner,
+        annotator: str,
+        task: AnnotationTask,
+        *,
+        marks: Sequence[Mark],
+        status: AnnotationStatus,
+        actual: str | None,
+        source: PhonemesSource | None,
+        seconds_spent: int | None,
+        self_corrected: bool,
+        comment: str,
+    ) -> bool:
         check_label(status, actual, task.bot_heard)
-        layout = layout_of(text, cells)
+        cells = task.cells
+        layout = layout_of(task.item_text, cells)
         saved = [
             CellMark(
                 cell=m.cell, layout=layout, char_start=cells[m.cell].start,
@@ -301,14 +352,13 @@ class SubmitMarks:
             for m in marks
         ]  # fmt: skip
         label = Label(
-            attempt_id, annotator, status, actual, comment.strip(), AnnotationSource.TELEGRAM,
-            seconds_spent,
-            self.clock.now(), self_corrected, Entry.CELLS,
+            task.attempt_id, annotator, status, actual, comment.strip(), AnnotationSource.TELEGRAM,
+            seconds_spent, self.clock.now(), self_corrected, Entry.CELLS, source,
         )  # fmt: skip
         await self.tasks.add(label, saved)
         await self.events.record(
             "annotation_submitted", learner.id,
-            {"annotator": annotator, "attempt_id": str(attempt_id), "status": str(status),
+            {"annotator": annotator, "attempt_id": str(task.attempt_id), "status": str(status),
              "entry": str(Entry.CELLS), "marks": len(saved)},
         )  # fmt: skip
         await self.uow.commit()

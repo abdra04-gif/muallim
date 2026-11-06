@@ -62,6 +62,7 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
             annotations.c.attempt_id, annotations.c.annotator, annotations.c.label,
             annotations.c.corrected_phonemes, annotations.c.guide_version,
             annotations.c.self_corrected, annotations.c.entry, annotations.c.id,
+            annotations.c.phonemes_source,
         )
         .join(attempts, attempts.c.id == annotations.c.attempt_id)
         .join(learners, learners.c.id == attempts.c.learner_id)
@@ -78,12 +79,15 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
         self_corrected,
         entry,
         label_id,
+        source,
     ) in labels.all():
         latest[attempt_id][annotator] = {
             "annotator": annotator, "status": status, "actual_phonemes": actual,
             "guide_version": guide,
             "self_corrected": self_corrected,  # None — метка до руководства 2.1 (не спрашивали)
             "entry": entry,  # cells | phonemes; None — до FR-62 или «плохая запись», «не то»
+            # typed | marks | confirmed | reference; None — до FR-63 или строки нет
+            "phonemes_source": source,
             "marks": label_id,  # заменяется списком клеток ниже
         }  # fmt: skip
     cells = await _cell_marks(session, [m["marks"] for by in latest.values() for m in by.values()])

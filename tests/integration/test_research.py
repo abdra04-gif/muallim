@@ -503,6 +503,49 @@ async def test_dataset_carries_entry_and_cell_marks_of_each_label(
     assert '"tafkhim"' in (tmp_path / "manifest.jsonl").read_text(encoding="utf-8")
 
 
+# ---------- FR-63 (ADR-0080): откуда строка «что прозвучало» ----------
+async def test_dataset_carries_where_the_phonemes_of_each_label_come_from(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """Обучать можно на надёжных строках: у метки видно, введена она, собрана из отметок,
+    подтверждена («Бот прав») или это эталон («Чисто»). Из Excel «agree» — подтверждена."""
+    from sqlalchemy import insert  # noqa: PLC0415
+
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    for row in rows:
+        row["status"] = "agree"
+    await annotation.import_package(
+        session, _save_like_excel(rows, tmp_path / "A1.csv"), "A1", FixedClock()
+    )
+    await session.execute(
+        insert(annotations).values(
+            id=101, attempt_id=UUID(int=10), annotator="A2", label="fix",
+            corrected_phonemes="سَ", comment="", guide_version="3.0",
+            created_at=FixedClock().now(), source="telegram", entry="cells",
+            phonemes_source="marks",
+        )
+    )  # fmt: skip
+    await session.commit()
+    by_id = {r["attempt_id"]: r for r in await dataset.dataset_rows(session)}
+    excel, cells = by_id[str(UUID(int=10))]["annotations"]
+    assert (excel["annotator"], excel["phonemes_source"]) == ("A1", "confirmed")
+    assert (cells["annotator"], cells["phonemes_source"]) == ("A2", "marks")
+
+
+async def test_excel_fix_is_typed_phonemes(session: AsyncSession, tmp_path: Path) -> None:
+    await _seed(session)
+    rows = _read(await _package(session, tmp_path) / "tasks.csv")
+    for row in rows:
+        row["status"] = "fix"
+        row["actual_phonemes"] = "ثَ"  # не то, что услышал бот (سَ, صَ): иначе это не «fix»
+    await annotation.import_package(
+        session, _save_like_excel(rows, tmp_path / "A1.csv"), "A1", FixedClock()
+    )
+    sources = (await session.execute(select(annotations.c.phonemes_source))).scalars().all()
+    assert sources and set(sources) == {"typed"}
+
+
 async def test_excel_package_columns_do_not_change_with_cell_marks(
     session: AsyncSession, tmp_path: Path
 ) -> None:

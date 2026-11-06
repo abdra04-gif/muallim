@@ -106,6 +106,7 @@ erDiagram
         int seconds_spent
         bool self_corrected "сам исправился (2.1)"
         string entry "cells | phonemes (FR-62)"
+        string phonemes_source "typed | marks | confirmed | reference (FR-63)"
         text comment
     }
     annotation_marks {
@@ -116,8 +117,8 @@ erDiagram
         int char_start
         int char_end
         text piece
-        string kind "11 видов"
-        string heard_letter
+        string kind "13 видов (FR-63)"
+        string heard_letter "что прозвучало (FR-63)"
         bool bot_flagged "стоял «!» бота"
     }
     interaction_events {

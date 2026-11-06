@@ -380,3 +380,61 @@ async def test_cell_outcomes_are_counted_from_the_database(
     c = (await metrics.collect(session, TODAY)).cells
     assert (c.labels, c.counts.ta, c.counts.fr, c.counts.fa, c.counts.tr) == (1, 18, 0, 1, 1)
     assert c.recall_by_kind == {"letter": pytest.approx(1.0), "vowel": pytest.approx(0.0)}
+
+
+# ---------- FR-63 (ADR-0080): охват двумя разметчиками и примеры по видам ----------
+async def test_report_shows_the_share_of_attempts_labelled_by_two(session: AsyncSession) -> None:
+    """Для согласия годятся только попытки, размеченные обоими: доля видна в отчёте."""
+    await _seed(session)
+    m = await metrics.collect(session, TODAY)
+    assert (m.annotated_attempts, m.double_annotated) == (4, 3)
+    assert "3 (75 %)" in metrics.render(m)
+
+
+async def test_marks_are_counted_by_kind_from_the_latest_label_of_each_annotator(
+    session: AsyncSession,
+) -> None:
+    """Сколько примеров каждого вида ошибки — до обучения видно, чего мало."""
+    from muallim.infrastructure.db.tables import annotation_marks  # noqa: PLC0415
+
+    await _seed(session)
+    await _cell_label(session)  # T3: одна отметка «tafkhim»
+    await session.execute(
+        insert(annotations).values(
+            id=700, attempt_id=UUID(int=3), annotator="T4", label="fix", corrected_phonemes=None,
+            comment="", guide_version="3.0", created_at=_at(17), entry="cells",
+            phonemes_source=None,
+        )
+    )  # fmt: skip
+    await session.execute(
+        insert(annotation_marks),
+        [
+            {"annotation_id": 700, "cell": n, "layout": "letters", "char_start": 0, "char_end": 2,
+             "piece": "صَ", "kind": kind, "heard_letter": None, "bot_flagged": False}
+            for n, kind in enumerate(("vowel", "vowel", "shadda", "sukun"))
+        ],
+    )  # fmt: skip
+    await session.commit()
+    m = await metrics.collect(session, TODAY)
+    assert m.cells.marks_by_kind == {"tafkhim": 1, "vowel": 2, "shadda": 1, "sukun": 1}
+    md = metrics.render(m)
+    assert "по видам ошибки" in md.lower()
+    for kind in ("vowel", "shadda", "sukun", "tafkhim"):
+        assert kind in md
+
+
+async def test_phonemes_sources_are_counted_for_the_usable_labels(session: AsyncSession) -> None:
+    """Сколько строк для обучения какой надёжности: введены, из отметок, подтверждены, эталон."""
+    await _seed(session)
+    for i, source in enumerate(("typed", "marks", "confirmed", "reference", "confirmed")):
+        await session.execute(
+            insert(annotations).values(
+                id=800 + i, attempt_id=UUID(int=3), annotator=f"S{i}", label="agree",
+                corrected_phonemes="صَ", comment="", guide_version="3.0", created_at=_at(17),
+                entry="cells", phonemes_source=source,
+            )
+        )  # fmt: skip
+    await session.commit()
+    m = await metrics.collect(session, TODAY)
+    assert m.sources == {"typed": 1, "marks": 1, "confirmed": 2, "reference": 1}
+    assert "confirmed" in metrics.render(m)

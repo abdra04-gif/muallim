@@ -9,6 +9,8 @@
 | понять, откуда взялась строка / цифра / идея | `research/sources.md` (ключи `SRC-NNN`) |
 | какие ошибки бывают, как их классифицируют до нас и что из них проверяем | `research/error-taxonomy.md` (ADR-0078) |
 | что я прочитал, что думаю о статье, какие статьи читать дальше | `research/reading/README.md` (`/read-next`, `/read-note`, `/read-draft`) |
+| что взяли из статей про ошибки чтения Корана (разметка, бот, ограничения моделей) | `research/quran-mdd-papers-analysis.md` |
+| статьи и выступления: идеи, площадки, чек-лист, реестр | `publications/README.md` |
 | чем обосновано каждое методическое решение, где дыры | `research/justification.md` (`/justify`) |
 | что решили с руководителем и когда | `thesis/supervisor/` (`/supervisor`) |
 | вопросы к защите и мои ответы | `thesis/defense/questions.md` (`/defense-drill`) |

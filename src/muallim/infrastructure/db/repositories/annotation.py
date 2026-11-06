@@ -91,6 +91,10 @@ def queue_query(annotator: str) -> Select[Any]:
     own = exists().where(
         annotations.c.attempt_id == attempts.c.id, annotations.c.annotator == annotator
     )
+    # FR-63: сначала записи, уже размеченные другим, — пары закрываются, оба размечают одно и то же.
+    by_other = exists().where(
+        annotations.c.attempt_id == attempts.c.id, annotations.c.annotator != annotator
+    )
     disputed = exists().where(learner_reports.c.attempt_id == attempts.c.id)
     found_errors = exists().where(detected_errors.c.attempt_id == attempts.c.id)
     # Свои попытки не размечают: вход открыт (ADR-0072), ученик не подтверждает свой же спор.
@@ -100,7 +104,13 @@ def queue_query(annotator: str) -> Select[Any]:
     return (
         _tasks()
         .where(~own, ~mine)
-        .order_by(disputed.desc(), found_errors.desc(), attempts.c.created_at.desc(), attempts.c.id)
+        .order_by(
+            by_other.desc(),
+            disputed.desc(),
+            found_errors.desc(),
+            attempts.c.created_at.desc(),
+            attempts.c.id,
+        )
     )
 
 
@@ -159,6 +169,7 @@ class SqlAnnotationTasks(AnnotationTasks):
                     guide_version=GUIDE_VERSION, source=label.source,
                     seconds_spent=label.seconds_spent, created_at=label.created_at,
                     self_corrected=label.self_corrected, entry=label.entry,
+                    phonemes_source=label.phonemes_source,
                 ).returning(annotations.c.id)
             )  # fmt: skip
             if not marks:
