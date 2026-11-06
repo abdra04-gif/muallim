@@ -45,3 +45,4 @@
 {"ts": "2026-11-06T21:57:46+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}
 {"ts": "2026-11-06T22:00:56+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}
 {"ts": "2026-11-06T22:05:24+00:00", "hook": "git_guard", "kind": "block", "reason": "`git add` и `git commit` — отдельными командами: проверка перед коммитом видит только уже подготовленные файлы."}
+{"ts": "2026-11-06T22:06:30+00:00", "hook": "git_guard", "kind": "block", "reason": "Push остановлен: важное изменение (migrations/versions/0012_annotation_v3.py, src/muallim/application/use_cases/annotation.py, src/muallim/domain/annotation.py,"}
