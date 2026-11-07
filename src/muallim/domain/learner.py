@@ -45,20 +45,87 @@ class NativeLanguage(StrEnum):
 
 
 class ArabicReading(StrEnum):
-    """Опыт чтения по-арабски до бота (FR-44): новичок или продолжающий."""
+    """Опыт чтения по-арабски до бота (FR-44): от «с нуля» до «читаю уверенно» (FR-65)."""
 
     NONE = "none"
     SOME_LETTERS = "some_letters"
     SLOW_SYLLABLES = "slow_syllables"
+    FLUENT = "fluent"
+
+
+class AgeGroup(StrEnum):
+    """Возрастная группа (FR-65): точный возраст не храним — для публикаций хватает групп."""
+
+    U18 = "u18"
+    A18_24 = "18_24"
+    A25_34 = "25_34"
+    A35_44 = "35_44"
+    A45_54 = "45_54"
+    A55_PLUS = "55_plus"
+
+
+class Gender(StrEnum):
+    MALE = "m"
+    FEMALE = "f"
+
+
+class Prayer(StrEnum):
+    """Совершает ли намаз (FR-65): объясняет, насколько ученик знаком со звуками арабского."""
+
+    NO = "no"
+    SOMETIMES = "sometimes"
+    REGULAR = "regular"
+
+
+class Question(StrEnum):
+    """Вопросы анкеты в порядке показа (FR-65). Значение — поле кнопки и событий."""
+
+    NAME = "name"
+    AGE = "age"
+    GENDER = "gender"
+    NATIVE = "native"
+    READING = "reading"
+    PRAYER = "prayer"
+
+
+QUESTIONS: tuple[Question, ...] = tuple(Question)
+NAME_MAX_LENGTH = 40
 
 
 @dataclass(frozen=True, slots=True)
 class LearnerProfile:
-    """Анкета ученика: заполняется один раз. Младшим 18 остальное не задаётся (None)."""
+    """Анкета ученика (FR-44, FR-65): заполняется по одному ответу, пропуск запоминается.
+
+    ``display_name`` — единственное прямое ПДн анкеты: хранится в отдельной таблице и в отчёты,
+    представления и выгрузки не попадает. Остальные поля — ковариаты исследования.
+    """
 
     learner_id: UUID
-    adult: bool
-    native_language: NativeLanguage | None
-    arabic_reading: ArabicReading | None
     questionnaire_version: str
     answered_at: datetime
+    display_name: str | None = None
+    age_group: AgeGroup | None = None
+    gender: Gender | None = None
+    native_language: NativeLanguage | None = None
+    arabic_reading: ArabicReading | None = None
+    prayer: Prayer | None = None
+    skipped: frozenset[Question] = frozenset()
+
+    def has_answer(self, question: Question) -> bool:
+        return self.value_of(question) is not None
+
+    def value_of(self, question: Question) -> object | None:
+        return {
+            Question.NAME: self.display_name,
+            Question.AGE: self.age_group,
+            Question.GENDER: self.gender,
+            Question.NATIVE: self.native_language,
+            Question.READING: self.arabic_reading,
+            Question.PRAYER: self.prayer,
+        }[question]
+
+    def next_question(self) -> Question | None:
+        """Первый вопрос без ответа и не пропущенный; None — анкета закончена."""
+        return next(
+            (q for q in QUESTIONS if not self.has_answer(q) and q not in self.skipped), None
+        )

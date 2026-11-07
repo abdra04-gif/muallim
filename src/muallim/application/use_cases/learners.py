@@ -1,7 +1,8 @@
 """Регистрация ученика, согласие на исследование, анкета, удаление данных."""
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from typing import Any
 
 from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.erasures import ErasureAction, ErasureLog
@@ -14,18 +15,23 @@ from muallim.application.ports.repositories import (
 from muallim.application.ports.storage import AudioStore
 from muallim.application.ports.system import Clock, EventLog, IdGenerator
 from muallim.domain.learner import (
+    NAME_MAX_LENGTH,
+    AgeGroup,
     ArabicReading,
     ConsentKind,
     ConsentRecord,
+    Gender,
     Learner,
     LearnerProfile,
     NativeLanguage,
+    Prayer,
+    Question,
 )
 
 # Меняйте версию при каждом изменении текста согласия в presentation/telegram/texts.py.
-CONSENT_TEXT_VERSION = "2026-10-17"
+CONSENT_TEXT_VERSION = "2026-11-07"
 # Меняйте при изменении вопросов анкеты (presentation/telegram/texts.py, PROFILE_*).
-QUESTIONNAIRE_VERSION = "2026-10-18"
+QUESTIONNAIRE_VERSION = "2026-11-07"
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,48 +103,91 @@ class SetResearchConsent:
         await delete_unused_audio(released, self.attempts, self.audio)
 
 
+_CHOICES: dict[
+    Question, tuple[str, type[AgeGroup | Gender | NativeLanguage | ArabicReading | Prayer]]
+] = {
+    Question.AGE: ("age_group", AgeGroup),
+    Question.GENDER: ("gender", Gender),
+    Question.NATIVE: ("native_language", NativeLanguage),
+    Question.READING: ("arabic_reading", ArabicReading),
+    Question.PRAYER: ("prayer", Prayer),
+}
+
+
+def _parsed(question: Question, value: str) -> dict[str, Any] | None:
+    """Поле профиля и его значение; None — ответ не из списка (старая кнопка, подделка)."""
+    if question is Question.NAME:
+        name = " ".join(value.split())  # без переводов строки и двойных пробелов
+        return {"display_name": name} if 0 < len(name) <= NAME_MAX_LENGTH else None
+    field, choices = _CHOICES[question]
+    try:
+        return {field: choices(value)}
+    except ValueError:
+        return None
+
+
 @dataclass(frozen=True, slots=True)
 class Questionnaire:
-    """Анкета один раз после согласия на исследование (FR-44, ADR-0038).
+    """Анкета один раз после согласия на исследование (FR-44, FR-65, ADR-0038, ADR-0081).
 
-    Без согласия анкета не нужна: эти данные собираются только для исследования. Ответ не
-    перезаписывается. «Нет 18» снимает согласие на запись голоса (TD-SEC-05), учиться можно.
+    Шесть вопросов, каждый можно пропустить; ответ сохраняется сразу, поэтому брошенная анкета
+    продолжается с того же места. Без согласия на исследование анкета не нужна. Ответ не
+    перезаписывается. Возраст «до 18» ничего не отключает (ADR-0081): голос пишется у всех.
     """
 
     profiles: LearnerProfileRepository
-    consent: SetResearchConsent
     uow: UnitOfWork
     clock: Clock
     events: EventLog
 
-    async def needed(self, learner: Learner) -> bool:
-        return learner.research_consent and await self.profiles.get(learner.id) is None
+    async def next_question(self, learner: Learner) -> Question | None:
+        profile = await self.profiles.get(learner.id)
+        return Question.NAME if profile is None else profile.next_question()
 
-    async def answer(
-        self,
-        learner: Learner,
-        adult: bool,
-        native: NativeLanguage | None = None,
-        reading: ArabicReading | None = None,
-    ) -> bool:
-        """Сохраняет анкету; False — уже была заполнена, ничего не изменено."""
-        if await self.profiles.get(learner.id) is not None:
+    async def needed(self, learner: Learner) -> bool:
+        return learner.research_consent and await self.next_question(learner) is not None
+
+    async def answer(self, learner: Learner, question: Question, value: str) -> bool:
+        """Сохраняет ответ; False — ответ не из списка или на вопрос уже отвечали."""
+        fields = _parsed(question, value)
+        profile = await self._profile(learner)
+        if fields is None or profile.has_answer(question) or question in profile.skipped:
             return False
-        await self.profiles.add(
-            LearnerProfile(
-                learner_id=learner.id,
-                adult=adult,
-                native_language=native if adult else None,
-                arabic_reading=reading if adult else None,
+        await self.profiles.save(
+            replace(
+                profile,
                 questionnaire_version=QUESTIONNAIRE_VERSION,
                 answered_at=self.clock.now(),
+                **fields,
             )
         )
-        await self.events.record("questionnaire_answered", learner.id, {})
-        if not adult and learner.research_consent:
-            await self.consent.execute(learner, False)  # сохраняет и анкету: общий commit
-        else:
-            await self.uow.commit()
+        await self.events.record("questionnaire_answered", learner.id, {"question": question.value})
+        return await self._finish(learner)
+
+    async def skip(self, learner: Learner, question: Question) -> bool:
+        profile = await self._profile(learner)
+        if profile.has_answer(question) or question in profile.skipped:
+            return False
+        await self.profiles.save(
+            replace(
+                profile,
+                questionnaire_version=QUESTIONNAIRE_VERSION,
+                answered_at=self.clock.now(),
+                skipped=profile.skipped | {question},
+            )
+        )
+        await self.events.record("questionnaire_skipped", learner.id, {"question": question.value})
+        return await self._finish(learner)
+
+    async def _profile(self, learner: Learner) -> LearnerProfile:
+        return await self.profiles.get(learner.id) or LearnerProfile(
+            learner.id, QUESTIONNAIRE_VERSION, self.clock.now()
+        )
+
+    async def _finish(self, learner: Learner) -> bool:
+        if await self.next_question(learner) is None:
+            await self.events.record("questionnaire_completed", learner.id, {})
+        await self.uow.commit()
         return True
 
 

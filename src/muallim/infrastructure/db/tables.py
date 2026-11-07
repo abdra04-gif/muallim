@@ -38,6 +38,14 @@ from muallim.domain.annotation import (
     MarkKind,
     PhonemesSource,
 )
+from muallim.domain.learner import (
+    NAME_MAX_LENGTH,
+    AgeGroup,
+    ArabicReading,
+    Gender,
+    NativeLanguage,
+    Prayer,
+)
 from muallim.domain.policy import Verdict
 from muallim.domain.report import ReportReason
 from muallim.domain.settings import (
@@ -56,6 +64,10 @@ LEGACY_LABELS = ("correct", "false_alarm", "missed_error", "wrong_error")
 def _one_of(column: str, values: Iterable[object]) -> str:
     """CHECK «значение из списка» (TD-DB-02): новое значение — только вместе с миграцией."""
     return f"{column} IN ({', '.join(repr(str(v)) for v in values)})"
+
+
+def _one_of_or_null(column: str, values: Iterable[object]) -> str:
+    return f"{column} IS NULL OR {_one_of(column, values)}"
 
 
 class UtcDateTime(TypeDecorator[datetime]):
@@ -116,15 +128,34 @@ consents = Table(
     Column("at", UtcDateTime(), nullable=False),
 )
 
+# Анкета (FR-44, FR-65, ADR-0081): ответы копятся по одному; NULL — не отвечал или пропустил
+# (пропуски — в skipped). Имени здесь нет: оно в learner_names и в отчёты не попадает.
 learner_profiles = Table(
     "learner_profiles",
     metadata,
     Column("learner_id", Uuid, ForeignKey("learners.id", ondelete="CASCADE"), primary_key=True),
-    Column("adult", Boolean, nullable=False),
+    Column("age_group", String(8)),
+    Column("gender", String(1)),
     Column("native_language", String(8)),
     Column("arabic_reading", String(16)),
+    Column("prayer", String(16)),
+    Column("skipped", JSON, nullable=False, default=list),
     Column("questionnaire_version", String(16), nullable=False),
     Column("answered_at", UtcDateTime(), nullable=False),
+    CheckConstraint(_one_of_or_null("age_group", AgeGroup), name="age_group_values"),
+    CheckConstraint(_one_of_or_null("gender", Gender), name="gender_values"),
+    CheckConstraint(_one_of_or_null("native_language", NativeLanguage), name="native_values"),
+    CheckConstraint(_one_of_or_null("arabic_reading", ArabicReading), name="reading_values"),
+    CheckConstraint(_one_of_or_null("prayer", Prayer), name="prayer_values"),
+)
+
+# Имя из анкеты — прямое ПДн. Отдельная таблица: роль просмотра её не читает (roles.sql), в
+# представления, отчёты и выгрузки она не входит; находит ученика по псевдониму исследователь.
+learner_names = Table(
+    "learner_names",
+    metadata,
+    Column("learner_id", Uuid, ForeignKey("learners.id", ondelete="CASCADE"), primary_key=True),
+    Column("display_name", String(NAME_MAX_LENGTH), nullable=False),
 )
 
 attempts = Table(

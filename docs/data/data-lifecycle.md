@@ -14,5 +14,6 @@
 
 ## Воспроизводимость датасета
 Каждая выгрузка — отдельная папка с датой; `manifest.jsonl` содержит `attempt_id`, `audio_sha256`,
-`model_version` и `curriculum_version`. Для статьи/диссертации фиксируйте имя папки выгрузки и
+`model_version`, `curriculum_version` и ковариаты анкеты (`age_group`, `gender`, `native_language`,
+`arabic_reading`, `prayer`; имени нет, FR-65). Для статьи/диссертации фиксируйте имя папки выгрузки и
 git-коммит, на котором она сделана (OQ-06 — переход на DVC/audb).

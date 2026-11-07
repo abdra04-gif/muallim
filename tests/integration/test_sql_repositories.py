@@ -10,12 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from muallim.domain.assessment import assess
 from muallim.domain.attempt import Attempt
 from muallim.domain.learner import (
+    AgeGroup,
     ArabicReading,
     ConsentKind,
     ConsentRecord,
+    Gender,
     Learner,
     LearnerProfile,
     NativeLanguage,
+    Prayer,
+    Question,
 )
 from muallim.domain.policy import Verdict
 from muallim.infrastructure.db.repositories.attempts import SqlAttemptRepository
@@ -29,6 +33,8 @@ from muallim.infrastructure.db.tables import (
     consents,
     detected_errors,
     interaction_events,
+    learner_names,
+    learner_profiles,
 )
 from tests.fakes import FixedClock
 
@@ -232,9 +238,10 @@ async def test_activity_counts_attempts_per_day(session: AsyncSession) -> None:
 # ---------- анкета (FR-44) ----------
 def _profile(learner: Learner, clock: FixedClock) -> LearnerProfile:
     return LearnerProfile(
-        learner_id=learner.id, adult=True, native_language=NativeLanguage.TT,
-        arabic_reading=ArabicReading.SLOW_SYLLABLES, questionnaire_version="q1",
-        answered_at=clock.now(),
+        learner_id=learner.id, questionnaire_version="q1", answered_at=clock.now(),
+        display_name="Айша", age_group=AgeGroup.A25_34, gender=Gender.FEMALE,
+        native_language=NativeLanguage.TT, arabic_reading=ArabicReading.SLOW_SYLLABLES,
+        prayer=Prayer.SOMETIMES, skipped=frozenset({Question.PRAYER}),
     )  # fmt: skip
 
 
@@ -245,20 +252,51 @@ async def test_profile_roundtrip(session: AsyncSession) -> None:
     repo = SqlLearnerProfileRepository(session)
     assert await repo.get(learner.id) is None
     profile = _profile(learner, clock)
-    await repo.add(profile)
+    await repo.save(profile)
     await session.commit()
     assert await repo.get(learner.id) == profile
 
 
-async def test_minor_profile_has_no_answers(session: AsyncSession) -> None:
+async def test_profile_is_updated_answer_by_answer(session: AsyncSession) -> None:
     clock = FixedClock()
     learner = _learner(clock)
     await SqlLearnerRepository(session).add(learner)
     repo = SqlLearnerProfileRepository(session)
-    minor = LearnerProfile(learner.id, False, None, None, "q1", clock.now())
-    await repo.add(minor)
+    first = LearnerProfile(learner.id, "q1", clock.now(), age_group=AgeGroup.U18)
+    await repo.save(first)
+    second = replace(first, gender=Gender.MALE, skipped=frozenset({Question.NAME}))
+    await repo.save(second)  # вторая запись дополняет первую, а не падает на первичном ключе
     await session.commit()
-    assert await repo.get(learner.id) == minor
+    assert await repo.get(learner.id) == second
+
+
+async def test_name_lives_in_its_own_table_and_goes_with_the_learner(
+    session: AsyncSession,
+) -> None:
+    clock = FixedClock()
+    learner = _learner(clock)
+    await SqlLearnerRepository(session).add(learner)
+    await SqlLearnerProfileRepository(session).save(_profile(learner, clock))
+    await session.commit()
+    names = (await session.execute(select(learner_names))).mappings().all()
+    assert [(r["learner_id"], r["display_name"]) for r in names] == [(learner.id, "Айша")]
+    assert "display_name" not in learner_profiles.c  # имя не в таблице, которую читают отчёты
+    await SqlLearnerRepository(session).delete(learner.id)
+    await session.commit()
+    assert (await session.execute(select(learner_names))).all() == []
+    assert (await session.execute(select(learner_profiles))).all() == []
+
+
+async def test_profile_with_every_question_skipped_has_no_answers(session: AsyncSession) -> None:
+    clock = FixedClock()
+    learner = _learner(clock)
+    await SqlLearnerRepository(session).add(learner)
+    repo = SqlLearnerProfileRepository(session)
+    skipped = LearnerProfile(learner.id, "q1", clock.now(), skipped=frozenset(Question))
+    await repo.save(skipped)
+    await session.commit()
+    assert await repo.get(learner.id) == skipped
+    assert (await session.execute(select(learner_names))).all() == []  # имени нет — строки нет
 
 
 async def test_profile_deleted_with_learner(session: AsyncSession) -> None:
@@ -266,7 +304,7 @@ async def test_profile_deleted_with_learner(session: AsyncSession) -> None:
     learner = _learner(clock)
     learners = SqlLearnerRepository(session)
     await learners.add(learner)
-    await SqlLearnerProfileRepository(session).add(_profile(learner, clock))
+    await SqlLearnerProfileRepository(session).save(_profile(learner, clock))
     await session.commit()
     await learners.delete(learner.id)  # право на удаление (FR-10): анкета уходит каскадом
     await session.commit()

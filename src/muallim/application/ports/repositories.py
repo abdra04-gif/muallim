@@ -30,11 +30,13 @@ class LearnerRepository(Protocol):
 
 
 class LearnerProfileRepository(Protocol):
-    """Анкета ученика (FR-44). Удаляется вместе с учеником (FR-10)."""
+    """Анкета ученика (FR-44, FR-65). Удаляется вместе с учеником (FR-10)."""
 
     async def get(self, learner_id: UUID) -> LearnerProfile | None: ...
 
-    async def add(self, profile: LearnerProfile) -> None: ...
+    async def save(self, profile: LearnerProfile) -> None:
+        """Создаёт анкету или заменяет сохранённую: ответы приходят по одному."""
+        ...
 
 
 class AttemptRepository(Protocol):

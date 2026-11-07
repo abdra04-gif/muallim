@@ -1,7 +1,7 @@
 """Выгрузка датасета для оценки и дообучения модели (FR-14).
 
 В выгрузку попадают только ученики с согласием и только реальные попытки (не заглушка).
-Telegram ID не выгружается никогда — только псевдоним.
+Telegram ID и имя не выгружаются никогда — только псевдоним и ковариаты анкеты (FR-65).
 
 Строка — попытка: эталон, что услышала модель, и разметка каждого разметчика (последняя его
 метка). ``consensus_phonemes`` — что прозвучало, если попытку оценили минимум двое разметчиков
@@ -23,7 +23,13 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from muallim.infrastructure.db.tables import annotation_marks, annotations, attempts, learners
+from muallim.infrastructure.db.tables import (
+    annotation_marks,
+    annotations,
+    attempts,
+    learner_profiles,
+    learners,
+)
 from muallim.research.annotation import USABLE, AttemptStatus
 from muallim.research.metrics import COMPARISON_VERSION, phoneme_outcomes
 
@@ -52,8 +58,15 @@ async def dataset_rows(session: AsyncSession) -> list[dict[str, Any]]:
             attempts.c.reference_variant,
             attempts.c.feedback_language,
             attempts.c.app_version,
+            # ковариаты анкеты (FR-65); имени нет — оно в learner_names и не выгружается
+            learner_profiles.c.age_group,
+            learner_profiles.c.gender,
+            learner_profiles.c.native_language,
+            learner_profiles.c.arabic_reading,
+            learner_profiles.c.prayer,
         )
         .join(learners, learners.c.id == attempts.c.learner_id)
+        .outerjoin(learner_profiles, learner_profiles.c.learner_id == learners.c.id)
         .where(*consenting_real)
         .order_by(attempts.c.created_at, attempts.c.id)
     )

@@ -34,6 +34,7 @@ from muallim.domain.curriculum import (
     lesson_letter,
     letters_before,
 )
+from muallim.domain.learner import Question
 from muallim.domain.phonetics import Zone, articulation_zone
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import QUIZ_ROUND, RoundSummary, Step, first_quiz_lesson
@@ -46,7 +47,7 @@ from muallim.domain.settings import (
 )
 from muallim.domain.sura import AyahOutcome, Sura, SuraMode, find_sura, suras
 from muallim.domain.syllables import ayah_number
-from muallim.presentation.telegram import render, texts, views
+from muallim.presentation.telegram import keyboards, render, texts, views
 from muallim.presentation.telegram.callbacks import (
     ChangeSetting,
     Consent,
@@ -157,6 +158,21 @@ def _bar(done: int, total: int) -> str:
 
 
 # ---------- главная ----------
+_PROFILE_TEXTS: Final = {
+    Question.NAME: texts.PROFILE_NAME,
+    Question.AGE: texts.PROFILE_AGE,
+    Question.GENDER: texts.PROFILE_GENDER,
+    Question.NATIVE: texts.PROFILE_NATIVE,
+    Question.READING: texts.PROFILE_READING,
+    Question.PRAYER: texts.PROFILE_PRAYER,
+}
+
+
+def profile_question(question: Question, telegram_name: str = "") -> Screen:
+    """Один экран анкеты (FR-65); имя из Telegram предлагается кнопкой только на первом."""
+    return Screen(_PROFILE_TEXTS[question], keyboards.profile_question(question, telegram_name))
+
+
 def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> Screen:
     item = progress.continue_item or curriculum.first_item()
     lesson, _ = curriculum.locate(item.id)

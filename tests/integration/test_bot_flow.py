@@ -273,15 +273,11 @@ async def test_new_learner_consents_reads_disputes_and_deletes_data(
     await ali.write("/start")
     assert ali.tg.texts()[:2] == [texts.WELCOME, texts.CONSENT_TEXT]
 
-    # 2. Согласие → анкета один раз (FR-44): 18+ → родной язык → опыт чтения → главный экран
+    # 2. Согласие → анкета один раз (FR-44, FR-65): шесть экранов, имя — «как в Telegram»
     await ali.press(Consent(granted=True))
     assert texts.CONSENT_SAVED_YES in ali.tg.alerts()
-    assert ali.tg.texts()[-1] == texts.PROFILE_ADULT
-    await ali.press(Profile(adult=True))
-    assert ali.tg.texts()[-1] == texts.PROFILE_LANGUAGE
-    await ali.press(Profile(adult=True, lang="kk"))
-    assert ali.tg.texts()[-1] == texts.PROFILE_READING
-    await ali.press(Profile(adult=True, lang="kk", read="none"))
+    assert ali.tg.texts()[-1] == texts.PROFILE_NAME
+    await _answer_profile(ali)
     assert ali.button(GoItem)  # на главном есть «Начать»/«Продолжить»
 
     # 3. Открыть строку для чтения и прочитать её голосовым
@@ -338,51 +334,160 @@ async def test_text_instead_of_voice_is_only_a_hint(
     assert [m.text or m.caption for m in ali.tg.shown[before:]] == [texts.SEND_VOICE]
 
 
-async def test_questionnaire_is_asked_only_once(
+def _profile_screens() -> list[tuple[str, Profile]]:
+    """Экран анкеты и ответ на него; функция, а не константа — модуль собирается и без кода."""
+    return [
+        (texts.PROFILE_NAME, Profile(q="name", v="tg")),
+        (texts.PROFILE_AGE, Profile(q="age", v="25_34")),
+        (texts.PROFILE_GENDER, Profile(q="gender", v="f")),
+        (texts.PROFILE_NATIVE, Profile(q="native", v="kk")),
+        (texts.PROFILE_READING, Profile(q="reading", v="none")),
+        (texts.PROFILE_PRAYER, Profile(q="prayer", v="regular")),
+    ]
+
+
+def _callbacks(ali: Learner) -> list[str]:
+    markup = ali.last_screen().reply_markup
+    assert markup is not None
+    return [b.callback_data for row in markup.inline_keyboard for b in row if b.callback_data]
+
+
+async def _answer_profile(ali: Learner) -> None:
+    """Проходит все шесть экранов кнопками; каждый экран — тот, что ждёт ученик."""
+    for text, answer in _profile_screens():
+        assert ali.tg.texts()[-1] == text
+        await ali.press(answer)
+
+
+async def _profile_of(container: AsyncContainer, telegram_id: int) -> Any:
+    async with container() as request:
+        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(telegram_id)
+        assert learner is not None
+        return await (await request.get(LearnerProfileRepository)).get(learner.id)
+
+
+async def test_questionnaire_goes_screen_by_screen_and_saves_answers(
     bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
 ) -> None:
     _, container = bot_app
     ali = learner_factory(5101)
     await ali.write("/start")
     await ali.press(Consent(granted=True))
-    await ali.press(Profile(adult=True, lang="ru", read="some_letters"))
-    asked = ali.tg.texts().count(texts.PROFILE_ADULT)
+    await _answer_profile(ali)
+    profile = await _profile_of(container, 5101)
+    assert profile is not None
+    assert profile.display_name == "Ученик"  # имя из Telegram — одним нажатием
+    assert (profile.age_group, profile.gender) == ("25_34", "f")
+    assert (profile.native_language, profile.arabic_reading, profile.prayer) == (
+        "kk", "none", "regular",
+    )  # fmt: skip
+
+
+async def test_every_question_has_skip_and_goes_on(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    _, container = bot_app
+    ali = learner_factory(5105)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    for text, answer in _profile_screens():
+        assert ali.tg.texts()[-1] == text
+        skip = Profile(q=answer.q, v="skip").pack()
+        assert skip in _callbacks(ali)  # «Пропустить» на каждом экране
+        await ali.press(skip)
+    assert ali.button(GoItem)  # всё пропущено — сразу к урокам
+    profile = await _profile_of(container, 5105)
+    assert profile is not None and profile.display_name is None and profile.gender is None
+
+
+async def test_name_can_be_typed(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    _, container = bot_app
+    ali = learner_factory(5106)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.write("Айша")
+    assert ali.tg.texts()[-1] == texts.PROFILE_AGE
+    profile = await _profile_of(container, 5106)
+    assert profile is not None and profile.display_name == "Айша"
+
+
+async def test_bad_name_is_asked_again(learner_factory: Callable[[int], Learner]) -> None:
+    ali = learner_factory(5107)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.write("я" * 41)
+    assert texts.PROFILE_NAME_WRONG in ali.tg.texts()
+    await ali.write("Айша")  # вопрос остался на месте: правильное имя принимается
+    assert ali.tg.texts()[-1] == texts.PROFILE_AGE
+
+
+async def test_text_outside_name_step_is_not_taken_as_name(
+    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
+) -> None:
+    _, container = bot_app
+    ali = learner_factory(5108)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.press(Profile(q="name", v="skip"))
+    before = len(ali.tg.shown)
+    await ali.write("салам")  # сейчас вопрос про возраст, а не про имя
+    assert texts.SEND_VOICE in [m.text or m.caption for m in ali.tg.shown[before:]]
+    profile = await _profile_of(container, 5108)
+    assert profile is not None and profile.display_name is None
+
+
+async def test_questionnaire_is_asked_only_once(
+    learner_factory: Callable[[int], Learner],
+) -> None:
+    ali = learner_factory(5109)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await _answer_profile(ali)
+    asked = ali.tg.texts().count(texts.PROFILE_NAME)
 
     await ali.write("/start")  # вернулся — анкеты больше нет, сразу главный экран
-    assert ali.tg.texts().count(texts.PROFILE_ADULT) == asked == 1
+    assert ali.tg.texts().count(texts.PROFILE_NAME) == asked == 1
     assert ali.button(GoItem)
-    async with container() as request:
-        learner = await (await request.get(LearnerRepository)).get_by_telegram_id(5101)
-        assert learner is not None
-        profile = await (await request.get(LearnerProfileRepository)).get(learner.id)
-        assert profile is not None and profile.native_language == "ru"
 
 
-async def test_unfinished_questionnaire_is_asked_on_next_start(
+async def test_unfinished_questionnaire_resumes_at_next_question(
     learner_factory: Callable[[int], Learner],
 ) -> None:
     ali = learner_factory(5102)
     await ali.write("/start")
     await ali.press(Consent(granted=True))
-    await ali.press(Profile(adult=True))  # ушёл, не ответив на язык
+    await ali.press(Profile(q="name", v="tg"))
+    await ali.press(Profile(q="age", v="18_24"))  # ушёл, не ответив на пол
     await ali.write("/start")
-    assert ali.tg.texts()[-1] == texts.PROFILE_ADULT
+    assert ali.tg.texts()[-1] == texts.PROFILE_GENDER  # продолжает, а не начинает заново
 
 
-async def test_minor_learns_without_research_and_is_not_asked_more(
+async def test_minor_is_asked_the_same_and_voice_is_kept(
     bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
 ) -> None:
     _, container = bot_app
     kid = learner_factory(5103)
     await kid.write("/start")
     await kid.press(Consent(granted=True))
-    await kid.press(Profile(adult=False))
-    assert texts.PROFILE_MINOR in kid.tg.alerts()
-    assert kid.button(GoItem)  # учиться можно
-    assert texts.PROFILE_LANGUAGE not in kid.tg.texts()  # остальное у младших не спрашиваем
+    await kid.press(Profile(q="name", v="tg"))
+    await kid.press(Profile(q="age", v="u18"))
+    assert kid.tg.texts()[-1] == texts.PROFILE_GENDER  # решение автора: младшим — те же вопросы
     async with container() as request:
         learner = await (await request.get(LearnerRepository)).get_by_telegram_id(5103)
-        assert learner is not None and not learner.research_consent  # голос не сохраняется
+        assert learner is not None and learner.research_consent  # голос сохраняется (ADR-0081)
+
+
+async def test_old_questionnaire_button_does_not_break(
+    learner_factory: Callable[[int], Learner],
+) -> None:
+    ali = learner_factory(5110)
+    await ali.write("/start")
+    await ali.press(Consent(granted=True))
+    await ali.press("pf:1:ru:")  # кнопка анкеты прошлой версии (adult/lang/read)
+    assert texts.STALE_BUTTON in ali.tg.alerts()
+    assert ali.tg.texts()[-1] == texts.PROFILE_NAME  # экран не сломан
 
 
 async def test_declined_consent_skips_questionnaire(
@@ -391,7 +496,7 @@ async def test_declined_consent_skips_questionnaire(
     ali = learner_factory(5104)
     await ali.write("/start")
     await ali.press(Consent(granted=False))
-    assert texts.PROFILE_ADULT not in ali.tg.texts()
+    assert texts.PROFILE_NAME not in ali.tg.texts()
     assert ali.button(GoItem)
 
 

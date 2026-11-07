@@ -15,13 +15,16 @@ from muallim.presentation.telegram import texts
 pytestmark = pytest.mark.integration
 
 
-# Согласие и анкета → главная нового ученика
+# Согласие и анкета (имя — текстом, остальное кнопками) → главная нового ученика
 ONBOARDING = [
     "/start",
     texts.CONSENT_YES_BUTTON,
-    texts.PROFILE_ADULT_YES,
+    "Айша",
+    texts.PROFILE_AGE_OPTIONS["25_34"],
+    texts.PROFILE_GENDER_OPTIONS["f"],
     texts.PROFILE_LANGUAGES["ru"],
     texts.PROFILE_READING_OPTIONS["none"],
+    texts.PROFILE_PRAYER_OPTIONS["regular"],
 ]
 # Урок 1: правило → ▶️ → истиаза голосом → ▶️ → басмала голосом (урок пройден)
 LESSON_ONE = [texts.START_BUTTON, "▶️", "🎤", "▶️", "🎤"]
@@ -46,8 +49,8 @@ async def _run(steps: list[str]) -> str:
 
 
 BUTTONS = {
-    *ONBOARDING[1:], texts.START_BUTTON, "▶️", texts.HOME_BUTTON, texts.LESSONS_BUTTON,
-    texts.DISPUTE_BUTTON, "1. Знакомство", "2. Арабский алфавит",
+    *ONBOARDING[1:2], *ONBOARDING[3:], texts.START_BUTTON, "▶️", texts.HOME_BUTTON,
+    texts.LESSONS_BUTTON, texts.DISPUTE_BUTTON, "1. Знакомство", "2. Арабский алфавит",
 }  # fmt: skip
 RESEARCH_MARKS = ("Для исследования", "Услышано", "Попытка №", "Эталон:")
 

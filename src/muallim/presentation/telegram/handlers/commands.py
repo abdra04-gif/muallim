@@ -18,11 +18,8 @@ from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.daily import home_or_opening
 from muallim.presentation.telegram.handlers.quiz import quiz_screen
 from muallim.presentation.telegram.learner import NewLearner
-from muallim.presentation.telegram.screens import Screen
 
 router: Final = Router(name="learner.commands")
-
-PROFILE_START: Final = Screen(texts.PROFILE_ADULT, keyboards.profile_adult())
 
 
 @router.message(CommandStart())
@@ -42,8 +39,11 @@ async def start(
         await m.answer(texts.WELCOME)
         await m.answer(texts.CONSENT_TEXT, reply_markup=keyboards.consent())
         return
-    if await questionnaire.needed(learner):  # анкету бросили на середине — спросить ещё раз
-        await display.send(bot, m.chat.id, PROFILE_START)
+    if (question := await questionnaire.next_question(learner)) and await questionnaire.needed(
+        learner
+    ):  # анкету бросили на середине — продолжить с того же вопроса
+        name = m.from_user.first_name if m.from_user else ""
+        await display.send(bot, m.chat.id, screens.profile_question(question, name))
         return
     waiting = (await quiz.overview(learner)).waiting
     p = await progress.execute(learner)

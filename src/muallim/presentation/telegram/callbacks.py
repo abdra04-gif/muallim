@@ -71,11 +71,10 @@ class Consent(CallbackData, prefix="consent"):
 
 
 class Profile(CallbackData, prefix="pf"):
-    """Ответы анкеты копятся в кнопке: пустое поле — вопрос ещё не задан (FR-44)."""
+    """Ответ анкеты (FR-65): q — вопрос, v — значение; «skip» — пропуск, «tg» — имя из Telegram."""
 
-    adult: bool
-    lang: str = ""
-    read: str = ""
+    q: str
+    v: str = ""
 
 
 class DeleteData(CallbackData, prefix="delete"):

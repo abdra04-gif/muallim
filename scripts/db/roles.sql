@@ -100,6 +100,12 @@ BEGIN
     IF to_regclass('public.annotator_invites') IS NOT NULL THEN
         REVOKE SELECT ON public.annotator_invites FROM muallim_reader;
     END IF;
+    -- Имя из анкеты (FR-65, ADR-0081) — прямое ПДн: его видит бот и исследователь (muallim-research
+    -- learner), а просмотр в DBeaver — нет. Новая таблица по умолчанию читаема просмотром (права
+    -- по умолчанию ниже), поэтому после миграции 0013 запустите этот скрипт: make db-roles.
+    IF to_regclass('public.learner_names') IS NOT NULL THEN
+        REVOKE SELECT ON public.learner_names FROM muallim_reader;
+    END IF;
 END $$;
 
 -- Таблицы, которые миграции создадут потом (владелец — muallim_owner), получат те же права.

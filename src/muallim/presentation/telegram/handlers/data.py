@@ -11,11 +11,10 @@ from muallim.application.use_cases.learners import DeleteMyData, Questionnaire, 
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.screen import ScreenState
 from muallim.domain.curriculum import Curriculum
-from muallim.domain.learner import ArabicReading, Learner, NativeLanguage
+from muallim.domain.learner import Learner, Question
 from muallim.presentation.telegram import keyboards, screens, texts
 from muallim.presentation.telegram.callbacks import Consent, DeleteData, Privacy, Profile
 from muallim.presentation.telegram.display import Display, drop_sound, message_of
-from muallim.presentation.telegram.handlers.commands import PROFILE_START
 from muallim.presentation.telegram.screens import Screen
 
 router: Final = Router(name="learner.data")
@@ -51,13 +50,22 @@ async def cb_consent(
     await uc.execute(learner, callback_data.granted)
     await cb.answer(texts.CONSENT_SAVED_YES if callback_data.granted else texts.CONSENT_SAVED_NO)
     if msg := message_of(cb):
-        if await questionnaire.needed(learner):  # анкета — один раз, сразу после согласия (FR-44)
-            screen = PROFILE_START
+        if question := await _next_question(
+            questionnaire, learner
+        ):  # анкета — сразу после согласия
+            screen = screens.profile_question(question, cb.from_user.first_name)
         elif callback_data.then == "privacy":
             screen = screens.privacy(learner.research_consent)
         else:
             screen = screens.home(cur, await progress.execute(learner))
         await display.show(msg, screen)
+
+
+async def _next_question(questionnaire: Questionnaire, learner: Learner) -> Question | None:
+    """Следующий вопрос анкеты; None — анкета не нужна или закончена."""
+    return (
+        await questionnaire.next_question(learner) if await questionnaire.needed(learner) else None
+    )
 
 
 @router.callback_query(Profile.filter())
@@ -71,33 +79,25 @@ async def cb_profile(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
-    """Анкета по шагам: 18+ → родной язык → опыт чтения; ответы копятся в кнопке (FR-44)."""
+    """Анкета по экранам: ответ или «Пропустить» сохраняются сразу, дальше — следующий вопрос."""
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    msg = message_of(cb)
-    if callback_data.adult and not callback_data.lang:
-        await cb.answer()
-        if msg:
-            await display.show(msg, Screen(texts.PROFILE_LANGUAGE, keyboards.profile_language()))
+    try:
+        question = Question(callback_data.q)
+    except ValueError:  # кнопка от старой версии анкеты
+        await cb.answer(texts.STALE_BUTTON)
         return
-    if callback_data.adult and not callback_data.read:
-        await cb.answer()
-        if msg:
-            await display.show(
-                msg, Screen(texts.PROFILE_READING, keyboards.profile_reading(callback_data.lang))
-            )
-        return
-    if callback_data.adult:
-        try:
-            native = NativeLanguage(callback_data.lang)
-            reading = ArabicReading(callback_data.read)
-        except ValueError:  # кнопка от старой версии анкеты
-            await cb.answer(texts.STALE_BUTTON)
-            return
-        saved = await questionnaire.answer(learner, adult=True, native=native, reading=reading)
-        await cb.answer(texts.PROFILE_THANKS if saved else None)
+    if callback_data.v == "skip":
+        await questionnaire.skip(learner, question)
     else:
-        saved = await questionnaire.answer(learner, adult=False)
-        await cb.answer(texts.PROFILE_MINOR if saved else None)
+        value = cb.from_user.first_name if callback_data.v == "tg" else callback_data.v
+        await questionnaire.answer(learner, question, value)  # повторное нажатие ничего не меняет
+    msg = message_of(cb)
+    if following := await _next_question(questionnaire, learner):
+        await cb.answer()
+        if msg:
+            await display.show(msg, screens.profile_question(following, cb.from_user.first_name))
+        return
+    await cb.answer(texts.PROFILE_THANKS)
     if msg:
         await display.show(msg, screens.home(cur, await progress.execute(learner)))
 

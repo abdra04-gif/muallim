@@ -30,8 +30,8 @@ async def test_start_shows_welcome_and_consent_buttons() -> None:
 async def test_button_is_pressed_by_its_label() -> None:
     out = await console.run_console(["/start", texts.CONSENT_YES_BUTTON])
     assert _plain(texts.CONSENT_SAVED_YES) in out
-    assert _plain(texts.PROFILE_ADULT).splitlines()[-1] in out  # дальше — анкета
-    assert f"[{texts.PROFILE_ADULT_YES}]" in out
+    assert _plain(texts.PROFILE_NAME).splitlines()[-1] in out  # дальше — анкета, первый вопрос
+    assert f"[{texts.PROFILE_SKIP}]" in out
 
 
 async def test_unknown_label_is_sent_as_text() -> None:

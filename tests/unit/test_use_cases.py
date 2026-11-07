@@ -26,7 +26,16 @@ from muallim.application.use_cases.recitation import AssessRecitation, Recitatio
 from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.reports import ReportMistake
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
-from muallim.domain.learner import ArabicReading, ConsentKind, Learner, NativeLanguage
+from muallim.domain.learner import (
+    AgeGroup,
+    ArabicReading,
+    ConsentKind,
+    Gender,
+    Learner,
+    NativeLanguage,
+    Prayer,
+    Question,
+)
 from muallim.domain.policy import GradingPolicy, Verdict
 from muallim.domain.report import ReportReason
 from tests.fakes import (
@@ -202,54 +211,123 @@ async def test_granting_consent_deletes_nothing(w: World) -> None:
     assert not any(e.startswith("delete:") for e in w.audio.journal)
 
 
-# ---------- анкета (FR-44) ----------
+# ---------- анкета (FR-44, FR-65) ----------
 def _questionnaire(w: World) -> Questionnaire:
-    consent = w.consent()
-    return Questionnaire(InMemoryProfiles(), consent, w.uow, w.clock, w.events)
+    return Questionnaire(InMemoryProfiles(), w.uow, w.clock, w.events)
+
+
+async def _answer_all(q: Questionnaire, learner: Learner) -> None:
+    for question, value in [
+        (Question.NAME, "Айша"), (Question.AGE, "25_34"), (Question.GENDER, "f"),
+        (Question.NATIVE, "kk"), (Question.READING, "none"), (Question.PRAYER, "regular"),
+    ]:  # fmt: skip
+        assert await q.answer(learner, question, value)
 
 
 async def test_questionnaire_asked_only_after_research_consent(w: World) -> None:
     learner, q = await w.learner(), _questionnaire(w)
-    assert not await q.needed(learner)  # без согласия эти данные не нужны и не собираются
+    assert not await q.needed(learner)  # отказ от исследования — анкета не нужна (минимизация)
     await w.consent().execute(learner, True)
     assert await q.needed(learner)
 
 
-async def test_questionnaire_saved_once_and_not_asked_again(w: World) -> None:
+async def test_questions_come_in_fixed_order_and_finish(w: World) -> None:
     learner, q = await w.learner(), _questionnaire(w)
     learner.research_consent = True
-    assert await q.answer(learner, adult=True, native=NativeLanguage.KK, reading=ArabicReading.NONE)
+    order = []
+    while (question := await q.next_question(learner)) is not None:
+        order.append(question)
+        await q.skip(learner, question)
+    assert order == [
+        Question.NAME, Question.AGE, Question.GENDER,
+        Question.NATIVE, Question.READING, Question.PRAYER,
+    ]  # fmt: skip
+    assert not await q.needed(learner)
+
+
+async def test_answers_are_saved_one_by_one_and_not_overwritten(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    await _answer_all(q, learner)
     profile = await q.profiles.get(learner.id)
     assert profile is not None
-    assert (profile.adult, profile.native_language, profile.arabic_reading) == (
-        True, NativeLanguage.KK, ArabicReading.NONE,
+    assert (profile.display_name, profile.age_group, profile.gender) == (
+        "Айша", AgeGroup.A25_34, Gender.FEMALE,
     )  # fmt: skip
-    assert profile.answered_at < w.clock.now() and profile.questionnaire_version  # часы тикают
+    assert (profile.native_language, profile.arabic_reading, profile.prayer) == (
+        NativeLanguage.KK, ArabicReading.NONE, Prayer.REGULAR,
+    )  # fmt: skip
+    assert profile.questionnaire_version and profile.answered_at <= w.clock.now()
     assert not await q.needed(learner)
-    # второй ответ не перезаписывает первый: анкета — один раз
-    assert not await q.answer(learner, adult=True, native=NativeLanguage.RU, reading=None)
-    assert (await q.profiles.get(learner.id)) == profile
+    # второй ответ на тот же вопрос ничего не меняет: анкета — один раз
+    assert not await q.answer(learner, Question.GENDER, "m")
+    assert await q.profiles.get(learner.id) == profile
 
 
-async def test_minor_keeps_learning_but_voice_is_not_kept(w: World) -> None:
-    learner, q = await w.learner(), _questionnaire(w)
-    await w.consent().execute(learner, True)
-    assert await q.answer(learner, adult=False)
-    assert not learner.research_consent  # участие в исследовании — только 18+ (TD-SEC-05)
-    assert [c.granted for c in w.learners.consents] == [True, False]
-    profile = await q.profiles.get(learner.id)
-    assert profile is not None and not profile.adult and profile.native_language is None
-    assert not await q.needed(learner)
-
-
-async def test_questionnaire_event_has_no_answers(w: World) -> None:
+async def test_unfinished_questionnaire_resumes_at_next_question(w: World) -> None:
     learner, q = await w.learner(), _questionnaire(w)
     learner.research_consent = True
-    await q.answer(
-        learner, adult=True, native=NativeLanguage.RU, reading=ArabicReading.SOME_LETTERS
-    )
-    assert ("questionnaire_answered", learner.id, {}) in w.events.events  # ответы — только в анкете
-    assert w.uow.commits >= 1
+    await q.answer(learner, Question.NAME, "Айша")
+    await q.answer(learner, Question.AGE, "18_24")
+    assert await q.needed(learner)
+    assert await q.next_question(learner) is Question.GENDER
+
+
+async def test_skipped_question_is_remembered_and_not_asked_again(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    assert await q.skip(learner, Question.NAME)
+    profile = await q.profiles.get(learner.id)
+    assert profile is not None and profile.display_name is None
+    assert Question.NAME in profile.skipped
+    assert await q.next_question(learner) is Question.AGE
+    assert not await q.skip(learner, Question.NAME)  # повторный пропуск — не событие
+
+
+async def test_invalid_answers_are_rejected(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    for question, value in [
+        (Question.AGE, "12"), (Question.GENDER, "x"), (Question.NATIVE, ""),
+        (Question.READING, "adult"), (Question.PRAYER, "yes"),
+        (Question.NAME, "   "), (Question.NAME, "я" * 41),
+    ]:  # fmt: skip
+        assert not await q.answer(learner, question, value), (question, value)
+    assert await q.profiles.get(learner.id) is None  # ничего не сохранено
+    assert await q.next_question(learner) is Question.NAME
+
+
+async def test_name_is_trimmed_and_kept_as_typed(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    assert await q.answer(learner, Question.NAME, "  Умм Хабиба \n")
+    profile = await q.profiles.get(learner.id)
+    assert profile is not None and profile.display_name == "Умм Хабиба"
+
+
+async def test_minor_keeps_research_consent_and_is_asked_the_rest(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    await w.consent().execute(learner, True)
+    assert await q.answer(learner, Question.AGE, "u18")
+    assert learner.research_consent  # решение автора, ADR-0081: голос пишется у всех возрастов
+    assert [c.granted for c in w.learners.consents] == [True]
+    assert await q.next_question(learner) is Question.NAME
+
+
+async def test_questionnaire_events_carry_no_answers(w: World) -> None:
+    learner, q = await w.learner(), _questionnaire(w)
+    learner.research_consent = True
+    await q.answer(learner, Question.NAME, "Айша")
+    await q.skip(learner, Question.AGE)
+    for question in (Question.GENDER, Question.NATIVE, Question.READING, Question.PRAYER):
+        await q.skip(learner, question)
+    names = [name for name, _, _ in w.events.events]
+    assert names.count("questionnaire_answered") == 1
+    assert names.count("questionnaire_skipped") == 5
+    assert names.count("questionnaire_completed") == 1  # один раз, когда вопросов не осталось
+    payloads = [str(data) for name, _, data in w.events.events if name.startswith("questionnaire")]
+    assert not any("Айша" in p for p in payloads)  # имя и ответы — только в анкете
+    assert w.uow.commits >= 6
 
 
 # ---------- проверка чтения ----------

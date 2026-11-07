@@ -19,17 +19,30 @@
 | `feedback_language` | varchar(8), null | язык объяснений (ADR-0017); пока только русский — команда /language скрыта (ADR-0022), значение не меняется | 🟢 |
 | `created_at` | timestamptz (UTC) | дата регистрации | 🟢 |
 
-## `learner_profiles` — анкета ученика (FR-44, ADR-0038)
-Одна строка на ученика, заполняется один раз после согласия на исследование; не перезаписывается.
-Удаляется вместе с учеником (CASCADE). Только кнопки — свободного текста нет.
+## `learner_profiles` — анкета ученика (FR-44, FR-65, ADR-0038, ADR-0081)
+Одна строка на ученика (миграции 0004, 0013). Заполняется по одному ответу после согласия на
+исследование; ответ не перезаписывается; пропущенный вопрос запоминается и не задаётся снова.
+Удаляется вместе с учеником (CASCADE). Только кнопки (имя — в `learner_names`). Имени здесь нет.
 | Поле | Тип | Описание | Кат. |
 |---|---|---|---|
 | `learner_id` | UUID, PK → learners, CASCADE | чья анкета | 🟡 |
-| `adult` | bool | ответ «мне 18+»; `false` — согласие на запись голоса снято, остальное не спрашивалось | 🔴 |
-| `native_language` | varchar(8), null | `ru` / `kk` / `tt` / `other`; null у младших 18 | 🔴 |
-| `arabic_reading` | varchar(16), null | `none` / `some_letters` / `slow_syllables` — опыт чтения до бота; null у младших 18 | 🟡 |
+| `age_group` | varchar(8), null | `u18` / `18_24` / `25_34` / `35_44` / `45_54` / `55_plus`; null — не отвечал; у прежних «нет 18» — `u18` | 🔴 |
+| `gender` | varchar(1), null | `m` / `f` | 🔴 |
+| `native_language` | varchar(8), null | `ru` / `kk` / `tt` / `other` | 🔴 |
+| `arabic_reading` | varchar(16), null | `none` / `some_letters` / `slow_syllables` / `fluent` — как читает по-арабски | 🟡 |
+| `prayer` | varchar(16), null | `no` / `sometimes` / `regular` — совершает ли намаз | 🔴 |
+| `skipped` | JSON, список | вопросы, на которых нажали «Пропустить» (`name`, `age`, …) | 🟢 |
 | `questionnaire_version` | varchar(16) | версия вопросов (`QUESTIONNAIRE_VERSION`) | 🟢 |
-| `answered_at` | timestamptz (UTC) | когда ответил | 🟢 |
+| `answered_at` | timestamptz (UTC) | последний ответ | 🟢 |
+
+## `learner_names` — имя из анкеты (FR-65, ADR-0081)
+Одна строка на ученика, только если назвал имя. **Прямое ПДн**: в `v_*`, отчёты и выгрузки не входит,
+роль `muallim_reader` её не читает (`scripts/db/roles.sql`); исследователь находит ученика по
+номеру `L-…` командой `muallim-research learner`. Удаляется вместе с учеником (CASCADE).
+| Поле | Тип | Описание | Кат. |
+|---|---|---|---|
+| `learner_id` | UUID, PK → learners, CASCADE | чьё имя | 🟡 |
+| `display_name` | varchar(40) | «как обращаться»: из Telegram одной кнопкой или написал сам | 🔴 |
 
 ## `learner_settings` — настройки ученика и состояние экрана (FR-51, TD-FN-90, ADR-0061)
 Одна строка на ученика (миграция 0008); нет строки — умолчания, как бот работал до настроек.
@@ -119,6 +132,7 @@
 | Представление | Строка = | Главные поля |
 |---|---|---|
 | `v_attempts` | попытка | `pseudonym`, `item_id`, `lesson_id`, `page`, `line`, `item_text`, `item_note`, `score`, `verdict`, `errors`, `disputed`, `annotations`, `audio_sha256`, `model_version` |
+| `v_learner_cohorts` | ученик (FR-65) | `pseudonym`, `research_consent`, `age_group`, `gender`, `native_language`, `arabic_reading`, `prayer`, `attempts`, `errors`, `avg_score`, `first_attempt_at`, `last_attempt_at` (настоящая модель, без заглушки; имени и Telegram ID нет) |
 | `v_errors` | найденная ошибка | `pseudonym`, `item_id`, `page`, `line`, `item_text`, `kind`, `expected`, `heard`, `position`, `syllable`, `message`, `score`, `label` (последняя метка попытки, не этой ошибки; ADR-0055), `disputed`, `audio_sha256` |
 
 ## `detected_errors` — ошибки, найденные системой

@@ -183,6 +183,7 @@ uv run muallim-research annotation-export --annotator A1 --limit 50   # паке
 uv run muallim-research annotation-import FILE --annotator A1         # метки обратно в БД
 uv run muallim-research dataset-export                                # датасет → data/exports/<дата>/
 uv run muallim-research verify                                        # сверка БД и файлов записей
+uv run muallim-research learner L-7f3a9c12                            # имя и анкета ученика по номеру
 ```
 Как смотреть данные и писать свои SQL-запросы — [`docs/data/browsing.md`](docs/data/browsing.md),
 словарь таблиц — [`docs/data/data-dictionary.md`](docs/data/data-dictionary.md),

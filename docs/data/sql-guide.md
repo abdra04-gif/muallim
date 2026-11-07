@@ -15,6 +15,8 @@
 | `v_attempts` | попытка (ученик прочитал строку) | `created_at`, `pseudonym`, `page`, `line`, `item_text`, `score`, `verdict`, `errors`, `disputed`, `annotations`, `model_version` |
 | `v_errors` | ошибка, найденная ботом | `pseudonym`, `page`, `line`, `item_text`, `kind`, `expected`, `heard`, `syllable`, `message`, `label`, `model_version` |
 
+| `v_learner_cohorts` | ученик под псевдонимом (FR-65) | `pseudonym`, `age_group`, `gender`, `native_language`, `arabic_reading`, `prayer`, `attempts`, `errors`, `avg_score` |
+
 Связь: у каждой ошибки есть `attempt_id` её попытки. Главные колонки — `docs/data/data-dictionary.md`,
 все — `src/muallim/infrastructure/db/views.py`.
 

@@ -1,7 +1,7 @@
 """Представления для просмотра данных в DBeaver/psql и для отчётов (ADR-0023).
 
 SQL переносимый (PostgreSQL и SQLite). Telegram ID в представления не попадает — только псевдоним.
-Последняя миграция с представлениями (сейчас 0007) хранит их замороженную копию; тест сверяет.
+Последняя миграция с представлениями (сейчас 0013) хранит их замороженную копию; тест сверяет.
 Изменили SQL здесь — добавьте миграцию, которая пересоздаёт представление.
 """
 
@@ -74,6 +74,30 @@ JOIN attempts a ON a.id = e.attempt_id
 JOIN learners l ON l.id = a.learner_id
 LEFT JOIN curriculum_items ci
     ON ci.item_id = a.item_id AND ci.curriculum_version = a.curriculum_version
+""",
+    # Ученик под псевдонимом: ковариаты анкеты и итоги попыток (FR-65). Имени и Telegram ID нет.
+    "v_learner_cohorts": """
+SELECT
+    l.pseudonym,
+    l.created_at,
+    l.research_consent,
+    p.age_group,
+    p.gender,
+    p.native_language,
+    p.arabic_reading,
+    p.prayer,
+    (SELECT COUNT(*) FROM attempts a
+        WHERE a.learner_id = l.id AND a.model_version <> 'stub') AS attempts,
+    (SELECT COUNT(*) FROM detected_errors e JOIN attempts a ON a.id = e.attempt_id
+        WHERE a.learner_id = l.id AND a.model_version <> 'stub') AS errors,
+    (SELECT ROUND(AVG(a.score), 1) FROM attempts a
+        WHERE a.learner_id = l.id AND a.model_version <> 'stub') AS avg_score,
+    (SELECT MIN(a.created_at) FROM attempts a
+        WHERE a.learner_id = l.id AND a.model_version <> 'stub') AS first_attempt_at,
+    (SELECT MAX(a.created_at) FROM attempts a
+        WHERE a.learner_id = l.id AND a.model_version <> 'stub') AS last_attempt_at
+FROM learners l
+LEFT JOIN learner_profiles p ON p.learner_id = l.id
 """,
 }
 

@@ -71,14 +71,14 @@ class InMemoryLearners:
 
 @dataclass
 class InMemoryProfiles:
-    """Анкета ученика (FR-44): одна на ученика."""
+    """Анкета ученика (FR-44, FR-65): одна на ученика, дополняется по одному ответу."""
 
     by_learner: dict[UUID, LearnerProfile] = field(default_factory=dict)
 
     async def get(self, learner_id: UUID) -> LearnerProfile | None:
         return self.by_learner.get(learner_id)
 
-    async def add(self, profile: LearnerProfile) -> None:
+    async def save(self, profile: LearnerProfile) -> None:
         self.by_learner[profile.learner_id] = profile
 
 

@@ -94,7 +94,7 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.RecordReference: callbacks.RecordReference(item_id=item),
         callbacks.ShowProgress: callbacks.ShowProgress(),
         callbacks.Consent: callbacks.Consent(granted=False, then="privacy"),
-        callbacks.Profile: callbacks.Profile(adult=False, lang="other", read="slow_syllables"),
+        callbacks.Profile: callbacks.Profile(q="reading", v="slow_syllables"),
         callbacks.DeleteData: callbacks.DeleteData(confirmed=False),
         callbacks.Noop: callbacks.Noop(),
         callbacks.Again: callbacks.Again(),

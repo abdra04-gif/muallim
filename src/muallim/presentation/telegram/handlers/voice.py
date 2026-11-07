@@ -16,6 +16,7 @@ from dishka import FromDishka
 from muallim.application.ports.recognition import RecognitionError
 from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
 from muallim.application.use_cases.cards import OpenItem
+from muallim.application.use_cases.learners import Questionnaire
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.recitation import AssessRecitation
@@ -25,7 +26,7 @@ from muallim.application.use_cases.settings import GetSettings
 from muallim.application.use_cases.staff import StaffAccess
 from muallim.application.use_cases.sura import ReadSura
 from muallim.domain.curriculum import Curriculum, ItemKind
-from muallim.domain.learner import Learner
+from muallim.domain.learner import Learner, Question
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import read_passed
 from muallim.presentation.telegram import opening, screens, texts
@@ -184,8 +185,11 @@ async def fallback(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
     screen_state: FromDishka[ScreenState],
+    questionnaire: FromDishka[Questionnaire],
 ) -> None:
     """Текст вместо голосового — одна подсказка; экран с кнопками остаётся выше (FR-50).
+
+    Исключение — первый вопрос анкеты «как обращаться»: текст в этот момент и есть ответ (FR-65).
 
     Неизвестная команда (в том числе /annotate постороннего) — главная: это не «текст вместо
     голосового», и ученику нужны кнопки.
@@ -193,6 +197,23 @@ async def fallback(
     if (m.text or "").startswith("/"):  # неизвестная команда — просто главная с кнопками
         await screen_state.menu(learner)  # на экране меню: голосовое не оценивается (FR-50)
         await display.send(bot, m.chat.id, screens.home(cur, await progress.execute(learner)))
+        return
+    if (
+        m.text
+        and await questionnaire.needed(learner)
+        and (await questionnaire.next_question(learner) is Question.NAME)
+    ):
+        if not await questionnaire.answer(learner, Question.NAME, m.text):
+            await m.answer(texts.PROFILE_NAME_WRONG)
+            return
+        following = await questionnaire.next_question(learner)
+        name = m.from_user.first_name if m.from_user else ""
+        screen = (
+            screens.profile_question(following, name)
+            if following
+            else screens.home(cur, await progress.execute(learner))
+        )
+        await display.send(bot, m.chat.id, screen)
         return
     await m.answer(texts.SEND_VOICE)
 

@@ -38,6 +38,7 @@ from muallim.research import (
     erasures,
     errors,
     integrity,
+    learners,
     metrics,
     pilot,
     reports,
@@ -84,8 +85,8 @@ async def _run(args: argparse.Namespace) -> str:
                     deleted = await integrity.delete_orphans(session, report, settings.audio_dir)
                     text += f"\nУдалено лишних файлов (старше 10 минут): {deleted}"
                 return text
-            if args.command == "errors":
-                return await _errors(session, args, settings, stamp)
+            if args.command in ("errors", "learner"):
+                return await _lookup(session, args, settings, stamp)
             if args.command == "dataset-export":
                 rows = await dataset.dataset_rows(session)
                 store = FileAudioStore(settings.audio_dir)
@@ -163,6 +164,15 @@ async def _errors(
     return f"{table}\n\nНайдено ошибок: {len(rows)} (на экране до 30) → {out}"
 
 
+async def _lookup(
+    session: AsyncSession, args: argparse.Namespace, settings: Settings, stamp: str
+) -> str:
+    if args.command == "errors":
+        return await _errors(session, args, settings, stamp)
+    card = await learners.find(session, args.pseudonym)
+    return learners.render(card) if card else f"Ученика {args.pseudonym} нет."
+
+
 def _date(value: str | None) -> datetime | None:
     return datetime.fromisoformat(value).replace(tzinfo=UTC) if value else None
 
@@ -186,6 +196,8 @@ def main() -> None:
     ver.add_argument(
         "--delete-orphans", action="store_true", help="удалить файлы, на которые нет попыток"
     )
+    one = sub.add_parser("learner", help="имя и анкета ученика по номеру L-xxxx (личная помощь)")
+    one.add_argument("pseudonym", help="номер ученика, например L-7f3a9c12")
     err = sub.add_parser("errors", help="каталог ошибок с фильтрами")
     err.add_argument("--letter", help="какая буква должна была прозвучать, например ص")
     err.add_argument("--heard", help="что услышала модель, например س")

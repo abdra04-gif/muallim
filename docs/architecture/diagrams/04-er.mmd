@@ -1,7 +1,8 @@
 %% Схема БД (подробно — docs/data/data-dictionary.md).
 erDiagram
     learners ||--o{ consents : "журнал согласий"
-    learners ||--o| learner_profiles : "анкета один раз"
+    learners ||--o| learner_profiles : "анкета, ответы по одному"
+    learners ||--o| learner_names : "имя отдельно"
     learners ||--o| learner_settings : "настройки и экран"
     learners ||--o{ attempts : "читает"
     learners |o--o{ interaction_events : "действия"
@@ -35,10 +36,17 @@ erDiagram
     }
     learner_profiles {
         uuid learner_id PK,FK
-        bool adult "18+"
+        string age_group "группа возраста"
+        string gender "m / f"
         string native_language "родной язык"
-        string arabic_reading "опыт чтения"
+        string arabic_reading "как читает"
+        string prayer "намаз"
+        json skipped "пропущенные вопросы"
         string questionnaire_version
+    }
+    learner_names {
+        uuid learner_id PK,FK
+        string display_name "как обращаться"
     }
     learner_settings {
         uuid learner_id PK,FK
