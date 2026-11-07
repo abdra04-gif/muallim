@@ -480,10 +480,10 @@ async def test_dataset_carries_entry_and_cell_marks_of_each_label(
         insert(annotation_marks),
         [
             {"annotation_id": 100, "cell": 0, "layout": "letters", "char_start": 0,
-             "char_end": 2, "piece": "صَ", "kind": "letter", "heard_letter": "س",
+             "char_end": 2, "piece": "صَ", "kind": "letter", "heard": "س",
              "bot_flagged": True},
             {"annotation_id": 100, "cell": 0, "layout": "letters", "char_start": 0,
-             "char_end": 2, "piece": "صَ", "kind": "tafkhim", "heard_letter": None,
+             "char_end": 2, "piece": "صَ", "kind": "tafkhim", "heard": None,
              "bot_flagged": True},
         ],
     )  # fmt: skip
@@ -495,9 +495,9 @@ async def test_dataset_carries_entry_and_cell_marks_of_each_label(
     assert (cells["annotator"], cells["entry"], cells["actual_phonemes"]) == ("A2", "cells", None)
     assert sorted(cells["marks"], key=lambda m: m["kind"]) == [
         {"cell": 0, "char_start": 0, "char_end": 2, "piece": "صَ", "kind": "letter",
-         "heard_letter": "س", "bot_flagged": True},
+         "heard": "س", "bot_flagged": True},
         {"cell": 0, "char_start": 0, "char_end": 2, "piece": "صَ", "kind": "tafkhim",
-         "heard_letter": None, "bot_flagged": True},
+         "heard": None, "bot_flagged": True},
     ]  # fmt: skip
     dataset.write_jsonl(list(by_id.values()), tmp_path / "manifest.jsonl")  # клетки — в JSON
     assert '"tafkhim"' in (tmp_path / "manifest.jsonl").read_text(encoding="utf-8")

@@ -180,7 +180,7 @@ class SqlAnnotationTasks(AnnotationTasks):
                     {
                         "annotation_id": annotation_id, "cell": m.cell, "layout": m.layout,
                         "char_start": m.char_start, "char_end": m.char_end, "piece": m.piece,
-                        "kind": m.kind, "heard_letter": m.heard_letter,
+                        "kind": m.kind, "heard": m.heard,
                         "bot_flagged": m.bot_flagged,
                     }
                     for m in marks

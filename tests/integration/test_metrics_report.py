@@ -296,7 +296,7 @@ async def _cell_label(session: AsyncSession) -> None:
     await session.execute(
         insert(annotation_marks).values(
             annotation_id=500, cell=0, layout="letters", char_start=0, char_end=2, piece="صَ",
-            kind="tafkhim", heard_letter=None, bot_flagged=False,
+            kind="tafkhim", heard=None, bot_flagged=False,
         )
     )  # fmt: skip
     await session.commit()
@@ -371,9 +371,9 @@ async def test_cell_outcomes_are_counted_from_the_database(
         insert(annotation_marks),
         [
             {"annotation_id": 600, "cell": 5, "layout": "letters", **cell(5), "kind": "letter",
-             "heard_letter": "ه", "bot_flagged": False},
+             "heard": "ه", "bot_flagged": False},
             {"annotation_id": 600, "cell": 0, "layout": "letters", **cell(0), "kind": "vowel",
-             "heard_letter": None, "bot_flagged": True},
+             "heard": None, "bot_flagged": True},
         ],
     )  # fmt: skip
     await session.commit()
@@ -410,7 +410,7 @@ async def test_marks_are_counted_by_kind_from_the_latest_label_of_each_annotator
         insert(annotation_marks),
         [
             {"annotation_id": 700, "cell": n, "layout": "letters", "char_start": 0, "char_end": 2,
-             "piece": "صَ", "kind": kind, "heard_letter": None, "bot_flagged": False}
+             "piece": "صَ", "kind": kind, "heard": None, "bot_flagged": False}
             for n, kind in enumerate(("vowel", "vowel", "shadda", "sukun"))
         ],
     )  # fmt: skip

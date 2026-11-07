@@ -347,7 +347,7 @@ class SubmitMarks:
             CellMark(
                 cell=m.cell, layout=layout, char_start=cells[m.cell].start,
                 char_end=cells[m.cell].end, piece=cells[m.cell].piece, kind=m.kind,
-                heard_letter=m.heard_letter, bot_flagged=m.cell in task.bot_cells,
+                heard=m.heard, bot_flagged=m.cell in task.bot_cells,
             )
             for m in marks
         ]  # fmt: skip

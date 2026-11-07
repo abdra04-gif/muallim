@@ -58,14 +58,15 @@ def test_teachers_agreement_by_cells_and_by_kind() -> None:
     """3/T1 и 3/T2 согласны, где ошибка, но расходятся в виде (таджвид в клетке 5).
 
     α по клеткам: единица — клетка, значение «ошибка / нет». α по виду: единица — пара
-    (клетка, вид) для каждого из 13 видов (FR-63: добавлены «shadda» и «sukun»), значение
-    «отмечен / нет»: 12 × 13 = 156 единиц, одно расхождение. Обе — ``krippendorff_alpha_nominal``
-    по попыткам с двумя и более разметчиками.
+    (клетка, вид) для каждого вида, который учитель видит на экране (7 главных + 5 за «Ещё»; без
+    прежней «Шадда/сукун», которую никто уже не может нажать, — 2026-11-07, TD-FN-150), значение
+    «отмечен / нет»: 12 × 12 = 144 единицы, одно расхождение: α = 1 − 287 / (5 · 283). Обе —
+    ``krippendorff_alpha_nominal`` по попыткам с двумя и более разметчиками.
     """
     c = metrics.cell_metrics(_labels())
     assert c.alpha_cells == pytest.approx(1.0)
-    assert c.alpha_kinds == pytest.approx(0.7973941368078176)
-    assert (c.alpha_units, c.alpha_kind_units) == (12, 156)
+    assert c.alpha_kinds == pytest.approx(1 - 287 / 1415)
+    assert (c.alpha_units, c.alpha_kind_units) == (12, 144)
 
 
 def test_cell_confidence_intervals_bootstrap_by_learner() -> None:

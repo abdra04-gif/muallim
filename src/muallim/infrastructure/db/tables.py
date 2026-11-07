@@ -290,7 +290,10 @@ annotation_marks = Table(
     Column("char_end", SmallInteger, nullable=False),
     Column("piece", Text, nullable=False),  # кусочек, как его видел учитель
     Column("kind", String(32), nullable=False),
-    Column("heard_letter", String(4)),  # фонема у «не та буква»; NULL — не указал или «не знаю»
+    # что прозвучало (FR-63): у «Буква» — согласная, у «Огласовка» — гласная или «-» (никакой), у
+    # «Сукун» — гласная, у «Пропуск» и «Лишний звук» — звук; NULL — вопроса нет или «не знаю».
+    # До миграции 0014 — heard_letter.
+    Column("heard", String(4)),
     Column("bot_flagged", Boolean, nullable=False),  # стояла ли на клетке «!» бота
     UniqueConstraint("annotation_id", "cell", "kind"),
     CheckConstraint(_one_of("layout", Layout), name="layout_values"),

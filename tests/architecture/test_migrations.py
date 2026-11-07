@@ -148,6 +148,12 @@ _INSERT_MARK = (
     "INSERT INTO annotation_marks (annotation_id, cell, layout, char_start, char_end, piece,"
     " kind, heard_letter, bot_flagged) VALUES (1, ?, ?, 0, 3, 'x', ?, NULL, 0)"
 )
+# С миграции 0014 (2026-11-07, TD-FN-150): ``heard_letter`` → ``heard`` — там не только буква,
+# но и огласовка («что прозвучало»).
+_INSERT_MARK_HEAD = (
+    "INSERT INTO annotation_marks (annotation_id, cell, layout, char_start, char_end, piece,"
+    " kind, heard, bot_flagged) VALUES (1, ?, ?, 0, 3, 'x', ?, ?, 0)"
+)
 
 
 def _seed_annotation(conn: Any) -> None:
@@ -248,8 +254,8 @@ def test_annotation_marks_go_away_with_their_annotation(tmp_path: Path) -> None:
     event.listen(engine, "connect", lambda dbapi, _: dbapi.execute("PRAGMA foreign_keys=ON"))
     with engine.begin() as conn:
         _seed_annotation(conn)
-        conn.exec_driver_sql(_INSERT_MARK, (0, "syllables", "letter"))
-        conn.exec_driver_sql(_INSERT_MARK, (1, "syllables", "missing"))
+        conn.exec_driver_sql(_INSERT_MARK_HEAD, (0, "syllables", "letter", None))
+        conn.exec_driver_sql(_INSERT_MARK_HEAD, (1, "syllables", "missing", None))
         conn.exec_driver_sql("DELETE FROM annotations WHERE id = 1")
         assert conn.exec_driver_sql("SELECT count(*) FROM annotation_marks").scalar() == 0
 
@@ -325,3 +331,51 @@ def test_migration_0012_downgrade_keeps_labels_and_folds_new_kinds_into_the_old_
         columns = [r[1] for r in conn.exec_driver_sql("PRAGMA table_info(annotations)").all()]
     assert marks == [(0, "shadda_sukun"), (1, "shadda_sukun"), (2, "vowel")]
     assert "phonemes_source" not in columns
+
+
+# ---------- 0014: ``heard_letter`` → ``heard`` (TD-FN-150, 2026-11-07) ----------
+_OLD_MARKS = (
+    "INSERT INTO annotation_marks (annotation_id, cell, layout, char_start, char_end,"
+    " piece, kind, heard_letter, bot_flagged) VALUES"
+    " (1, 0, 'syllables', 0, 3, 'x', 'letter', 'س', 1),"
+    " (1, 1, 'syllables', 0, 3, 'x', 'vowel', '-', 0)"
+)
+
+
+def test_migration_0014_renames_heard_and_keeps_the_marks(tmp_path: Path) -> None:
+    """Что прозвучало — и буква, и огласовка: столбец ``heard``; отметки, CHECK, UNIQUE и каскад
+    целы. Откат возвращает ``heard_letter`` с теми же значениями."""
+    from sqlalchemy import inspect  # noqa: PLC0415
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    db = tmp_path / "m14.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0013")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)
+        conn.exec_driver_sql(_OLD_MARKS)
+    command.upgrade(cfg, "0014")
+    engine = create_engine(f"sqlite:///{db}")
+    with engine.begin() as conn:
+        info = inspect(conn)
+        columns = {c["name"]: c for c in info.get_columns("annotation_marks")}
+        (fk,) = info.get_foreign_keys("annotation_marks")
+        uniques = [u["column_names"] for u in info.get_unique_constraints("annotation_marks")]
+        rows = conn.exec_driver_sql(
+            "SELECT cell, kind, heard, bot_flagged FROM annotation_marks ORDER BY cell"
+        ).all()
+    assert "heard" in columns and "heard_letter" not in columns
+    assert columns["heard"]["nullable"] is True
+    assert (fk["referred_table"], fk["options"].get("ondelete")) == ("annotations", "CASCADE")
+    assert ["annotation_id", "cell", "kind"] in uniques
+    assert rows == [(0, "letter", "س", 1), (1, "vowel", "-", 0)]
+    with pytest.raises(IntegrityError), engine.begin() as conn:
+        conn.exec_driver_sql(_INSERT_MARK_HEAD, (5, "syllables", "unsure", None))
+    engine.dispose()
+
+    command.downgrade(cfg, "0013")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        back = conn.exec_driver_sql(
+            "SELECT cell, kind, heard_letter FROM annotation_marks ORDER BY cell"
+        ).all()
+    assert back == [(0, "letter", "س"), (1, "vowel", "-")]

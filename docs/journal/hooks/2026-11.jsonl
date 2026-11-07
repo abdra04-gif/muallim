@@ -46,3 +46,14 @@
 {"ts": "2026-11-06T22:00:56+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}
 {"ts": "2026-11-06T22:05:24+00:00", "hook": "git_guard", "kind": "block", "reason": "`git add` и `git commit` — отдельными командами: проверка перед коммитом видит только уже подготовленные файлы."}
 {"ts": "2026-11-06T22:06:30+00:00", "hook": "git_guard", "kind": "block", "reason": "Push остановлен: важное изменение (migrations/versions/0012_annotation_v3.py, src/muallim/application/use_cases/annotation.py, src/muallim/domain/annotation.py,"}
+{"ts": "2026-11-07T14:12:46+00:00", "hook": "stop_gate", "kind": "block", "reason": "Нельзя завершать: исправь и проверь снова."}
+{"ts": "2026-11-07T14:13:53+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (схема БД): src/muallim/infrastructure/db/tables.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-11-07T14:14:26+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (оценщик RQ-1: метрику не правит тот, кого оценивают): src/muallim/research/metrics.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-11-07T14:14:33+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (оценщик RQ-1: метрику не правит тот, кого оценивают): src/muallim/research/metrics.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-11-07T14:14:38+00:00", "hook": "human_zones", "kind": "ask", "reason": "Зона человека (схема БД): migrations/versions/0014_mark_heard.py. Подтвердите правку — CLAUDE.md, «Только человек»."}
+{"ts": "2026-11-07T14:15:02+00:00", "hook": "guard", "kind": "block", "reason": "Фаза impl: тесты заморожены. Если тест неверен — остановись и спроси человека."}
+{"ts": "2026-11-07T14:15:17+00:00", "hook": "doc_sync", "kind": "block", "reason": "Документация и код разошлись — исправь до завершения (doc_sync, ADR-0039):"}
+{"ts": "2026-11-07T14:17:47+00:00", "hook": "stop_gate", "kind": "block", "reason": "Нельзя завершать: исправь и проверь снова."}
+{"ts": "2026-11-07T14:19:03+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}
+{"ts": "2026-11-07T14:19:07+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}
+{"ts": "2026-11-07T14:27:44+00:00", "hook": "guard", "kind": "block", "reason": "Запрещено: команда обращается к секретам или данным учеников."}

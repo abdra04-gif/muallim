@@ -113,14 +113,15 @@ class AnnotateAct(CallbackData, prefix="ann"):
 
 class AnnotateMark(CallbackData, prefix="am"):
     """Разметка клетками (FR-62, ADR-0079). ``s`` — шаг: c — выбрать слог, k — вид вкл/выкл,
-    l — какая буква, o — все буквы, h — буква, n — «не знаю», d — готово. Самая длинная —
+    l — какая буква, o — все буквы, h — что прозвучало (фонема или «-»), n — «не знаю»,
+    d — готово. Самая длинная —
     ≈ 48 байт (≤ 64)."""
 
     a: str  # UUID.hex попытки — 32 символа
     s: str
     c: int = 0  # номер клетки
     k: str = ""  # код вида (MarkKind.code)
-    h: str = ""  # буква (фонема)
+    h: str = ""  # что прозвучало: фонема или «-» (никакой)
 
 
 class Opening(CallbackData, prefix="open"):

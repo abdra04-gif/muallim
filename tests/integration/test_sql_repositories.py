@@ -145,7 +145,7 @@ async def test_delete_learner_removes_teacher_cell_marks(session: AsyncSession) 
         insert(annotation_marks),
         [
             {"annotation_id": 1, "cell": 0, "layout": "letters", "char_start": 0, "char_end": 2,
-             "piece": "صَ", "kind": kind, "heard_letter": letter, "bot_flagged": True}
+             "piece": "صَ", "kind": kind, "heard": letter, "bot_flagged": True}
             for kind, letter in (("letter", "س"), ("vowel", None))
         ],
     )  # fmt: skip

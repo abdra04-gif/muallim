@@ -68,14 +68,15 @@ class Layout(StrEnum):
 class MarkGroup(StrEnum):
     SAID = "said"  # сказал неправильно
     TAJWID = "tajwid"  # таджвид
-    READING = "reading"  # как читает
+    # Как читает (запинка, пауза). Не «reading»: «ошибка чтения» RQ-1 — другое (TD-FN-150).
+    FLUENCY = "fluency"
 
 
 class MarkKind(StrEnum):
     """Вид ошибки в клетке (решение автора 2026-10-31): три группы.
 
-    FR-63 (ADR-0080): на экране шесть главных видов (``MAIN_KINDS``) и шесть прочих
-    (``MORE_KINDS``, кнопка «Ещё»); ``shadda_sukun`` — только у прежних меток.
+    FR-63 (ADR-0080): на экране семь главных видов (``MAIN_KINDS``, с 2026-11-07 — и «Длина») и
+    пять прочих (``MORE_KINDS``, кнопка «Ещё»); ``shadda_sukun`` — только у прежних меток.
     """
 
     LETTER = "letter"  # не та буква
@@ -109,7 +110,7 @@ class MarkKind(StrEnum):
 _SAID: Final = ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra", "shadda", "sukun")
 _TAJWID: Final = ("tafkhim", "ghunna", "qalqala")
 _KIND_GROUP: Final = {
-    k: MarkGroup.SAID if k in _SAID else MarkGroup.TAJWID if k in _TAJWID else MarkGroup.READING
+    k: MarkGroup.SAID if k in _SAID else MarkGroup.TAJWID if k in _TAJWID else MarkGroup.FLUENCY
     for k in MarkKind
 }
 _KIND_CODE: Final = {
@@ -121,14 +122,16 @@ _KIND_CODE: Final = {
 _CODE_KIND: Final = {code: kind for kind, code in _KIND_CODE.items()}
 
 # Главный экран разметки (по порядку на экране) и панель «Ещё» (FR-63).
+# 2026-11-07 (автор, TD-FN-150): «Длина» — на главном экране (книга учит мадд, строка выводится).
 MAIN_KINDS: Final = (
     MarkKind.LETTER, MarkKind.MISSING, MarkKind.VOWEL, MarkKind.EXTRA, MarkKind.SHADDA,
-    MarkKind.SUKUN,
+    MarkKind.SUKUN, MarkKind.MADD,
 )  # fmt: skip
 MORE_KINDS: Final = (
-    MarkKind.MADD, MarkKind.TAFKHIM, MarkKind.GHUNNA, MarkKind.QALQALA, MarkKind.HALTING,
-    MarkKind.WRONG_STOP,
+    MarkKind.TAFKHIM, MarkKind.GHUNNA, MarkKind.QALQALA, MarkKind.HALTING, MarkKind.WRONG_STOP,
 )  # fmt: skip
+# Долгий того же звука: фатха → аа, кясра → ии, дамма → уу.
+_LONG_OF: Final = {"\u064e": "ا", "\u0650": "ۦ", "\u064f": "ۥ"}
 NO_VOWEL: Final = (
     "-"  # у «Огласовка»: гласной не было совсем; не фонема, чтобы не спутать со звуком
 )
@@ -243,11 +246,12 @@ class Cell:
 
 @dataclass(frozen=True, slots=True)
 class Mark:
-    """Отметка учителя: клетка, вид ошибки и (только у «не та буква») какая буква прозвучала."""
+    """Отметка учителя: клетка, вид ошибки и что прозвучало (буква, звук или гласная — смотря по
+    виду, FR-63); None — вопроса нет или «не знаю»."""
 
     cell: int
     kind: MarkKind
-    heard_letter: str | None = None
+    heard: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -260,7 +264,7 @@ class CellMark:
     char_end: int
     piece: str
     kind: MarkKind
-    heard_letter: str | None
+    heard: str | None
     bot_flagged: bool
 
 
@@ -446,10 +450,32 @@ def _from_missing(
 
 
 def _from_vowel(reference: str, heard: str | None, positions: Sequence[int], out: "_Edits") -> bool:
+    """Краткая заменена названной; у долгого слога долгая — того же звука («аа» → «ии»), иначе
+    вышла бы невозможная запись «и» + «аа» (исправлено 2026-11-07, TD-FN-150). «Никакой» у
+    долгого слога — неясно, что стало с маддом: строки нет."""
     vowels = [pos for pos in positions if reference[pos] in SHORT_VOWELS]
+    long = [pos for pos in positions if reference[pos] in LONG_VOWELS]
     if heard is None or len(vowels) != 1 or not (heard in SHORT_VOWELS or heard == NO_VOWEL):
         return False
-    out.replace[vowels[0]] = "" if heard == NO_VOWEL else heard
+    if heard == NO_VOWEL:
+        out.replace[vowels[0]] = ""
+        return not long
+    out.replace[vowels[0]] = heard
+    out.replace.update(dict.fromkeys(long, _LONG_OF[heard]))
+    return True
+
+
+def _from_madd(reference: str, heard: str | None, positions: Sequence[int], out: "_Edits") -> bool:
+    """«Длина» (2026-11-07, TD-FN-150): долгий прочитан кратко — долгая снята; краткий протянут —
+    долгая того же звука на 2 харакята. Только в клетке ровно с одной краткой гласной."""
+    vowels = [pos for pos in positions if reference[pos] in SHORT_VOWELS]
+    long = [pos for pos in positions if reference[pos] in LONG_VOWELS]
+    if heard is not None or len(vowels) != 1:
+        return False
+    if long:
+        out.replace.update(dict.fromkeys(long, ""))
+    else:
+        out.after[vowels[0]] = _LONG_OF[reference[vowels[0]]] * 2
     return True
 
 
@@ -502,7 +528,8 @@ _DERIVE: Final = {
     MarkKind.SUKUN: _from_sukun,
     MarkKind.SHADDA: _from_shadda,
     MarkKind.EXTRA: _from_extra,
-}  # остальные виды (прочие шесть и прежний «Шадда/сукун») строки не дают
+    MarkKind.MADD: _from_madd,
+}  # остальные виды (пять за «Ещё» и прежний «Шадда/сукун») строки не дают
 
 
 def apply_marks(
@@ -510,11 +537,12 @@ def apply_marks(
 ) -> str | None:
     """«Что прозвучало» из отметок — только где однозначно, иначе None (FR-63, ADR-0080).
 
-    Нет отметок — эталон. По одной отметке в слоге из шести главных видов: «Буква» с буквой —
+    Нет отметок — эталон. По одной отметке в слоге из семи главных видов: «Буква» с буквой —
     согласная заменена (обе половины шадды); «Пропуск» — убран названный звук (без названия —
     весь слог); «Огласовка» — краткая заменена названной или убрана (``NO_VOWEL``); «Лишний звук»
     — вставлен после звуков слога; «Шадда» — удвоение единственной согласной переворачивается;
-    «Сукун» — гласная вставлена после согласной без гласной. Любой другой вид, отметка без ответа
+    «Сукун» — гласная вставлена после согласной без гласной; «Длина» — долгий ↔ краткий
+    (2026-11-07). Любой другой вид, отметка без ответа
     или две отметки в одном слоге — строка не выводится.
     """
     if not marks:
@@ -531,7 +559,7 @@ def apply_marks(
         derive = _DERIVE.get(mark.kind)
         if len(given) != 1 or derive is None:
             return None
-        if not derive(reference, mark.heard_letter, _cell_positions(where, cell), edits):
+        if not derive(reference, mark.heard, _cell_positions(where, cell), edits):
             return None
     return "".join(
         edits.replace.get(pos, ch) + edits.after.get(pos, "") for pos, ch in enumerate(reference)
@@ -639,10 +667,12 @@ _ANSWERS: Final[dict[MarkKind, tuple[Callable[[str], bool], str]]] = {
 
 
 def _check_answer(mark: Mark, cells: Sequence[Cell]) -> None:
-    """Ответ «что прозвучало» (``heard_letter``) подходит к виду (FR-63, ADR-0080)."""
-    kind, heard = mark.kind, mark.heard_letter
+    """Ответ «что прозвучало» (``heard``) подходит к виду (FR-63, ADR-0080)."""
+    kind, heard = mark.kind, mark.heard
     if heard is None:
         return
+    if kind is MarkKind.VOWEL and _written_vowels(cells[mark.cell].piece) == {heard}:
+        raise LabelError(f"в «{cells[mark.cell].piece}» и так «{heard}» — это не ошибка огласовки")
     if kind is MarkKind.LETTER:
         if heard not in CONSONANTS:
             hint = _HINTS.get(heard, "нужна одна согласная фонетического алфавита")
@@ -656,6 +686,11 @@ def _check_answer(mark: Mark, cells: Sequence[Cell]) -> None:
     ok, hint = rule
     if not ok(heard):
         raise LabelError(hint)
+
+
+def _written_vowels(piece: str) -> set[str]:
+    """Краткие гласные, написанные в кусочке (огласовки текста — те же знаки, что в фонемах)."""
+    return {ch for ch in piece if ch in SHORT_VOWELS}
 
 
 def check_marks(cells: Sequence[Cell], marks: Sequence[Mark]) -> None:

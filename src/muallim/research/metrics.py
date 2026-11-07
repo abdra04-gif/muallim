@@ -25,7 +25,7 @@ from sqlalchemy import ColumnElement, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from muallim.application.ports.reading import AyahSyllables
-from muallim.domain.annotation import Entry, MarkKind, annotation_cells, bot_cells
+from muallim.domain.annotation import MAIN_KINDS, MORE_KINDS, Entry, annotation_cells, bot_cells
 from muallim.domain.assessment import ErrorKind, assess, phoneme_errors
 from muallim.domain.policy import GradingPolicy, Verdict
 from muallim.infrastructure.db.tables import (
@@ -440,7 +440,9 @@ def cell_metrics(labels: Sequence[CellLabel]) -> CellMetrics:
         [kind in r.teacher.get(pos, frozenset()) for r in raters]
         for raters in shared
         for pos in range(max(r.cells for r in raters))
-        for kind in MarkKind
+        # виды экрана (7 + 5 за «Ещё»): прежнюю «Шадда/сукун» уже никто не может нажать —
+        # её «не отмечено» лишь завышало бы согласие (2026-11-07, TD-FN-150)
+        for kind in (*MAIN_KINDS, *MORE_KINDS)
     ]
     learners: dict[UUID, list[CellLabel]] = defaultdict(list)
     for lab in labels:

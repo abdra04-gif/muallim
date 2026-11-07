@@ -181,8 +181,8 @@
 | `layout` | varchar(16) | `syllables` — слоги аята суры (`curriculum/syllables/ayat.yaml`), `letters` — буквы со знаками |
 | `char_start`, `char_end` | smallint | позиция кусочка в тексте пункта (`curriculum_items.text`) — не зависит от пересборки `ayat.yaml` |
 | `piece` | text | кусочек, как его видел учитель |
-| `kind` | varchar(32) | вид ошибки. Главные (FR-63): `letter`, `missing`, `vowel`, `extra`, `shadda`, `sukun`; прочие («Ещё»): `madd`, `tafkhim`, `ghunna`, `qalqala`, `halting`, `wrong_stop`; `shadda_sukun` — прежний вид (до 0012), на экране не предлагается |
-| `heard_letter` | varchar(4), null | что прозвучало на этом месте (фонема); смысл зависит от вида (FR-63): `letter` — согласная; `vowel` — гласная (َ ِ ُ) или `-` («никакой»); `sukun` — гласная; `extra` — добавленный звук; `missing` — пропущенный звук, `null` — весь слог; `shadda` и прочие виды — `null`. У видов с вопросом `null` ещё и «не знаю». Имя столбца осталось от первых версий |
+| `kind` | varchar(32) | вид ошибки. Главные (FR-63; `madd` — на главном с 2026-11-07, TD-FN-150): `letter`, `missing`, `vowel`, `extra`, `shadda`, `sukun`, `madd`; прочие («Ещё»): `tafkhim`, `ghunna`, `qalqala`, `halting`, `wrong_stop`; `shadda_sukun` — прежний вид (до 0012), на экране не предлагается |
+| `heard` | varchar(4), null | что прозвучало на этом месте (фонема); смысл зависит от вида (FR-63): `letter` — согласная; `vowel` — гласная (َ ِ ُ, кроме написанной в слоге) или `-` («никакой»); `sukun` — гласная; `extra` — добавленный звук; `missing` — пропущенный звук, `null` — весь слог; `shadda`, `madd` и прочие виды — `null`. У видов с вопросом `null` ещё и «не знаю». До миграции 0014 — `heard_letter` |
 | `bot_flagged` | boolean | стояла ли на клетке «!» бота (оценка эффекта подсказки, `preregistration.md` §5) |
 
 Строка — одна отметка «клетка × вид»; в одной клетке может быть несколько видов. Метрики по

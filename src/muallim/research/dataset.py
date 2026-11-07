@@ -128,7 +128,7 @@ async def _cell_marks(session: AsyncSession, ids: list[int]) -> dict[int, list[d
     c = annotation_marks.c
     rows = await session.execute(
         select(
-            c.annotation_id, c.cell, c.char_start, c.char_end, c.piece, c.kind, c.heard_letter,
+            c.annotation_id, c.cell, c.char_start, c.char_end, c.piece, c.kind, c.heard,
             c.bot_flagged,
         )
         .where(c.annotation_id.in_(ids))

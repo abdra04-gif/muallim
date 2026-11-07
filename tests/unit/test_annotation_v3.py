@@ -42,21 +42,20 @@ from tests.unit.test_annotation_marks import (
 
 FATHA, KASRA, DAMMA = "َ", "ِ", "ُ"
 NO_VOWEL = "-"  # «никакой»: не фонема, чтобы не спутать со звуком
-MORE = ["madd", "tafkhim", "ghunna", "qalqala", "halting", "wrong_stop"]
+# 2026-11-07 (автор, TD-FN-150): «Длина» — на главном экране (книга учит мадд, строка выводится).
+MORE = ["tafkhim", "ghunna", "qalqala", "halting", "wrong_stop"]
 
 
 def _apply(*marks: tuple[str, int, str | None]) -> str | None:
     return ann.apply_marks(FATIHA_2, P, _cells(), [_mark(c, k, h) for k, c, h in marks])
 
 
-# ---------- виды: шесть главных, шесть прочих, прежний ----------
-def test_there_are_thirteen_kinds_six_main_six_more_and_the_legacy_one() -> None:
+# ---------- виды: семь главных, пять прочих, прежний ----------
+def test_there_are_thirteen_kinds_seven_main_five_more_and_the_legacy_one() -> None:
     assert [str(k) for k in ann.MAIN_KINDS] == [
-        "letter", "missing", "vowel", "extra", "shadda", "sukun",
+        "letter", "missing", "vowel", "extra", "shadda", "sukun", "madd",
     ]  # fmt: skip
-    assert [str(k) for k in ann.MORE_KINDS] == [
-        "madd", "tafkhim", "ghunna", "qalqala", "halting", "wrong_stop",
-    ]  # fmt: skip
+    assert [str(k) for k in ann.MORE_KINDS] == MORE
     assert {str(k) for k in ann.MarkKind} == {
         *map(str, ann.MAIN_KINDS), *map(str, ann.MORE_KINDS), "shadda_sukun",
     }  # fmt: skip
@@ -81,7 +80,10 @@ def test_no_vowel_marker_is_not_a_phoneme_so_it_cannot_be_confused_with_a_sound(
         (2, NO_VOWEL, P[:7] + P[8:]),  # гласной не было совсем
         (6, DAMMA, P[:18] + DAMMA + P[19:]),  # «رَ» → «رُ»
         (0, KASRA, P[:1] + KASRA + P[2:]),  # «ٱلْ»: огласовка — у хамзы
-        (11, FATHA, P[:30] + FATHA + P[31:]),  # «مِينَ»: единственная краткая — после م
+        # «مِينَ»: за краткой — долгая «ии»; она становится долгой «аа», а не «а» + «ии»
+        (11, FATHA, P[:30] + FATHA + "اا" + P[33:]),
+        (4, KASRA, P[:12] + KASRA + "ۦۦ" + P[15:]),  # «لَّ» (долгая «аа») → долгая «ии»
+        (9, DAMMA, P[:24] + DAMMA + "ۥۥ" + P[27:]),  # «عَـٰ» → долгая «уу»
     ],
 )
 def test_vowel_mark_replaces_the_short_vowel_of_the_cell(
@@ -92,6 +94,11 @@ def test_vowel_mark_replaces_the_short_vowel_of_the_cell(
 
 def test_vowel_mark_without_an_answer_gives_nothing() -> None:
     assert _apply(("vowel", 2, None)) is None  # «не знаю» — строки нет
+
+
+def test_no_vowel_on_a_long_syllable_gives_nothing() -> None:
+    """«Никакой» у долгого слога: что стало с маддом — неясно, строки нет."""
+    assert _apply(("vowel", 9, NO_VOWEL)) is None
 
 
 def test_vowel_mark_on_a_cell_without_a_short_vowel_gives_nothing() -> None:
@@ -195,6 +202,25 @@ def test_two_marks_in_one_cell_give_nothing() -> None:
     assert _apply(("vowel", 2, FATHA), ("extra", 2, "ن")) is None
 
 
+# ---------- Длина: долгий ↔ краткий (2026-11-07, TD-FN-150) ----------
+@pytest.mark.parametrize(
+    ("cell", "expected"),
+    [
+        (9, P[:25] + P[27:]),  # «عَـٰ»: долгая «аа» прочитана кратко
+        (4, P[:13] + P[15:]),  # «لَّ»
+        (11, P[:31] + P[33:]),  # «مِينَ»: «ии» кратко
+        (3, P[:10] + "ۦۦ" + P[10:]),  # «لِ» протянут — долгая «ии» (2 харакята)
+        (1, P[:5] + "اا" + P[5:]),  # «حَمْ» → «хаам»
+    ],
+)
+def test_length_mark_turns_long_into_short_and_short_into_long(cell: int, expected: str) -> None:
+    assert _apply(("madd", cell, None)) == expected
+
+
+def test_length_mark_on_a_cell_without_a_vowel_gives_nothing() -> None:
+    assert _apply(("madd", 8, None)) is None  # «ٱلْ» внутри фразы: только ل
+
+
 @pytest.mark.parametrize("kind", [*MORE, "shadda_sukun"])
 def test_a_mark_of_a_kind_that_gives_no_phonemes_spoils_the_whole_string(kind: str) -> None:
     assert _apply(("vowel", 2, FATHA), (kind, 9, None)) is None
@@ -204,6 +230,7 @@ def test_derived_string_is_a_valid_phoneme_record() -> None:
     for marks in (
         [("vowel", 2, FATHA)], [("sukun", 1, DAMMA)], [("shadda", 7, None)],
         [("extra", 11, "ن")], [("missing", 2, "د")], [("letter", 9, "ء")],
+        [("vowel", 4, KASRA)], [("vowel", 11, FATHA)], [("madd", 9, None)], [("madd", 3, None)],
     ):  # fmt: skip
         actual = _apply(*marks)
         assert actual is not None
@@ -248,6 +275,8 @@ def test_valid_answers_pass_the_check(mark: tuple[str, int, str | None]) -> None
     "mark",
     [
         ("vowel", 2, "ب"),  # согласная — не гласная
+        ("vowel", 2, DAMMA),  # в «دُ» и так дамма — это не ошибка огласовки
+        ("vowel", 6, FATHA),  # в «رَ» и так фатха
         ("vowel", 2, "x"),
         ("sukun", 1, NO_VOWEL),  # у сукуна гласная обязательна, «никакой» — это и есть сукун
         ("sukun", 1, "ب"),
@@ -331,7 +360,7 @@ async def test_bot_right_saves_what_the_bot_heard_with_its_marks() -> None:
     assert (label.status, label.actual, label.entry) == (AnnotationStatus.AGREE, SUB_AIN, "cells")
     assert label.phonemes_source == "confirmed" and label.seconds_spent == 7
     ((mark,),) = w.tasks.marks[UUID(int=1)]
-    assert (mark.cell, str(mark.kind), mark.heard_letter, mark.bot_flagged) == (
+    assert (mark.cell, str(mark.kind), mark.heard, mark.bot_flagged) == (
         9, "letter", "ء", True,
     )  # fmt: skip
     assert w.uow.commits == 1 and w.events.events[-1][0] == "annotation_submitted"
@@ -400,5 +429,5 @@ async def test_new_kinds_are_saved_with_their_answers() -> None:
     w = World()
     marks: list[Any] = [_mark(2, "vowel", FATHA), _mark(7, "shadda"), _mark(1, "sukun", DAMMA)]
     await w.submit().execute(_learner(ANNOTATOR_TG), UUID(int=2), marks)
-    saved = {(m.cell, str(m.kind), m.heard_letter) for m in w.tasks.marks[UUID(int=2)][-1]}
+    saved = {(m.cell, str(m.kind), m.heard) for m in w.tasks.marks[UUID(int=2)][-1]}
     assert saved == {(2, "vowel", FATHA), (7, "shadda", None), (1, "sukun", DAMMA)}

@@ -104,16 +104,19 @@ def test_there_are_thirteen_mark_kinds_in_the_database() -> None:
 
 
 def test_mark_kinds_fall_into_three_groups_as_approved() -> None:
-    """Сказал неправильно · таджвид · как читает (решение автора 2026-10-31)."""
+    """Сказал неправильно · таджвид · беглость (решение автора 2026-10-31). Группа «как читает»
+    называется «беглость» (``fluency``), а не «чтение»: «ошибка чтения» в RQ-1 — другое
+    (огласовка, буква) — 2026-11-07, TD-FN-150."""
     group = {str(k): k.group for k in ann.MarkKind}
     said = {
         group[k]
         for k in ("letter", "vowel", "madd", "shadda_sukun", "missing", "extra", "shadda", "sukun")
     }
     tajwid = {group[k] for k in ("tafkhim", "ghunna", "qalqala")}
-    reading = {group[k] for k in ("halting", "wrong_stop")}
-    assert len(said) == len(tajwid) == len(reading) == 1
-    assert len(said | tajwid | reading) == 3
+    fluency = {group[k] for k in ("halting", "wrong_stop")}
+    assert len(said) == len(tajwid) == len(fluency) == 1
+    assert len(said | tajwid | fluency) == 3
+    assert {str(g) for g in ann.MarkGroup} == {"said", "tajwid", "fluency"}
 
 
 def test_mark_kind_codes_are_short_unique_and_fit_a_button() -> None:
@@ -227,7 +230,7 @@ def test_apply_marks_gives_phonemes_where_unambiguous(
     "marks",
     [
         [("vowel", 2, None)],
-        [("madd", 9, None)],
+        # «Длина» с 2026-11-07 строку даёт (TD-FN-150, test_annotation_v3.py) — разрешил автор
         [("shadda_sukun", 7, None)],
         [("extra", 11, None)],
         [("tafkhim", 6, None)],
@@ -385,7 +388,7 @@ async def test_letter_mark_like_bot_is_saved_as_agree_with_its_cell() -> None:
     piece = _pieces(FATIHA_2)[9]
     assert (mark.cell, mark.layout, mark.piece, mark.kind) == (9, "syllables", piece, "letter")
     assert FATIHA_2[mark.char_start : mark.char_end] == piece
-    assert (mark.heard_letter, mark.bot_flagged) == ("ء", True)
+    assert (mark.heard, mark.bot_flagged) == ("ء", True)
     assert w.uow.commits == 1
     assert w.events.events[-1][0] == "annotation_submitted"
 

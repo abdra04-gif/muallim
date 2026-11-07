@@ -7,7 +7,7 @@
 чат. Роутер подключается раньше роутера ученика (bootstrap/main.py: ``routers()``).
 
 FR-62 (ADR-0079, дополнено 2026-11-01): один экран — сверху слоги (ряд на слово, первый справа),
-под ними шесть главных видов для выбранного слога и «Ещё» (прочие шесть), внизу действия.
+под ними семь главных видов для выбранного слога и «Ещё» (прочие пять), внизу действия.
 Учитель оценивает чтение ученика: «Бот прав» (ответ бота), «Чисто», «Исправить» (отметки бота — в
 черновик) или свои отметки и «Готово»; у «Буква», «Огласовка», «Сукун», «Лишний звук», «Пропуск» —
 вопрос «что прозвучало» (FR-63, ADR-0080). Текст и клавиатура меняются на месте; черновик отметок —
@@ -215,7 +215,7 @@ class Desk:
             await self._put(key, attempt, None)
 
     async def panel(self, attempt: UUID) -> str:
-        """Какие виды на экране: ``main`` — шесть главных, ``more`` — прочие шесть (FR-63)."""
+        """Какие виды на экране: ``main`` — семь главных, ``more`` — прочие пять (FR-63)."""
         value = _map(await self._get("panels")).get(attempt.hex)
         return value if value == "more" else "main"
 
@@ -243,7 +243,7 @@ class Desk:
         ]
 
     async def set_draft(self, attempt: UUID, marks: list[Mark]) -> None:
-        rows = [[m.cell, str(m.kind), m.heard_letter] for m in marks]
+        rows = [[m.cell, str(m.kind), m.heard] for m in marks]
         await self._put("marks", attempt, rows or None)
 
 
@@ -281,8 +281,8 @@ def _mark(a: str, step: str, cell: int = 0, kind: str = "", letter: str = "") ->
 
 def _kinds_text(marks: list[Mark], cell: int) -> str:
     return ", ".join(
-        t.MARK_LETTER.format(kind=t.KIND_BUTTONS[str(m.kind)].lower(), letter=m.heard_letter)
-        if m.heard_letter
+        t.MARK_LETTER.format(kind=t.KIND_BUTTONS[str(m.kind)].lower(), letter=m.heard)
+        if m.heard
         else t.KIND_BUTTONS[str(m.kind)].lower()
         for m in marks
         if m.cell == cell
@@ -331,7 +331,7 @@ def _cell_rows(s: Screen) -> list[list[InlineKeyboardButton]]:
 
 
 def _kind_rows(s: Screen) -> list[list[InlineKeyboardButton]]:
-    """Шесть главных видов по 2 в ряд и «Ещё»; в панели «Ещё» — прочие шесть и «Назад»."""
+    """Семь главных видов по 2 в ряд и «Ещё»; в панели «Ещё» — прочие пять и «Назад»."""
     a, cell = s.task.attempt_id.hex, s.selected
     chosen = {m.kind for m in s.marks if m.cell == cell}
     more = s.panel == "more"
@@ -429,8 +429,14 @@ def _dont_know(s: Screen, kind: MarkKind, text: str = t.BTN_DONT_KNOW) -> Inline
 
 
 def _vowel_keyboard(s: Screen, kind: MarkKind) -> InlineKeyboardMarkup:
-    """Какая гласная прозвучала: а / и / у (и «никакой» — у «Огласовка»)."""
-    buttons = [_pick(s, kind, name, vowel) for vowel, name in t.VOWEL_NAMES.items()]
+    """Какая гласная прозвучала: а / и / у (и «никакой» — у «Огласовка»). У «Огласовка» написанная
+    в слоге не предлагается — это не ошибка (2026-11-07, TD-FN-150)."""
+    piece = s.task.cells[s.selected].piece
+    written = {ch for ch in piece if ch in t.VOWEL_NAMES} if kind is MarkKind.VOWEL else set()
+    skip = written if len(written) == 1 else set()
+    buttons = [
+        _pick(s, kind, name, vowel) for vowel, name in t.VOWEL_NAMES.items() if vowel not in skip
+    ]
     if kind is MarkKind.VOWEL:
         buttons.append(_pick(s, kind, t.BTN_NO_VOWEL, NO_VOWEL))
     return InlineKeyboardMarkup(inline_keyboard=[buttons, [_dont_know(s, kind)]])

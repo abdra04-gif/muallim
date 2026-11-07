@@ -263,7 +263,7 @@ def _cell_mark(cell: int, kind: str, letter: str | None = None, *, flagged: bool
 
     return ann.CellMark(
         cell=cell, layout=ann.Layout("syllables"), char_start=2 * cell, char_end=2 * cell + 2,
-        piece="صَ", kind=ann.MarkKind(kind), heard_letter=letter, bot_flagged=flagged,
+        piece="صَ", kind=ann.MarkKind(kind), heard=letter, bot_flagged=flagged,
     )  # fmt: skip
 
 
@@ -283,7 +283,7 @@ async def test_label_and_its_cells_are_written_together(session: AsyncSession) -
     row = (await session.execute(select(annotations))).mappings().one()
     assert (row["label"], row["corrected_phonemes"], row["entry"]) == ("fix", None, "cells")
     saved = (await session.execute(select(annotation_marks))).mappings().all()
-    assert {(m["annotation_id"], m["cell"], m["kind"], m["heard_letter"], m["bot_flagged"])
+    assert {(m["annotation_id"], m["cell"], m["kind"], m["heard"], m["bot_flagged"])
             for m in saved} == {
         (row["id"], 0, "letter", "س", True), (row["id"], 0, "vowel", None, False),
         (row["id"], 3, "halting", None, False),
@@ -357,6 +357,6 @@ async def test_new_kinds_and_their_answers_are_stored(session: AsyncSession) -> 
     await SqlAnnotationTasks(session).add(label, marks)
     await session.commit()
     saved = (await session.execute(select(annotation_marks))).mappings().all()
-    assert {(m["cell"], m["kind"], m["heard_letter"]) for m in saved} == {
+    assert {(m["cell"], m["kind"], m["heard"]) for m in saved} == {
         (0, "sukun", "ُ"), (1, "shadda", None), (2, "vowel", "-"), (3, "missing", "ب"),
     }  # fmt: skip
