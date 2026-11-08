@@ -371,7 +371,7 @@ def write_contents(lessons_: list[dict]) -> None:
 def main() -> None:
     doc = {
         "id": "al-muallim-al-thani-ru",
-        "version": "2026.10.23-book-6",
+        "version": "2026.11.08-book-7",  # сверка со сканом, образцы, знаки остановки (ADR-0084)
         "title": "Муаллим сани — вся книга Максуди",
         "source": {
             "source_id": SRC,
