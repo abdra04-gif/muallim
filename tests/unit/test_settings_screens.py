@@ -29,17 +29,16 @@ def _progress(c: Curriculum) -> Progress:
     return Progress(lessons, attempts_total=3, continue_item=c.item("L006-02"))
 
 
-def test_home_ends_with_progress_and_settings(curriculum: Curriculum) -> None:
+def test_home_ends_with_more_which_holds_progress_and_settings(curriculum: Curriculum) -> None:
+    """ADR-0082: на главной три ряда; прогресс, знаки, настройки и «Наизусть» — в «⋯ Ещё»."""
     buttons = _buttons(screens.home(curriculum, _progress(curriculum)).keyboard)
-    assert buttons[1:] == [
-        (texts.LESSONS_BUTTON, cb.Lessons(part=-1).pack()),
-        (texts.QUIZ_BUTTON, cb.Quiz().pack()),
-        (texts.SIGNS_BUTTON, cb.Signs().pack()),
-        (texts.PROGRESS_BUTTON, cb.ShowProgress().pack()),
-        (texts.SETTINGS_BUTTON, cb.ShowSettings().pack()),
-        (texts.MEMORY_BUTTON, cb.SuraList().pack()),  # «Наизусть» — FR-59, ADR-0076
-    ]
+    assert [t for t, _ in buttons[1:]] == [texts.LESSONS_BUTTON, texts.QUIZ_BUTTON, "⋯ Ещё"]
+    assert buttons[2][1] == cb.Quiz().pack() and buttons[3][1] == cb.More().pack()
+    assert cb.Lessons.unpack(buttons[1][1]).part >= 0  # сразу часть ученика, не список частей
     assert buttons[0][1] == cb.GoItem(item_id="L006-02").pack()  # ▶️ Продолжить
+    more = [d for _, d in _buttons(screens.more().keyboard)]
+    for data in (cb.ShowProgress(), cb.Signs(), cb.ShowSettings(), cb.SuraList()):
+        assert data.pack() in more and data.pack() not in [d for _, d in buttons]
 
 
 def test_home_has_no_help_or_privacy_buttons(curriculum: Curriculum) -> None:

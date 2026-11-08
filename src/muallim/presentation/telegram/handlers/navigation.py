@@ -7,8 +7,12 @@ from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
 from muallim.application.ports.reading import AyahSyllables
-from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
-from muallim.application.use_cases.cards import OpenItem
+from muallim.application.ports.storage import (
+    ArticulationVideoLibrary,
+    LessonLinks,
+    ReferenceAudioLibrary,
+)
+from muallim.application.use_cases.cards import OpenItem, RecordDeepOpened
 from muallim.application.use_cases.progress import GetProgress
 from muallim.application.use_cases.quiz import PracticeQuiz
 from muallim.application.use_cases.reading import HowToRead
@@ -21,11 +25,13 @@ from muallim.domain.learner import Learner
 from muallim.presentation.telegram import opening, screens, texts
 from muallim.presentation.telegram.callbacks import (
     Again,
+    Deep,
     GoItem,
     Help,
     Home,
     Lessons,
     Menu,
+    More,
     Noop,
     ShowProgress,
     Signs,
@@ -105,6 +111,52 @@ async def cb_help(
     if msg := message_of(cb):
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         await display.show(msg, screens.help_screen())
+    await cb.answer()
+
+
+@router.callback_query(More.filter())
+async def cb_more(
+    cb: CallbackQuery,
+    display: FromDishka[Display],
+    learner: FromDishka[Learner],
+    screen_state: FromDishka[ScreenState],
+) -> None:
+    await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
+    if msg := message_of(cb):
+        await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
+        await display.show(msg, screens.more())
+    await cb.answer()
+
+
+@router.callback_query(Deep.filter())
+async def cb_deep(
+    cb: CallbackQuery,
+    callback_data: Deep,
+    display: FromDishka[Display],
+    learner: FromDishka[Learner],
+    uc: FromDishka[RecordDeepOpened],
+    cur: FromDishka[Curriculum],
+    reading: FromDishka[HowToRead],
+    learner_settings: FromDishka[GetSettings],
+    links: FromDishka[LessonLinks],
+) -> None:
+    """«📖 Углублённо»: экран на месте карточки или результата; карточка остаётся текущей, поэтому
+    голосовое с этого экрана по-прежнему оценивается."""
+    try:
+        item = await uc.execute(learner, callback_data.item_id)
+    except KeyError:
+        await cb.answer(texts.STALE_BUTTON, show_alert=True)
+        return
+    if msg := message_of(cb):
+        await drop_sound(display, msg)  # автоэталон над карточкой не остаётся над «Углублённо»
+        screen = screens.deep(
+            cur,
+            item,
+            reading.execute(learner, item),
+            view=await learner_settings.execute(learner),
+            video_url=links.for_lesson(cur.locate(item.id)[0].id),
+        )
+        await display.show(msg, screen)
     await cb.answer()
 
 

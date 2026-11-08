@@ -162,18 +162,22 @@ def test_sheet_callback_fits_telegram_limit(curriculum: Curriculum) -> None:
 
 # ---------- шпаргалка: откуда открывается ----------
 @pytest.mark.parametrize("item_id", ["L006-01", "L006-03", MIM_LINE, "L004-05"])
-def test_card_with_known_letters_opens_the_sheet(curriculum: Curriculum, item_id: str) -> None:
+def test_deep_with_known_letters_opens_the_sheet(curriculum: Curriculum, item_id: str) -> None:
+    """ADR-0082: шпаргалка — в «📖 Углублённо»; с самой карточки её кнопки больше нет."""
     lesson, _ = curriculum.locate(item_id)
-    s = screens.card(curriculum, curriculum.item(item_id), has_audio=False, is_teacher=False)
+    item = curriculum.item(item_id)
+    s = screens.deep(curriculum, item)
     expected = cb.LettersSheet(lesson_id=lesson.id, item_id=item_id).pack()
     assert (texts.SHEET_BUTTON, expected) in _buttons(s.keyboard)
+    card = screens.card(curriculum, item, has_audio=False, is_teacher=False)
+    assert texts.SHEET_BUTTON not in [t for t, _ in _buttons(card.keyboard)]
 
 
 @pytest.mark.parametrize("item_id", ["L001-02", "L002-02", "L003-01", "L003-10"])
-def test_card_without_known_letters_has_no_sheet_button(
+def test_deep_without_known_letters_has_no_sheet_button(
     curriculum: Curriculum, item_id: str
 ) -> None:
-    s = screens.card(curriculum, curriculum.item(item_id), has_audio=False, is_teacher=False)
+    s = screens.deep(curriculum, curriculum.item(item_id))
     assert _sheet_buttons(s.keyboard) == []
     assert texts.SHEET_BUTTON not in [t for t, _ in _buttons(s.keyboard)]
 

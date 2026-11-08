@@ -133,11 +133,13 @@ def test_card_of_other_lessons_has_no_sura_buttons(curriculum: Curriculum) -> No
     assert not any(d.startswith(("sura:", "suras")) for d in data)
 
 
-def test_home_offers_memorization(curriculum: Curriculum) -> None:
+def test_more_offers_memorization_and_home_does_not(curriculum: Curriculum) -> None:
+    """ADR-0082: «🎯 Наизусть» с главной ушла в «⋯ Ещё»."""
     from muallim.application.use_cases.progress import Progress  # noqa: PLC0415
 
-    screen = screens.home(curriculum, Progress(lessons=(), attempts_total=0))
-    assert (texts.MEMORY_BUTTON, SuraList().pack()) in _buttons(screen.keyboard)
+    home = screens.home(curriculum, Progress(lessons=(), attempts_total=0))
+    assert (texts.MEMORY_BUTTON, SuraList().pack()) not in _buttons(home.keyboard)
+    assert (texts.MEMORY_BUTTON, SuraList().pack()) in _buttons(screens.more().keyboard)
 
 
 def test_memory_screens_lead_back_to_the_sura_list(curriculum: Curriculum) -> None:

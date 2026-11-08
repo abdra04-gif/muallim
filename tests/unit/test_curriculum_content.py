@@ -144,7 +144,7 @@ def test_book_contents_map_points_to_existing_lessons(curriculum: Curriculum) ->
 
 def test_only_russian_language_files_are_active() -> None:
     active = sorted(p.name for p in (ROOT / "curriculum").glob("*.yaml"))
-    assert active == ["course.ru.yaml", "feedback.ru.yaml", "lexicon.ru.yaml"]
+    assert active == ["course.ru.yaml", "feedback.ru.yaml", "lesson_links.yaml", "lexicon.ru.yaml"]
 
 
 def test_each_vowel_is_practised_alone_before_the_book_row(curriculum: Curriculum) -> None:

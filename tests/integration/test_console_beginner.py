@@ -50,7 +50,7 @@ async def _run(steps: list[str]) -> str:
 
 BUTTONS = {
     *ONBOARDING[1:2], *ONBOARDING[3:], texts.START_BUTTON, "▶️", texts.HOME_BUTTON,
-    texts.LESSONS_BUTTON, texts.DISPUTE_BUTTON, "1. Знакомство", "2. Арабский алфавит",
+    texts.LESSONS_BUTTON, texts.DISPUTE_BUTTON, "2. Арабский алфавит",
 }  # fmt: skip
 RESEARCH_MARKS = ("Для исследования", "Услышано", "Попытка №", "Эталон:")
 
@@ -65,7 +65,7 @@ async def test_voice_on_rule_card_says_it_is_a_rule() -> None:
 
 async def test_voice_on_alphabet_card_says_reading_is_not_needed() -> None:
     out = await _run(
-        [*ONBOARDING, texts.LESSONS_BUTTON, "1. Знакомство", "2. Арабский алфавит", "▶️", "🎤"]
+        [*ONBOARDING, texts.LESSONS_BUTTON, "2. Арабский алфавит", "▶️", "🎤"]  # сразу часть
     )
     answer = _steps(out)[-1]
     assert _plain(texts.NOT_PRACTICE) in answer
@@ -78,7 +78,7 @@ async def test_home_after_lesson_one_continues_with_lesson_two(curriculum: Curri
     home = _steps(out)[-1]
     done = texts.LESSON_DONE.format(lesson=curriculum.lessons[0].title)
     assert _plain(done) in out  # урок 1 действительно пройден
-    assert f"Дальше: {second.title}" in home
+    assert second.title in home  # «Дальше: …» — следующий урок (формулировка — черновик)
     first_button = next(line for line in home.splitlines() if line.startswith("   ["))
     assert second.title in first_button
     label = first_button.strip()[1:-1]

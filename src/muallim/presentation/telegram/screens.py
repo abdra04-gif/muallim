@@ -47,10 +47,12 @@ from muallim.domain.settings import (
 )
 from muallim.domain.sura import AyahOutcome, Sura, SuraMode, find_sura, suras
 from muallim.domain.syllables import ayah_number
-from muallim.presentation.telegram import keyboards, render, texts, views
+from muallim.presentation.telegram import keyboards, render, texts
+from muallim.presentation.telegram import views as views  # noqa: PLC0414  (screens.views — для тестов)
 from muallim.presentation.telegram.callbacks import (
     ChangeSetting,
     Consent,
+    Deep,
     DeleteData,
     Dispute,
     GoItem,
@@ -59,7 +61,7 @@ from muallim.presentation.telegram.callbacks import (
     Lessons,
     LettersSheet,
     Listen,
-    Me,
+    More,
     Noop,
     Opening,
     Privacy,
@@ -153,10 +155,6 @@ def _alphabet_map(curriculum: Curriculum, progress: Progress) -> tuple[bytes | N
     return render.alphabet(rows), "map:" + "".join(key)
 
 
-def _bar(done: int, total: int) -> str:
-    return views.bar(round(100 * done / total) if total else 0)
-
-
 # ---------- главная ----------
 _PROFILE_TEXTS: Final = {
     Question.NAME: texts.PROFILE_NAME,
@@ -179,25 +177,20 @@ def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> S
     fresh = progress.attempts_total == 0 and item == curriculum.first_item()
     caption = texts.HOME.format(
         streak=_days(progress.streak_days),
-        today=progress.today_attempts,
         done=progress.done_lessons,
         total=progress.practice_lessons,
-        bar=_bar(progress.done_lessons, progress.practice_lessons),
         next_title=escape(lesson.title),
     )
     kb = InlineKeyboardBuilder()
     label = texts.START_BUTTON if fresh else texts.CONTINUE_BUTTON.format(title=lesson.title)
     kb.button(text=label, callback_data=GoItem(item_id=item.id))
-    kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
+    kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     quiz_label = (
         texts.QUIZ_BUTTON_WAITING.format(n=quiz_waiting) if quiz_waiting else texts.QUIZ_BUTTON
     )
     kb.button(text=quiz_label, callback_data=Quiz())
-    kb.button(text=texts.SIGNS_BUTTON, callback_data=Signs())
-    kb.button(text=texts.PROGRESS_BUTTON, callback_data=ShowProgress())
-    kb.button(text=texts.SETTINGS_BUTTON, callback_data=ShowSettings())  # FR-51
-    kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraList())  # FR-59
-    kb.adjust(1, 2, 2, 2)
+    kb.button(text=texts.MORE_BUTTON, callback_data=More())  # ADR-0082
+    kb.adjust(1, 2, 1)
     image, key = _alphabet_map(curriculum, progress)
     return Screen(caption, kb.as_markup(), image, key)
 
@@ -276,7 +269,7 @@ def card(
     item: LessonItem,
     has_audio: bool,
     is_teacher: bool,
-    reading: CardReading | None = None,
+    reading: CardReading | None = None,  # не используется: «Как читается» — в deep (ADR-0082)
     *,
     view: LearnerSettings | None = None,
     videos: ArticulationVideoLibrary | None = None,
@@ -311,32 +304,17 @@ def card(
                 if item.kind is ItemKind.SYLLABLE
                 else texts.CARD_LETTER_INFO
             )
-            parts.append(
-                info.format(name=escape(item.name), sound=escape(item.sound), tip=escape(item.tip))
-            )
+            parts.append(info.format(name=escape(item.name), sound=escape(item.sound)))
         if item.note and not item.note.startswith(("фраза", "сура", "басмала", "слог")):
             parts.append(texts.CARD_NOTE.format(note=escape(item.note)))
         parts.append(
             texts.CARD_READ_SYLLABLE if item.kind is ItemKind.SYLLABLE else texts.CARD_READ
         )
-        if reading is not None and reading.reading and view.how_to_read is not HowToRead.HIDDEN:
-            legend = "".join(f"\n<i>{escape(line)}</i>" for line in reading.legend)
-            line = (
-                texts.CARD_HOW_TO_READ_SHOWN
-                if view.how_to_read is HowToRead.SHOWN
-                else texts.CARD_HOW_TO_READ
-            )
-            parts.append(line.format(reading=escape(as_text(reading.reading)), legend=legend))
-    ref = []
-    if item.source is not None and item.source.page is not None:
-        ref.append(texts.CARD_BOOK.format(page=item.source.page))
-    if item.quran:
-        ref.append(texts.CARD_QURAN.format(ref=item.quran))
-    if ref:
-        parts.append("<i>" + " · ".join(ref) + "</i>")
+    if item.quran:  # подсказка, «Как читается» и книга — в «📖 Углублённо» (ADR-0082)
+        parts.append("<i>" + texts.CARD_QURAN.format(ref=item.quran) + "</i>")
 
     video = card_video(videos, item)
-    kb = _card_keyboard(curriculum, item, has_audio, is_teacher, bool(known), video=video)
+    kb = _card_keyboard(curriculum, item, has_audio, is_teacher, video=video)
     key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
     return Screen("\n\n".join(parts), kb, image, key)
 
@@ -351,43 +329,88 @@ def _card_keyboard(
     item: LessonItem,
     has_audio: bool,
     is_teacher: bool,
-    sheet: bool,
     *,
     video: str | None = None,
 ) -> InlineKeyboardMarkup:
-    """Кнопки карточки; ``sheet`` — есть буквы до урока, кнопка шпаргалки (FR-52); ``video`` —
-    ключ ролика: он вместо 🔊 (FR-56)."""
+    """Кнопки карточки (ADR-0082): «🔊 или 🎬» + «📖 Углублённо», навигация с 🏠.
+
+    ``video`` — ключ ролика: он вместо 🔊 (FR-56, ADR-0074)."""
     lesson, i = curriculum.locate(item.id)
     kb = InlineKeyboardBuilder()
-    top = 0
     if video is not None:  # ролик — с тем же звуком, что 🔊 (ADR-0074)
         kb.button(
             text=texts.VIDEO_BUTTON, callback_data=Watch(v=video, src="card", item_id=item.id)
         )
-        top += 1
     elif has_audio:  # послушать можно везде, где есть звук: и в правиле, и в слоге (ADR-0032)
         kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=item.id))
-        top += 1
+    kb.button(text=texts.DEEP_BUTTON, callback_data=Deep(item_id=item.id))
+    top = 2 if video is not None or has_audio else 1
+    rows: list[int] = [top]
     if is_teacher and item.kind is not ItemKind.ALPHABET:  # учитель озвучивает и правило
         kb.button(text=texts.RECORD_BUTTON, callback_data=RecordReference(item_id=item.id))
-        top += 1
-    if sheet:  # шпаргалка букв, пройденных до урока (FR-52)
-        kb.button(
-            text=texts.SHEET_BUTTON,
-            callback_data=LettersSheet(lesson_id=lesson.id, item_id=item.id),
-        )
-        top += 1
+        rows.append(1)
     sura = find_sura(curriculum, lesson.id) if lesson.section == "sura" else None
     if sura is not None:  # сура целиком и наизусть (FR-57, FR-59)
         kb.button(text=texts.WHOLE_SURA_BUTTON, callback_data=SuraOpen(n=sura.number, m="t"))
         kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraOpen(n=sura.number, m="m"))
-    nav = _nav(kb, curriculum, item)
+        rows.append(2)
+    rows += _nav(kb, curriculum, item)
     # первый шаг: назад — только «⬅️ Предыдущий урок», без «◀️ Назад» на шаг (FR-50)
-    prev = i == 0 and _previous_lesson_button(kb, curriculum, lesson)
-    kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
-    _home_row(kb)
-    kb.adjust(*([1] * top), *((2,) if sura else ()), *nav, *((1,) if prev else ()), 2)
+    if i == 0 and _previous_lesson_button(kb, curriculum, lesson):
+        rows.append(1)
+    kb.adjust(*rows)
     return kb.as_markup()
+
+
+def deep(
+    curriculum: Curriculum,
+    item: LessonItem,
+    reading: CardReading | None = None,
+    *,
+    view: LearnerSettings | None = None,
+    video_url: str | None = None,
+) -> Screen:
+    """«📖 Углублённо» (ADR-0082): подсказка, «Как читается» (по настройке), страница книги,
+    видеоурок (URL-кнопка), шпаргалка букв; «◀️ К уроку» — на карточку. Текст без картинки."""
+    view = view or LearnerSettings()
+    lesson, _ = curriculum.locate(item.id)
+    parts = [texts.DEEP_HEAD.format(lesson=escape(lesson.title))]
+    if item.tip:
+        parts.append(texts.DEEP_TIP.format(tip=escape(item.tip)))
+    if reading is not None and reading.reading and view.how_to_read is not HowToRead.HIDDEN:
+        legend = "".join(f"\n<i>{escape(line)}</i>" for line in reading.legend)
+        line = (
+            texts.CARD_HOW_TO_READ_SHOWN
+            if view.how_to_read is HowToRead.SHOWN
+            else texts.CARD_HOW_TO_READ
+        )
+        parts.append(line.format(reading=escape(as_text(reading.reading)), legend=legend))
+    if item.source is not None and item.source.page is not None:
+        parts.append("<i>" + texts.CARD_BOOK.format(page=item.source.page) + "</i>")
+    kb = InlineKeyboardBuilder()
+    if video_url:
+        kb.button(text=texts.DEEP_VIDEO_BUTTON, url=video_url)
+    if letters_before(curriculum, lesson.id):  # шпаргалка букв, пройденных до урока (FR-52)
+        kb.button(
+            text=texts.SHEET_BUTTON,
+            callback_data=LettersSheet(lesson_id=lesson.id, item_id=item.id),
+        )
+    kb.button(text=texts.DEEP_BACK_BUTTON, callback_data=GoItem(item_id=item.id))
+    kb.adjust(1)
+    return Screen("\n\n".join(parts), kb.as_markup())
+
+
+def more() -> Screen:
+    """«⋯ Ещё» (ADR-0082): то, что ушло с главной."""
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.PROGRESS_BUTTON, callback_data=ShowProgress())
+    kb.button(text=texts.SIGNS_BUTTON, callback_data=Signs())
+    kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraList())  # FR-59
+    kb.button(text=texts.SETTINGS_BUTTON, callback_data=ShowSettings())  # FR-51
+    kb.button(text=texts.HELP_BUTTON, callback_data=Help())
+    _home_row(kb)
+    kb.adjust(2, 2, 1, 1)
+    return Screen(texts.MORE_TITLE, kb.as_markup())
 
 
 def _new_letter(curriculum: Curriculum, lesson: Lesson, known: Sequence[LessonItem]) -> str:
@@ -431,30 +454,32 @@ def _card_image(
 
 
 def _nav(kb: InlineKeyboardBuilder, curriculum: Curriculum, item: LessonItem) -> list[int]:
-    """Кнопки «◀️ Назад» и «▶️ Дальше» без пустышек: счёт шагов — в заголовке (FR-50).
+    """«◀️ Назад», «▶️ Дальше» и 🏠 без пустышек: счёт шагов — в заголовке (FR-50, ADR-0082).
 
     На первом шаге урока «Назад» нет (там «⬅️ Предыдущий урок»); на последнем вперёд ведёт
-    «➡️ Следующий урок: …» отдельной строкой. Возвращает раскладку рядов.
+    «➡️ Следующий урок: …» отдельной строкой, «Назад» и 🏠 — под ней. Возвращает раскладку рядов.
     """
     lesson, i = curriculum.locate(item.id)
-    rows: list[int] = []
     previous = curriculum.previous_item(item.id) if i > 0 else None
+    following = curriculum.next_item(item.id)
+    rows: list[int] = []
+    in_row = 0  # кнопок «Назад/Дальше» в последнем ряду
+    if following is not None:
+        next_lesson, _ = curriculum.locate(following.id)
+        if next_lesson != lesson:
+            kb.button(
+                text=texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title),
+                callback_data=GoItem(item_id=following.id),
+            )
+            rows.append(1)
     if previous:
         kb.button(text=texts.BACK_BUTTON, callback_data=GoItem(item_id=previous.id))
-    following = curriculum.next_item(item.id)
-    if following is None:
-        return [1] if previous else []
-    next_lesson, _ = curriculum.locate(following.id)
-    if next_lesson != lesson:
-        if previous:
-            rows.append(1)
-        kb.button(
-            text=texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title),
-            callback_data=GoItem(item_id=following.id),
-        )
-        return [*rows, 1]
-    kb.button(text=texts.NEXT_BUTTON, callback_data=GoItem(item_id=following.id))
-    return [2 if previous else 1]
+        in_row += 1
+    if following is not None and not rows:
+        kb.button(text=texts.NEXT_BUTTON, callback_data=GoItem(item_id=following.id))
+        in_row += 1
+    kb.button(text=texts.HOME_BUTTON, callback_data=Home())
+    return [*rows, in_row + 1]
 
 
 def _previous_lesson_button(
@@ -471,8 +496,14 @@ def _previous_lesson_button(
     return True
 
 
+def learner_part(curriculum: Curriculum, progress: Progress) -> Lessons:
+    """«Уроки» с главной и /lessons — страница части, где занимается ученик (ADR-0082)."""
+    item = progress.continue_item or curriculum.first_item()
+    return _lessons_of(curriculum, curriculum.locate(item.id)[0])
+
+
 def _lessons_of(curriculum: Curriculum, lesson: Lesson) -> Lessons:
-    """Кнопка «Уроки» с карточки — сразу на страницу её части."""
+    """Кнопка «Уроки» — сразу на страницу части урока."""
     for k, (_, items) in enumerate(curriculum.parts()):
         if lesson in items:
             return Lessons(part=k, page=items.index(lesson) // LESSONS_PER_PAGE)
@@ -668,14 +699,17 @@ def _result_keyboard(
     на карточках алфавита (решение автора 2026-10-25, ADR-0074)."""
     kb = InlineKeyboardBuilder()
     item_id = r.item.id
-    top = 0
+    top = 0  # «🔊 или 🎬» и, если есть ошибки, «📖 Углублённо» — один ряд (ADR-0082)
     if after is not None:
         kb.button(
             text=texts.VIDEO_BUTTON, callback_data=Watch(v=after, src="after", item_id=item_id)
         )
         top += 1
-    elif after is None and has_audio:
+    elif has_audio:
         kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=r.item.id))
+        top += 1
+    if r.attempt.assessment.errors:
+        kb.button(text=texts.DEEP_BUTTON, callback_data=Deep(item_id=item_id))
         top += 1
     # ряд «◀️ Назад · 🔁 Ещё раз · ▶️ Дальше»: обе крайние — на соседние строки, «Ещё раз» —
     # снова карточка этой строки (там видно, что читать, и можно послушать эталон)
@@ -705,7 +739,7 @@ def _result_keyboard(
     kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
     _home_row(kb)
     rows: Sequence[int] = (
-        *([1] * top),
+        *((top,) if top else ()),
         nav,
         *((1,) if next_row else ()),
         *((1,) if r.lesson_completed else ()),
@@ -851,7 +885,6 @@ def settings(s: LearnerSettings) -> Screen:
         ("auto_reference", texts.SETTING_AUTO_REFERENCE, s.auto_reference),
         ("daily_opening", texts.SETTING_DAILY_OPENING, s.daily_opening),
         ("large_font", texts.SETTING_LARGE_FONT, s.large_font),
-        ("research_block", texts.SETTING_RESEARCH_BLOCK, s.research_block),
     )
     for name, label, on in toggles:
         kb.button(
@@ -864,11 +897,9 @@ def settings(s: LearnerSettings) -> Screen:
         else texts.SETTING_REMINDER_AT.format(time=_clock(s.reminder_minute))
     )
     kb.button(text=reminder, callback_data=ShowSettings(page="reminder"))
-    kb.button(text=texts.HELP_BUTTON, callback_data=Help())
-    kb.button(text=texts.PRIVACY_BUTTON, callback_data=Privacy())
-    kb.button(text=texts.ME_BUTTON, callback_data=Me())
-    _home_row(kb)
-    kb.adjust(1, 3, 1, 1, 1, 1, 1, 2, 2)
+    kb.button(text=texts.PRIVACY_BUTTON, callback_data=Privacy())  # «Мой ID» — внутри (ADR-0082)
+    _home_row(kb, (texts.BACK_TO_MORE, More()))
+    kb.adjust(1, 3, 1, 1, 1, 1, 2)
     return Screen(texts.SETTINGS, kb.as_markup())
 
 
@@ -928,13 +959,12 @@ def me(pseudonym: str) -> Screen:
 def help_screen() -> Screen:
     kb = InlineKeyboardBuilder()
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
-    _back_to_settings(kb)
-    _home_row(kb)
+    _home_row(kb, (texts.BACK_TO_MORE, More()))
     kb.adjust(1, 2)
     return Screen(texts.HELP, kb.as_markup())
 
 
-def privacy(research_consent: bool) -> Screen:
+def privacy(research_consent: bool, pseudonym: str = "") -> Screen:
     kb = InlineKeyboardBuilder()
     if research_consent:
         kb.button(
@@ -952,7 +982,7 @@ def privacy(research_consent: bool) -> Screen:
     _back_to_settings(kb)
     _home_row(kb)
     kb.adjust(1, 1, 2)
-    return Screen(views.privacy(research_consent), kb.as_markup())
+    return Screen(views.privacy(research_consent, pseudonym), kb.as_markup())
 
 
 # ---------- знаки, шпаргалка букв и закрепление ----------

@@ -60,9 +60,9 @@ def test_home_offers_continue_from_current_item(curriculum: Curriculum) -> None:
     s = screens.home(curriculum, _progress(curriculum, current=item.id))
     buttons = _buttons(s.keyboard)
     assert buttons[0][1] == cb.GoItem(item_id=item.id).pack() and "Продолжить" in buttons[0][0]
-    assert "🔥 Серия: <b>3 дня</b>" in s.caption
+    assert "3" in s.caption  # серия дней (ADR-0082: короткий текст главной)
     datas = [d for _, d in buttons]
-    assert cb.Quiz().pack() in datas and cb.Signs().pack() in datas
+    assert cb.Quiz().pack() in datas and cb.More().pack() in datas  # «Знаки» — в «⋯ Ещё»
 
 
 def test_fresh_learner_starts_with_basmala_lesson(curriculum: Curriculum) -> None:
@@ -108,7 +108,8 @@ def test_card_next_on_last_item_opens_next_lesson(curriculum: Curriculum) -> Non
     s = screens.card(curriculum, lesson.items[-1], has_audio=False, is_teacher=False)
     label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)  # последний шаг — следующий урок
     assert (label, cb.GoItem(item_id=nxt.items[0].id).pack()) in _buttons(s.keyboard)
-    assert _has_home(s.keyboard) and "с. 11" in s.caption
+    assert _has_home(s.keyboard)
+    assert "с. 11" in screens.deep(curriculum, lesson.items[-1]).caption  # книга — в «Углублённо»
 
 
 def test_card_offers_previous_lesson(curriculum: Curriculum) -> None:
@@ -280,8 +281,10 @@ def test_card_hides_reading_under_spoiler(curriculum: Curriculum) -> None:
     item = _head(_letters(curriculum)[1])
     shown = CardReading((("с̣а", False), ("ба", False)), LEGEND)
     s = screens.card(curriculum, item, has_audio=False, is_teacher=False, reading=shown)
-    assert "<tg-spoiler>с̣а-ба" in s.caption and LEGEND[0] in s.caption
+    deep = screens.deep(curriculum, item, reading=shown)  # «Как читается» — в «Углублённо»
+    assert "<tg-spoiler>с̣а-ба" in deep.caption and LEGEND[0] in deep.caption
     assert "tg-spoiler" not in screens.card(curriculum, item, False, False).caption
+    assert "tg-spoiler" not in s.caption
 
 
 def _words_right(ok: int, total: int) -> str:
@@ -399,7 +402,8 @@ def test_result_caption_fits_telegram_photo_limit(
 def test_syllable_card_says_how_to_read_and_offers_listen(curriculum: Curriculum) -> None:
     item = next(i for les in _letters(curriculum) for i in les.items if i.kind is ItemKind.SYLLABLE)
     s = screens.card(curriculum, item, has_audio=True, is_teacher=False)
-    assert item.sound in s.caption and item.tip in s.caption and "послушай" in s.caption
+    assert item.sound in s.caption and "послушай" in s.caption
+    assert item.tip not in s.caption  # подсказка — в «Углублённо»
     assert (texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
 
 

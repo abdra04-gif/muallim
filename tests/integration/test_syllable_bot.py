@@ -18,6 +18,7 @@ from aiogram import Dispatcher
 from dishka import AsyncContainer
 
 from muallim.domain.curriculum import Curriculum
+from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, texts
 from muallim.presentation.telegram.callbacks import GoItem
 from tests.integration import test_settings_bot as settings_bot
@@ -85,7 +86,9 @@ async def test_sura_card_in_bot_is_drawn_by_syllables(
     await ali.press(GoItem(item_id=FATIHA_BASMALA))
     [call] = ayah_calls
     assert call["number"] == 1 and call["scale"] == 1.0
-    assert texts.CARD_HOW_TO_READ.split("{")[0] in _card_caption(ali)  # спойлер остался
+    assert texts.CARD_HOW_TO_READ.split("{")[0] not in _card_caption(ali)  # ушло в «Углублённо»
+    await ali.press(cb.Deep(item_id=FATIHA_BASMALA))
+    assert texts.CARD_HOW_TO_READ.split("{")[0] in _card_caption(ali)  # спойлер — там
 
 
 async def test_sura_card_marked_bad_is_still_drawn_by_syllables(

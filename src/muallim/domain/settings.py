@@ -44,7 +44,8 @@ class LearnerSettings:
     auto_reference: bool = False  # В5: автозвук выключен
     daily_opening: bool = True  # ADR-0050: начало занятия предлагается
     large_font: bool = False
-    research_block: bool = False  # ADR-0057: блок исследования — по умолчанию выкл.
+    # не используется с ADR-0082 (переключатель удалён); колонка БД остаётся, TD-FN-158
+    research_block: bool = False
     reminder_minute: int | None = None  # минута местных суток; None — напоминание выключено
     utc_offset_min: int = DEFAULT_UTC_OFFSET_MIN
     # состояние экрана и начала занятия (TD-FN-90)

@@ -34,7 +34,7 @@ COMMANDS = [
     BotCommand(command="help", description="Как заниматься"),
     BotCommand(command="progress", description="Мой прогресс"),
     BotCommand(command="privacy", description="Мои данные и согласие"),
-    BotCommand(command="me", description="Мой ID"),
+    BotCommand(command="me", description=texts.ME_BUTTON),
 ]
 
 

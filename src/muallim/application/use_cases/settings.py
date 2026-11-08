@@ -23,7 +23,8 @@ from muallim.domain.settings import (
 )
 
 HOW_TO_READ: Final = "how_to_read"
-TOGGLES: Final = ("auto_reference", "daily_opening", "large_font", "research_block")
+# ``research_block`` не переключается: колонка осталась в БД, но ничего не значит (ADR-0082)
+TOGGLES: Final = ("auto_reference", "daily_opening", "large_font")
 REMINDER_MINUTE: Final = "reminder_minute"
 UTC_OFFSET: Final = "utc_offset_min"
 REMINDER_OFF: Final = "off"  # значение кнопки «выключить напоминание»

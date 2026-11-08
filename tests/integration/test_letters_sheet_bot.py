@@ -11,6 +11,7 @@ import pytest
 from aiogram import Dispatcher
 from dishka import AsyncContainer
 
+from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import texts
 from muallim.presentation.telegram.callbacks import GoItem, Home, Signs
 from tests.integration import test_settings_bot as settings_bot
@@ -30,7 +31,9 @@ async def test_sheet_from_card_shows_known_letters_and_returns_to_card(
     dp, _ = app
     person = await _on_home(dp)
     await person.press(GoItem(item_id=MIM_STEP))
-    card_caption, _ = _view(person)
+    card_caption, card_labels = _view(person)
+    assert texts.SHEET_BUTTON not in card_labels  # шпаргалка — в «Углублённо» (ADR-0082)
+    await person.press(cb.Deep(item_id=MIM_STEP))
     await person.press(_find(person, texts.SHEET_BUTTON))
     caption, _ = _view(person)
     for letter, name in (("أ", "Элиф с хэмзэ"), ("ر", "Ра"), ("ز", "Зэй")):
@@ -47,6 +50,7 @@ async def test_sheet_listen_sends_the_letter_reference(
     (tmp_path / "reference" / f"{RA_HEAD}.ogg").write_bytes(b"OggS-ra-reference")
     person = await _on_home(dp)
     await person.press(GoItem(item_id=MIM_STEP))
+    await person.press(cb.Deep(item_id=MIM_STEP))
     await person.press(_find(person, texts.SHEET_BUTTON))
     listen = [t for t in _view(person)[1] if "🔊" in t and "ر" in t]
     assert len(listen) == 1, _view(person)[1]

@@ -27,6 +27,7 @@ from muallim.application.ports.repositories import (
 from muallim.application.ports.storage import (
     ArticulationVideoLibrary,
     AudioStore,
+    LessonLinks,
     ReferenceAudioLibrary,
 )
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
@@ -38,7 +39,7 @@ from muallim.application.use_cases.annotation import (
     SubmitAnnotation,
     SubmitMarks,
 )
-from muallim.application.use_cases.cards import OpenItem
+from muallim.application.use_cases.cards import OpenItem, RecordDeepOpened
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.application.use_cases.learners import (
     DeleteMyData,
@@ -73,6 +74,7 @@ from muallim.infrastructure.audio.reference_library import (
     RecitationCache,
     SoundLibrary,
 )
+from muallim.infrastructure.curriculum.lesson_links import YamlLessonLinks
 from muallim.infrastructure.curriculum.syllables import SyllableLibrary
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
@@ -143,6 +145,12 @@ class AppProvider(Provider):
     def videos(self) -> ArticulationVideoLibrary:
         """Ролики «🎬 Как произносить» (ADR-0074): манифест читается один раз при запуске."""
         return VideoLibrary.load(self.settings.video_dir)
+
+    @provide
+    def lesson_links(self) -> LessonLinks:
+        """Ссылки на видеоурок (ADR-0082): провайдер области APP — файл читается один раз, при
+        первом обращении к порту, дальше объект общий."""
+        return YamlLessonLinks.load(self.settings.curriculum_dir / "lesson_links.yaml")
 
     @provide
     def syllables(self) -> AyahSyllables:
@@ -327,6 +335,7 @@ class RequestProvider(Provider):
         SetFeedbackLanguage,
         DeleteMyData,
         OpenItem,
+        RecordDeepOpened,
         AssessRecitation,
         ReadSura,
         HowToRead,

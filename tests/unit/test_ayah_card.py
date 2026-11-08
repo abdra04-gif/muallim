@@ -3,7 +3,8 @@
 ``screens.card(..., syllables=...)`` — как ``videos=`` (ADR-0074). Для ``lesson.section == "sura"``
 и пункта с ``quran``: библиотека знает текст — ``render.ayah(words, number, position, scale)``,
 иначе — прежняя ``render.card``. Номер — ``ayah_number`` (басмала перед сурой — без номера).
-«Как читается» под спойлером остаётся; «Крупный шрифт» — ``render.LARGE_SCALE`` и свой ключ экрана.
+«Как читается» с карточки ушло в «Углублённо» (ADR-0082);
+«Крупный шрифт» — ``render.LARGE_SCALE`` и свой ключ экрана.
 
 Разбор — фейк порта ``AyahSyllables`` (каждое слово — одна клетка); рисование подменено шпионами,
 пиксели не проверяются. Тексты — из curriculum/course.ru.yaml. Статус строки (``bad`` и др.)
@@ -152,12 +153,15 @@ def test_rule_step_of_sura_lesson_is_not_an_ayah(curriculum: Curriculum, drawn: 
     assert drawn.ayah == []
 
 
-def test_how_to_read_spoiler_stays_on_syllable_card(curriculum: Curriculum, drawn: Spy) -> None:
-    """Решение автора 2026-10-30: «Как читается» под спойлером на карточке суры остаётся."""
+def test_how_to_read_leaves_sura_card_for_deep_screen(curriculum: Curriculum, drawn: Spy) -> None:
+    """Решение автора 2026-11-08 (ADR-0082): «Как читается» убрано и с карточки суры — оно в
+    «📖 Углублённо» (решение 2026-10-30 о спойлере на карточке суры заменено)."""
     reading = CardReading((("бисми", False), ("ллаахи", False)), ())
     library = _all_sura_texts(curriculum)
     with_ayah = _card(curriculum, FATIHA_BASMALA, reading=reading, syllables=library)
     before = _card(curriculum, FATIHA_BASMALA, reading=reading, syllables=_port(()))
     assert drawn.ayah, "карточка нарисована по слогам"
-    assert "<tg-spoiler>" in with_ayah.caption
+    assert "<tg-spoiler>" not in with_ayah.caption and "Как читается" not in with_ayah.caption
     assert with_ayah.caption == before.caption
+    deep = screens.deep(curriculum, curriculum.item(FATIHA_BASMALA), reading)
+    assert "<tg-spoiler>бисми" in deep.caption

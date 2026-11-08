@@ -157,11 +157,9 @@ async def on_voice(
     if shown.opening_active and basmala and attempt.verdict is not Verdict.FAILED:
         with suppress(KeyError):  # басмала прочитана — вернуть, где был
             resume = cur.item(shown.resume_item) if shown.resume_item else None
-    # «Для исследования» и номер попытки — учителю и разметчику (FR-50) и ученику, который
-    # включил их в ⚙️ Настройках (ADR-0061)
-    staff = (await learner_settings.execute(learner)).research_block or (
-        await staff_access.is_staff(learner)
-    )
+    # «Для исследования» и номер попытки — только учителю и разметчику (FR-50, ADR-0082:
+    # флаг ученика ``research_block`` больше ничего не включает)
+    staff = await staff_access.is_staff(learner)
     await wait.delete()
     has_audio = library.has(result.item.id)
     screen = screens.result(cur, result, has_audio, resume, staff=staff, videos=videos)

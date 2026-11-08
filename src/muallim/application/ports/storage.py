@@ -49,3 +49,9 @@ class ArticulationVideoLibrary(Protocol):
 
     async def get(self, key: str) -> Video | None:
         """Ролик по ключу; None — ключ неизвестен (ролик убран или отклонён)."""
+
+
+class LessonLinks(Protocol):
+    """Ссылки на видеоурок (ADR-0082): по уроку, иначе общая; нет годной ссылки — None."""
+
+    def for_lesson(self, lesson_id: str) -> str | None: ...

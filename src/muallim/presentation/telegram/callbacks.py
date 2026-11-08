@@ -18,6 +18,16 @@ class Lessons(CallbackData, prefix="lessons"):
     page: int = 0
 
 
+class Deep(CallbackData, prefix="deep"):
+    """«📖 Углублённо» (ADR-0082): подсказка, «Как читается», книга, видеоурок, шпаргалка."""
+
+    item_id: str
+
+
+class More(CallbackData, prefix="more"):
+    """«⋯ Ещё» (ADR-0082): прогресс, знаки, «Наизусть», настройки, «Как заниматься»."""
+
+
 class Signs(CallbackData, prefix="signs"):
     """Знаки огласовки."""
 

@@ -9,6 +9,21 @@ from muallim.domain.learner import Learner
 
 
 @dataclass(frozen=True, slots=True)
+class RecordDeepOpened:
+    """Ученик открыл «📖 Углублённо» (ADR-0082): событие ``deep_opened`` {item_id}."""
+
+    curriculum: Curriculum
+    uow: UnitOfWork
+    events: EventLog
+
+    async def execute(self, learner: Learner, item_id: str) -> LessonItem:
+        item = self.curriculum.item(item_id)  # KeyError — устаревшая кнопка, события нет
+        await self.events.record("deep_opened", learner.id, {"item_id": item.id})
+        await self.uow.commit()
+        return item
+
+
+@dataclass(frozen=True, slots=True)
 class OpenItem:
     curriculum: Curriculum
     learners: LearnerRepository

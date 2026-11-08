@@ -55,6 +55,7 @@ from muallim.infrastructure.db.engine import create_engine
 from muallim.infrastructure.db.tables import interaction_events, metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.infrastructure.system import SystemClock
+from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, texts
 from muallim.presentation.telegram.callbacks import ChangeSetting as ChangeSettingCallback
 from muallim.presentation.telegram.callbacks import (
@@ -94,7 +95,6 @@ TOGGLES = {
     "auto_reference": ("🔊", False),
     "daily_opening": ("🌙", True),
     "large_font": ("🔎", False),
-    "research_block": ("🔬", False),
 }
 
 
@@ -194,6 +194,8 @@ async def _press_text(person: Learner, part: str) -> None:
 
 
 async def _open_settings(person: Learner) -> None:
+    """С главной: «⋯ Ещё» → «⚙️ Настройки» (ADR-0082: на главной настроек больше нет)."""
+    await person.press(cb.More())
     await _press_text(person, texts.SETTINGS_BUTTON)
 
 
@@ -239,23 +241,18 @@ async def _events(container: AsyncContainer, event: str) -> list[dict[str, Any]]
 
 
 # ---------- 1. главная ----------
-async def test_home_has_settings_instead_of_help_and_privacy(
+async def test_home_has_more_instead_of_settings_help_and_privacy(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
     dp, _ = app
     ali = await _on_home(dp)
     labels = [text for text, _ in _buttons(ali)]
-    assert "⚙️" in texts.SETTINGS_BUTTON and "Настройки" in texts.SETTINGS_BUTTON
-    assert labels[1:] == [
-        texts.LESSONS_BUTTON,
-        texts.QUIZ_BUTTON,
-        texts.SIGNS_BUTTON,
-        texts.PROGRESS_BUTTON,
-        texts.SETTINGS_BUTTON,
-        texts.MEMORY_BUTTON,  # «Наизусть» — FR-59, ADR-0076
-    ], labels
+    assert labels[1:] == [texts.LESSONS_BUTTON, texts.QUIZ_BUTTON, "⋯ Ещё"], labels
     assert labels[0].startswith("▶️")  # «Начать первый урок» / «Продолжить: …»
     assert texts.HELP_BUTTON not in labels and texts.PRIVACY_BUTTON not in labels
+    assert texts.SETTINGS_BUTTON not in labels  # настройки — в «⋯ Ещё» (ADR-0082)
+    await ali.press(cb.More())
+    assert texts.SETTINGS_BUTTON in _view(ali)[1] and texts.MEMORY_BUTTON in _view(ali)[1]
 
 
 # ---------- 2. экран настроек ----------
@@ -270,9 +267,10 @@ async def test_settings_screen_offers_every_option_and_inner_screens(
         assert any(label in text for text in labels), (label, labels)
     for icon, _ in TOGGLES.values():
         assert sum(icon in text for text in labels) == 1, (icon, labels)
-    for inner in (texts.HELP_BUTTON, texts.PRIVACY_BUTTON, texts.HOME_BUTTON):
+    for inner in (texts.PRIVACY_BUTTON, texts.HOME_BUTTON):
         assert inner in labels, (inner, labels)
-    assert sum("🪪" in text for text in labels) == 1, labels
+    assert texts.HELP_BUTTON not in labels  # «Как заниматься» — в «⋯ Ещё»
+    assert not [text for text in labels if "🪪" in text or "🔬" in text], labels
 
 
 async def test_settings_screen_shows_reminder_switched_off_by_default(
@@ -352,24 +350,21 @@ async def test_toggle_is_saved_logged_and_redrawn(
     ]
 
 
-async def test_help_privacy_and_id_open_from_settings(
+async def test_help_opens_from_more_privacy_and_id_from_settings(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
     dp, _ = app
     ali = await _on_home(dp)
-    await _open_settings(ali)
+    await ali.press(cb.More())
     await _press_text(ali, texts.HELP_BUTTON)
     assert _view(ali)[0] == texts.HELP
 
     await ali.press(Home())
     await _open_settings(ali)
     await _press_text(ali, texts.PRIVACY_BUTTON)
-    assert _view(ali)[0].startswith(texts.PRIVACY_STATUS.split("\n")[0])
-
-    await ali.press(Home())
-    await _open_settings(ali)
-    await _press_text(ali, "🪪")
-    assert any(t.startswith(texts.ME_TEXT.split("{")[0]) for t in ali.tg.texts())
+    caption = _view(ali)[0]
+    assert caption.startswith(texts.PRIVACY_STATUS.split("\n")[0])
+    assert "L-" in caption  # «Мой ID» (псевдоним L-xxxxxxxx) показан на «Мои данные»
 
 
 async def test_settings_screen_leads_home(app: tuple[Dispatcher, AsyncContainer]) -> None:
@@ -377,7 +372,7 @@ async def test_settings_screen_leads_home(app: tuple[Dispatcher, AsyncContainer]
     ali = await _on_home(dp)
     await _open_settings(ali)
     await _press_text(ali, texts.HOME_BUTTON)
-    assert texts.SETTINGS_BUTTON in [text for text, _ in _buttons(ali)]
+    assert "⋯ Ещё" in [text for text, _ in _buttons(ali)]  # главная: настройки внутри «Ещё»
 
 
 # ---------- 3. настройки действуют ----------
@@ -385,21 +380,27 @@ def _card_caption(person: Learner) -> str:
     return _view(person)[0]
 
 
+async def _deep_caption(person: Learner, item_id: str) -> str:
+    """«Как читается» живёт в «📖 Углублённо» (ADR-0082): карточка → кнопка → подпись."""
+    await person.press(GoItem(item_id=item_id))
+    assert "Как читается" not in _card_caption(person)  # на карточке его больше нет
+    await person.press(cb.Deep(item_id=item_id))
+    return _card_caption(person)
+
+
 async def test_how_to_read_is_under_spoiler_by_default(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
     dp, _ = app
     ali = await _on_home(dp)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    assert texts.CARD_HOW_TO_READ.split("{")[0] in _card_caption(ali)
+    assert texts.CARD_HOW_TO_READ.split("{")[0] in await _deep_caption(ali, WITH_REFERENCE)
 
 
 async def test_how_to_read_shown_has_no_spoiler(app: tuple[Dispatcher, AsyncContainer]) -> None:
     dp, container = app
     ali = await _on_home(dp)
     await _set(container, PUPIL, how_to_read=HowToRead.SHOWN)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    caption = _card_caption(ali)
+    caption = await _deep_caption(ali, WITH_REFERENCE)
     assert "Как читается" in caption, caption
     assert "tg-spoiler" not in caption
 
@@ -410,8 +411,7 @@ async def test_how_to_read_hidden_removes_the_line(
     dp, container = app
     ali = await _on_home(dp)
     await _set(container, PUPIL, how_to_read=HowToRead.HIDDEN)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    caption = _card_caption(ali)
+    caption = await _deep_caption(ali, WITH_REFERENCE)
     assert "Как читается" not in caption and "tg-spoiler" not in caption
 
 
@@ -428,13 +428,16 @@ async def _read_isti_adha(person: Learner) -> str:
     return _result_text(person)
 
 
-async def test_pupil_with_research_block_sees_it(app: tuple[Dispatcher, AsyncContainer]) -> None:
+async def test_pupil_with_old_research_flag_does_not_see_it(
+    app: tuple[Dispatcher, AsyncContainer],
+) -> None:
+    """ADR-0082: переключателя нет; старый флаг в БД ничего не включает."""
     dp, container = app
     ali = await _on_home(dp)
     await _set(container, PUPIL, research_block=True)
     result = await _read_isti_adha(ali)
     assert texts.VERDICT_EXCELLENT in result
-    assert "Для исследования" in result and "Попытка №" in result
+    assert "Для исследования" not in result and "Попытка №" not in result
 
 
 async def test_pupil_without_research_block_does_not_see_it(
@@ -453,18 +456,6 @@ async def test_staff_sees_research_block_even_when_switched_off(
     await _set(container, TEACHER, research_block=False)
     result = await _read_isti_adha(teacher)
     assert "Для исследования" in result and "Попытка №" in result
-
-
-async def test_research_block_switched_on_in_settings_reaches_result(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    """Сквозь экран: ⚙️ → 🔬 → урок → голосовое — блок виден."""
-    dp, _ = app
-    ali = await _on_home(dp)
-    await _open_settings(ali)
-    await _press_text(ali, TOGGLES["research_block"][0])
-    result = await _read_isti_adha(ali)
-    assert "Для исследования" in result
 
 
 async def test_daily_opening_off_is_not_offered(app: tuple[Dispatcher, AsyncContainer]) -> None:
@@ -812,11 +803,11 @@ async def test_manual_listen_replaces_auto_reference_instead_of_adding_second(
     assert manual in _deleted(ali), "и новый убирается, когда ученик уходит с карточки"
 
 
-@pytest.mark.parametrize("inner", [texts.HELP_BUTTON, texts.PRIVACY_BUTTON])
-async def test_help_and_privacy_from_settings_lead_back_to_settings(
+@pytest.mark.parametrize("inner", [texts.PRIVACY_BUTTON])
+async def test_privacy_from_settings_leads_back_to_settings(
     app: tuple[Dispatcher, AsyncContainer], inner: str
 ) -> None:
-    """П. 3: из «Как заниматься» и «Мои данные» — «◀️ Настройки», на месте экрана."""
+    """П. 3: из «Мои данные» — «◀️ Настройки», на месте экрана («Как заниматься» — в «Ещё»)."""
     dp, _ = app
     ali = await _on_home(dp)
     await _open_settings(ali)
@@ -828,18 +819,18 @@ async def test_help_and_privacy_from_settings_lead_back_to_settings(
     assert ali.last_screen().message_id == screen_id
 
 
-async def test_my_id_replaces_settings_screen_and_leads_back(
+async def test_my_id_is_shown_on_privacy_screen_in_place(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
-    """П. 4: «🪪 Мой ID» — на месте экрана, не новым сообщением."""
+    """П. 4 (ADR-0082): «Мой ID» — на экране «Мои данные», на месте экрана, не новым сообщением."""
     dp, _ = app
     ali = await _on_home(dp)
     await _open_settings(ali)
     screen_id = ali.last_screen().message_id
     sent_before = sum(isinstance(c, SendMessage) for c in ali.tg.calls)
-    await _press_text(ali, "🪪")
+    await _press_text(ali, texts.PRIVACY_BUTTON)
     caption, labels = _view(ali)
-    assert caption.startswith(texts.ME_TEXT.split("{")[0]), caption
+    assert "L-" in caption
     assert ali.last_screen().message_id == screen_id
     assert sum(isinstance(c, SendMessage) for c in ali.tg.calls) == sent_before
     assert texts.BACK_TO_SETTINGS in labels, labels

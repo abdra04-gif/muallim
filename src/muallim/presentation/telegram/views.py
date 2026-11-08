@@ -31,9 +31,11 @@ def bar(percent: int) -> str:
     return "▰" * n + "▱" * (10 - n)
 
 
-def privacy(research_consent: bool) -> str:
+def privacy(research_consent: bool, pseudonym: str = "") -> str:
+    """«Мои данные»; с псевдонимом — ещё «Твой ID» (ADR-0082: бывшая кнопка «🪪 Мой ID»)."""
     status = texts.CONSENT_ON if research_consent else texts.CONSENT_OFF
-    return texts.PRIVACY_STATUS.format(status=status)
+    text = texts.PRIVACY_STATUS.format(status=status)
+    return f"{text}\n\n{me(pseudonym)}" if pseudonym else text
 
 
 def attempt_code(attempt_id: UUID) -> str:

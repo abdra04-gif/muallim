@@ -121,6 +121,9 @@ def _worst_cases(curriculum: Curriculum) -> dict[type[CallbackData], CallbackDat
         callbacks.SuraList: callbacks.SuraList(),
         callbacks.SuraOpen: callbacks.SuraOpen(n=114, m="m"),
         callbacks.SuraReady: callbacks.SuraReady(n=114),
+        # 📖 Углублённо и ⋯ Ещё (FR-66, FR-67, ADR-0082)
+        callbacks.Deep: callbacks.Deep(item_id=item),
+        callbacks.More: callbacks.More(),
     }
 
 

@@ -30,7 +30,7 @@ async def cb_privacy(
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
     if msg := message_of(cb):
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
-        await display.show(msg, screens.privacy(learner.research_consent))
+        await display.show(msg, screens.privacy(learner.research_consent, learner.pseudonym))
     await cb.answer()
 
 
@@ -55,7 +55,7 @@ async def cb_consent(
         ):  # анкета — сразу после согласия
             screen = screens.profile_question(question, cb.from_user.first_name)
         elif callback_data.then == "privacy":
-            screen = screens.privacy(learner.research_consent)
+            screen = screens.privacy(learner.research_consent, learner.pseudonym)
         else:
             screen = screens.home(cur, await progress.execute(learner))
         await display.show(msg, screen)

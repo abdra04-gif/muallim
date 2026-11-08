@@ -63,8 +63,9 @@ async def lessons(
     progress: FromDishka[GetProgress],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    screen = screens.lessons(cur, await progress.execute(learner), part=-1)
-    await display.send(bot, m.chat.id, screen)
+    p = await progress.execute(learner)
+    target = screens.learner_part(cur, p)  # часть ученика; список частей — кнопка «◀️ Части»
+    await display.send(bot, m.chat.id, screens.lessons(cur, p, target.part, target.page))
 
 
 @router.message(Command("progress"))
@@ -104,7 +105,7 @@ async def privacy(
     learner: FromDishka[Learner],
 ) -> None:
     await screen_state.menu(learner)  # не карточка: голосовое здесь не оценивается
-    await display.send(bot, m.chat.id, screens.privacy(learner.research_consent))
+    await display.send(bot, m.chat.id, screens.privacy(learner.research_consent, learner.pseudonym))
 
 
 @router.message(Command("signs"))
