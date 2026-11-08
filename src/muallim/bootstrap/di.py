@@ -27,6 +27,7 @@ from muallim.application.ports.repositories import (
 from muallim.application.ports.storage import (
     ArticulationVideoLibrary,
     AudioStore,
+    BookPages,
     LessonLinks,
     ReferenceAudioLibrary,
 )
@@ -74,8 +75,9 @@ from muallim.infrastructure.audio.reference_library import (
     RecitationCache,
     SoundLibrary,
 )
+from muallim.infrastructure.curriculum.book_pages import DirBookPages
 from muallim.infrastructure.curriculum.lesson_links import YamlLessonLinks
-from muallim.infrastructure.curriculum.syllables import SyllableLibrary
+from muallim.infrastructure.curriculum.syllables import SuraSyllables, SyllableLibrary
 from muallim.infrastructure.curriculum.yaml_loader import load_curriculum, load_feedback_catalog
 from muallim.infrastructure.db.engine import create_engine, create_session_factory
 from muallim.infrastructure.db.repositories.annotation import (
@@ -145,6 +147,11 @@ class AppProvider(Provider):
     def videos(self) -> ArticulationVideoLibrary:
         """Ролики «🎬 Как произносить» (ADR-0074): манифест читается один раз при запуске."""
         return VideoLibrary.load(self.settings.video_dir)
+
+    @provide
+    def book_pages(self) -> BookPages:
+        """Картинки страниц книги (``curriculum/book_pages``, вне git)."""
+        return DirBookPages(self.settings.book_pages_dir)
 
     @provide
     def lesson_links(self) -> LessonLinks:
@@ -252,9 +259,10 @@ class RequestProvider(Provider):
         events: EventLog,
         uow: UnitOfWork,
         syllables: AyahSyllables,
+        curriculum: Curriculum,
     ) -> NextAnnotation:
         """Очередь разметки; клетки аята — из того же разбора, что карточка суры (ADR-0079)."""
-        return NextAnnotation(access, tasks, audio, events, uow, syllables)
+        return NextAnnotation(access, tasks, audio, events, uow, _sura_only(syllables, curriculum))
 
     @provide
     def submit_marks(
@@ -266,9 +274,10 @@ class RequestProvider(Provider):
         events: EventLog,
         clock: Clock,
         syllables: AyahSyllables,
+        curriculum: Curriculum,
     ) -> SubmitMarks:
         """Разметка по клеткам (FR-62, ADR-0079)."""
-        return SubmitMarks(access, tasks, uow, events, clock, syllables)
+        return SubmitMarks(access, tasks, uow, events, clock, _sura_only(syllables, curriculum))
 
     @provide
     def staff_access(self, settings: Settings, annotators: AnnotatorAccess) -> StaffAccess:
@@ -370,3 +379,15 @@ def create_container(settings: Settings) -> AsyncContainer:
     return make_async_container(
         AppProvider(settings), RequestProvider(), AiogramProvider(), LearnerProvider()
     )
+
+
+def _sura_only(syllables: AyahSyllables, curriculum: Curriculum) -> AyahSyllables:
+    """Разметке — слоги только аятов сур (как до слогов на всех карточках)."""
+    texts = frozenset(
+        item.text
+        for lesson in curriculum.lessons
+        if lesson.section == "sura"
+        for item in lesson.items
+        if item.quran
+    )
+    return SuraSyllables(syllables, texts)

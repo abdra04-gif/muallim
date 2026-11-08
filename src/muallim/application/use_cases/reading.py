@@ -21,7 +21,7 @@ class HowToRead:
     catalog: FeedbackCatalog
 
     def execute(self, learner: Learner, item: LessonItem) -> CardReading | None:
-        if not item.is_practice:
+        if not item.is_checkable:
             return None
         phonemes = self.guide.phonemes(item.text)
         if not phonemes:

@@ -62,8 +62,6 @@ from muallim.presentation.telegram.callbacks import (
     Consent,
     GoItem,
     Home,
-    Lessons,
-    Listen,
     Opening,
     ShowSettings,
 )
@@ -92,7 +90,6 @@ HOW_TO_READ_LABELS = {  # подписи утвердил автор 2026-10-21
 }
 # переключатель → (значок на кнопке, умолчание)
 TOGGLES = {
-    "auto_reference": ("🔊", False),
     "daily_opening": ("🌙", True),
     "large_font": ("🔎", False),
 }
@@ -448,16 +445,6 @@ async def test_pupil_without_research_block_does_not_see_it(
     assert "Для исследования" not in result and "Попытка №" not in result
 
 
-async def test_staff_sees_research_block_even_when_switched_off(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    dp, container = app
-    teacher = await _on_home(dp, TEACHER)
-    await _set(container, TEACHER, research_block=False)
-    result = await _read_isti_adha(teacher)
-    assert "Для исследования" in result and "Попытка №" in result
-
-
 async def test_daily_opening_off_is_not_offered(app: tuple[Dispatcher, AsyncContainer]) -> None:
     """Урок 1 пройден вчера, сегодня не занимался — но начало занятия выключено."""
     dp, container = app
@@ -552,22 +539,6 @@ def _card_sent_after(person: Learner, index: int) -> bool:
     return any(CARD_MARK in _text_of(c) for c in person.tg.calls[index + 1 :])
 
 
-async def test_auto_reference_sends_reference_above_the_card(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    sounds = _sounds(ali)
-    assert len(sounds) == 1, "эталон прислан сам, без нажатия 🔊"
-    assert _card_sent_after(ali, sounds[0]), "карточка — под голосовым"
-    assert CARD_MARK in _card_caption(ali)
-    assert await _events(container, "reference_played") == [
-        {"item_id": WITH_REFERENCE, "auto": True}
-    ]
-
-
 async def test_auto_reference_off_sends_nothing(app: tuple[Dispatcher, AsyncContainer]) -> None:
     dp, container = app
     ali = await _on_home(dp)
@@ -586,33 +557,6 @@ async def test_auto_reference_on_card_without_reference_sends_nothing(
     assert _sounds(ali) == []
     assert await _events(container, "reference_played") == []
     assert CARD_MARK in _card_caption(ali)  # карточка показана
-
-
-async def test_auto_reference_switched_on_in_settings_plays_on_next_card(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    """Сквозь экран: ⚙️ → 🔊 → урок — эталон пришёл сам."""
-    dp, _ = app
-    ali = await _on_home(dp)
-    await _open_settings(ali)
-    await _press_text(ali, TOGGLES["auto_reference"][0])
-    await ali.press(Home())
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    assert len(_sounds(ali)) == 1
-
-
-async def test_card_still_comes_when_auto_reference_fails(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    """Звук не ушёл — карточка всё равно приходит: ученик не остаётся без экрана (ревью круга 3)."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    assert isinstance(ali.tg, VoiceTelegram)
-    ali.tg.fail_sound = True
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    assert _sounds(ali) == []
-    assert CARD_MARK in _card_caption(ali)
 
 
 # ---------- 4. напоминание: час и «который у тебя час?» (круг 4, В1–В3) ----------
@@ -770,37 +714,6 @@ def _deleted(person: Learner) -> set[int]:
 def _sound_ids(person: Learner) -> list[int]:
     assert isinstance(person.tg, VoiceTelegram)
     return person.tg.sound_ids
-
-
-@pytest.mark.parametrize(
-    "away", [Home(), Lessons(part=-1), ShowSettings()], ids=["home", "lessons", "settings"]
-)
-async def test_auto_reference_is_removed_when_leaving_card_for_a_menu(
-    app: tuple[Dispatcher, AsyncContainer], away: Any
-) -> None:
-    """П. 1: автоголосовое не остаётся висеть над главной, уроками и настройками."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    [sound] = _sound_ids(ali)
-    await ali.press(away)
-    assert sound in _deleted(ali)
-
-
-async def test_manual_listen_replaces_auto_reference_instead_of_adding_second(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    """П. 2: «🔊 Как правильно» при автозвуке — эталон в чате один (старый заменяется новым)."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=WITH_REFERENCE))
-    await ali.press(Listen(item_id=WITH_REFERENCE))
-    auto, manual = _sound_ids(ali)
-    assert auto in _deleted(ali), "автоэталон убран — второго эталона над карточкой нет"
-    await ali.press(Home())
-    assert manual in _deleted(ali), "и новый убирается, когда ученик уходит с карточки"
 
 
 @pytest.mark.parametrize("inner", [texts.PRIVACY_BUTTON])

@@ -18,6 +18,19 @@ class Lessons(CallbackData, prefix="lessons"):
     page: int = 0
 
 
+class PageOpen(CallbackData, prefix="pg"):
+    """Начало урока-страницы ``n``: скан страницы, что на ней, «▶️ Начать»."""
+
+    n: int
+
+
+class BookPage(CallbackData, prefix="bp"):
+    """«📄 Страница книги» из «📖 Подробнее»: картинка страницы, назад — к карточке."""
+
+    page: int
+    item_id: str
+
+
 class Deep(CallbackData, prefix="deep"):
     """«📖 Углублённо» (ADR-0082): подсказка, «Как читается», книга, видеоурок, шпаргалка."""
 
@@ -186,6 +199,12 @@ class SuraOpen(CallbackData, prefix="sura"):
 
     n: int
     m: str
+
+
+class SuraErrors(CallbackData, prefix="suraerr"):
+    """«📋 К ошибкам суры»: снова список аятов с ошибками последнего чтения суры ``n``."""
+
+    n: int
 
 
 class SuraReady(CallbackData, prefix="suraok"):

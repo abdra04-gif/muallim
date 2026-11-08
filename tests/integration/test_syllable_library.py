@@ -172,9 +172,8 @@ def _rows() -> list[dict[str, Any]]:
 
 
 def _sura_texts(curriculum: Curriculum) -> set[str]:
-    return {
-        i.text for les in curriculum.lessons if les.section == "sura" for i in les.items if i.quran
-    }
+    """Тексты всех карточек, которые читают вслух (автор 2026-11-08: слоги на всех карточках)."""
+    return {i.text for les in curriculum.lessons for i in les.items if i.is_checkable}
 
 
 def _row(text: str) -> dict[str, Any]:
@@ -197,7 +196,7 @@ def test_every_sura_ayah_of_the_program_is_in_the_file(curriculum: Curriculum) -
     assert not missing, missing
 
 
-def test_every_file_row_is_a_sura_ayah_of_the_program(curriculum: Curriculum) -> None:
+def test_every_file_row_is_a_card_of_the_program(curriculum: Curriculum) -> None:
     """Нет лишних и устаревших строк."""
     extra = [r["text"] for r in _rows() if r["text"] not in _sura_texts(curriculum)]
     assert not extra, extra

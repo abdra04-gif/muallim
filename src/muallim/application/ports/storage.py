@@ -55,3 +55,13 @@ class LessonLinks(Protocol):
     """Ссылки на видеоурок (ADR-0082): по уроку, иначе общая; нет годной ссылки — None."""
 
     def for_lesson(self, lesson_id: str) -> str | None: ...
+
+
+class BookPages(Protocol):
+    """Картинки страниц книги SRC-040 (автор 2026-11-08: «📄 Страница книги» в «Подробнее»)."""
+
+    def has(self, page: int) -> bool:
+        """Есть ли картинка страницы ``page`` (нумерация книги)."""
+
+    async def get(self, page: int) -> bytes | None:
+        """JPEG страницы; None — нет файла."""

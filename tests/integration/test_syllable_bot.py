@@ -68,7 +68,11 @@ def ayah_calls(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
     card = render.card
 
     def ayah(
-        words: Any, number: int | None, position: tuple[int, int], scale: float = 1.0
+        words: Any,
+        number: int | None,
+        position: tuple[int, int],
+        scale: float = 1.0,
+        accent: Any = (),
     ) -> bytes:
         calls.append({"words": words, "number": number, "position": position, "scale": scale})
         text = " ".join("".join(cell.text for cell in word) for word in words)
@@ -137,9 +141,11 @@ def card_calls(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     texts_: list[str] = []
     card = render.card
 
-    def spy(text: str, accent: Any, position: tuple[int, int], scale: float = 1.0) -> bytes:
+    def spy(
+        text: str, accent: Any, position: tuple[int, int], scale: float = 1.0, reading: str = ""
+    ) -> bytes:
         texts_.append(text)
-        return card(text, accent, position, scale)
+        return card(text, accent, position, scale, reading)
 
     monkeypatch.setattr(render, "card", spy)
     return texts_

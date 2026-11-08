@@ -6,7 +6,7 @@
 """
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Final
 
 from muallim.application.ports.repositories import LearnerSettingsRepository, UnitOfWork
@@ -24,7 +24,8 @@ from muallim.domain.settings import (
 
 HOW_TO_READ: Final = "how_to_read"
 # ``research_block`` не переключается: колонка осталась в БД, но ничего не значит (ADR-0082)
-TOGGLES: Final = ("auto_reference", "daily_opening", "large_font")
+# ``auto_reference`` (автозвук) убран автором 2026-11-08: колонка в БД осталась, всегда выкл.
+TOGGLES: Final = ("daily_opening", "large_font")
 REMINDER_MINUTE: Final = "reminder_minute"
 UTC_OFFSET: Final = "utc_offset_min"
 REMINDER_OFF: Final = "off"  # значение кнопки «выключить напоминание»
@@ -70,7 +71,8 @@ class GetSettings:
     settings: LearnerSettingsRepository
 
     async def execute(self, learner: Learner) -> LearnerSettings:
-        return await self.settings.get(learner.id)
+        # автозвук убран: и у тех, кто включал его раньше, звук сам не приходит
+        return replace(await self.settings.get(learner.id), auto_reference=False)
 
 
 @dataclass(frozen=True, slots=True)

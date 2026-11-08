@@ -329,3 +329,5 @@
 | Выгрузки датасета | `data/exports/<дата>/` | `manifest.jsonl` + `truth.csv`/`predictions.csv` (Iqra'Eval) + `phonemes.csv` (итог по каждому звуку для каждого разметчика, ADR-0056; `docs/data/browsing.md`) + `audio/` |
 | Журнал удалений | `data/erasures/erasures.jsonl` | вне БД (ADR-0054): строка — время UTC, `delete` / `withdraw` / `grant`, UUID ученика; пишется до commit, повторяется после восстановления |
 | Резервные копии | `data/backups/<дата>/` | `db.dump` + `audio.tar.gz` + `erasures.jsonl` + `SHA256SUMS`; неудачная — с суффиксом `-FAILED` |
+
+> **2026-11-08 (ADR-0084):** `learner_settings.auto_reference` больше не используется — всегда выкл. (удалить колонку — миграцией, решение человека); `research_block` — блока «Для исследования» нет ни у кого; при `how_to_read = spoiler` подпись под слогами на картинке видна (скрыта только при `hidden`); анкета без «Пропустить» — новые `skipped` не появляются.

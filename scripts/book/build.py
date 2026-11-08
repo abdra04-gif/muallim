@@ -9,6 +9,7 @@
 """
 
 import sys
+import unicodedata
 from pathlib import Path
 
 import yaml
@@ -23,6 +24,7 @@ from quran import Q
 from texts import ACCENT, PARTS, RULES, TITLES
 
 ROOT = Path(__file__).resolve().parents[2]
+VOWELS = set("\u064b\u064c\u064d\u064e\u064f\u0650")  # огласовки и танвин
 LINES_PER_LESSON = 8
 SRC = "SRC-040"
 
@@ -47,6 +49,40 @@ def src(page: int, line: int, note: str = "") -> dict:
     return out
 
 
+# Знаки остановки и сакта, которых нет в тексте quran_transcript (с. 64–66, 76; сверка со
+# сканом 2026-11-08): слово аята → слово со знаком; в аяте слово — один раз.
+MARKS: dict[str, list[tuple[str, str]]] = {
+    "6:36": [("يَسْمَعُونَ", "يَسْمَعُونَ ۘ")],
+    "2:37": [("عَلَيْهِ", "عَلَيْهِ ۚ")],
+    "2:5": [("رَّبِّهِمْ", "رَّبِّهِمْ ۖ")],
+    "61:13": [("قَرِيبٌۭ", "قَرِيبٌۭ ۗ")],
+    "2:2": [("رَيْبَ", "رَيْبَ ۛ"), ("فِيهِ", "فِيهِ ۛ")],
+    "18:1": [("عِوَجَا", "عِوَجَا ۜ")],
+    "36:52": [("مَّرْقَدِنَا", "مَّرْقَدِنَا ۜۗ")],
+    "69:28": [("مَالِيَهْ", "مَالِيَهْ ۜ")],
+    "75:27": [("مَنْ", "مَنْ ۜ")],
+    "83:14": [("كَلَّا", "كَلَّا ۖ"), ("بَلْ", "بَلْ ۜ")],
+}
+
+
+def with_marks(text: str, ref: str) -> str:
+    """Поставить знаки остановки/сакта из ``MARKS`` (по ссылке «сура:аят»)."""
+    words = text.split()
+    if ref in MARKS:  # фраза из середины аята (с. 49: «مِن رَّبِّهِمْ») — без знаков, как в книге
+        s, a = (int(x) for x in ref.split(":"))
+        if words[:1] != Aya(s, a).get().uthmani.split()[:1]:
+            return text
+    for word, marked in MARKS.get(ref, []):
+        same = unicodedata.normalize("NFC", word)  # порядок шадды и огласовки бывает разный
+        hits = [i for i, w in enumerate(words) if unicodedata.normalize("NFC", w) == same]
+        if not hits:  # фраза из аята без этого слова (например, «ذَٰلِكَ» из 2:2)
+            continue
+        if len(hits) > 1:
+            raise SystemExit(f"{ref}: слово {word!r} встречается {len(hits)} раз в {text!r}")
+        words[hits[0]] += marked[len(word) :].strip()  # знак слитно со словом, как в мусхафе
+    return " ".join(words)
+
+
 def quran_phrase(spec: str) -> tuple[str, str]:
     """(точный текст, «сура:аят») для записи из quran.py."""
     if spec.startswith("#"):
@@ -67,6 +103,7 @@ def sections() -> list[tuple[str, list[dict]]]:
     out: list[tuple[str, list[dict]]] = []
 
     def add(key: str, card: dict) -> None:
+        card["text"] = with_marks(card["text"], card.get("quran", ""))
         if not out or out[-1][0] != key:
             out.append((key, []))
         out[-1][1].append(card)
@@ -118,6 +155,8 @@ def sections() -> list[tuple[str, list[dict]]]:
             card = {"kind": "line", "text": text, "source": src(page, n)}
             if kind == rules.H:
                 card["note"] = "Образец"
+                if not VOWELS & set(text):  # «أ إ ؤ ئ ء»: без огласовок не прочесть — смотрим
+                    card["kind"] = "sample"
             events.append((page, n, 0, key, card))
     for (page, line), (key, phrases) in Q.items():
         for k, spec in enumerate(phrases, start=1):

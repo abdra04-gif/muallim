@@ -63,6 +63,7 @@ WRONG_BG = (255, 214, 214)
 OK = (46, 125, 50)
 WARN = (230, 160, 0)
 MUTED = (190, 182, 165)
+MUTED_INK = (95, 88, 78)  # транскрипция под строкой: темнее MUTED, чтобы читалась
 DOT = (215, 205, 180)
 
 
@@ -219,16 +220,47 @@ def _arabic_block(
 
 # ---------- экраны ----------
 def card(
-    text: str, accent: Collection[str], position: tuple[int, int], scale: float = 1.0
+    text: str,
+    accent: Collection[str],
+    position: tuple[int, int],
+    scale: float = 1.0,
+    reading: str = "",
 ) -> bytes:
     """Карточка урока: строка книги, буква урока красным, точки «шаг k из n».
 
     ``scale`` — множитель шрифта (``LARGE_SCALE`` — «Крупный шрифт»), ширина та же.
+    ``reading`` — как читается русскими буквами: строкой под арабским текстом.
     """
     color_of = dict.fromkeys(accent_clusters(text, accent), ACCENT)
-    img, draw, _ = _arabic_block(text, color_of, top=96, scale=scale)
+    img, _, _ = _arabic_block(text, color_of, top=96, scale=scale)
+    img, draw = _with_reading(img, reading)
     _dots(draw, img.height - 64, position[0], position[1])
     return _png(img)
+
+
+READING_SIZE = 36
+
+
+def _with_reading(img: Image.Image, reading: str) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+    """Картинка с транскрипцией внизу (PT Sans, по центру, переносы по словам)."""
+    if not reading:
+        return img, ImageDraw.Draw(img)
+    font = _ui_font(READING_SIZE)
+    lines: list[str] = []
+    for word in reading.split():
+        if lines and font.getlength(f"{lines[-1]} {word}") <= TEXT_WIDTH:
+            lines[-1] += f" {word}"
+        else:
+            lines.append(word)
+    step = READING_SIZE * 3 // 2
+    out = Image.new("RGB", (WIDTH, img.height + step * len(lines)), PAPER)
+    out.paste(img.crop((0, 0, WIDTH, img.height - 40)), (0, 0))
+    draw = _frame(out)
+    y = img.height - 70
+    for line in lines:
+        draw.text((WIDTH // 2, y), line, font=font, fill=MUTED_INK, anchor="mm")
+        y += step
+    return out, draw
 
 
 def result(text: str, wrong: Collection[int], score: int, unread: Collection[int] = ()) -> bytes:
@@ -311,10 +343,10 @@ def signs() -> bytes:
     return _png(img)
 
 
-def rule(text: str, scale: float = 1.0) -> bytes:
-    """Карточка правила: пример крупно, без подсветки."""
+def rule(text: str, scale: float = 1.0, reading: str = "") -> bytes:
+    """Карточка правила: пример крупно, без подсветки; ``reading`` — как читается."""
     img, _, _ = _arabic_block(text, {}, top=96, scale=scale)
-    return _png(img)
+    return _png(_with_reading(img, reading)[0])
 
 
 # ---------- экраны из макетов (ADR-0050) ----------
@@ -977,9 +1009,16 @@ def ayah_layout(words: Ayah, number: int | None, scale: float = 1.0) -> AyahLayo
     return _ayah_layout(words, number, scale)[0]
 
 
-def ayah(words: Ayah, number: int | None, position: tuple[int, int], scale: float = 1.0) -> bytes:
+def ayah(
+    words: Ayah,
+    number: int | None,
+    position: tuple[int, int],
+    scale: float = 1.0,
+    accent: Collection[str] = (),
+) -> bytes:
     """Карточка аята по слогам: клетки-слоги с подписью, номер в кружке (если ``number``),
-    точки «шаг k из n» снизу, как у ``card``. ``scale`` — «Крупный шрифт» (ADR-0061)."""
+    точки «шаг k из n» снизу, как у ``card``. ``scale`` — «Крупный шрифт» (ADR-0061).
+    ``accent`` — буквы урока: слог с ними красный, как в книге (автор 2026-11-08)."""
     layout, shaped = _ayah_layout(words, number, scale)
     s = layout.scale
     font, sound_font = _font(round(AYAH_SIZE * s)), _ui_font(round(SOUND_SIZE * s))
@@ -1000,8 +1039,9 @@ def ayah(words: Ayah, number: int | None, position: tuple[int, int], scale: floa
                 draw.rectangle(box, fill=CELL_A if k % 2 == 0 else CELL_B)
                 cx = x - cell.width / 2
                 # арабский выше середины клетки: кясра не залезает на подпись
+                ink = ACCENT if set(cell.text) & set(accent) else INK
                 draw.text(
-                    (cx, y + cell_h / 2 - 8 * s), cell.text, font=font, fill=INK, anchor="mm",
+                    (cx, y + cell_h / 2 - 8 * s), cell.text, font=font, fill=ink, anchor="mm",
                     direction="rtl",
                 )  # fmt: skip
                 draw.text(

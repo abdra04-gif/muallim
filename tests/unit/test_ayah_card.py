@@ -67,12 +67,18 @@ def drawn(monkeypatch: pytest.MonkeyPatch) -> Spy:
     spy = Spy()
 
     def ayah(
-        words: Any, number: int | None, position: tuple[int, int], scale: float = 1.0
+        words: Any,
+        number: int | None,
+        position: tuple[int, int],
+        scale: float = 1.0,
+        accent: Any = (),
     ) -> bytes:
         spy.ayah.append({"words": words, "number": number, "position": position, "scale": scale})
         return b"ayah-png"
 
-    def card(text: str, accent: Any, position: tuple[int, int], scale: float = 1.0) -> bytes:
+    def card(
+        text: str, accent: Any, position: tuple[int, int], scale: float = 1.0, reading: str = ""
+    ) -> bytes:
         spy.card.append(text)
         return b"card-png"
 
@@ -80,7 +86,7 @@ def drawn(monkeypatch: pytest.MonkeyPatch) -> Spy:
     monkeypatch.setattr(render, "ayah", ayah)
     monkeypatch.setattr(render, "card", card)
     # шаг-правило рисуется render.rule: подменяем, чтобы тест не зависел от libraqm
-    monkeypatch.setattr(render, "rule", lambda text, scale=1.0: b"rule-png")
+    monkeypatch.setattr(render, "rule", lambda text, scale=1.0, reading="": b"rule-png")
     return spy
 
 
@@ -139,18 +145,21 @@ def test_card_without_syllables_argument_keeps_old_card(curriculum: Curriculum, 
     assert drawn.ayah == [] and len(drawn.card) == 1
 
 
-def test_ayah_outside_sura_lessons_keeps_old_card(curriculum: Curriculum, drawn: Spy) -> None:
-    """أَحَدٌ (112:1) в уроке остановки: разбор есть, но урок не «sura» — прежняя карточка."""
+def test_ayah_outside_sura_lessons_has_cells_but_no_number(
+    curriculum: Curriculum, drawn: Spy
+) -> None:
+    """أَحَدٌ (112:1) в уроке остановки: слоги с подписью, как везде (автор 2026-11-08), но номер
+    аята в кружке — только в сурах."""
     text = curriculum.item(AHAD).text
     _card(curriculum, AHAD, syllables=_port((text,)))
-    assert drawn.ayah == [] and drawn.card == [text]
+    assert drawn.card == [] and [a["number"] for a in drawn.ayah] == [None]
 
 
 def test_rule_step_of_sura_lesson_is_not_an_ayah(curriculum: Curriculum, drawn: Spy) -> None:
-    """Правило «سُورَة» (без quran) — не аят, даже если текст знаком библиотеке."""
+    """Правило «سُورَة» (без quran) — не аят: слоги с подписью, но без номера аята."""
     text = curriculum.item(FATIHA_RULE).text
     _card(curriculum, FATIHA_RULE, syllables=_port((text,)))
-    assert drawn.ayah == []
+    assert [a["number"] for a in drawn.ayah] == [None]
 
 
 def test_how_to_read_leaves_sura_card_for_deep_screen(curriculum: Curriculum, drawn: Spy) -> None:

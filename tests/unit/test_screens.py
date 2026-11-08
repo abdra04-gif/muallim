@@ -90,10 +90,10 @@ def test_part_screen_shows_lesson_status_and_paginates(curriculum: Curriculum) -
     )
     s = screens.lessons(curriculum, p, part=1, page=0)
     labels = [t for t, _ in _buttons(s.keyboard)]
-    assert any(t.startswith("✅") and "ر" in t for t in labels)
-    assert any(t.startswith("🟡") and "ز" in t for t in labels)
+    # урок = страница (автор 2026-11-08): ر пройдена, ز начата — страница 11 начата
+    assert any(t.startswith("🟡") and "Стр. 11" in t and "ر ز م" in t for t in labels)
     assert (
-        sum(1 for _, d in _buttons(s.keyboard) if d.startswith("go:")) == screens.LESSONS_PER_PAGE
+        sum(1 for _, d in _buttons(s.keyboard) if d.startswith("pg:")) == screens.LESSONS_PER_PAGE
     )
     assert ("▶️", cb.Lessons(part=1, page=1).pack()) in _buttons(s.keyboard)
     assert ("◀️ Части", cb.Lessons(part=-1).pack()) in _buttons(s.keyboard)
@@ -101,36 +101,39 @@ def test_part_screen_shows_lesson_status_and_paginates(curriculum: Curriculum) -
     assert any("ظ" in t for t, _ in _buttons(last.keyboard))
 
 
-def test_card_next_on_last_item_opens_next_lesson(curriculum: Curriculum) -> None:
-    lesson = _letters(curriculum)[1]
-    nxt = curriculum.next_lesson(lesson.id)
-    assert nxt is not None
-    s = screens.card(curriculum, lesson.items[-1], has_audio=False, is_teacher=False)
-    label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)  # последний шаг — следующий урок
-    assert (label, cb.GoItem(item_id=nxt.items[0].id).pack()) in _buttons(s.keyboard)
-    assert _has_home(s.keyboard)
-    assert "с. 11" in screens.deep(curriculum, lesson.items[-1]).caption  # книга — в «Углублённо»
-
-
-def test_card_offers_previous_lesson(curriculum: Curriculum) -> None:
-    lesson = _letters(curriculum)[1]
-    prev = curriculum.previous_lesson(lesson.id)
-    assert prev is not None
-    s = screens.card(curriculum, lesson.items[0], has_audio=False, is_teacher=False)  # FR-50
-    label = f"⬅️ Предыдущий урок: {prev.title}"
-    assert (label, cb.GoItem(item_id=prev.items[0].id).pack()) in _buttons(s.keyboard)
-
-
 def test_first_card_has_no_previous_lesson(curriculum: Curriculum) -> None:
     s = screens.card(curriculum, curriculum.first_item(), has_audio=False, is_teacher=False)
     assert not any(t.startswith("⬅️ Предыдущий урок") for t, _ in _buttons(s.keyboard))
 
 
-def test_rule_card_explains_without_voice_prompt(curriculum: Curriculum) -> None:
-    rule = next(i for les in curriculum.lessons for i in les.items if i.kind is ItemKind.RULE)
+def test_rule_card_without_readable_text_asks_no_voice(curriculum: Curriculum) -> None:
+    """Правило буквы «ر» прочесть нельзя — голосовое не просим, «Прочитал — нажми» нет."""
+    rule = curriculum.item("L004-01")
     s = screens.card(curriculum, rule, has_audio=False, is_teacher=False)
-    assert rule.name in s.caption and "голосовое" not in s.caption
-    assert "Правило" in s.caption
+    assert rule.name in s.caption and "Правило" in s.caption
+    assert "голосовое" not in s.caption and "Прочитал" not in s.caption
+
+
+def test_rule_card_with_readable_text_asks_voice(curriculum: Curriculum) -> None:
+    """Автор 2026-11-08: прочитал правило — сразу проверь (огласованный текст правила)."""
+    rule = curriculum.item("L038-01")  # رَبَّ
+    assert rule.is_checkable
+    s = screens.card(curriculum, rule, has_audio=False, is_teacher=False)
+    assert texts.CARD_READ in s.caption
+
+
+def test_long_rule_shows_first_paragraph_and_points_to_more(curriculum: Curriculum) -> None:
+    rule = curriculum.item("L003-02")
+    first, rest = rule.tip.split("\n", maxsplit=1)
+    s = screens.card(curriculum, rule, has_audio=False, is_teacher=False)
+    assert first.split(".")[0] in s.caption and rest.split(".")[0] not in s.caption
+    assert texts.CARD_RULE_MORE in s.caption
+
+
+def test_alphabet_names_start_left_to_right(curriculum: Curriculum) -> None:
+    item = next(i for les in curriculum.lessons for i in les.items if i.kind is ItemKind.ALPHABET)
+    s = screens.card(curriculum, item, has_audio=False, is_teacher=False)
+    assert "\u200eا — элиф" in s.caption
 
 
 def test_alphabet_card_shows_names(curriculum: Curriculum) -> None:
@@ -203,20 +206,6 @@ def _result(c: Curriculum, item_id: str, heard: str, completed: bool) -> Recitat
         item, attempt, (Explanation("Ошибка"),) if a.errors else (), "", c.next_item(item.id),
         lesson_completed=completed,
     )  # fmt: skip
-
-
-def test_result_celebrates_completed_lesson_and_offers_next(curriculum: Curriculum) -> None:
-    lesson = _letters(curriculum)[1]
-    nxt = curriculum.next_lesson(lesson.id)
-    assert nxt is not None
-    last = lesson.items[-1]
-    s = screens.result(curriculum, _result(curriculum, last.id, last.text, True), has_audio=False)
-    assert "Урок пройден" in s.caption
-    assert any(
-        "Следующий урок" in t and d == cb.GoItem(item_id=nxt.items[0].id).pack()
-        for t, d in _buttons(s.keyboard)
-    )
-    assert _has_home(s.keyboard)
 
 
 def test_result_of_later_step_has_no_previous_lesson(curriculum: Curriculum) -> None:
@@ -402,8 +391,8 @@ def test_result_caption_fits_telegram_photo_limit(
 def test_syllable_card_says_how_to_read_and_offers_listen(curriculum: Curriculum) -> None:
     item = next(i for les in _letters(curriculum) for i in les.items if i.kind is ItemKind.SYLLABLE)
     s = screens.card(curriculum, item, has_audio=True, is_teacher=False)
-    assert item.sound in s.caption and "послушай" in s.caption
-    assert item.tip not in s.caption  # подсказка — в «Углублённо»
+    assert item.sound in s.caption and texts.CARD_READ_SYLLABLE in s.caption
+    assert item.tip not in s.caption  # подсказка — в «Подробнее»
     assert (texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()) in _buttons(s.keyboard)
 
 

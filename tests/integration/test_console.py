@@ -31,7 +31,7 @@ async def test_button_is_pressed_by_its_label() -> None:
     out = await console.run_console(["/start", texts.CONSENT_YES_BUTTON])
     assert _plain(texts.CONSENT_SAVED_YES) in out
     assert _plain(texts.PROFILE_NAME).splitlines()[-1] in out  # дальше — анкета, первый вопрос
-    assert f"[{texts.PROFILE_SKIP}]" in out
+    assert "Пропустить" not in out  # анкету проходят все (автор 2026-11-08)
 
 
 async def test_unknown_label_is_sent_as_text() -> None:

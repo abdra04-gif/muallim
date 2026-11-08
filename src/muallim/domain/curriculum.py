@@ -5,6 +5,7 @@
 чтобы любую строку в боте можно было проследить до книги (NFR-TR-01).
 """
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -19,6 +20,7 @@ class ItemKind(StrEnum):
     LINE = "line"  # печатная строка упражнения из книги (слоги и слова), как есть
     ALPHABET = "alphabet"  # строка таблицы алфавита (с. 10): знакомство, без проверки чтения
     RULE = "rule"  # правило своими словами перед разделом (name — заголовок, tip — объяснение)
+    SAMPLE = "sample"  # образец написания без огласовок (с. 35, 37): только посмотреть
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +32,10 @@ class SourceRef:
     line: int | None = None
     note: str = ""
     verified: bool = False  # сверено человеком с печатным изданием
+
+
+# огласовки и танвин без сукуна: «مْ» само по себе не прочесть
+_VOWEL_MARKS = frozenset("\u064b\u064c\u064d\u064e\u064f\u0650")
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,7 +54,20 @@ class LessonItem:
     @property
     def is_practice(self) -> bool:
         """Карточку читают вслух и проверяют; таблицу алфавита — только смотрят."""
-        return self.kind not in (ItemKind.ALPHABET, ItemKind.RULE)
+        return self.kind not in (ItemKind.ALPHABET, ItemKind.RULE, ItemKind.SAMPLE)
+
+    @property
+    def is_checkable(self) -> bool:
+        """Голосовое проверяем: карточка чтения или правило, чей арабский текст огласован
+        (автор 2026-11-08: прочитал правило — сразу проверь). В прогресс урока правило не входит."""
+        if self.is_practice:
+            return True
+        words = [w for w in self.text.split() if any("\u0621" <= ch <= "\u064a" for ch in w)]
+        return (
+            self.kind is ItemKind.RULE
+            and bool(words)
+            and all(any(ch in _VOWEL_MARKS for ch in w) for w in words)
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,6 +106,35 @@ class Lexicon:
 
 
 @dataclass(frozen=True, slots=True)
+class Page:
+    """Страница книги — урок для ученика (автор 2026-11-08): карточки в порядке страницы.
+
+    ``lessons`` — разделы программы, чьи карточки стоят на странице (прогресс и закрепление
+    считаются по ним, как раньше). Страница только с правилом (с. 46, 50, 69) — без карточек."""
+
+    number: int
+    items: tuple[LessonItem, ...]
+    lessons: tuple["Lesson", ...]
+
+
+_TITLE_NUMBER = re.compile(r"^\d+\.\s*")
+_TITLE_PART = re.compile(r"\s*\(\d+/\d+\)$")
+
+
+def unit_title(lesson: "Lesson") -> str:
+    """Название раздела без номера урока и «(1/4)»: «4. ر · Ра» → «ر · Ра»."""
+    return _TITLE_PART.sub("", _TITLE_NUMBER.sub("", lesson.title))
+
+
+def page_title(page: Page) -> str:
+    """Что на странице: буквы — «ر ز م», иначе разделы через запятую."""
+    if page.lessons and all(les.section == "letter" for les in page.lessons):
+        return " ".join(unit_title(les).split(" · ")[0] for les in page.lessons)
+    names = list(dict.fromkeys(unit_title(les) for les in page.lessons))
+    return ", ".join(names)
+
+
+@dataclass(frozen=True, slots=True)
 class Curriculum:
     id: str
     version: str  # меняется при любой правке контента; пишется в каждую попытку
@@ -95,6 +143,7 @@ class Curriculum:
     lexicon: Lexicon
     _items: dict[str, tuple[Lesson, int]] = field(init=False, repr=False, compare=False)
     _order: tuple[LessonItem, ...] = field(init=False, repr=False, compare=False)
+    _pages: tuple[Page, ...] = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         index: dict[str, tuple[Lesson, int]] = {}
@@ -105,6 +154,25 @@ class Curriculum:
                 index[item.id] = (lesson, i)
         object.__setattr__(self, "_items", index)
         object.__setattr__(self, "_order", tuple(i for les in self.lessons for i in les.items))
+        object.__setattr__(self, "_pages", _build_pages(self.lessons, self._order))
+
+    def pages(self) -> tuple[Page, ...]:
+        """Страницы книги подряд, от первой до последней; страница без карточек — пустая."""
+        return self._pages
+
+    def page(self, number: int) -> Page:
+        for page in self._pages:
+            if page.number == number:
+                return page
+        raise KeyError(number)
+
+    def page_of(self, item_id: str) -> tuple[Page, int]:
+        """Страница карточки и её номер на странице (с 0)."""
+        item = self.item(item_id)
+        for page in self._pages:
+            if item in page.items:
+                return page, page.items.index(item)
+        raise KeyError(item_id)
 
     def lesson(self, lesson_id: str) -> Lesson:
         for lesson in self.lessons:
@@ -177,3 +245,23 @@ def lesson_letter(lesson: Lesson) -> str | None:
     if not head:
         return None
     return "ء" if head in HAMZA_FORMS else head
+
+
+def _build_pages(lessons: tuple["Lesson", ...], order: tuple[LessonItem, ...]) -> tuple[Page, ...]:
+    """Карточки по страницам книги (``source.page``); без страницы — на странице предыдущей."""
+    owner = {item.id: les for les in lessons for item in les.items}
+    by_page: dict[int, list[LessonItem]] = {}
+    current: int | None = None
+    for item in order:
+        if item.source is not None and item.source.page is not None:
+            current = item.source.page
+        if current is not None:
+            by_page.setdefault(current, []).append(item)
+    if not by_page:
+        return ()
+    out = []
+    for number in range(min(by_page), max(by_page) + 1):
+        items = tuple(by_page.get(number, ()))
+        units = tuple(dict.fromkeys(owner[i.id] for i in items))
+        out.append(Page(number, items, units))
+    return tuple(out)

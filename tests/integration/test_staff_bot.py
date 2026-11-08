@@ -80,13 +80,6 @@ def _result_text(person: Learner) -> str:
     return "\n".join(shown[start + 1 :])
 
 
-async def test_teacher_sees_research_block(app: tuple[Dispatcher, AsyncContainer]) -> None:
-    dp, _ = app
-    result = _result_text(await _read_isti_adha(dp, TEACHER))
-    assert texts.VERDICT_EXCELLENT in result
-    assert "Для исследования" in result and "Попытка №" in result
-
-
 async def test_pupil_does_not_see_research_block(app: tuple[Dispatcher, AsyncContainer]) -> None:
     dp, _ = app
     result = _result_text(await _read_isti_adha(dp, PUPIL))

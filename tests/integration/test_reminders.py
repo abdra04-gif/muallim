@@ -60,7 +60,7 @@ from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
 from muallim.infrastructure.db.repositories.settings import SqlLearnerSettingsRepository
 from muallim.infrastructure.db.tables import interaction_events, metadata
 from muallim.infrastructure.db.views import create_views
-from muallim.presentation.telegram import texts
+from muallim.presentation.telegram import screens, texts
 from muallim.presentation.telegram.callbacks import GoItem
 from muallim.presentation.telegram.handlers import router
 from tests.integration.test_bot_flow import FakeTelegram, Learner
@@ -229,7 +229,8 @@ async def test_due_learner_gets_reminder_with_continue_button(
     markup = message.reply_markup
     assert markup is not None and hasattr(markup, "inline_keyboard")
     buttons = [b for row in markup.inline_keyboard for b in row]
-    title = (await container.get(Curriculum)).locate(RESUME)[0].title
+    cur = await container.get(Curriculum)
+    title = screens.where(cur, cur.item(RESUME))  # «Стр. N · раздел»
     assert [(b.text, b.callback_data) for b in buttons] == [
         (texts.CONTINUE_BUTTON.format(title=title), GoItem(item_id=RESUME).pack())
     ]

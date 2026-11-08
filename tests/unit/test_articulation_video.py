@@ -152,20 +152,6 @@ def _card(c: Curriculum, item_id: str, *, has_audio: bool = True, **kw: Any) -> 
     return screens.card(c, c.item(item_id), has_audio, False, **kw)
 
 
-@pytest.mark.parametrize("item_id", [RA, RA_TRIPLE, "L003-04", "L005-03"])
-def test_card_with_video_has_video_button_instead_of_listen(
-    curriculum: Curriculum, item_id: str
-) -> None:
-    """Звук «как правильно» есть, но у текста карточки есть ролик — только ролик."""
-    videos = _videos()
-    s = _card(curriculum, item_id, videos=videos)
-    assert _listen(s.keyboard) == []
-    assert texts.LISTEN_BUTTON not in [t for t, _ in _buttons(s.keyboard)]
-    assert _watched(s.keyboard) == [videos.for_text(curriculum.item(item_id).text)]
-    video = [t for t, d in _buttons(s.keyboard) if d in _video_datas(s.keyboard)]
-    assert video == [texts.VIDEO_BUTTON]
-
-
 def test_card_with_video_but_without_reference_sound_has_video_button(
     curriculum: Curriculum,
 ) -> None:
@@ -219,19 +205,6 @@ def _shown(c: Curriculum, renderer: FeedbackRenderer, item_id: str, heard: str,
     r = _result(c, renderer, item_id, heard)
     assert r.breakdown.groups, "оценка нашла ошибку"
     return screens.result(c, r, True, videos=videos or _videos())
-
-
-def test_result_with_video_offers_video_instead_of_listen(
-    curriculum: Curriculum, renderer: FeedbackRenderer
-) -> None:
-    """После попытки, где раньше был 🔊 «как правильно», — ролик (ошибок нет)."""
-    videos = _videos()
-    s = screens.result(curriculum, _result(curriculum, renderer, RA), True, videos=videos)
-    assert _listen(s.keyboard) == []
-    assert _watched(s.keyboard) == [videos.for_text("رَ")]
-    [data] = _video_datas(s.keyboard)
-    assert (texts.VIDEO_BUTTON, data) in _buttons(s.keyboard)
-    assert "after" in data
 
 
 def test_result_without_video_keeps_listen(

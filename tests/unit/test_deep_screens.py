@@ -17,15 +17,20 @@ from aiogram.types import InlineKeyboardMarkup
 from muallim.application.feedback import FeedbackRenderer
 from muallim.application.use_cases.reading import CardReading
 from muallim.application.use_cases.settings import TOGGLES, parse
-from muallim.domain.curriculum import Curriculum, ItemKind, LessonItem, letters_before
+from muallim.domain.curriculum import (
+    Curriculum,
+    ItemKind,
+    LessonItem,
+    letters_before,
+    unit_title,
+)
 from muallim.domain.settings import HowToRead, LearnerSettings
 from muallim.domain.sura import find_sura
 from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, screens, texts
-from tests.fakes import InMemoryVideos
 from tests.unit.test_screens import _head, _letters, _progress, _result, _with_errors
 
-DEEP = "📖 Углублённо"
+DEEP = texts.DEEP_BUTTON
 HOME = "🏠"
 MORE = "⋯ Ещё"
 YOUTUBE = "🎥 Видеоурок на YouTube"
@@ -83,60 +88,12 @@ def test_card_keeps_listen_caption_for_plan_listen() -> None:
     assert "«Как правильно»" in texts.PLAN_LISTEN
 
 
-def test_card_with_video_puts_video_instead_of_listen_next_to_deep(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    item = _middle_step(curriculum)
-    videos = InMemoryVideos({item.text: "k1"})
-    s = screens.card(curriculum, item, has_audio=True, is_teacher=False, videos=videos)
-    watch = cb.Watch(v="k1", src="card", item_id=item.id).pack()
-    assert _rows(s.keyboard)[0] == [
-        ("🎬 Как произносить", watch),
-        (DEEP, cb.Deep(item_id=item.id).pack()),
-    ]
-    assert texts.LISTEN_BUTTON not in _labels(s.keyboard)
-
-
 def test_card_without_sound_and_video_has_only_deep_in_first_row(
     curriculum: Curriculum, captions_only: None
 ) -> None:
     item = _middle_step(curriculum)
     s = screens.card(curriculum, item, has_audio=False, is_teacher=False)
     assert _rows(s.keyboard)[0] == [(DEEP, cb.Deep(item_id=item.id).pack())]
-
-
-def test_card_second_row_is_back_next_home(curriculum: Curriculum, captions_only: None) -> None:
-    item = _middle_step(curriculum)
-    previous = curriculum.previous_item(item.id)
-    following = curriculum.next_item(item.id)
-    assert previous is not None and following is not None
-    s = screens.card(curriculum, item, has_audio=True, is_teacher=False)
-    assert _rows(s.keyboard)[1] == [
-        (texts.BACK_BUTTON, cb.GoItem(item_id=previous.id).pack()),
-        (texts.NEXT_BUTTON, cb.GoItem(item_id=following.id).pack()),
-        (HOME, cb.Home().pack()),
-    ]
-    assert texts.BACK_BUTTON == "◀️ Назад"
-
-
-def test_card_first_step_has_no_back(curriculum: Curriculum, captions_only: None) -> None:
-    lesson = _letters(curriculum)[1]
-    s = screens.card(curriculum, lesson.items[0], has_audio=True, is_teacher=False)
-    assert texts.BACK_BUTTON not in _labels(s.keyboard)
-    assert [t for t, _ in _row_with(s.keyboard, texts.NEXT_BUTTON)] == [texts.NEXT_BUTTON, HOME]
-
-
-def test_card_last_step_next_lesson_is_its_own_row(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    lesson = _letters(curriculum)[1]
-    nxt = curriculum.next_lesson(lesson.id)
-    assert nxt is not None
-    s = screens.card(curriculum, lesson.items[-1], has_audio=True, is_teacher=False)
-    label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=nxt.items[0].id).pack())]
-    assert texts.NEXT_BUTTON not in _labels(s.keyboard)
-    assert texts.BACK_BUTTON in _labels(s.keyboard) and HOME in _labels(s.keyboard)
 
 
 def test_card_drops_lessons_and_sheet_buttons(curriculum: Curriculum, captions_only: None) -> None:
@@ -160,7 +117,7 @@ def test_sura_card_keeps_whole_sura_and_memory_row(
         (texts.WHOLE_SURA_BUTTON, cb.SuraOpen(n=sura.number, m="t").pack()),
         (texts.MEMORY_BUTTON, cb.SuraOpen(n=sura.number, m="m").pack()),
     ] in _rows(s.keyboard)
-    assert texts.WHOLE_SURA_BUTTON == "📖 Вся сура" and texts.MEMORY_BUTTON == "🎯 Наизусть"
+    assert texts.WHOLE_SURA_BUTTON == "📜 Вся сура" and texts.MEMORY_BUTTON == "🎯 Наизусть"
 
 
 def test_teacher_still_sees_record_button_on_new_card(
@@ -231,7 +188,7 @@ def test_card_keeps_head_letter_line_and_quran_line(
     lesson = _letters(curriculum)[1]
     head = _head(lesson)
     s = screens.card(curriculum, head, has_audio=True, is_teacher=False)
-    assert lesson.title in s.caption and "шаг" in s.caption
+    assert unit_title(lesson) in s.caption and "шаг" in s.caption
     assert head.name in s.caption and head.sound in s.caption
     quran = next(i for les in curriculum.lessons for i in les.items if i.quran == "112:1")
     assert "Коран 112:1" in screens.card(curriculum, quran, True, False).caption
@@ -386,91 +343,10 @@ def test_result_ok_has_no_deep_button(curriculum: Curriculum, captions_only: Non
     assert rows[0] == [(texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack())]
 
 
-def test_result_ok_layout_listen_nav_dispute_home(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    item = _middle_step(curriculum)
-    previous = curriculum.previous_item(item.id)
-    following = curriculum.next_item(item.id)
-    assert previous is not None and following is not None
-    r = _result(curriculum, item.id, item.text, False)
-    s = screens.result(curriculum, r, has_audio=True)
-    assert _rows(s.keyboard) == [
-        [(texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack())],
-        [
-            ("◀️ Назад", cb.GoItem(item_id=previous.id).pack()),
-            ("🔁 Ещё раз", cb.GoItem(item_id=item.id).pack()),
-            ("▶️ Дальше", cb.GoItem(item_id=following.id).pack()),
-        ],
-        [
-            ("🚩 Бот ошибся", cb.Dispute(attempt=r.attempt.id.hex).pack()),
-            (HOME, cb.Home().pack()),
-        ],
-    ]
-
-
-def test_result_with_errors_has_deep_next_to_listen(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    item = _middle_step(curriculum)
-    s = _wrong(curriculum, item)
-    assert _rows(s.keyboard)[0] == [
-        (texts.LISTEN_BUTTON, cb.Listen(item_id=item.id).pack()),
-        (DEEP, cb.Deep(item_id=item.id).pack()),
-    ]
-    assert [t for t, _ in _rows(s.keyboard)[-1]] == ["🚩 Бот ошибся", HOME]
-
-
-def test_result_with_video_replaces_listen_with_video_button(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    """ADR-0074: где есть ролик — «🎬 Как произносить» вместо «🔊»; ошибка — плюс «Углублённо»."""
-    item = _middle_step(curriculum)
-    videos = InMemoryVideos({item.text: "k1"})
-    watch = cb.Watch(v="k1", src="after", item_id=item.id).pack()
-    ok = _ok(curriculum, item, videos=videos)
-    assert _rows(ok.keyboard)[0] == [("🎬 Как произносить", watch)]
-    wrong = _wrong(curriculum, item, videos=videos)
-    assert _rows(wrong.keyboard)[0] == [
-        ("🎬 Как произносить", watch),
-        (DEEP, cb.Deep(item_id=item.id).pack()),
-    ]
-    assert texts.LISTEN_BUTTON not in _labels(wrong.keyboard)
-
-
 def test_result_drops_lessons_button(curriculum: Curriculum, captions_only: None) -> None:
     item = _middle_step(curriculum)
     for s in (_ok(curriculum, item), _wrong(curriculum, item)):
         assert texts.LESSONS_BUTTON not in _labels(s.keyboard)
-
-
-def test_result_keeps_next_lesson_and_share_rows(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    lesson = _letters(curriculum)[1]
-    nxt = curriculum.next_lesson(lesson.id)
-    assert nxt is not None
-    last = lesson.items[-1]
-    s = screens.result(curriculum, _result(curriculum, last.id, last.text, True), True)
-    label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=nxt.items[0].id).pack())]
-    assert _row_with(s.keyboard, texts.SHARE_BUTTON) == [
-        (texts.SHARE_BUTTON, cb.ShareLesson(lesson=lesson.id).pack())
-    ]
-    assert DEEP not in _labels(s.keyboard)
-
-
-def test_result_keeps_previous_lesson_row_on_first_step(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    lesson = _letters(curriculum)[1]
-    prev = curriculum.previous_lesson(lesson.id)
-    assert prev is not None
-    first = lesson.items[0]
-    s = _ok(curriculum, first)
-    label = texts.PREVIOUS_LESSON_BUTTON.format(title=prev.title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=prev.items[0].id).pack())]
-    assert texts.BACK_BUTTON not in _labels(s.keyboard)
 
 
 def test_result_keeps_resume_row_after_basmala(curriculum: Curriculum, captions_only: None) -> None:
@@ -562,8 +438,8 @@ def test_home_text_is_short(curriculum: Curriculum, captions_only: None) -> None
     s = screens.home(curriculum, p)
     lines = [ln for ln in s.caption.splitlines() if ln.strip()]
     assert len(lines) <= 4, lines
-    assert str(p.done_lessons) in s.caption and str(p.practice_lessons) in s.caption
-    assert letters[2].title in s.caption  # «Дальше: …» — название следующего урока
+    assert "пройдено страниц" in s.caption
+    assert unit_title(letters[2]) in s.caption  # «Дальше: Стр. 11 · ز · Зэй»
     assert "сегодня" not in s.caption.lower() and "▰" not in s.caption and "▱" not in s.caption
 
 
@@ -585,7 +461,8 @@ def test_lessons_from_home_opens_current_part(curriculum: Curriculum, captions_o
     assert target.part >= 0
     assert lesson in curriculum.parts()[target.part][1]
     page = screens.lessons(curriculum, p, target.part, target.page)
-    assert any(lesson.title in t for t in _labels(page.keyboard))  # урок ученика виден
+    number = curriculum.page_of(item.id)[0].number
+    assert any(f"Стр. {number} " in t for t in _labels(page.keyboard))  # страница видна
 
 
 def test_parts_button_still_lists_parts(curriculum: Curriculum, captions_only: None) -> None:
@@ -681,30 +558,6 @@ def test_wrong_result_without_sound_has_only_deep_in_first_row(
     assert r.attempt.assessment.errors
     s = screens.result(curriculum, r, has_audio=False)
     assert _rows(s.keyboard)[0] == [(DEEP, cb.Deep(item_id=item.id).pack())]
-
-
-def test_wrong_result_on_last_step_has_next_lesson_row_and_deep(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    item = _last_of_lesson(curriculum)
-    nxt = curriculum.next_lesson(curriculum.locate(item.id)[0].id)
-    assert nxt is not None
-    s = _wrong(curriculum, item)
-    label = texts.NEXT_LESSON_BUTTON.format(title=nxt.title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=nxt.items[0].id).pack())]
-    assert (DEEP, cb.Deep(item_id=item.id).pack()) in _rows(s.keyboard)[0]
-
-
-def test_wrong_result_on_first_step_has_previous_lesson_and_no_back(
-    curriculum: Curriculum, captions_only: None
-) -> None:
-    lesson = _letters(curriculum)[1]
-    prev = curriculum.previous_lesson(lesson.id)
-    assert prev is not None
-    s = _wrong(curriculum, lesson.items[0])
-    label = texts.PREVIOUS_LESSON_BUTTON.format(title=prev.title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=prev.items[0].id).pack())]
-    assert texts.BACK_BUTTON not in _labels(s.keyboard)
 
 
 def test_wrong_result_keeps_resume_row(curriculum: Curriculum, captions_only: None) -> None:

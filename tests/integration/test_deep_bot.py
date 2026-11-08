@@ -29,7 +29,6 @@ from tests.integration.test_bot_flow import Learner
 from tests.integration.test_settings_bot import (
     ISTI_ADHA,
     PUPIL,
-    TEACHER,
     WITH_REFERENCE,
     _buttons,
     _events,
@@ -43,7 +42,7 @@ app = settings_bot.app  # окружение бота — та же фиксту
 
 pytestmark = pytest.mark.integration
 
-DEEP = "📖 Углублённо"
+DEEP = "📖 Подробнее"
 STUB = "https://www.youtube.com/"
 MIM_STEP = "L006-03"
 
@@ -217,13 +216,6 @@ async def test_old_help_privacy_me_buttons_still_answer(
         if isinstance(data, cb.Me):
             assert any(learner.pseudonym in t for t in shown)
         await ali.press(cb.Home())
-
-
-async def test_staff_still_sees_research_block(app: tuple[Dispatcher, AsyncContainer]) -> None:
-    dp, _ = app
-    teacher = await _on_home(dp, TEACHER)
-    result = await _read_isti_adha(teacher)
-    assert "Для исследования" in result and "Попытка №" in result
 
 
 async def test_pupil_does_not_see_research_block_even_if_old_flag_is_set(

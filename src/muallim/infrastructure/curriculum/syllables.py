@@ -37,6 +37,18 @@ def _ayah(row: Mapping[str, Any]) -> Ayah | None:
 
 
 @dataclass(frozen=True, slots=True)
+class SuraSyllables(AyahSyllables):
+    """Слоги только аятов уроков «Суры» — для разметки: клетки строк из книги в ней остаются
+    буквами, как до слогов на всех карточках (автор 2026-11-08: разметку пока не трогать)."""
+
+    inner: AyahSyllables
+    texts: frozenset[str]
+
+    def for_text(self, text: str) -> Ayah | None:
+        return self.inner.for_text(text) if text in self.texts else None
+
+
+@dataclass(frozen=True, slots=True)
 class SyllableLibrary(AyahSyllables):
     ayat: Mapping[str, Ayah] = field(default_factory=dict)  # текст пункта → слова
 

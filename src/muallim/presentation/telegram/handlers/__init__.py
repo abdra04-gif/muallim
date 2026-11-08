@@ -10,6 +10,7 @@ from typing import Final
 from aiogram import Router
 
 from muallim.presentation.telegram.handlers import (
+    book,
     commands,
     daily,
     data,
@@ -27,6 +28,7 @@ router: Final = Router(name="learner")
 router.include_routers(
     commands.router,
     navigation.router,
+    book.router,
     quiz.router,
     letters.router,
     daily.router,

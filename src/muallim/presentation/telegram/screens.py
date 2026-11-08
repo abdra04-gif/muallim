@@ -12,6 +12,7 @@ from html import escape
 from typing import Final
 
 from aiogram.enums import ButtonStyle
+from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -31,8 +32,11 @@ from muallim.domain.curriculum import (
     ItemKind,
     Lesson,
     LessonItem,
+    Page,
     lesson_letter,
     letters_before,
+    page_title,
+    unit_title,
 )
 from muallim.domain.learner import Question
 from muallim.domain.phonetics import Zone, articulation_zone
@@ -50,6 +54,7 @@ from muallim.domain.syllables import ayah_number
 from muallim.presentation.telegram import keyboards, render, texts
 from muallim.presentation.telegram import views as views  # noqa: PLC0414  (screens.views — для тестов)
 from muallim.presentation.telegram.callbacks import (
+    BookPage,
     ChangeSetting,
     Consent,
     Deep,
@@ -64,6 +69,7 @@ from muallim.presentation.telegram.callbacks import (
     More,
     Noop,
     Opening,
+    PageOpen,
     Privacy,
     Quiz,
     QuizAnswer,
@@ -73,6 +79,7 @@ from muallim.presentation.telegram.callbacks import (
     ShowProgress,
     ShowSettings,
     Signs,
+    SuraErrors,
     SuraList,
     SuraOpen,
     SuraReady,
@@ -166,23 +173,26 @@ _PROFILE_TEXTS: Final = {
 }
 
 
-def profile_question(question: Question, telegram_name: str = "") -> Screen:
+def profile_question(question: Question) -> Screen:
     """Один экран анкеты (FR-65); имя из Telegram предлагается кнопкой только на первом."""
-    return Screen(_PROFILE_TEXTS[question], keyboards.profile_question(question, telegram_name))
+    return Screen(_PROFILE_TEXTS[question], keyboards.profile_question(question))
 
 
 def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> Screen:
     item = progress.continue_item or curriculum.first_item()
     lesson, _ = curriculum.locate(item.id)
     fresh = progress.attempts_total == 0 and item == curriculum.first_item()
+    counted = [pg for pg in curriculum.pages() if any(les.practice_items for les in pg.lessons)]
     caption = texts.HOME.format(
         streak=_days(progress.streak_days),
-        done=progress.done_lessons,
-        total=progress.practice_lessons,
-        next_title=escape(lesson.title),
+        done=sum(_page_icon(progress, pg) == "✅" for pg in counted),
+        total=len(counted),
+        next_title=escape(where(curriculum, item)),
     )
     kb = InlineKeyboardBuilder()
-    label = texts.START_BUTTON if fresh else texts.CONTINUE_BUTTON.format(title=lesson.title)
+    label = (
+        texts.START_BUTTON if fresh else texts.CONTINUE_BUTTON.format(title=where(curriculum, item))
+    )
     kb.button(text=label, callback_data=GoItem(item_id=item.id))
     kb.button(text=texts.LESSONS_BUTTON, callback_data=_lessons_of(curriculum, lesson))
     quiz_label = (
@@ -195,12 +205,19 @@ def home(curriculum: Curriculum, progress: Progress, quiz_waiting: int = 0) -> S
     return Screen(caption, kb.as_markup(), image, key)
 
 
+def where(curriculum: Curriculum, item: LessonItem) -> str:
+    """Где ученик: «Стр. 11 · ر · Ра» — страница книги и раздел."""
+    page, _ = curriculum.page_of(item.id)
+    unit = unit_title(curriculum.locate(item.id)[0])
+    return texts.CARD_PLACE.format(page=page.number, unit=unit)
+
+
 def voice_on_home(curriculum: Curriculum, progress: Progress) -> Screen:
     """Голосовое, когда урок не открыт: попытку не пишем, кнопка — на карточку курсора."""
     item = progress.continue_item or curriculum.first_item()
     kb = InlineKeyboardBuilder()
     kb.button(
-        text=texts.CONTINUE_BUTTON.format(title=curriculum.locate(item.id)[0].title),
+        text=texts.CONTINUE_BUTTON.format(title=where(curriculum, item)),
         callback_data=GoItem(item_id=item.id),
     )
     return Screen(texts.VOICE_ON_HOME, kb.as_markup())
@@ -228,19 +245,20 @@ def lessons(curriculum: Curriculum, progress: Progress, part: int | None, page: 
         kb.adjust(1)
         return Screen(texts.PARTS, kb.as_markup(), image, key)
 
-    name, chunk_all = parts[part]
+    name, _ = parts[part]
+    chunk_all = _pages_of_part(curriculum, part)
     pages = max(1, -(-len(chunk_all) // LESSONS_PER_PAGE))
     page = min(max(page, 0), pages - 1)
     chunk = chunk_all[page * LESSONS_PER_PAGE : (page + 1) * LESSONS_PER_PAGE]
-    current = curriculum.locate(progress.continue_item.id)[0].id if progress.continue_item else ""
-    for lesson in chunk:
-        lp = progress.of(lesson.id)
-        icon = "📖" if not lp.total else _ICON[lp.status]
-        pointer = "👉" if lesson.id == current else ""
-        count = f" {lp.mastered}/{lp.total}" if lp.status is LessonStatus.STARTED else ""
+    current = (
+        curriculum.page_of(progress.continue_item.id)[0].number if progress.continue_item else 0
+    )
+    for pg in chunk:
+        icon = _page_icon(progress, pg) + ("👉" if pg.number == current else "")
+        title = page_title(pg) or texts.PAGE_RULE_TITLE
         kb.button(
-            text=f"{icon}{pointer} {lesson.title}{count}",
-            callback_data=GoItem(item_id=lesson.items[0].id),
+            text=texts.PAGE_BUTTON.format(icon=icon, page=pg.number, title=title)[:60],
+            callback_data=PageOpen(n=pg.number),
         )
     nav = 0
     if page > 0:
@@ -269,31 +287,47 @@ def card(
     item: LessonItem,
     has_audio: bool,
     is_teacher: bool,
-    reading: CardReading | None = None,  # не используется: «Как читается» — в deep (ADR-0082)
+    reading: CardReading | None = None,  # не используется: транскрипция — plain на картинке
     *,
     view: LearnerSettings | None = None,
     videos: ArticulationVideoLibrary | None = None,
     syllables: AyahSyllables | None = None,
+    sura_errors: int | None = None,
 ) -> Screen:
-    """``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51).
+    """``sura_errors`` — аят из списка ошибок суры: «📋 К ошибкам суры» (автор 2026-11-08).
+
+    ``view`` — настройки ученика: «Как читается» и крупный шрифт (FR-51).
 
     ``videos`` — ролики «🎬 Как произносить» (FR-56, ADR-0074): есть ролик для текста карточки —
     кнопка ролика вместо 🔊 (решение автора: где есть ролик — только ролик).
     ``syllables`` — аяты по слогам (FR-61, ADR-0077): аят урока «Суры» рисуется клетками-слогами."""
     view = view or LearnerSettings()
     lesson, i = curriculum.locate(item.id)
-    parts = [texts.CARD_HEAD.format(lesson=escape(lesson.title), n=i + 1, total=len(lesson.items))]
+    page, k = curriculum.page_of(item.id)
+    place = texts.CARD_PLACE.format(page=page.number, unit=unit_title(lesson))
+    parts = [texts.CARD_HEAD.format(lesson=escape(place), n=k + 1, total=len(page.items))]
     known = letters_before(curriculum, lesson.id)
     if i == 0 and lesson.section == "letter":
         parts.append(_new_letter(curriculum, lesson, known))
-    image = _card_image(lesson, item, i, view.large_font, syllables)
+    # простой кириллицей по словам, как в разборе (audience.md: значков х̣ с̣ новичок не читает)
+    shown = (
+        " ".join(plain(word, curriculum.lexicon) for word in item.text.split())
+        if item.is_checkable and view.how_to_read is not HowToRead.HIDDEN
+        else ""
+    )
+    image = _card_image(lesson, item, (k, len(page.items)), view.large_font, syllables, shown=shown)
     if image is None:
         parts.append(f"<b>{escape(item.text)}</b>")
-    if item.kind is ItemKind.RULE:
-        parts.append(texts.CARD_RULE.format(title=escape(item.name), body=escape(item.tip)))
+    if item.kind is ItemKind.RULE:  # первый абзац; целиком — в «📖 Подробнее»
+        first, *rest = item.tip.split("\n", maxsplit=1)
+        parts.append(texts.CARD_RULE.format(title=escape(item.name), body=escape(first)))
+        parts += [texts.CARD_RULE_MORE] * bool(rest)
+        parts += [texts.CARD_READ] * item.is_checkable  # прочитал правило — сразу проверь
+    elif item.kind is ItemKind.SAMPLE:
+        parts.append(texts.CARD_SAMPLE)
     elif item.kind is ItemKind.ALPHABET:
-        names = "\n".join(
-            f"{letter} — {escape(name)}"
+        names = "\n".join(  # LRM: строка слева направо, буква не уезжает вправо (bidi)
+            f"\u200e{letter} — {escape(name)}"
             for letter, name in zip(item.text.split(), item.name.split(" · "), strict=False)
         )
         parts.append(texts.CARD_ALPHABET.format(names=names))
@@ -315,8 +349,19 @@ def card(
 
     video = card_video(videos, item)
     kb = _card_keyboard(curriculum, item, has_audio, is_teacher, video=video)
+    if sura_errors is not None:
+        kb = _with_sura_errors(kb, sura_errors)
     key = f"card:{item.id}:{curriculum.version}" + (":large" if view.large_font else "")
+    key += ":r" if shown else ""
     return Screen("\n\n".join(parts), kb, image, key)
+
+
+def _with_sura_errors(kb: InlineKeyboardMarkup, sura: int) -> InlineKeyboardMarkup:
+    """Первым рядом — «📋 К ошибкам суры»: разобрал аят — назад к списку."""
+    back = InlineKeyboardButton(
+        text=texts.SURA_ERRORS_BUTTON, callback_data=SuraErrors(n=sura).pack()
+    )
+    return InlineKeyboardMarkup(inline_keyboard=[[back], *kb.inline_keyboard])
 
 
 def card_video(videos: ArticulationVideoLibrary | None, item: LessonItem) -> str | None:
@@ -334,18 +379,17 @@ def _card_keyboard(
 ) -> InlineKeyboardMarkup:
     """Кнопки карточки (ADR-0082): «🔊 или 🎬» + «📖 Углублённо», навигация с 🏠.
 
-    ``video`` — ключ ролика: он вместо 🔊 (FR-56, ADR-0074)."""
-    lesson, i = curriculum.locate(item.id)
+    ``video`` — ключ ролика «🎬» рядом с 🔊 (FR-56, ADR-0074)."""
+    lesson, _ = curriculum.locate(item.id)
     kb = InlineKeyboardBuilder()
-    if video is not None:  # ролик — с тем же звуком, что 🔊 (ADR-0074)
+    if has_audio:  # 🔊 и 🎬 — оба, если есть (автор 2026-11-08: везде одинаково)
+        kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=item.id))
+    if video is not None:
         kb.button(
             text=texts.VIDEO_BUTTON, callback_data=Watch(v=video, src="card", item_id=item.id)
         )
-    elif has_audio:  # послушать можно везде, где есть звук: и в правиле, и в слоге (ADR-0032)
-        kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=item.id))
     kb.button(text=texts.DEEP_BUTTON, callback_data=Deep(item_id=item.id))
-    top = 2 if video is not None or has_audio else 1
-    rows: list[int] = [top]
+    rows: list[int] = [1 + has_audio + (video is not None)]
     if is_teacher and item.kind is not ItemKind.ALPHABET:  # учитель озвучивает и правило
         kb.button(text=texts.RECORD_BUTTON, callback_data=RecordReference(item_id=item.id))
         rows.append(1)
@@ -355,9 +399,6 @@ def _card_keyboard(
         kb.button(text=texts.MEMORY_BUTTON, callback_data=SuraOpen(n=sura.number, m="m"))
         rows.append(2)
     rows += _nav(kb, curriculum, item)
-    # первый шаг: назад — только «⬅️ Предыдущий урок», без «◀️ Назад» на шаг (FR-50)
-    if i == 0 and _previous_lesson_button(kb, curriculum, lesson):
-        rows.append(1)
     kb.adjust(*rows)
     return kb.as_markup()
 
@@ -369,8 +410,11 @@ def deep(
     *,
     view: LearnerSettings | None = None,
     video_url: str | None = None,
+    book_page: bool = False,
 ) -> Screen:
-    """«📖 Углублённо» (ADR-0082): подсказка, «Как читается» (по настройке), страница книги,
+    """``book_page`` — есть картинка страницы книги: кнопка «📄 Страница книги».
+
+    «📖 Подробнее» (ADR-0082): подсказка, «Как читается» (по настройке), страница книги,
     видеоурок (URL-кнопка), шпаргалка букв; «◀️ К уроку» — на карточку. Текст без картинки."""
     view = view or LearnerSettings()
     lesson, _ = curriculum.locate(item.id)
@@ -388,6 +432,9 @@ def deep(
     if item.source is not None and item.source.page is not None:
         parts.append("<i>" + texts.CARD_BOOK.format(page=item.source.page) + "</i>")
     kb = InlineKeyboardBuilder()
+    page = item.source.page if item.source is not None else None
+    if book_page and page is not None:
+        kb.button(text=texts.BOOK_PAGE_BUTTON, callback_data=BookPage(page=page, item_id=item.id))
     if video_url:
         kb.button(text=texts.DEEP_VIDEO_BUTTON, url=video_url)
     if letters_before(curriculum, lesson.id):  # шпаргалка букв, пройденных до урока (FR-52)
@@ -396,8 +443,18 @@ def deep(
             callback_data=LettersSheet(lesson_id=lesson.id, item_id=item.id),
         )
     kb.button(text=texts.DEEP_BACK_BUTTON, callback_data=GoItem(item_id=item.id))
-    kb.adjust(1)
+    kb.button(text=texts.HOME_BUTTON, callback_data=Home())
+    kb.adjust(*[1] * (len(list(kb.buttons)) - 2), 2)  # «◀️ К уроку · 🏠» — последним рядом
     return Screen("\n\n".join(parts), kb.as_markup())
+
+
+def book_page(item: LessonItem, page: int, image: bytes) -> Screen:
+    """Картинка страницы книги; «◀️ К уроку» — на ту же карточку."""
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.DEEP_BACK_BUTTON, callback_data=GoItem(item_id=item.id))
+    kb.button(text=texts.HOME_BUTTON, callback_data=Home())
+    kb.adjust(2)
+    return Screen(texts.BOOK_PAGE_CAPTION.format(page=page), kb.as_markup(), image)
 
 
 def more() -> Screen:
@@ -425,75 +482,63 @@ def _new_letter(curriculum: Curriculum, lesson: Lesson, known: Sequence[LessonIt
     return line
 
 
+_WHOLE_PICTURE = (ItemKind.LETTER, ItemKind.ALPHABET)  # своя картинка: формы буквы, таблица
+
+
 def _card_image(
     lesson: Lesson,
     item: LessonItem,
-    i: int,
+    position: tuple[int, int],
     large: bool = False,
     syllables: AyahSyllables | None = None,
+    *,
+    shown: str = "",
 ) -> bytes | None:
     """``large`` — «Крупный шрифт»: крупнее строка карточки и правила (ADR-0061).
 
-    Аят урока «Суры» с разбором на слоги — клетками-слогами (ADR-0077), иначе — строка целиком."""
+    Аят урока «Суры» с разбором на слоги — клетками-слогами (ADR-0077); остальные строки — тоже
+    клетками с подписью, если транскрипция не выключена; иначе — строка целиком."""
     if not render.available():
         return None
     scale = render.LARGE_SCALE if large else 1.0
-    if syllables is not None and lesson.section == "sura" and item.quran:
-        words = syllables.for_text(item.text)
-        if words is not None:
-            return render.ayah(words, ayah_number(lesson, item), (i, len(lesson.items)), scale)
+    cells = syllables.for_text(item.text) if syllables is not None else None
+    ayah = lesson.section == "sura" and bool(item.quran)
+    # под каждым слогом — как он читается (автор 2026-11-08), буква урока красная; аят суры —
+    # клетками всегда (ADR-0077), остальное — если транскрипция не выключена
+    if cells is not None and (ayah or (shown and item.kind not in _WHOLE_PICTURE)):
+        number = ayah_number(lesson, item) if ayah else None  # номер в кружке — только в сурах
+        return render.ayah(cells, number, position, scale, () if ayah else lesson.accent)
     if item.kind is ItemKind.ALPHABET:
         return render.letters(item.text)
-    if item.kind is ItemKind.RULE:
-        return render.rule(item.text, scale)
+    if item.kind in (ItemKind.RULE, ItemKind.SAMPLE):
+        return render.rule(item.text, scale, shown)
     if item.kind is ItemKind.LETTER and (letter := _letter_shown(lesson)):
         zone = articulation_zone(letter)
         zones = [(texts.ZONES[z.value], z is zone) for z in Zone] if zone else []
         return render.letter_forms(letter, item.text, texts.LETTER_FORMS, zones)
-    return render.card(item.text, lesson.accent, (i, len(lesson.items)), scale)
+    return render.card(item.text, lesson.accent, position, scale, shown)
 
 
 def _nav(kb: InlineKeyboardBuilder, curriculum: Curriculum, item: LessonItem) -> list[int]:
-    """«◀️ Назад», «▶️ Дальше» и 🏠 без пустышек: счёт шагов — в заголовке (FR-50, ADR-0082).
-
-    На первом шаге урока «Назад» нет (там «⬅️ Предыдущий урок»); на последнем вперёд ведёт
-    «➡️ Следующий урок: …» отдельной строкой, «Назад» и 🏠 — под ней. Возвращает раскладку рядов.
-    """
-    lesson, i = curriculum.locate(item.id)
-    previous = curriculum.previous_item(item.id) if i > 0 else None
+    """Один ряд «◀️ Назад · 🏠 · ▶️ Дальше» на любом шаге (автор 2026-11-08): назад и вперёд
+    переходят и через границу урока, коротко, без названия урока; счёт шагов — в заголовке."""
+    previous = curriculum.previous_item(item.id)
     following = curriculum.next_item(item.id)
-    rows: list[int] = []
-    in_row = 0  # кнопок «Назад/Дальше» в последнем ряду
-    if following is not None:
-        next_lesson, _ = curriculum.locate(following.id)
-        if next_lesson != lesson:
-            kb.button(
-                text=texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title),
-                callback_data=GoItem(item_id=following.id),
-            )
-            rows.append(1)
-    if previous:
+    if previous is not None:
         kb.button(text=texts.BACK_BUTTON, callback_data=GoItem(item_id=previous.id))
-        in_row += 1
-    if following is not None and not rows:
-        kb.button(text=texts.NEXT_BUTTON, callback_data=GoItem(item_id=following.id))
-        in_row += 1
     kb.button(text=texts.HOME_BUTTON, callback_data=Home())
-    return [*rows, in_row + 1]
+    if following is not None:
+        kb.button(text=texts.NEXT_BUTTON, callback_data=_forward(curriculum, item, following))
+    return [1 + (previous is not None) + (following is not None)]
 
 
-def _previous_lesson_button(
-    kb: InlineKeyboardBuilder, curriculum: Curriculum, lesson: Lesson
-) -> bool:
-    """Кнопка «Предыдущий урок» — на его первую карточку; на первом уроке книги её нет."""
-    prev = curriculum.previous_lesson(lesson.id)
-    if prev is None:
-        return False
-    kb.button(
-        text=texts.PREVIOUS_LESSON_BUTTON.format(title=prev.title),
-        callback_data=GoItem(item_id=prev.items[0].id),
-    )
-    return True
+def _forward(curriculum: Curriculum, item: LessonItem, following: LessonItem) -> CallbackData:
+    """«▶️ Дальше»: на той же странице — следующий шаг; на новой — её начало со сканом."""
+    here, _ = curriculum.page_of(item.id)
+    there, _ = curriculum.page_of(following.id)
+    if there.number == here.number:
+        return GoItem(item_id=following.id)
+    return PageOpen(n=here.number + 1)
 
 
 def learner_part(curriculum: Curriculum, progress: Progress) -> Lessons:
@@ -503,11 +548,58 @@ def learner_part(curriculum: Curriculum, progress: Progress) -> Lessons:
 
 
 def _lessons_of(curriculum: Curriculum, lesson: Lesson) -> Lessons:
-    """Кнопка «Уроки» — сразу на страницу части урока."""
-    for k, (_, items) in enumerate(curriculum.parts()):
-        if lesson in items:
-            return Lessons(part=k, page=items.index(lesson) // LESSONS_PER_PAGE)
+    """Кнопка «Уроки» — сразу на экран части, где страница с началом раздела."""
+    number = curriculum.page_of(lesson.items[0].id)[0].number
+    for k in range(len(curriculum.parts())):
+        found = [pg.number for pg in _pages_of_part(curriculum, k)]
+        if number in found:
+            return Lessons(part=k, page=found.index(number) // LESSONS_PER_PAGE)
     return Lessons(part=-1)
+
+
+def _pages_of_part(curriculum: Curriculum, part: int) -> list[Page]:
+    """Страницы части книги: по первому разделу страницы; пустая — с предыдущей."""
+    names = [name for name, _ in curriculum.parts()]
+    out: list[Page] = []
+    owner = names[0] if names else ""
+    for pg in curriculum.pages():
+        if pg.lessons:
+            owner = pg.lessons[0].part
+        if 0 <= part < len(names) and owner == names[part]:
+            out.append(pg)
+    return out
+
+
+def _page_icon(progress: Progress, page: Page) -> str:
+    statuses = [
+        lp for lp in progress.lessons if lp.lesson in page.lessons and lp.lesson.practice_items
+    ]
+    if statuses and all(lp.status is LessonStatus.DONE for lp in statuses):
+        return "✅"
+    if any(lp.status is not LessonStatus.NEW for lp in statuses):
+        return "🟡"
+    return "⚪"
+
+
+def page_intro(curriculum: Curriculum, page: Page, image: bytes | None) -> Screen:
+    """Начало урока-страницы: скан (всегда, автор 2026-11-08), что на ней, «▶️ Начать»."""
+    pages = curriculum.pages()
+    n = pages.index(page) + 1
+    title = page_title(page)
+    lines = [texts.PAGE_HEAD.format(n=n, page=page.number, title=escape(title))]
+    lines.append(texts.PAGE_STEPS.format(n=len(page.items)) if page.items else texts.PAGE_RULE_ONLY)
+    kb = InlineKeyboardBuilder()
+    if page.items:
+        kb.button(text=texts.PAGE_START, callback_data=GoItem(item_id=page.items[0].id))
+    back = n > 1
+    if back:
+        kb.button(text=texts.BACK_BUTTON, callback_data=PageOpen(n=page.number - 1))
+    kb.button(text=texts.HOME_BUTTON, callback_data=Home())
+    ahead = n < len(pages)
+    if ahead:
+        kb.button(text=texts.NEXT_BUTTON, callback_data=PageOpen(n=page.number + 1))
+    kb.adjust(*((1,) if page.items else ()), 1 + back + ahead)
+    return Screen("\n\n".join(lines), kb.as_markup(), image, f"page:{page.number}")
 
 
 # ---------- результат ----------
@@ -518,6 +610,7 @@ def result(
     resume: LessonItem | None = None,
     staff: bool = False,
     *,
+    sura_errors: int | None = None,
     videos: ArticulationVideoLibrary | None = None,
 ) -> Screen:
     """Итог попытки. ``resume`` — идёт начало занятия: после басмалы — «Продолжить занятие».
@@ -527,7 +620,7 @@ def result(
     подпись — хвост уходит вторым сообщением, ничего не обрезая. Разбор строит сценарий; нет его
     (``breakdown is None``) — экран без разбора.
 
-    «Услышано» и блок «Для исследования» с номером попытки видят только учитель и разметчик
+    «Услышано» видят только учитель и разметчик; блока «Для исследования» нет (автор 2026-11-08)
     (``staff``): новичку они мешают, номер попытки ученик получает в «🚩 Бот ошибся» (FR-50).
 
     ``videos`` — ролики (FR-56, ADR-0074): ролик карточки вместо 🔊; к ошибкам разбора роликов нет.
@@ -549,6 +642,8 @@ def result(
     elif render.available():
         image = render.result_marks(text=r.item.text, breakdown=breakdown, score_label=counter)
     blocks = ["\n".join(x for x in (_VERDICT[r.verdict], counter) if x)]  # «Верно 2 слова из 5»
+    other = r.attempt.policy.is_other_line(a)  # совпало очень мало — разбор всё равно ниже
+    blocks += [texts.RESULT_OTHER_LINE] * other
     if image is None:
         blocks.append(f"<b>{escape(r.item.text)}</b>")
     blocks += _progress(r)
@@ -568,19 +663,13 @@ def result(
             blocks.append(texts.MORE_NOT_SHOWN.format(n=hidden))
     blocks.append(unread)
     after = card_video(videos, r.item)
-    listen = has_audio and after is None  # 🔊 на экране; с роликом 🔊 нет (ADR-0074)
+    listen = has_audio  # 🔊 есть и рядом с роликом (автор 2026-11-08)
     if groups or unread:
         blocks.append(texts.PLAN_LISTEN if listen else texts.PLAN_READ)
-    if staff:
-        blocks.append(
-            texts.RESEARCH_BLOCK.format(
-                code=texts.ATTEMPT_CODE.format(code=views.attempt_code(r.attempt.id)),
-                reference=escape(a.reference),
-                heard=escape(a.heard),
-            )
-        )
     caption, details = _split_caption([b for b in blocks if b])
-    keyboard = _result_keyboard(curriculum, r, lesson, has_audio, resume, after=after)
+    keyboard = _result_keyboard(
+        curriculum, r, lesson, has_audio, resume, after=after, sura_errors=sura_errors
+    )
     return Screen(caption, keyboard, image, details=details)
 
 
@@ -694,60 +783,53 @@ def _result_keyboard(
     resume: LessonItem | None = None,
     *,
     after: str | None = None,
+    sura_errors: int | None = None,
 ) -> InlineKeyboardMarkup:
     """``after`` — ролик карточки (вместо 🔊). Роликов к ошибкам разбора нет: ролики — только
     на карточках алфавита (решение автора 2026-10-25, ADR-0074)."""
     kb = InlineKeyboardBuilder()
     item_id = r.item.id
-    top = 0  # «🔊 или 🎬» и, если есть ошибки, «📖 Углублённо» — один ряд (ADR-0082)
+    top = 0  # 🔊, 🎬 и при ошибках «📖 Подробнее» — один ряд (ADR-0082)
+    if has_audio:
+        kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=item_id))
+        top += 1
     if after is not None:
         kb.button(
             text=texts.VIDEO_BUTTON, callback_data=Watch(v=after, src="after", item_id=item_id)
         )
         top += 1
-    elif has_audio:
-        kb.button(text=texts.LISTEN_BUTTON, callback_data=Listen(item_id=r.item.id))
-        top += 1
     if r.attempt.assessment.errors:
         kb.button(text=texts.DEEP_BUTTON, callback_data=Deep(item_id=item_id))
         top += 1
-    # ряд «◀️ Назад · 🔁 Ещё раз · ▶️ Дальше»: обе крайние — на соседние строки, «Ещё раз» —
-    # снова карточка этой строки (там видно, что читать, и можно послушать эталон)
+    # «◀️ Назад · 🏠 · ▶️ Дальше» — как на карточке (автор 2026-11-08: 🏠 по центру)
     nav = 1
-    first_step = curriculum.locate(r.item.id)[1] == 0  # назад — «⬅️ Предыдущий урок» (FR-50)
-    if not first_step and (previous := curriculum.previous_item(r.item.id)):
+    if previous := curriculum.previous_item(item_id):
         kb.button(text=texts.BACK_BUTTON, callback_data=GoItem(item_id=previous.id))
         nav += 1
-    kb.button(text=texts.AGAIN_BUTTON, callback_data=GoItem(item_id=r.item.id))
-    next_row = False
+    kb.button(text=texts.HOME_BUTTON, callback_data=Home())
+    if resume is None and r.next_item is not None:
+        forward = _forward(curriculum, r.item, r.next_item)
+        kb.button(text=texts.NEXT_BUTTON, callback_data=forward)
+        nav += 1
     if resume is not None:  # начало занятия прочитано — туда, где ученик остановился
         title = curriculum.locate(resume.id)[0].title
         kb.button(
             text=texts.RESUME_BUTTON.format(title=title), callback_data=GoItem(item_id=resume.id)
         )
-        next_row = True
-    elif r.next_item is not None:
-        next_lesson, _ = curriculum.locate(r.next_item.id)
-        if next_lesson != lesson:  # длинная подпись — отдельной строкой
-            label, next_row = texts.NEXT_LESSON_BUTTON.format(title=next_lesson.title), True
-        else:
-            label, nav = texts.NEXT_BUTTON, nav + 1
-        kb.button(text=label, callback_data=GoItem(item_id=r.next_item.id))
+    kb.button(text=texts.AGAIN_BUTTON, callback_data=GoItem(item_id=item_id))
+    kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
     if r.lesson_completed:
         kb.button(text=texts.SHARE_BUTTON, callback_data=ShareLesson(lesson=lesson.id))
-    prev = first_step and _previous_lesson_button(kb, curriculum, lesson)
-    kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
-    _home_row(kb)
     rows: Sequence[int] = (
         *((top,) if top else ()),
         nav,
-        *((1,) if next_row else ()),
-        *((1,) if r.lesson_completed else ()),
-        *((1,) if prev else ()),
+        *((1,) if resume is not None else ()),
         2,
+        *((1,) if r.lesson_completed else ()),
     )
     kb.adjust(*rows)
-    return kb.as_markup()
+    markup = kb.as_markup()
+    return markup if sura_errors is None else _with_sura_errors(markup, sura_errors)
 
 
 # ---------- прогресс, помощь, данные ----------
@@ -780,12 +862,12 @@ def progress(curriculum: Curriculum, p: Progress, quiz: QuizOverview | None = No
     kb = InlineKeyboardBuilder()
     item = p.continue_item or curriculum.first_item()
     kb.button(
-        text=texts.CONTINUE_BUTTON.format(title=curriculum.locate(item.id)[0].title),
+        text=texts.CONTINUE_BUTTON.format(title=where(curriculum, item)),
         callback_data=GoItem(item_id=item.id),
     )
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
-    _home_row(kb)
-    kb.adjust(1, 2)
+    _home_row(kb, (texts.BACK_TO_MORE, More()))  # открыт из «⋯ Ещё» — туда и назад
+    kb.adjust(1, 3)
     image, key = _book_progress(curriculum, p)
     return Screen("\n".join(lines)[:1000], kb.as_markup(), image, key)
 
@@ -882,7 +964,6 @@ def settings(s: LearnerSettings) -> Screen:
             callback_data=ChangeSetting(name="how_to_read", value=option.value),
         )
     toggles = (
-        ("auto_reference", texts.SETTING_AUTO_REFERENCE, s.auto_reference),
         ("daily_opening", texts.SETTING_DAILY_OPENING, s.daily_opening),
         ("large_font", texts.SETTING_LARGE_FONT, s.large_font),
     )
@@ -941,7 +1022,7 @@ def reminder(curriculum: Curriculum, progress: Progress) -> Screen:
     item = progress.continue_item or curriculum.first_item()
     kb = InlineKeyboardBuilder()
     kb.button(
-        text=texts.CONTINUE_BUTTON.format(title=curriculum.locate(item.id)[0].title),
+        text=texts.CONTINUE_BUTTON.format(title=where(curriculum, item)),
         callback_data=GoItem(item_id=item.id),
     )
     return Screen(texts.REMINDER, kb.as_markup())
@@ -1000,8 +1081,8 @@ def signs(curriculum: Curriculum | None = None, progress: Progress | None = None
         if sheet := bool(letters_before(curriculum, lesson.id)):
             kb.button(text=texts.SHEET_BUTTON, callback_data=LettersSheet(lesson_id=lesson.id))
     kb.button(text=texts.LESSONS_BUTTON, callback_data=Lessons(part=-1))
-    _home_row(kb)
-    kb.adjust(*((1,) if sheet else ()), 2)
+    _home_row(kb, (texts.BACK_TO_MORE, More()))
+    kb.adjust(*((1,) if sheet else ()), 3)
     image = render.signs() if render.available() else None
     return Screen(texts.SIGNS, kb.as_markup(), image, "signs:v1")
 
@@ -1068,6 +1149,22 @@ def quiz(view: QuizView) -> Screen:
     image = render.card(q.prompt, set(), (0, 1)) if render.available() else None
     body = ask if image else f"<b>{escape(q.prompt)}</b>\n\n{ask}"
     return Screen(f"{header}\n\n{body}", kb.as_markup(), image, f"quiz:{q.item_id}")
+
+
+def quiz_right(result: QuizResult) -> InlineKeyboardMarkup:
+    """Верный ответ на миг: выбранный вариант — «✅» зелёным, нажать ничего нельзя; потом
+    обработчик сам показывает следующий вопрос (автор 2026-11-08)."""
+    q = result.view.question
+    kb = InlineKeyboardBuilder()
+    for k, option in enumerate(q.options):
+        right = k == q.answer
+        kb.button(
+            text=f"✅ {option}" if right else option,
+            callback_data=Noop(),
+            style=ButtonStyle.SUCCESS if right else None,
+        )
+    kb.adjust(2)
+    return kb.as_markup()
 
 
 def quiz_answer(result: QuizResult) -> Screen:
@@ -1192,8 +1289,8 @@ def sura_list(curriculum: Curriculum, memorized: Collection[int]) -> Screen:
     for sura in found:
         mark = "✅ " if sura.number in memorized else ""
         kb.button(text=f"{mark}{sura.name}", callback_data=SuraOpen(n=sura.number, m="m"))
-    _home_row(kb)
-    kb.adjust(*([2] * (len(found) // 2)), *([1] * (len(found) % 2)), 1)
+    _home_row(kb, (texts.BACK_TO_MORE, More()))
+    kb.adjust(*([2] * (len(found) // 2)), *([1] * (len(found) % 2)), 2)
     return Screen(texts.SURA_LIST, kb.as_markup())
 
 
@@ -1239,38 +1336,79 @@ def sura_memory_ready(sura: Sura) -> Screen:
 
 
 SURA_BAD_SHOWN: Final = 8  # строк про аяты с ошибками в разборе
-SURA_BAD_BUTTONS: Final = 4  # кнопок «🔁 Аят N»
+SURA_BAD_BUTTONS: Final = 8  # кнопок «🔁 Аят N»
+
+
+@dataclass(frozen=True, slots=True)
+class SuraErrorList:
+    """Что осталось от чтения суры для разбора: аяты с ошибками, исправленные — ✅.
+
+    Хранится у ученика (FSM), пока он разбирает аяты (автор 2026-11-08: список не пропадает)."""
+
+    sura: int
+    mode: str  # «t» по тексту, «m» наизусть
+    clean: int
+    total: int
+    bad: tuple[tuple[int, str, str], ...]  # (номер аята, карточка, AyahOutcome)
+    fixed: frozenset[str] = frozenset()
+
+    @classmethod
+    def of(cls, result: SuraReadingResult) -> "SuraErrorList":
+        reading = result.reading
+        return cls(
+            result.sura.number,
+            "t" if reading.mode is SuraMode.TEXT else "m",
+            reading.assessment.clean_count,
+            len(reading.assessment.ayahs),
+            tuple(
+                (x.number, x.item_id, x.outcome.value)
+                for x in reading.assessment.ayahs
+                if x.outcome is not AyahOutcome.CLEAN
+            ),
+        )
 
 
 def sura_result(result: SuraReadingResult) -> Screen:
     """Разбор чтения суры по аятам: итог, аяты с ошибками, переход к их карточкам."""
     reading, sura = result.reading, result.sura
-    a = reading.assessment
-    parts = [
-        texts.SURA_RESULT_HEAD[reading.mode.value].format(name=escape(sura.name)),
-        texts.SURA_SUMMARY.format(clean=a.clean_count, total=len(a.ayahs)),
-    ]
-    bad = [x for x in a.ayahs if x.outcome is not AyahOutcome.CLEAN]
+    head = texts.SURA_RESULT_HEAD[reading.mode.value].format(name=escape(sura.name))
     if reading.passed:
-        parts.append(
+        passed = (
             texts.SURA_PASSED_TEXT if reading.mode is SuraMode.TEXT else texts.SURA_PASSED_MEMORY
         )
-    else:
-        lines = [
-            texts.SURA_AYAH_LINE.format(n=x.number, outcome=texts.SURA_OUTCOME[x.outcome.value])
-            for x in bad[:SURA_BAD_SHOWN]
-        ]
-        if len(bad) > SURA_BAD_SHOWN:
-            lines.append(texts.SURA_MORE.format(n=len(bad) - SURA_BAD_SHOWN))
-        parts += ["\n".join(lines), texts.SURA_NOT_PASSED]
+        a = reading.assessment
+        summary = texts.SURA_SUMMARY.format(clean=a.clean_count, total=len(a.ayahs))
+        kb = InlineKeyboardBuilder()
+        mode = "t" if reading.mode is SuraMode.TEXT else "m"
+        kb.button(text=texts.SURA_AGAIN_BUTTON, callback_data=SuraOpen(n=sura.number, m=mode))
+        _sura_back(kb, sura, reading.mode)
+        kb.adjust(1, 2)
+        return Screen("\n\n".join((head, summary, passed)), kb.as_markup())
+    return sura_errors(sura, SuraErrorList.of(result), head)
+
+
+def sura_errors(sura: Sura, errors: SuraErrorList, head: str = "") -> Screen:
+    """Аяты с ошибками; исправленные после чтения — ✅. Кнопка аята — его карточка, оттуда
+    «📋 К ошибкам суры» — снова сюда."""
+    head = head or texts.SURA_RESULT_HEAD[
+        SuraMode.TEXT.value if errors.mode == "t" else SuraMode.MEMORY.value
+    ].format(name=escape(sura.name))
+    lines = [
+        texts.SURA_FIXED_LINE.format(n=n)
+        if item_id in errors.fixed
+        else texts.SURA_AYAH_LINE.format(n=n, outcome=texts.SURA_OUTCOME[outcome])
+        for n, item_id, outcome in errors.bad[:SURA_BAD_SHOWN]
+    ]
+    if len(errors.bad) > SURA_BAD_SHOWN:
+        lines.append(texts.SURA_MORE.format(n=len(errors.bad) - SURA_BAD_SHOWN))
+    summary = texts.SURA_SUMMARY.format(clean=errors.clean, total=errors.total)
+    parts = [head, summary, "\n".join(lines), texts.SURA_NOT_PASSED]
     kb = InlineKeyboardBuilder()
-    shown = bad[:SURA_BAD_BUTTONS]
-    for x in shown:
-        kb.button(
-            text=texts.SURA_AYAH_BUTTON.format(n=x.number), callback_data=GoItem(item_id=x.item_id)
-        )
-    mode = "t" if reading.mode is SuraMode.TEXT else "m"
-    kb.button(text=texts.SURA_AGAIN_BUTTON, callback_data=SuraOpen(n=sura.number, m=mode))
-    _sura_back(kb, sura, reading.mode)
+    shown = errors.bad[:SURA_BAD_BUTTONS]
+    for n, item_id, _ in shown:
+        label = texts.SURA_AYAH_FIXED_BUTTON if item_id in errors.fixed else texts.SURA_AYAH_BUTTON
+        kb.button(text=label.format(n=n), callback_data=GoItem(item_id=item_id))
+    kb.button(text=texts.SURA_AGAIN_BUTTON, callback_data=SuraOpen(n=sura.number, m=errors.mode))
+    _sura_back(kb, sura, SuraMode.TEXT if errors.mode == "t" else SuraMode.MEMORY)
     kb.adjust(*([2] * (len(shown) // 2)), *([1] * (len(shown) % 2)), 1, 2)
     return Screen("\n\n".join(parts), kb.as_markup())

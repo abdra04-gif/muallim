@@ -561,3 +561,17 @@ def test_hamza_error_points_at_the_hamza_letter(
     assert (place.word_index, place.word_text) == (4, "أَحْسَنَ")
     hamza = next(n for n, c in enumerate(arabic.clusters(L024_07)) if c.base == "أ")
     assert place.clusters == (hamza,)
+
+
+def test_error_over_several_words_marks_every_word(lexicon: Lexicon) -> None:
+    """Прочитана другая строка (жалоба автора 2026-11-08): одна замена накрывает всю строку —
+    неверны все слова, а не только первое («Верно 4 слова из 5»)."""
+    a = assess("ءءءءء", "قَلَمُ")
+    b = build_breakdown(a, "أ إ ؤ ئ ء", lexicon)
+    assert b.words_ok == 0
+
+
+def test_another_line_is_not_almost_right(lexicon: Lexicon) -> None:
+    """Чужая строка вместо L020_06 — не «почти верно»: верных слов не больше половины."""
+    b = _review(lexicon, L020_06, "قُلْهُوَٱللَّهُأَحَدٌ")
+    assert b.words_ok <= b.words_total // 2

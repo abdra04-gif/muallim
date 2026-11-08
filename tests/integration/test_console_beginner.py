@@ -9,7 +9,7 @@ import re
 import pytest
 
 from muallim.bootstrap import console
-from muallim.domain.curriculum import Curriculum
+from muallim.domain.curriculum import Curriculum, unit_title
 from muallim.presentation.telegram import texts
 
 pytestmark = pytest.mark.integration
@@ -50,23 +50,23 @@ async def _run(steps: list[str]) -> str:
 
 BUTTONS = {
     *ONBOARDING[1:2], *ONBOARDING[3:], texts.START_BUTTON, "▶️", texts.HOME_BUTTON,
-    texts.LESSONS_BUTTON, texts.DISPUTE_BUTTON, "2. Арабский алфавит",
+    texts.LESSONS_BUTTON, texts.DISPUTE_BUTTON,
 }  # fmt: skip
 RESEARCH_MARKS = ("Для исследования", "Услышано", "Попытка №", "Эталон:")
 
 
 # ---------- FR-49: голосовое на правиле и на алфавите ----------
-async def test_voice_on_rule_card_says_it_is_a_rule() -> None:
+async def test_voice_on_readable_rule_card_is_checked() -> None:
+    """Автор 2026-11-08: правило с огласованным текстом (басмала) — сразу проверяем голосовое."""
     out = await _run([*ONBOARDING, texts.START_BUTTON, "🎤"])
     answer = _steps(out)[-1]
-    assert _plain(texts.VOICE_ON_RULE) in answer
+    assert _plain(texts.VOICE_ON_RULE) not in answer
     assert _plain(texts.NOT_PRACTICE) not in answer
 
 
 async def test_voice_on_alphabet_card_says_reading_is_not_needed() -> None:
-    out = await _run(
-        [*ONBOARDING, texts.LESSONS_BUTTON, "2. Арабский алфавит", "▶️", "🎤"]  # сразу часть
-    )
+    # урок 1 (3 шага) → правило алфавита → первая строка таблицы (стр. 10, шаг 5)
+    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "▶️", "▶️", "▶️", "🎤"])
     answer = _steps(out)[-1]
     assert _plain(texts.NOT_PRACTICE) in answer
 
@@ -78,13 +78,13 @@ async def test_home_after_lesson_one_continues_with_lesson_two(curriculum: Curri
     home = _steps(out)[-1]
     done = texts.LESSON_DONE.format(lesson=curriculum.lessons[0].title)
     assert _plain(done) in out  # урок 1 действительно пройден
-    assert second.title in home  # «Дальше: …» — следующий урок (формулировка — черновик)
+    assert unit_title(second) in home  # «Дальше: Стр. 10 · …» — следующий раздел
     first_button = next(line for line in home.splitlines() if line.startswith("   ["))
-    assert second.title in first_button
+    assert unit_title(second) in first_button
     label = first_button.strip()[1:-1]
     opened = _steps(await _run([*ONBOARDING, *LESSON_ONE, texts.HOME_BUTTON, label]))[-1]
     assert opened.startswith(f"[{label}]")  # первая кнопка главной нажата
-    assert f"{second.title} · шаг" in opened  # открылась карточка урока 2
+    assert f"{unit_title(second)} · шаг" in opened  # открылась карточка урока 2
 
 
 # ---------- FR-49: у истиазы есть 🔊 ----------

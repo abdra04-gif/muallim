@@ -633,3 +633,20 @@ def test_groups_sent_to_the_image_are_on_the_image(
     assert texts.MORE_ON_IMAGE.format(n=on_image) in text
     assert texts.MORE_NOT_SHOWN.format(n=hidden) in text
     assert texts.MORE_ON_IMAGE.format(n=total - shown) not in text
+
+
+def test_other_line_warns_and_still_shows_breakdown(
+    curriculum: Curriculum, lexicon: Lexicon, renderer: FeedbackRenderer, drawn: list[Any]
+) -> None:
+    """Прочитана другая строка (автор 2026-11-08): предупреждение и разбор — всегда оба."""
+    r = _result(curriculum, lexicon, renderer, L020_06, "قُلْهُوَٱللَّهُأَحَدٌ")
+    text = _text(screens.result(curriculum, r, has_audio=True))
+    assert texts.RESULT_OTHER_LINE in text
+    assert _point(text, 1)
+
+
+def test_good_reading_has_no_other_line_warning(
+    curriculum: Curriculum, lexicon: Lexicon, renderer: FeedbackRenderer, drawn: list[Any]
+) -> None:
+    r = _result(curriculum, lexicon, renderer, L020_06, SWAP_THREE)
+    assert texts.RESULT_OTHER_LINE not in _text(screens.result(curriculum, r, has_audio=True))

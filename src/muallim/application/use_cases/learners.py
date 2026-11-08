@@ -31,7 +31,7 @@ from muallim.domain.learner import (
 # Меняйте версию при каждом изменении текста согласия в presentation/telegram/texts.py.
 CONSENT_TEXT_VERSION = "2026-11-07"
 # Меняйте при изменении вопросов анкеты (presentation/telegram/texts.py, PROFILE_*).
-QUESTIONNAIRE_VERSION = "2026-11-07"
+QUESTIONNAIRE_VERSION = "2026-11-08"  # без «Пропустить» и «Как в Telegram»
 
 
 @dataclass(frozen=True, slots=True)

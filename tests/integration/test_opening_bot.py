@@ -32,7 +32,7 @@ from muallim.infrastructure.db.repositories.learners import SqlLearnerRepository
 from muallim.infrastructure.db.tables import metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.infrastructure.system import SystemClock
-from muallim.presentation.telegram import texts
+from muallim.presentation.telegram import screens, texts
 from muallim.presentation.telegram.callbacks import DeleteData, GoItem, Home, Opening
 from muallim.presentation.telegram.handlers import router
 from muallim.presentation.telegram.opening import OPENING_ITEMS
@@ -242,7 +242,7 @@ async def _next_lesson_from_basmala_card(ali: Learner) -> None:
     await ali.press(Opening(act="start"))
     await ali.voice()
     await _press_label(ali, texts.NEXT_BUTTON)  # → басмала
-    await _press_label(ali, texts.NEXT_LESSON_BUTTON.split("{")[0])  # «➡️ Следующий урок»
+    await _press_label(ali, texts.NEXT_BUTTON)  # на последнем шаге — в следующий урок
 
 
 @pytest.mark.parametrize(
@@ -334,7 +334,7 @@ async def test_voice_on_home_is_not_assessed(
         (b.text, b.callback_data) for row in reply[-1].reply_markup.inline_keyboard for b in row
     ]
     target = "L006-02" if leave == "home" else RESUME
-    title = curriculum.locate(target)[0].title
+    title = screens.where(curriculum, curriculum.item(target))  # «Стр. 11 · م · Мим»
     assert (texts.CONTINUE_BUTTON.format(title=title), GoItem(item_id=target).pack()) in buttons
     async with container() as request:
         assert await (await request.get(AttemptRepository)).count(learner.id) == before
@@ -400,8 +400,7 @@ async def test_lesson_chosen_from_list_during_opening_moves_cursor(
 
     Он завершает начало занятия, и карточка урока двигает «Продолжить».
     """
-    from muallim.presentation.telegram.callbacks import Lessons  # noqa: PLC0415
-    from muallim.presentation.telegram.screens import LESSONS_PER_PAGE  # noqa: PLC0415
+    from muallim.presentation.telegram.callbacks import Lessons, PageOpen  # noqa: PLC0415
 
     dp, container = app
     ali = _person(dp)
@@ -410,9 +409,10 @@ async def test_lesson_chosen_from_list_during_opening_moves_cursor(
     part = next(
         k for k, (_, ls) in enumerate(curriculum.parts()) if any(x.id == "L007" for x in ls)
     )
-    index = [x.id for x in curriculum.parts()[part][1]].index("L007")
-    await ali.press(Lessons(part=part, page=index // LESSONS_PER_PAGE))
-    target = GoItem(item_id="L007-01").pack()
+    await ali.press(Lessons(part=part, page=0))  # урок = страница (автор 2026-11-08): с. 12
+    assert PageOpen(n=12).pack() in [data for _, data in _labels(ali)], _labels(ali)
+    await ali.press(PageOpen(n=12))
+    target = GoItem(item_id="L007-01").pack()  # «▶️ Начать» — первый шаг страницы
     assert target in [data for _, data in _labels(ali)], _labels(ali)
     await ali.press(target)
     assert await _current_item(container) == "L007-01"

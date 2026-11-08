@@ -235,7 +235,7 @@ def test_letter_forms_card_of_first_lesson_shows_alif_with_hamza(
     monkeypatch.setattr(render, "letter_forms", letter_forms)
     lesson = curriculum.lesson(HAMZA)
     head = _head(lesson)
-    screens._card_image(lesson, head, lesson.items.index(head))
+    screens._card_image(lesson, head, (lesson.items.index(head), len(lesson.items)))
     assert drawn == ["أ"]
 
 

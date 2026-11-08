@@ -140,12 +140,13 @@ def test_fresh_learner_start_button_opens_lesson_one(curriculum: Curriculum) -> 
 
 
 def test_card_head_counts_steps_not_lines(curriculum: Curriculum) -> None:
-    """Карточка-правило — не «строка»: урок состоит из шагов."""
+    """Карточка-правило — не «строка»: урок-страница состоит из шагов (автор 2026-11-08)."""
     assert "шаг" in texts.CARD_HEAD and "строка" not in texts.CARD_HEAD
-    lesson = curriculum.lessons[0]
-    for n, item in enumerate(lesson.items[:2], start=1):
+    page = curriculum.pages()[0]
+    for n, item in enumerate(page.items[:2], start=1):
         s = screens.card(curriculum, item, has_audio=False, is_teacher=False)
-        assert f"шаг {n} из {len(lesson.items)}" in s.caption, item.id
+        assert f"Стр. {page.number}" in s.caption, item.id
+        assert f"шаг {n} из {len(page.items)}" in s.caption, item.id
 
 
 def _quiz_opens_at(c: Curriculum) -> Lesson:
@@ -202,67 +203,27 @@ def test_part_counters_count_only_lessons_with_reading(curriculum: Curriculum) -
     assert sum(totals) == with_reading == p.practice_lessons
     assert totals[0] == 1  # «Знакомство»: истиаза и басмала; алфавит только смотрят
     assert labels[0].startswith("✅") and labels[0].endswith("1/1")
-    assert f"из {with_reading}" in screens.home(curriculum, p).caption
+    pages = [pg for pg in curriculum.pages() if any(x.practice_items for x in pg.lessons)]
+    assert f"из {len(pages)}" in screens.home(curriculum, p).caption  # страницы книги
     assert f"из {with_reading}" in screens.progress(curriculum, p).caption
 
 
 # ---------- FR-50: кнопки карточки ----------
-def test_last_step_card_offers_next_lesson(curriculum: Curriculum) -> None:
-    """Последний шаг урока: вперёд — «➡️ Следующий урок: …», в том числе у «Алфавита» (шаг 5)."""
-    for lesson in (_letters(curriculum)[1], curriculum.lesson("L002")):
-        nxt = curriculum.next_lesson(lesson.id)
-        assert nxt is not None
-        s = screens.card(curriculum, lesson.items[-1], has_audio=False, is_teacher=False)
-        jump = (
-            texts.NEXT_LESSON_BUTTON.format(title=nxt.title),
-            cb.GoItem(item_id=nxt.items[0].id).pack(),
-        )
-        assert jump in _buttons(s.keyboard), lesson.id
-        assert not any(t == texts.NEXT_BUTTON for t, _ in _buttons(s.keyboard)), lesson.id
 
 
 def test_last_card_of_program_has_no_forward_button(curriculum: Curriculum) -> None:
     last = curriculum.lessons[-1].items[-1]
     s = screens.card(curriculum, last, has_audio=False, is_teacher=False)
-    forward = (texts.NEXT_BUTTON, texts.NEXT_LESSON_BUTTON.split("{")[0])
+    forward = (texts.NEXT_BUTTON,)
     assert not [t for t, _ in _buttons(s.keyboard) if t.startswith(forward)]
-
-
-def test_last_step_result_offers_next_lesson(curriculum: Curriculum) -> None:
-    lesson = _letters(curriculum)[1]
-    nxt = curriculum.next_lesson(lesson.id)
-    assert nxt is not None
-    last = lesson.items[-1]
-    s = screens.result(curriculum, _result(curriculum, last.id, last.text), has_audio=False)
-    jump = (
-        texts.NEXT_LESSON_BUTTON.format(title=nxt.title),
-        cb.GoItem(item_id=nxt.items[0].id).pack(),
-    )
-    assert jump in _buttons(s.keyboard)
-    assert not any(t == texts.NEXT_BUTTON for t, _ in _buttons(s.keyboard))
 
 
 def test_last_result_of_program_says_it_is_the_last(curriculum: Curriculum) -> None:
     last = curriculum.lessons[-1].items[-1]
     s = screens.result(curriculum, _result(curriculum, last.id, last.text), has_audio=False)
     assert texts.LAST_ITEM in s.caption
-    forward = (texts.NEXT_BUTTON, texts.NEXT_LESSON_BUTTON.split("{")[0])
+    forward = (texts.NEXT_BUTTON,)
     assert not [t for t, _ in _buttons(s.keyboard) if t.startswith(forward)]
-
-
-def test_first_step_has_one_back_button_to_previous_lesson(curriculum: Curriculum) -> None:
-    """На первом шаге назад ведёт одна кнопка — «⬅️ Предыдущий урок», без «◀️» на шаг."""
-    lesson = _letters(curriculum)[1]
-    prev = curriculum.previous_lesson(lesson.id)
-    assert prev is not None
-    s = screens.card(curriculum, lesson.items[0], has_audio=False, is_teacher=False)
-    buttons = _buttons(s.keyboard)
-    to_prev_step = cb.GoItem(item_id=prev.items[-1].id).pack()
-    assert not [t for t, d in buttons if d == to_prev_step]
-    assert not [t for t, _ in buttons if t.startswith("◀️")]
-    assert [t for t, _ in buttons if t.startswith("⬅️")] == [
-        texts.PREVIOUS_LESSON_BUTTON.format(title=prev.title)
-    ]
 
 
 def test_back_button_is_labelled_the_same_on_card_and_result(curriculum: Curriculum) -> None:
@@ -308,21 +269,6 @@ def _to_lesson(s: screens.Screen, lesson: Lesson) -> list[str]:
     """Кнопки, которые ведут на любую карточку урока ``lesson``."""
     targets = {cb.GoItem(item_id=i.id).pack() for i in lesson.items}
     return [t for t, d in _buttons(s.keyboard) if d in targets]
-
-
-def test_previous_lesson_button_only_on_first_step(curriculum: Curriculum) -> None:
-    lesson = _letters(curriculum)[1]
-    prev = curriculum.previous_lesson(lesson.id)
-    assert prev is not None
-    first = screens.card(curriculum, lesson.items[0], has_audio=False, is_teacher=False)
-    jump = (
-        texts.PREVIOUS_LESSON_BUTTON.format(title=prev.title),
-        cb.GoItem(item_id=prev.items[0].id).pack(),
-    )
-    assert jump in _buttons(first.keyboard)
-    for item in lesson.items[1:]:
-        s = screens.card(curriculum, item, has_audio=False, is_teacher=False)
-        assert _to_lesson(s, prev) == [], item.id
 
 
 # ---------- FR-50: разбор попытки ----------
@@ -378,14 +324,14 @@ def test_failed_result_lets_learner_go_on(curriculum: Curriculum) -> None:
 
 
 @pytest.mark.parametrize("failed", [False, True], ids=["correct", "with_errors"])
-def test_staff_sees_research_block(curriculum: Curriculum, failed: bool) -> None:
-    """Учитель и разметчик видят «Для исследования» с номером попытки (FR-50)."""
+def test_nobody_sees_research_block(curriculum: Curriculum, failed: bool) -> None:
+    """Автор 2026-11-08: «Для исследования» убран и у учителя; номер — в «🚩 Бот ошибся»."""
     item = curriculum.item("L001-02")
     r = _failed(curriculum) if failed else _result(curriculum, item.id, item.text)
     s = screens.result(curriculum, r, has_audio=True, staff=True)
     shown = _everything(s)
-    assert "Для исследования" in shown
-    assert "Попытка №" in shown and views.attempt_code(ATTEMPT_ID) in shown
+    assert "Для исследования" not in shown and "Эталон:" not in shown
+    assert views.attempt_code(ATTEMPT_ID) not in shown
 
 
 def test_result_still_offers_dispute_with_attempt(curriculum: Curriculum) -> None:

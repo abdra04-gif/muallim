@@ -3,12 +3,14 @@
 from typing import Final
 
 from aiogram import Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
 from muallim.application.ports.reading import AyahSyllables
 from muallim.application.ports.storage import (
     ArticulationVideoLibrary,
+    BookPages,
     LessonLinks,
     ReferenceAudioLibrary,
 )
@@ -22,7 +24,7 @@ from muallim.application.use_cases.settings import GetSettings
 from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import opening, screens, texts
+from muallim.presentation.telegram import opening, screens, sura_errors, texts
 from muallim.presentation.telegram.callbacks import (
     Again,
     Deep,
@@ -139,6 +141,7 @@ async def cb_deep(
     reading: FromDishka[HowToRead],
     learner_settings: FromDishka[GetSettings],
     links: FromDishka[LessonLinks],
+    pages: FromDishka[BookPages],
 ) -> None:
     """«📖 Углублённо»: экран на месте карточки или результата; карточка остаётся текущей, поэтому
     голосовое с этого экрана по-прежнему оценивается."""
@@ -155,6 +158,9 @@ async def cb_deep(
             reading.execute(learner, item),
             view=await learner_settings.execute(learner),
             video_url=links.for_lesson(cur.locate(item.id)[0].id),
+            book_page=item.source is not None
+            and item.source.page is not None
+            and pages.has(item.source.page),
         )
         await display.show(msg, screen)
     await cb.answer()
@@ -194,6 +200,7 @@ async def cb_go(
     syllables: FromDishka[AyahSyllables],
     watch: FromDishka[GetArticulationVideo],
     played: FromDishka[RecordVideoPlayed],
+    state: FSMContext,
 ) -> None:
     try:
         # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
@@ -221,6 +228,7 @@ async def cb_go(
             view=view,
             videos=videos,
             syllables=syllables,
+            sura_errors=await sura_errors.sura_of(state, item.id),
         )
         await show_card(
             msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,

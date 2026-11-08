@@ -53,7 +53,7 @@ async def cb_consent(
         if question := await _next_question(
             questionnaire, learner
         ):  # анкета — сразу после согласия
-            screen = screens.profile_question(question, cb.from_user.first_name)
+            screen = screens.profile_question(question)
         elif callback_data.then == "privacy":
             screen = screens.privacy(learner.research_consent, learner.pseudonym)
         else:
@@ -95,7 +95,7 @@ async def cb_profile(
     if following := await _next_question(questionnaire, learner):
         await cb.answer()
         if msg:
-            await display.show(msg, screens.profile_question(following, cb.from_user.first_name))
+            await display.show(msg, screens.profile_question(following))
         return
     await cb.answer(texts.PROFILE_THANKS)
     if msg:

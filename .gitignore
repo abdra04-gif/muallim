@@ -45,3 +45,6 @@ logs/
 
 # Копии для параллельных сессий Claude (ADR-0073)
 .claude/worktrees/
+
+# Картинки страниц книги для «📄 Страница книги» (scripts/book/pages.py), как и скан — вне git
+curriculum/book_pages/*.jpg

@@ -150,17 +150,20 @@ PAGES[36] = [
 
 # Исправление: на с. 27–32, 34–36 и в строках 7–12 с. 33 слова были выписаны слева направо.
 # Книга читается справа налево — переворачиваем порядок слов в этих строках (сверено по нумерации).
-def _rtl(page, from_line=1):
+def _rtl(page, from_line=1, keep=()):
     fixed = []
     for i, (sec, kind, text) in enumerate(PAGES[page], start=1):
-        if sec is not None and kind == L and i >= from_line:
+        if sec is not None and kind == L and i >= from_line and sec not in keep:
             text = " ".join(reversed(text.split()))
         fixed.append((sec, kind, text))
     PAGES[page] = fixed
 
 
-for _p in (27, 28, 29, 30, 31, 32, 34, 35, 36):
+for _p in (27, 28, 29, 30, 31, 34, 35, 36):
     _rtl(_p)
+_rtl(
+    32, keep=("tanwin",)
+)  # строки танвина на с. 32 уже по алфавиту, как в книге (сверка 2026-11-08)
 _rtl(33, from_line=7)
 PAGES[37] = [
     ("ta_marbuta", H, "ة ـة"),

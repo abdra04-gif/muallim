@@ -4,13 +4,13 @@ from aiogram.enums import ButtonStyle
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from muallim.domain.learner import NAME_MAX_LENGTH, Question
+from muallim.domain.learner import Question
 from muallim.presentation.telegram import texts
 from muallim.presentation.telegram.callbacks import (
     Consent,
     DeleteData,
     DisputeReason,
-    Home,
+    Privacy,
     Profile,
 )
 
@@ -45,22 +45,16 @@ _PROFILE_OPTIONS: Final = {
 }
 
 
-def profile_question(question: Question, telegram_name: str = "") -> InlineKeyboardMarkup:
-    """Кнопки одного вопроса анкеты и «Пропустить» отдельной строкой внизу (FR-65)."""
+def profile_question(question: Question) -> InlineKeyboardMarkup:
+    """Кнопки одного вопроса анкеты (FR-65); имя — без кнопок, его пишут (автор 2026-11-08)."""
     kb = InlineKeyboardBuilder()
     if question is Question.NAME:
-        if telegram_name:
-            label = texts.PROFILE_NAME_TELEGRAM.format(name=telegram_name[:NAME_MAX_LENGTH])
-            kb.button(text=label, callback_data=Profile(q=question.value, v="tg"))
-        kb.button(text=texts.PROFILE_SKIP, callback_data=Profile(q=question.value, v="skip"))
-        kb.adjust(1)
-        return kb.as_markup()
+        return InlineKeyboardMarkup(inline_keyboard=[])
     options, per_row = _PROFILE_OPTIONS[question]
     for code, label in options.items():
         kb.button(text=label, callback_data=Profile(q=question.value, v=code))
-    kb.button(text=texts.PROFILE_SKIP, callback_data=Profile(q=question.value, v="skip"))
     full, rest = divmod(len(options), per_row)
-    kb.adjust(*[per_row] * full, *([rest] if rest else []), 1)  # «Пропустить» — отдельной строкой
+    kb.adjust(*[per_row] * full, *([rest] if rest else []))
     return kb.as_markup()
 
 
@@ -71,6 +65,6 @@ def delete_confirm() -> InlineKeyboardMarkup:
         callback_data=DeleteData(confirmed=True),
         style=ButtonStyle.DANGER,
     )
-    kb.button(text=texts.CANCEL_BUTTON, callback_data=Home())
+    kb.button(text=texts.CANCEL_BUTTON, callback_data=Privacy())  # отмена — назад в «Мои данные»
     kb.adjust(1)
     return kb.as_markup()

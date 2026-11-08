@@ -29,7 +29,7 @@ from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner, Question
 from muallim.domain.policy import Verdict
 from muallim.domain.quiz import read_passed
-from muallim.presentation.telegram import opening, screens, texts
+from muallim.presentation.telegram import opening, screens, sura_errors, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
 from muallim.presentation.telegram.handlers.sura import read_sura_voice
@@ -66,11 +66,14 @@ async def _off_card(
     progress: GetProgress,
     sura_uc: ReadSura,
     display: Display,
+    state: FSMContext,
 ) -> bool:
     """На экране не карточка: сура целиком — проверить суру; меню или вчерашнее начало занятия —
     не оцениваем, предлагаем открыть урок (решение автора). True — голосовое обработано."""
     if shown.sura is not None:  # FR-57, FR-59
-        await read_sura_voice(m, bot, shown.sura, learner=learner, uc=sura_uc, display=display)
+        await read_sura_voice(
+            m, bot, shown.sura, learner=learner, uc=sura_uc, display=display, state=state
+        )
         return True
     if shown.item_id is not None and not shown.stale:
         return False
@@ -114,17 +117,17 @@ async def on_voice(
     shown = await screen_state.execute(learner)
     if await _off_card(
         m, bot, shown, learner=learner, screen_state=screen_state, cur=cur, progress=progress,
-        sura_uc=sura_uc, display=display,
+        sura_uc=sura_uc, display=display, state=state,
     ):  # fmt: skip
         return
     assert shown.item_id is not None  # noqa: S101 — _off_card обработал экран без карточки
     item = cards.current(learner)
     with suppress(KeyError):  # карточку убрали из программы — карточка курсора
         item = cur.item(shown.item_id)
-    if item.kind is ItemKind.RULE:  # правило читают глазами, дальше — чтение (FR-49)
+    if item.kind is ItemKind.RULE and not item.is_checkable:  # в правиле нечего прочесть
         await m.reply(texts.VOICE_ON_RULE)
         return
-    if not item.is_practice:  # таблица алфавита — только посмотреть
+    if not item.is_checkable:  # таблица алфавита и образец — только посмотреть
         await m.reply(texts.NOT_PRACTICE)
         return
     if not buf.getbuffer().nbytes:  # скачиваем только то, что будем оценивать (TD-FN-90)
@@ -162,7 +165,12 @@ async def on_voice(
     staff = await staff_access.is_staff(learner)
     await wait.delete()
     has_audio = library.has(result.item.id)
-    screen = screens.result(cur, result, has_audio, resume, staff=staff, videos=videos)
+    if attempt.verdict is not Verdict.FAILED:  # аят из списка ошибок суры исправлен — ✅
+        await sura_errors.mark_fixed(state, result.item.id)
+    back = await sura_errors.sura_of(state, result.item.id)
+    screen = screens.result(
+        cur, result, has_audio, resume, staff=staff, videos=videos, sura_errors=back
+    )
     # ступень ③ закрепления: попытка — ответ на открытый вопрос этой строки (ADR-0066 п. 8)
     passed = read_passed(attempt.verdict)
     linked = await quiz.attach_attempt(learner, result.item.id, attempt.id, passed=passed)
@@ -205,9 +213,8 @@ async def fallback(
             await m.answer(texts.PROFILE_NAME_WRONG)
             return
         following = await questionnaire.next_question(learner)
-        name = m.from_user.first_name if m.from_user else ""
         screen = (
-            screens.profile_question(following, name)
+            screens.profile_question(following)
             if following
             else screens.home(cur, await progress.execute(learner))
         )

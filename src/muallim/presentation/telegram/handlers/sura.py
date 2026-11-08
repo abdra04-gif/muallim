@@ -9,6 +9,7 @@ import logging
 from typing import Final
 
 from aiogram import Bot, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from dishka import FromDishka
 
@@ -17,8 +18,8 @@ from muallim.application.use_cases.screen import ScreenState
 from muallim.application.use_cases.sura import ReadSura
 from muallim.domain.learner import Learner
 from muallim.domain.sura import SuraMode
-from muallim.presentation.telegram import screens, texts
-from muallim.presentation.telegram.callbacks import SuraList, SuraOpen, SuraReady
+from muallim.presentation.telegram import screens, sura_errors, texts
+from muallim.presentation.telegram.callbacks import SuraErrors, SuraList, SuraOpen, SuraReady
 from muallim.presentation.telegram.display import Display, drop_sound, message_of
 
 logger: Final = logging.getLogger(__name__)
@@ -92,8 +93,10 @@ async def read_sura_voice(
     learner: Learner,
     uc: ReadSura,
     display: Display,
+    state: FSMContext,
 ) -> None:
-    """Голосовое на экране суры (вызывает обработчик голосовых)."""
+    """Голосовое на экране суры (вызывает обработчик голосовых). Ошибки — в FSM: после
+    разбора аята ученик возвращается к ним («📋 К ошибкам суры»)."""
     number, mode = sura
     if mode == LOOK:  # текст ещё на экране — это не чтение наизусть
         await m.reply(texts.SURA_PRESS_READY)
@@ -130,4 +133,32 @@ async def read_sura_voice(
         reading.processing_ms,
     )
     await wait.delete()
+    errors = None if reading.passed else screens.SuraErrorList.of(result)
+    await sura_errors.remember(state, errors)
     await display.send(bot, m.chat.id, screens.sura_result(result))
+
+
+@router.callback_query(SuraErrors.filter())
+async def cb_sura_errors(
+    cb: CallbackQuery,
+    callback_data: SuraErrors,
+    state: FSMContext,
+    screen_state: FromDishka[ScreenState],
+    display: FromDishka[Display],
+    learner: FromDishka[Learner],
+    uc: FromDishka[ReadSura],
+) -> None:
+    """«📋 К ошибкам суры»: снова список аятов с ошибками; исправленные — ✅."""
+    errors = await sura_errors.load(state, callback_data.n)
+    try:
+        sura = uc.sura(callback_data.n)
+    except KeyError:
+        errors = None
+    if errors is None:  # бот перезапускался — список не сохранился
+        await cb.answer(texts.STALE_BUTTON, show_alert=True)
+        return
+    await screen_state.menu(learner)  # список — не карточка: голосовое здесь не оценивается
+    if msg := message_of(cb):
+        await drop_sound(display, msg)
+        await display.show(msg, screens.sura_errors(sura, errors))
+    await cb.answer()

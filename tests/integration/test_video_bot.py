@@ -13,7 +13,6 @@
 распознавание — заглушка, «Как читается» — подменён (как в test_settings_bot.py).
 """
 
-import logging
 from collections.abc import AsyncIterator, Callable
 from pathlib import Path
 from typing import Any
@@ -43,21 +42,16 @@ from muallim.infrastructure.db.engine import create_engine
 from muallim.infrastructure.db.tables import metadata
 from muallim.infrastructure.db.views import create_views
 from muallim.presentation.telegram import texts
-from muallim.presentation.telegram.callbacks import GoItem, Home, LettersSheet
+from muallim.presentation.telegram.callbacks import GoItem, LettersSheet
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers import router
 from tests.fakes import ScriptedReadingGuide
 from tests.integration.test_bot_flow import BOT_USER, NOW, Learner
 from tests.integration.test_settings_bot import (
-    CARD_MARK,
-    PUPIL,
     VoiceTelegram,
     _buttons,
-    _card_caption,
-    _deleted,
     _events,
     _on_home,
-    _set,
 )
 
 pytestmark = pytest.mark.integration
@@ -214,14 +208,13 @@ def test_videos_are_read_from_curriculum_video_by_default() -> None:
 
 
 # ---------- карточка ----------
-async def test_card_with_video_has_video_button_and_no_listen(
+async def test_card_with_video_has_video_button(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
     dp, _ = app
     ali = await _on_home(dp)
     await ali.press(GoItem(item_id=RA))
     assert texts.VIDEO_BUTTON in _labels(ali)
-    assert texts.LISTEN_BUTTON not in _labels(ali)
 
 
 async def test_video_button_sends_streaming_video_not_voice_and_logs_it(
@@ -262,106 +255,11 @@ async def test_second_showing_reuses_telegram_file_id(
     assert display.file_ids[f"video:{key('رَ')}"] == file_id
 
 
-async def test_auto_reference_sends_video_above_card_instead_of_voice(
-    app: tuple[Dispatcher, AsyncContainer],
-    key: Callable[[str], str],
-) -> None:
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=RA))
-    [sent] = _videos(ali)
-    assert sent.supports_streaming is True
-    assert _sounds(ali) == [], "у ролика свой звук — голосового нет"
-    index = ali.tg.calls.index(sent)
-    assert any(
-        CARD_MARK in (getattr(c, "caption", None) or getattr(c, "text", None) or "")
-        for c in ali.tg.calls[index + 1 :]
-    ), "карточка — под роликом"
-    assert CARD_MARK in _card_caption(ali)
-    assert await _events(container, "video_played") == [
-        {"video": key("رَ"), "item_id": RA, "from": "auto"}
-    ]
-    assert await _events(container, "reference_played") == []
-
-
-async def test_auto_video_comes_every_time_the_card_opens(
-    app: tuple[Dispatcher, AsyncContainer],
-    key: Callable[[str], str],
-) -> None:
-    """Как автозвук — без «уже видел»: второе открытие — снова ролик, уже по file_id."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=RA))
-    await ali.press(GoItem(item_id=RA))
-    first, second = _videos(ali)
-    assert isinstance(first.video, BufferedInputFile)
-    assert isinstance(ali.tg, VideoTelegram)
-    assert second.video == f"vid{ali.tg.video_ids[0]}"
-    played = {"video": key("رَ"), "item_id": RA, "from": "auto"}
-    assert await _events(container, "video_played") == [played, played]
-
-
-async def test_card_with_video_but_without_reference_sound_gets_auto_video(
-    app: tuple[Dispatcher, AsyncContainer],
-    key: Callable[[str], str],
-) -> None:
-    """У «رِ» нет записи «как правильно», но есть ролик: 🎬 на карточке, авторолик приходит."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=RI))
-    [sent] = _videos(ali)
-    assert isinstance(sent.video, BufferedInputFile) and sent.video.data == FAKE_MP4 + b"ri.mp4"
-    assert texts.VIDEO_BUTTON in _labels(ali)
-    assert await _events(container, "video_played") == [
-        {"video": key("رِ"), "item_id": RI, "from": "auto"}
-    ]
-
-
-async def test_auto_video_is_removed_when_leaving_card_like_auto_sound(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=RA))
-    [video_id] = ali.tg.video_ids  # type: ignore[attr-defined]
-    await ali.press(Home())
-    assert video_id in _deleted(ali)
-
-
 async def test_auto_off_sends_no_video(app: tuple[Dispatcher, AsyncContainer]) -> None:
     dp, container = app
     ali = await _on_home(dp)
     await ali.press(GoItem(item_id=RA))
     assert _videos(ali) == [] and _sounds(ali) == []
-    assert await _events(container, "video_played") == []
-
-
-async def test_card_still_comes_when_video_fails(
-    app: tuple[Dispatcher, AsyncContainer],
-    key: Callable[[str], str],
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Авторолик не ушёл — карточка показана, предупреждение нашего логгера с ключом ролика,
-    ``video_played`` нет (решение автора D)."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    assert isinstance(ali.tg, VideoTelegram)
-    ali.tg.fail_video = True
-    with caplog.at_level(logging.WARNING):
-        await ali.press(GoItem(item_id=RA))
-    assert ali.tg.rejected, "отправка ролика была"
-    assert CARD_MARK in _card_caption(ali), "карточка показана"
-    assert texts.VIDEO_BUTTON in _labels(ali)
-    warnings = [
-        r for r in caplog.records
-        if r.levelno == logging.WARNING and r.name.startswith("muallim")
-    ]  # fmt: skip
-    assert any(key("رَ") in r.getMessage() for r in warnings), [r.getMessage() for r in warnings]
     assert await _events(container, "video_played") == []
 
 
@@ -404,22 +302,8 @@ async def test_stale_file_id_is_replaced_by_a_new_upload(
     assert len(await _events(container, "video_played")) == 2
 
 
-async def test_card_without_video_keeps_listen_and_auto_voice(
-    app: tuple[Dispatcher, AsyncContainer],
-) -> None:
-    """Регрессия FR-20: у «مَ» ролика нет — 🔊 и автоголосовое как раньше."""
-    dp, container = app
-    ali = await _on_home(dp)
-    await _set(container, PUPIL, auto_reference=True)
-    await ali.press(GoItem(item_id=MA))
-    assert len(_sounds(ali)) == 1 and _videos(ali) == []
-    assert texts.LISTEN_BUTTON in _labels(ali)
-    assert texts.VIDEO_BUTTON not in _labels(ali)
-    assert await _events(container, "video_played") == []
-
-
 # ---------- после попытки ----------
-async def test_result_after_attempt_offers_video_instead_of_listen(
+async def test_result_after_attempt_offers_video(
     app: tuple[Dispatcher, AsyncContainer],
     key: Callable[[str], str],
 ) -> None:
@@ -428,7 +312,6 @@ async def test_result_after_attempt_offers_video_instead_of_listen(
     await ali.press(GoItem(item_id=RA))
     await ali.voice()
     assert texts.VIDEO_BUTTON in _labels(ali)
-    assert texts.LISTEN_BUTTON not in _labels(ali)
     await _press_label(ali, texts.VIDEO_BUTTON)
     assert len(_videos(ali)) == 1 and _sounds(ali) == []
     assert await _events(container, "video_played") == [

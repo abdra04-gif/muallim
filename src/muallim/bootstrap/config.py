@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     curriculum_dir: Path = PROJECT_ROOT / "curriculum"
     reference_audio_dir: Path = PROJECT_ROOT / "curriculum" / "audio"
     video_dir: Path = PROJECT_ROOT / "curriculum" / "video"  # ролики 🎬 (ADR-0074)
+    book_pages_dir: Path = PROJECT_ROOT / "curriculum" / "book_pages"  # 📄 страницы, вне git
     # Эталон для аятов: аль-Афаси с EveryAyah (ADR-0068); кэш вне git — data/recitations
     recitations_dir: Path = PROJECT_ROOT / "data" / "recitations"
     reciter: str = "Alafasy_128kbps"

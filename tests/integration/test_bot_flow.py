@@ -383,23 +383,6 @@ async def test_questionnaire_goes_screen_by_screen_and_saves_answers(
     )  # fmt: skip
 
 
-async def test_every_question_has_skip_and_goes_on(
-    bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
-) -> None:
-    _, container = bot_app
-    ali = learner_factory(5105)
-    await ali.write("/start")
-    await ali.press(Consent(granted=True))
-    for text, answer in _profile_screens():
-        assert ali.tg.texts()[-1] == text
-        skip = Profile(q=answer.q, v="skip").pack()
-        assert skip in _callbacks(ali)  # «Пропустить» на каждом экране
-        await ali.press(skip)
-    assert ali.button(GoItem)  # всё пропущено — сразу к урокам
-    profile = await _profile_of(container, 5105)
-    assert profile is not None and profile.display_name is None and profile.gender is None
-
-
 async def test_name_can_be_typed(
     bot_app: tuple[Dispatcher, AsyncContainer], learner_factory: Callable[[int], Learner]
 ) -> None:

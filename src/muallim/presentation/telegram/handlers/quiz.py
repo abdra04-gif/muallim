@@ -1,9 +1,12 @@
 """«🧠 Закрепление» (FR-53, ADR-0066): вопрос, ответ кнопкой, итог раунда."""
 
+import asyncio
+from contextlib import suppress
 from typing import Final
 from uuid import UUID
 
 from aiogram import Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
@@ -19,6 +22,7 @@ from muallim.presentation.telegram.display import Display, drop_sound, message_o
 from muallim.presentation.telegram.screens import Screen
 
 router: Final = Router(name="learner.quiz")
+RIGHT_PAUSE: Final = 1.0  # секунд показываем ✅ на верном ответе, потом следующий вопрос
 
 
 async def quiz_screen(
@@ -71,7 +75,8 @@ async def cb_quiz_answer(
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
 ) -> None:
-    """Верно — сразу следующий вопрос; неверно — разбор и «▶️ Дальше»; 10-й — итог раунда."""
+    """Верно — ✅ на выбранном и через миг следующий вопрос; неверно — разбор и «▶️ Дальше»;
+    10-й — итог раунда."""
     try:
         result = await uc.answer(learner, UUID(hex=callback_data.a), callback_data.p)
     except (ValueError, QuizStale):
@@ -80,6 +85,11 @@ async def cb_quiz_answer(
     msg = message_of(cb)
     if msg:
         await drop_sound(display, msg)  # звук слога ступени ② — не над следующим вопросом
+    if msg and result.correct and result.view.question.options:  # подсветить верный
+        await cb.answer(texts.QUIZ_TOAST_RIGHT)
+        with suppress(TelegramBadRequest):
+            await msg.edit_reply_markup(reply_markup=screens.quiz_right(result))
+        await asyncio.sleep(RIGHT_PAUSE)
     if result.finished and result.summary is not None:
         await screen_state.menu(learner)
         summary = screens.quiz_summary(cur, result.summary)
@@ -96,7 +106,8 @@ async def cb_quiz_answer(
             else screens.quiz_answer(result)
         )
         await display.show(msg, screen)
-    await cb.answer(texts.QUIZ_TOAST_RIGHT if result.correct else texts.QUIZ_TOAST_WRONG)
+    with suppress(TelegramBadRequest):  # на верный уже ответили выше
+        await cb.answer(texts.QUIZ_TOAST_RIGHT if result.correct else texts.QUIZ_TOAST_WRONG)
 
 
 @router.callback_query(QuizSkip.filter())

@@ -1,5 +1,6 @@
 """Экраны «📖 Вся сура» и «Наизусть» (FR-57, FR-59, ADR-0076). Надписи — черновики (TD-FN-117)."""
 
+from dataclasses import replace
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -17,7 +18,13 @@ from muallim.domain.sura import (
     suras,
 )
 from muallim.presentation.telegram import screens, texts
-from muallim.presentation.telegram.callbacks import GoItem, SuraList, SuraOpen, SuraReady
+from muallim.presentation.telegram.callbacks import (
+    GoItem,
+    SuraErrors,
+    SuraList,
+    SuraOpen,
+    SuraReady,
+)
 
 CALLBACK_LIMIT = 64  # байт, Telegram Bot API
 MESSAGE_LIMIT = 4096  # символов в текстовом сообщении Telegram
@@ -159,3 +166,24 @@ def test_whole_sura_screens_lead_back_to_the_lesson(curriculum: Curriculum) -> N
     back = (texts.SURA_BACK_TO_LESSON_BUTTON, GoItem(item_id=sura.ayahs[0].id).pack())
     for screen in (screens.sura_text(sura), screens.sura_result(_result(sura, SuraMode.TEXT))):
         assert back in _buttons(screen.keyboard)
+
+
+# ---------- список ошибок суры не теряется (автор 2026-11-08) ----------
+def test_sura_errors_list_marks_fixed_ayah_and_keeps_the_rest(curriculum: Curriculum) -> None:
+    sura = _sura(curriculum, 112)
+    errors = screens.SuraErrorList.of(_result(sura, SuraMode.MEMORY, skip=2))
+    assert errors.bad, "в чтении есть аят с ошибкой"
+    _, item_id, _ = errors.bad[0]
+    fixed = screens.sura_errors(sura, replace(errors, fixed=frozenset({item_id})))
+    labels = [t for t, _ in _buttons(fixed.keyboard)]
+    assert any(t.startswith("✅") for t in labels)
+    assert (texts.SURA_AGAIN_BUTTON, SuraOpen(n=112, m="m").pack()) in _buttons(fixed.keyboard)
+
+
+def test_ayah_card_from_sura_errors_leads_back_to_the_list(curriculum: Curriculum) -> None:
+    sura = _sura(curriculum, 112)
+    item = curriculum.item(sura.ayahs[1].id)
+    s = screens.card(curriculum, item, has_audio=True, is_teacher=False, sura_errors=112)
+    assert _buttons(s.keyboard)[0] == (texts.SURA_ERRORS_BUTTON, SuraErrors(n=112).pack())
+    plain = screens.card(curriculum, item, has_audio=True, is_teacher=False)
+    assert texts.SURA_ERRORS_BUTTON not in [t for t, _ in _buttons(plain.keyboard)]

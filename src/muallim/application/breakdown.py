@@ -172,9 +172,26 @@ def build_breakdown(
     groups = tuple(g for _, g in sorted(ranked, key=lambda r: r[0]))
 
     unread_words = _unread_words(line, assessment.heard, cut)
-    wrong = {p.word_index for g in groups for p in g.places}
+    wrong = {p.word_index for g in groups for p in g.places} | _covered_words(line, kept)
     ok = len(line.words) - len(wrong | set(unread_words))
     return Breakdown(groups, max(ok, 0), len(line.words), unread_words)
+
+
+def _covered_words(line: _Line, errors: list[PronunciationError]) -> set[int]:
+    """Все слова, которые накрывает ошибка: замена длиной в несколько слов (прочитана другая
+    строка) делает неверным каждое; вставка — слово до и после неё."""
+    if not line.owner:
+        return set()
+    words: set[int] = set()
+    for e in errors:
+        span = (
+            range(e.position, e.position + len(e.expected))
+            if e.expected
+            else (e.position - 1, e.position)
+        )
+        for pos in span:
+            words.add(line.word_of_consonant(line.consonant_at(max(pos, 0))))
+    return words
 
 
 def _unread_words(line: _Line, heard: str, cut: int | None) -> tuple[int, ...]:

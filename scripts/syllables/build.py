@@ -140,7 +140,8 @@ def _group(text: str, phonemes: str, spans: list[Span]) -> list[list[list[int]]]
 
 def _caption(syllabled: str, two_syllables: bool) -> str:
     """Подпись клетки: слог слитно («ррах»); клетка «لا» из двух слогов — через дефис («ли-ии»)."""
-    return syllabled if two_syllables else syllabled.replace("-", "")
+    # «ууу» → «уу»: долгий гласный — две буквы, не три (вау с даммой перед ۥ)
+    return re.sub(r"(.)\1{2,}", r"\1\1", syllabled if two_syllables else syllabled.replace("-", ""))
 
 
 def _keep_lam_alif(
@@ -206,14 +207,33 @@ def split_ayah(text: str, lexicon: Lexicon, moshaf: MoshafAttributes) -> list[li
     return out
 
 
+STOP_MARKS = frozenset("ۖۗۘۙۚۛۜ")  # знаки остановки и сакта отдельным «словом» (с. 64–66)
+
+
+def with_stop_marks(text: str, lexicon: Lexicon, moshaf: MoshafAttributes) -> list[list[Cell]]:
+    """Разбор без знаков остановки; знак (слитно в конце слова) — в последней клетке слова."""
+    tokens = text.split()
+    heads = [t.rstrip("".join(STOP_MARKS)) or t for t in tokens]  # ۜ внутри слова — буква «син»
+    tail = [t[len(h) :] for t, h in zip(tokens, heads, strict=True)]
+    if not any(tail):
+        return split_ayah(text, lexicon, moshaf)
+    bare = " ".join(heads)
+    out = split_ayah(bare, lexicon, moshaf)
+    for word, mark in zip(out, tail, strict=True):
+        if mark:
+            piece, sound = word[-1]
+            word[-1] = (piece + mark, sound)
+    return out
+
+
 def sura_texts(curriculum: Curriculum) -> list[str]:
-    """Уникальные тексты пунктов с ``quran`` в уроках «Суры», в порядке программы."""
+    """Уникальные тексты всех карточек, которые читают вслух, в порядке программы: под каждым
+    слогом — как он читается (автор 2026-11-08: на всех карточках, не только в сурах)."""
     seen: dict[str, None] = {}
     for lesson in curriculum.lessons:
-        if lesson.section == "sura":
-            for item in lesson.items:
-                if item.quran:
-                    seen.setdefault(item.text)
+        for item in lesson.items:
+            if item.is_checkable:
+                seen.setdefault(item.text)
     return list(seen)
 
 
@@ -244,7 +264,7 @@ def main() -> None:
     errors: list[str] = []
     for text in sura_texts(curriculum):
         try:
-            words = split_ayah(text, curriculum.lexicon, moshaf)
+            words = with_stop_marks(text, curriculum.lexicon, moshaf)
         except Exception as e:  # noqa: BLE001 — собрать все неразобранные, потом упасть
             errors.append(f"{text}: {e!r}")
             continue

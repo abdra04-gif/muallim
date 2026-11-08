@@ -97,7 +97,8 @@ async def test_container_resolves_ayah_syllables(tmp_path: Path) -> None:
         rows = yaml.safe_load(path.read_text(encoding="utf-8"))["ayat"]
         # любой статус, и «bad» тоже, — слоги отдаются (FR-62, ADR-0079 п. 7)
         assert all(library.for_text(r["text"]) is not None for r in rows)
-        assert library.for_text(curriculum.item("L001-02").text) is None  # не сура
+        # слоги — на всех карточках чтения, и не в сурах тоже (автор 2026-11-08)
+        assert library.for_text(curriculum.item("L001-02").text) is not None
     finally:
         await container.close()
 
