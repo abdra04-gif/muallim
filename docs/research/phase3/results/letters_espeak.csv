@@ -1,0 +1,841 @@
+﻿clip,class,system,model,expected_letter,expected_vowel,output,got_letter,got_vowel,audio_s,compute_s
+01-00,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.22,2.555
+01-01,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,0.9,0.206
+01-02,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.54,0.196
+01-03,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.09,0.171
+01-04,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.02,0.157
+01-05,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,0.83,0.154
+01-06,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.02,0.17
+01-07,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,1.28,0.176
+01-08,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,a,,,0.83,0.156
+01-09,alif_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,َ,h a,ه,َ,1.28,0.169
+02-00,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,e,,,1.22,0.172
+02-01,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,eː,,,1.41,0.194
+02-02,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,0.7,0.154
+02-03,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,e,,,1.09,0.166
+02-04,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,1.15,0.171
+02-05,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,1.22,0.174
+02-06,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,1.02,0.171
+02-07,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,1.41,0.197
+02-08,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,,,,1.54,0.197
+02-09,alif_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ِ,i,,,1.34,0.186
+03-00,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,o,,,1.28,0.182
+03-01,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,o,,,1.28,0.167
+03-02,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,u,,,0.7,0.146
+03-03,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,oː,,,0.77,0.148
+03-04,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,u,,,1.41,0.193
+03-05,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,oː,,,1.22,0.174
+03-06,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,aː,,,0.7,0.143
+03-07,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,o,,,1.22,0.169
+03-08,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,oː,,,1.54,0.201
+03-09,alif_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ء,ُ,o,,,2.18,0.25
+04-00,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,p a,,,1.09,0.17
+04-01,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,p ɛ,,,1.41,0.196
+04-02,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b aː,ب,َ,0.7,0.145
+04-03,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b ʌ,ب,,0.64,0.136
+04-04,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b aː,ب,َ,1.34,0.193
+04-05,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b a,ب,َ,1.15,0.166
+04-06,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b a,ب,َ,0.96,0.164
+04-07,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b ɛ,ب,ِ,1.22,0.172
+04-08,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,b,ب,,1.41,0.194
+04-09,ba_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,َ,p ɛ,,,1.54,0.204
+05-00,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,p,,,1.28,0.174
+05-01,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,f,ف,,1.22,0.183
+05-02,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,b i,ب,ِ,0.77,0.163
+05-03,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,p i,,,0.77,0.155
+05-04,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,b i,ب,ِ,1.28,0.188
+05-05,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,b i,ب,ِ,1.02,0.161
+05-06,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,b i,ب,ِ,0.9,0.159
+05-07,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,b i,ب,ِ,1.09,0.161
+05-08,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,p i,,,1.34,0.194
+05-09,ba_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ِ,p i,,,1.34,0.202
+06-00,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p u,,,1.15,0.164
+06-01,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,f uː,ف,ُ,1.34,0.193
+06-02,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p u,,,0.7,0.144
+06-03,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p uː,,,0.64,0.139
+06-04,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p u,,,1.47,0.204
+06-05,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,b uː,ب,ُ,0.96,0.16
+06-06,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,b u,ب,ُ,0.77,0.155
+06-07,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,d uː,د,ُ,1.15,0.165
+06-08,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p uː,,,1.47,0.202
+06-09,ba_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ب,ُ,p uː,,,1.28,0.173
+07-00,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.15,0.173
+07-01,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.15,0.17
+07-02,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,0.83,0.153
+07-03,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,0.7,0.15
+07-04,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.47,0.2
+07-05,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.09,0.163
+07-06,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,0.9,0.155
+07-07,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.15,0.164
+07-08,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.34,0.204
+07-09,ta_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,َ,t a,ت,َ,1.66,0.258
+08-00,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t e,ت,ِ,1.22,0.181
+08-01,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,d i,د,ِ,1.28,0.183
+08-02,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t i,ت,ِ,0.77,0.154
+08-03,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,d i,د,ِ,0.64,0.145
+08-04,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,d i,د,ِ,1.28,0.175
+08-05,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t i,ت,ِ,1.02,0.164
+08-06,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t i,ت,ِ,0.77,0.159
+08-07,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t i,ت,ِ,1.41,0.19
+08-08,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t eɪ,ت,,1.02,0.171
+08-09,ta_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ِ,t i,ت,ِ,1.66,0.208
+09-00,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t u,ت,ُ,1.22,0.202
+09-01,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t o,ت,ُ,0.96,0.194
+09-02,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t o,ت,ُ,0.64,0.148
+09-03,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t u ŋ,ت,ُ,0.58,0.138
+09-04,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,ʃ t oː,ش,ُ,1.34,0.199
+09-05,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t o,ت,ُ,0.9,0.159
+09-06,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t u,ت,ُ,0.77,0.161
+09-07,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t uː,ت,ُ,1.73,0.216
+09-08,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,t oː,ت,ُ,1.15,0.18
+09-09,ta_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ت,ُ,n o,ن,ُ,1.6,0.22
+10-00,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s aː,س,َ,1.15,0.17
+10-01,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s a,س,َ,1.22,0.168
+10-02,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s a,س,َ,0.83,0.157
+10-03,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s a,س,َ,0.58,0.135
+10-04,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s a,س,َ,1.15,0.172
+10-05,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,f a,ف,َ,1.09,0.164
+10-06,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,f a,ف,َ,0.83,0.156
+10-07,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,s a,س,َ,1.22,0.173
+10-08,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,f a,ف,َ,1.41,0.2
+10-09,tsa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,َ,θ a,ث,َ,1.34,0.193
+11-00,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,s eɪ,س,,1.22,0.167
+11-01,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,s i,س,ِ,0.96,0.167
+11-02,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,s iː,س,ِ,0.64,0.14
+11-03,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,s i,س,ِ,0.7,0.155
+11-04,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,θ i,ث,ِ,1.15,0.165
+11-05,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,θ,ث,,1.09,0.166
+11-06,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,f iː,ف,ِ,0.77,0.158
+11-07,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,s i,س,ِ,1.09,0.174
+11-08,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,θ eɪ,ث,,1.15,0.172
+11-09,tsa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ِ,f iː,ف,ِ,1.66,0.215
+12-00,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s oʊ,س,,1.09,0.167
+12-01,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s oʊ,س,,1.02,0.172
+12-02,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s oː,س,ُ,0.83,0.169
+12-03,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s oʊ,س,,0.58,0.15
+12-04,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s oː,س,ُ,1.41,0.2
+12-05,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s uː,س,ُ,0.9,0.166
+12-06,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,θ oʊ,ث,,0.77,0.161
+12-07,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,s uː,س,ُ,1.34,0.19
+12-08,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,θ oʊ,ث,,1.41,0.201
+12-09,tsa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ث,ُ,f s oː,ف,ُ,1.73,0.214
+13-00,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,j a,ي,َ,1.15,0.179
+13-01,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,t ɛ,ت,ِ,1.22,0.176
+13-02,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,dʒ ɛ,ج,ِ,0.96,0.165
+13-03,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,dʒ ɛ,ج,ِ,0.7,0.171
+13-04,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,d ɛ,د,ِ,1.34,0.207
+13-05,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,dʒ a,ج,َ,0.96,0.186
+13-06,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,j a,ي,َ,0.96,0.169
+13-07,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,j a,ي,َ,1.34,0.215
+13-08,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,dʒ e,ج,ِ,1.15,0.176
+13-09,jim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,َ,dʒ ɛ,ج,ِ,1.73,0.212
+14-00,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,ɲ i,,,1.47,0.202
+14-01,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,tɕ i5,,,0.96,0.163
+14-02,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,dʒ i,ج,ِ,0.9,0.164
+14-03,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,dʒ i,ج,ِ,0.58,0.143
+14-04,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,d i,د,ِ,1.6,0.207
+14-05,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,d i,د,ِ,0.83,0.165
+14-06,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,ɡ i,ج,ِ,0.9,0.167
+14-07,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,d i,د,ِ,1.22,0.172
+14-08,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,dʒ i,ج,ِ,1.34,0.202
+14-09,jim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ِ,t i,ت,ِ,1.86,0.225
+15-00,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ u,ج,ُ,1.22,0.174
+15-01,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,tɕ onɡ5,,,1.02,0.173
+15-02,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ uː,ج,ُ,0.77,0.164
+15-03,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ uː,ج,ُ,0.7,0.157
+15-04,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,d u,د,ُ,1.34,0.204
+15-05,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ uː,ج,ُ,0.96,0.171
+15-06,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ u,ج,ُ,0.77,0.162
+15-07,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,n uː,ن,ُ,1.47,0.195
+15-08,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ uː,ج,ُ,1.54,0.214
+15-09,jim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ج,ُ,dʒ uː,ج,ُ,1.73,0.219
+16-00,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,a,,,1.22,0.183
+16-01,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,h a,ه,َ,0.96,0.172
+16-02,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,aː,,,0.83,0.166
+16-03,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,f a,ف,َ,1.54,0.278
+16-04,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,h a,ه,َ,1.22,0.189
+16-05,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,a,,,0.9,0.17
+16-06,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,ʃ a,ش,َ,0.83,0.166
+16-07,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,h a,ه,َ,1.15,0.226
+16-08,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,x a,خ,َ,1.15,0.189
+16-09,hah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,َ,h a,ه,َ,1.79,0.258
+17-00,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,iɛ5,,,1.28,0.181
+17-01,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,f i,ف,ِ,1.28,0.182
+17-02,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,h eɪ,ه,,0.83,0.163
+17-03,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,h eɪ,ه,,0.83,0.166
+17-04,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,ʃ i,ش,ِ,1.28,0.182
+17-05,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,h,ه,,0.83,0.171
+17-06,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,a,,,0.9,0.173
+17-07,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,h aɪ,ه,,1.54,0.207
+17-08,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,eɪ,,,1.15,0.171
+17-09,hah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ِ,f iː,ف,ِ,1.98,0.254
+18-00,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,oː,,,1.28,0.18
+18-01,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,x oː,خ,ُ,0.9,0.165
+18-02,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,uː,,,0.77,0.166
+18-03,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,h oː,ه,ُ,0.64,0.143
+18-04,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,x u,خ,ُ,1.09,0.169
+18-05,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,h oː,ه,ُ,0.77,0.158
+18-06,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,x u5,خ,,0.9,0.166
+18-07,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,h oʊ,ه,,1.54,0.206
+18-08,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,h oʊ,ه,,1.54,0.208
+18-09,hah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ح,ُ,x oː,خ,ُ,1.54,0.198
+19-00,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ʌ,خ,,1.22,0.181
+19-01,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,1.15,0.174
+19-02,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɔ,خ,ُ,0.83,0.163
+19-03,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,0.83,0.165
+19-04,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,1.09,0.171
+19-05,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɔ,خ,ُ,0.7,0.162
+19-06,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,0.9,0.168
+19-07,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x o,خ,ُ,1.6,0.212
+19-08,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,1.54,0.203
+19-09,kha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,َ,x ɑ,خ,َ,1.6,0.205
+20-00,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i5,خ,,1.15,0.228
+20-01,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x aɪ,خ,,1.15,0.177
+20-02,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x,خ,,0.77,0.163
+20-03,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i,خ,ِ,0.77,0.2
+20-04,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i,خ,ِ,1.09,0.184
+20-05,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x,خ,,0.83,0.17
+20-06,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i,خ,ِ,0.9,0.168
+20-07,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i,خ,ِ,1.54,0.204
+20-08,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x,خ,,1.22,0.178
+20-09,kha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ِ,x i,خ,ِ,1.34,0.202
+21-00,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x u5,خ,,1.09,0.174
+21-01,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x uː,خ,ُ,0.9,0.167
+21-02,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,s u5,س,,0.58,0.14
+21-03,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x oː,خ,ُ,0.77,0.162
+21-04,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x u,خ,ُ,1.02,0.17
+21-05,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x uː ŋ,خ,ُ,0.64,0.142
+21-06,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x u,خ,ُ,0.9,0.166
+21-07,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x ɑu5 i5,خ,,1.79,0.218
+21-08,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x oː,خ,ُ,1.66,0.207
+21-09,kha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,خ,ُ,x oː,خ,ُ,1.41,0.197
+22-00,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d a,د,َ,1.22,0.175
+22-01,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,t ɛ,ت,ِ,1.15,0.175
+22-02,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d ɛ,د,ِ,0.83,0.16
+22-03,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d ɛ,د,ِ,1.09,0.175
+22-04,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,t,ت,,1.02,0.175
+22-05,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d ɛ,د,ِ,0.9,0.168
+22-06,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d ɛ,د,ِ,1.02,0.176
+22-07,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d a,د,َ,1.28,0.185
+22-08,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,t ɛ,ت,ِ,1.41,0.196
+22-09,dal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,َ,d ɛ,د,ِ,1.47,0.211
+23-00,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,t i,ت,ِ,1.09,0.174
+23-01,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.96,0.175
+23-02,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.7,0.161
+23-03,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.9,0.163
+23-04,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.96,0.168
+23-05,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.9,0.171
+23-06,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,0.9,0.164
+23-07,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,1.15,0.178
+23-08,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,t i,ت,ِ,1.41,0.2
+23-09,dal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ِ,d i,د,ِ,1.41,0.195
+24-00,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,t u,ت,ُ,1.41,0.197
+24-01,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,t uː,ت,ُ,1.09,0.174
+24-02,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d u,د,ُ,0.7,0.166
+24-03,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d uː,د,ُ,0.64,0.145
+24-04,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,t u,ت,ُ,1.09,0.169
+24-05,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d u,د,ُ,0.96,0.169
+24-06,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d u,د,ُ,0.77,0.161
+24-07,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d uː,د,ُ,1.09,0.175
+24-08,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d uː,د,ُ,1.6,0.216
+24-09,dal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,د,ُ,d uː,د,ُ,1.6,0.206
+25-00,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,d a,د,َ,1.15,0.175
+25-01,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,θ e,ث,ِ,0.96,0.173
+25-02,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,ð ɛ,ذ,ِ,0.9,0.178
+25-03,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,z e,ز,ِ,0.83,0.18
+25-04,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,v ɛ,,,1.09,0.207
+25-05,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,v a,,,1.47,0.244
+25-06,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,ð a,ذ,َ,1.02,0.193
+25-07,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,z ɛ,ز,ِ,1.47,0.234
+25-08,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,z ɛ,ز,ِ,1.54,0.203
+25-09,dzal_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,َ,d ɛ,د,ِ,1.22,0.188
+26-00,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,ð i,ذ,ِ,1.34,0.239
+26-01,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,θ i,ث,ِ,0.96,0.167
+26-02,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,ð iː,ذ,ِ,0.7,0.159
+26-03,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,z i,ز,ِ,0.83,0.163
+26-04,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,v i,,,1.09,0.182
+26-05,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,v i,,,1.22,0.185
+26-06,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,v i,,,0.96,0.174
+26-07,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,z i,ز,ِ,1.34,0.2
+26-08,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,v i,,,1.73,0.211
+26-09,dzal_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ِ,d i,د,ِ,1.41,0.201
+27-00,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z uː,ز,ُ,1.22,0.183
+27-01,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,s u5,س,,0.9,0.166
+27-02,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z uː,ز,ُ,0.77,0.166
+27-03,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z uː,ز,ُ,0.83,0.167
+27-04,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z u,ز,ُ,1.15,0.183
+27-05,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z uː,ز,ُ,1.28,0.186
+27-06,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,ð uː,ذ,ُ,0.83,0.169
+27-07,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,z uː,ز,ُ,1.28,0.19
+27-08,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,ð uː,ذ,ُ,1.41,0.201
+27-09,dzal_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ذ,ُ,d uː,د,ُ,1.66,0.22
+28-00,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,p r ɑ,ر,َ,1.02,0.177
+28-01,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,f ɹ a,ف,َ,0.96,0.219
+28-02,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r a,ر,َ,0.96,0.174
+28-03,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r o,ر,ُ,0.83,0.163
+28-04,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r o,ر,ُ,1.22,0.174
+28-05,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r o,ر,ُ,1.15,0.176
+28-06,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r o,ر,ُ,0.9,0.17
+28-07,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r o,ر,ُ,1.34,0.198
+28-08,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,p r a,ر,َ,1.54,0.222
+28-09,ra_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,َ,r a,ر,َ,1.6,0.209
+29-00,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,p r i,ر,ِ,1.02,0.181
+29-01,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,p r i,ر,ِ,0.96,0.171
+29-02,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,0.77,0.165
+29-03,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,0.77,0.163
+29-04,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,1.22,0.177
+29-05,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,f ɹ iː,ف,ِ,1.02,0.17
+29-06,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,0.9,0.169
+29-07,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,1.22,0.181
+29-08,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i n,ر,ِ,1.47,0.208
+29-09,ra_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ِ,r i,ر,ِ,1.73,0.215
+30-00,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,t r u,ت,ُ,1.09,0.174
+30-01,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,p ɪ l,ل,,0.96,0.172
+30-02,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r u,ر,ُ,0.9,0.166
+30-03,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r o,ر,ُ,0.64,0.143
+30-04,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r u,ر,ُ,1.02,0.17
+30-05,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r o,ر,ُ,0.96,0.174
+30-06,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r u,ر,ُ,0.96,0.174
+30-07,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r u,ر,ُ,1.34,0.197
+30-08,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r o,ر,ُ,1.28,0.183
+30-09,ra_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ر,ُ,r o,ر,ُ,1.41,0.199
+31-00,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z a,ز,َ,1.09,0.176
+31-01,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,s e,س,ِ,1.09,0.173
+31-02,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z e,ز,ِ,0.77,0.164
+31-03,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.22,0.181
+31-04,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.15,0.177
+31-05,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.41,0.2
+31-06,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.09,0.178
+31-07,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.09,0.179
+31-08,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z ɛ,ز,ِ,1.34,0.201
+31-09,zay_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,َ,z e,ز,ِ,1.41,0.198
+32-00,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,1.15,0.18
+32-01,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,s i,س,ِ,0.9,0.166
+32-02,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,0.96,0.169
+32-03,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,0.77,0.159
+32-04,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,1.15,0.177
+32-05,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,0.9,0.169
+32-06,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,0.9,0.171
+32-07,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,1.09,0.177
+32-08,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,1.15,0.178
+32-09,zay_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ِ,z i,ز,ِ,1.34,0.207
+33-00,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z u,ز,ُ,1.41,0.208
+33-01,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,s uː,س,ُ,0.77,0.174
+33-02,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z uː,ز,ُ,0.77,0.165
+33-03,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z u,ز,ُ,0.83,0.164
+33-04,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z u,ز,ُ,1.15,0.173
+33-05,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z u,ز,ُ,1.02,0.182
+33-06,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z uː,ز,ُ,0.83,0.174
+33-07,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z u,ز,ُ,1.28,0.181
+33-08,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z uː,ز,ُ,1.22,0.183
+33-09,zay_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ز,ُ,z y,ز,,1.28,0.182
+34-00,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.09,0.178
+34-01,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,0.96,0.171
+34-02,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s aː,س,َ,1.09,0.176
+34-03,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.22,0.188
+34-04,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.09,0.174
+34-05,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s aː,س,َ,1.09,0.239
+34-06,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.15,0.228
+34-07,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.28,0.191
+34-08,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.47,0.209
+34-09,sin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,َ,s a,س,َ,1.15,0.179
+35-00,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.09,0.175
+35-01,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,0.83,0.17
+35-02,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s iː,س,ِ,0.77,0.162
+35-03,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.02,0.176
+35-04,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.15,0.181
+35-05,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,0.96,0.172
+35-06,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.02,0.174
+35-07,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,0.96,0.172
+35-08,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.66,0.211
+35-09,sin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ِ,s i,س,ِ,1.09,0.175
+36-00,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s u,س,ُ,1.34,0.204
+36-01,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s oʊ,س,,0.7,0.162
+36-02,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s oː,س,ُ,0.83,0.165
+36-03,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s u5,س,,0.7,0.162
+36-04,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s oː,س,ُ,0.96,0.169
+36-05,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s u5,س,,0.77,0.163
+36-06,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s u,س,ُ,0.83,0.17
+36-07,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s uː,س,ُ,1.22,0.177
+36-08,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s oʊ,س,,1.22,0.177
+36-09,sin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,س,ُ,s o,س,ُ,1.47,0.209
+37-00,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.02,0.177
+37-01,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ aː,ش,َ,0.9,0.17
+37-02,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.09,0.179
+37-03,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.02,0.175
+37-04,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.41,0.203
+37-05,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.09,0.177
+37-06,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.22,0.182
+37-07,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.28,0.182
+37-08,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,s. əɜ,,,1.15,0.177
+37-09,shin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,َ,ʃ a,ش,َ,1.22,0.176
+38-00,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,s. i,,,1.09,0.172
+38-01,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ɕ i5,,,0.96,0.17
+38-02,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i5,ش,,0.77,0.162
+38-03,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i,ش,ِ,0.96,0.172
+38-04,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i,ش,ِ,1.28,0.177
+38-05,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ iː,ش,ِ,1.09,0.171
+38-06,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i,ش,ِ,0.96,0.168
+38-07,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ts. i5,,,1.28,0.178
+38-08,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i,ش,ِ,1.41,0.2
+38-09,shin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ِ,ʃ i,ش,ِ,1.34,0.196
+39-00,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ʃ uː,ش,ُ,1.28,0.18
+39-01,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,s. u5,,,0.7,0.157
+39-02,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ɕ uː,,,0.64,0.139
+39-03,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ʃ oː,ش,ُ,0.83,0.162
+39-04,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ʃ uː,ش,ُ,1.15,0.181
+39-05,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ʃ uː,ش,ُ,1.09,0.18
+39-06,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,s. u5,,,0.64,0.143
+39-07,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,tʃ uː,,,1.22,0.182
+39-08,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,s. uː,,,1.47,0.206
+39-09,shin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ش,ُ,ʃ uː,ش,ُ,1.34,0.205
+40-00,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,ʃ ɔ,ش,ُ,1.09,0.178
+40-01,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s aː,س,َ,0.9,0.166
+40-02,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s aː,س,َ,0.77,0.166
+40-03,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,ʃ ɑ,ش,َ,1.34,0.204
+40-04,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s ɑ,س,َ,1.09,0.175
+40-05,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s oː,س,ُ,0.96,0.168
+40-06,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s aː,س,َ,0.77,0.167
+40-07,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s o,س,ُ,1.34,0.201
+40-08,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s ɑ,س,َ,1.41,0.196
+40-09,sad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,َ,s. ɑ,,,1.41,0.196
+41-00,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s. i5,,,1.34,0.195
+41-01,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s i,س,ِ,0.9,0.163
+41-02,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s l iː,س,ِ,0.7,0.159
+41-03,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s. i5,,,0.83,0.161
+41-04,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s iː,س,ِ,1.22,0.182
+41-05,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,f aɪ,ف,,1.02,0.178
+41-06,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s i,س,ِ,0.83,0.171
+41-07,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,ʃ i5,ش,,1.28,0.183
+41-08,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,s i,س,ِ,1.79,0.243
+41-09,sad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ِ,ʃ iː,ش,ِ,1.28,0.197
+42-00,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,ʃ onɡ5,ش,,1.22,0.193
+42-01,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s oʊ,س,,0.9,0.174
+42-02,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s oː,س,ُ,0.77,0.166
+42-03,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,ʃ oʊ,ش,,0.9,0.165
+42-04,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s u,س,ُ,1.02,0.173
+42-05,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s u ŋ,س,ُ,0.9,0.164
+42-06,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s u,س,ُ,0.9,0.166
+42-07,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s u,س,ُ,1.66,0.21
+42-08,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,s onɡ5,س,,1.47,0.196
+42-09,sad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ص,ُ,ʃ oː,ش,ُ,1.47,0.196
+43-00,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d o,د,ُ,1.02,0.174
+43-01,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d o,د,ُ,1.09,0.172
+43-02,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,l ɔ,ل,ُ,0.83,0.17
+43-03,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,n o,ن,ُ,0.96,0.168
+43-04,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d o,د,ُ,0.96,0.167
+43-05,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d ɑ,د,َ,1.02,0.169
+43-06,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d,د,,0.9,0.163
+43-07,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,l o,ل,ُ,1.02,0.169
+43-08,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,v o,,,1.41,0.2
+43-09,dad_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,َ,d o,د,ُ,1.15,0.176
+44-00,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,1.09,0.172
+44-01,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d ʉ,د,,1.15,0.183
+44-02,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,l iː,ل,ِ,0.7,0.163
+44-03,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,0.83,0.165
+44-04,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,0.96,0.165
+44-05,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d ʉ,د,,1.02,0.17
+44-06,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,0.96,0.167
+44-07,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,1.22,0.202
+44-08,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d ʉ,د,,1.6,0.202
+44-09,dad_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ِ,d i,د,ِ,1.41,0.206
+45-00,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,n u,ن,ُ,1.15,0.181
+45-01,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d uː,د,ُ,1.34,0.2
+45-02,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,l uː,ل,ُ,0.58,0.148
+45-03,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d uː,د,ُ,0.9,0.165
+45-04,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d u,د,ُ,1.09,0.175
+45-05,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d uː,د,ُ,0.96,0.173
+45-06,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d u,د,ُ,1.02,0.169
+45-07,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,n u,ن,ُ,1.28,0.184
+45-08,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,b l u,ب,ُ,1.54,0.212
+45-09,dad_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ض,ُ,d u,د,ُ,1.34,0.199
+46-00,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,t o,ت,ُ,1.09,0.171
+46-01,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,t a,ت,َ,1.02,0.174
+46-02,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,l ɔ,ل,ُ,0.83,0.166
+46-03,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,t ɑ,ت,َ,1.73,0.214
+46-04,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,t ɑ,ت,َ,1.15,0.172
+46-05,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,t ɑ,ت,َ,1.15,0.181
+46-06,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,d ɑ,د,َ,1.28,0.183
+46-07,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,b ɑ,ب,َ,1.15,0.176
+46-08,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,b o,ب,ُ,1.41,0.198
+46-09,tah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,َ,n ɔ,ن,ُ,1.41,0.201
+47-00,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,n,ن,,1.15,0.174
+47-01,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,d i,د,ِ,0.83,0.166
+47-02,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,l i,ل,ِ,0.7,0.16
+47-03,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,l i,ل,ِ,0.83,0.168
+47-04,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,t u i,ت,ُ,1.09,0.173
+47-05,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,w ʌ,و,,1.02,0.172
+47-06,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,l i,ل,ِ,0.83,0.178
+47-07,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,l i,ل,ِ,1.15,0.192
+47-08,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,t i,ت,ِ,1.41,0.202
+47-09,tah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ِ,m ʌ i,م,ِ,1.41,0.205
+48-00,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,t oː,ت,ُ,1.02,0.169
+48-01,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,t o,ت,ُ,0.77,0.169
+48-02,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,l uː,ل,ُ,0.77,0.161
+48-03,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,t oː,ت,ُ,0.77,0.16
+48-04,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,t u,ت,ُ,1.15,0.174
+48-05,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,oː,,,0.77,0.166
+48-06,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,d o,د,ُ,0.9,0.164
+48-07,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,n uː,ن,ُ,1.28,0.195
+48-08,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,v oː,,,0.83,0.167
+48-09,tah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ط,ُ,n oː,ن,ُ,1.28,0.189
+49-00,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z ɑ,ز,َ,1.15,0.198
+49-01,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z d o,ز,ُ,1.02,0.177
+49-02,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z,ز,,0.9,0.172
+49-03,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z o,ز,ُ,0.77,0.166
+49-04,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,ð o,ذ,ُ,1.15,0.179
+49-05,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z ɑ,ز,َ,1.22,0.187
+49-06,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,ð o,ذ,ُ,1.02,0.179
+49-07,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z o,ز,ُ,1.22,0.189
+49-08,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,ð o,ذ,ُ,1.28,0.183
+49-09,zah_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,َ,z d ʌ,ز,,1.15,0.178
+50-00,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,z i5,ز,,1.34,0.203
+50-01,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,z i,ز,ِ,1.02,0.172
+50-02,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,z i,ز,ِ,0.7,0.162
+50-03,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,z i,ز,ِ,0.77,0.161
+50-04,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,v i,,,1.15,0.179
+50-05,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,ð iː,ذ,ِ,1.09,0.175
+50-06,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,v i,,,0.96,0.168
+50-07,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,l i,ل,ِ,1.02,0.171
+50-08,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,d i,د,ِ,1.09,0.17
+50-09,zah_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ِ,d i,د,ِ,1.15,0.175
+51-00,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z uː,ز,ُ,1.09,0.173
+51-01,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z u,ز,ُ,1.54,0.211
+51-02,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z uː,ز,ُ,0.7,0.169
+51-03,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z uː,ز,ُ,0.77,0.187
+51-04,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,ð u,ذ,ُ,1.41,0.24
+51-05,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z uː,ز,ُ,0.96,0.17
+51-06,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,v u,,,0.96,0.281
+51-07,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,z u,ز,ُ,1.15,0.331
+51-08,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,d u,د,ُ,1.54,0.247
+51-09,zah_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ظ,ُ,d u,د,ُ,1.28,0.183
+52-00,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,ɑː,,,1.09,0.178
+52-01,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,a l,ل,,0.9,0.172
+52-02,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,,,,0.83,0.175
+52-03,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,ɹ a,ر,َ,0.9,0.178
+52-04,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,a,,,1.54,0.245
+52-05,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,p aː,,,1.02,0.183
+52-06,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,a q aː,ق,َ,0.96,0.172
+52-07,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,l aː,ل,َ,1.15,0.247
+52-08,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,aː,,,1.47,0.279
+52-09,ain_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,َ,aː,,,1.41,0.288
+53-00,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aː i,,,1.41,0.26
+53-01,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,a,,,0.77,0.202
+53-02,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aː,,,0.7,0.267
+53-03,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aɪ,,,0.7,0.489
+53-04,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aɪ i,,,1.41,0.325
+53-05,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aɪ,,,1.15,0.194
+53-06,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,r a i,ر,َ,0.83,0.174
+53-07,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,aɪ,,,1.09,0.171
+53-08,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,t a i,ت,َ,1.54,0.21
+53-09,ain_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ِ,ɹ i,ر,ِ,1.34,0.216
+54-00,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,ɹ u,ر,ُ,1.28,0.208
+54-01,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,a,,,0.96,0.177
+54-02,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,h aʊ,ه,,0.7,0.174
+54-03,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,ɔ,,,0.77,0.179
+54-04,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,a,,,1.34,0.202
+54-05,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,a ŋ,,,0.96,0.167
+54-06,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,a r o,ر,ُ,0.9,0.167
+54-07,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,aʊ,,,1.41,0.202
+54-08,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,ʌ,,,1.22,0.182
+54-09,ain_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ع,ُ,,,,1.47,0.204
+55-00,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,m,م,,1.15,0.195
+55-01,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ʁ o,غ,ُ,0.83,0.169
+55-02,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ʁ o,غ,ُ,0.9,0.17
+55-03,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ɡ o,ج,ُ,0.9,0.173
+55-04,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,o,,,1.09,0.181
+55-05,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ɑ,,,0.9,0.167
+55-06,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ʁ o,غ,ُ,0.9,0.165
+55-07,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,l o,ل,ُ,1.54,0.203
+55-08,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ʁ o,غ,ُ,1.41,0.201
+55-09,ghaiin_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,َ,ʁ o,غ,ُ,1.09,0.175
+56-00,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,w i,و,ِ,1.22,0.207
+56-01,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,q,ق,,0.7,0.174
+56-02,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,r i,ر,ِ,0.77,0.433
+56-03,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,v i,,,0.58,0.163
+56-04,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,l i,ل,ِ,0.96,0.17
+56-05,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,ð i,ذ,ِ,1.09,0.175
+56-06,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,r i,ر,ِ,0.83,0.165
+56-07,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,r i,ر,ِ,1.47,0.205
+56-08,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,q,ق,,1.47,0.202
+56-09,ghaiin_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ِ,w,و,,0.9,0.171
+57-00,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,ɡ u,ج,ُ,1.47,0.212
+57-01,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,uː,,,0.77,0.168
+57-02,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,r uː,ر,ُ,0.7,0.165
+57-03,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,d uː,د,ُ,0.77,0.16
+57-04,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,l u,ل,ُ,1.09,0.242
+57-05,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,ʁ u,غ,ُ,1.02,0.219
+57-06,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,ɹ u,ر,ُ,0.9,0.176
+57-07,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,ɹ uː,ر,ُ,1.28,0.185
+57-08,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,ʁ uː,غ,ُ,1.34,0.21
+57-09,ghaiin_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,غ,ُ,v uː,,,1.54,0.213
+58-00,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.96,0.17
+58-01,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.9,0.168
+58-02,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.9,0.162
+58-03,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.77,0.164
+58-04,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,1.15,0.186
+58-05,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.9,0.165
+58-06,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,0.96,0.169
+58-07,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,1.34,0.198
+58-08,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,1.41,0.203
+58-09,fa_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,َ,f a,ف,َ,1.41,0.212
+59-00,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f i,ف,ِ,1.15,0.182
+59-01,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,0.83,0.171
+59-02,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,0.83,0.162
+59-03,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f i,ف,ِ,0.7,0.174
+59-04,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f i,ف,ِ,1.02,0.18
+59-05,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,0.96,0.176
+59-06,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,0.9,0.168
+59-07,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,1.47,0.211
+59-08,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f eɪ,ف,,1.47,0.205
+59-09,fa_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ِ,f iː,ف,ِ,1.28,0.19
+60-00,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː,ف,ُ,1.47,0.203
+60-01,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f u l,ف,ُ,0.83,0.168
+60-02,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː,ف,ُ,0.58,0.203
+60-03,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː,ف,ُ,0.64,0.159
+60-04,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː,ف,ُ,0.96,0.181
+60-05,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f u5,ف,,0.83,0.168
+60-06,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː,ف,ُ,0.83,0.181
+60-07,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f uː l,ف,ُ,1.28,0.27
+60-08,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f oʊ,ف,,1.47,0.296
+60-09,fa_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ف,ُ,f oː,ف,ُ,1.28,0.373
+61-00,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,q ɑ,ق,َ,1.15,0.236
+61-01,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,q,ق,,0.96,0.23
+61-02,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,ɔ,,,0.83,0.214
+61-03,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,q o,ق,ُ,0.9,0.211
+61-04,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,l ɔ,ل,ُ,1.15,0.238
+61-05,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,l aː,ل,َ,1.02,0.194
+61-06,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,l aː,ل,َ,0.9,0.338
+61-07,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,m o,م,ُ,1.47,0.407
+61-08,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,ʁ o,غ,ُ,1.6,0.387
+61-09,qaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,َ,l ɔ,ل,ُ,1.09,0.266
+62-00,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,q j i,ق,ِ,1.28,0.244
+62-01,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,w aɪ,و,,0.83,0.21
+62-02,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,l a,ل,َ,0.77,0.194
+62-03,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,p i,,,0.58,0.168
+62-04,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,l i,ل,ِ,1.09,0.212
+62-05,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,l a j iː,ل,َ,0.9,0.2
+62-06,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,r i,ر,ِ,0.9,0.195
+62-07,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,m ʌ j i,م,ِ,1.02,0.208
+62-08,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,l ʉ,ل,,1.54,0.247
+62-09,qaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ِ,w i,و,ِ,1.22,0.23
+63-00,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,q,ق,,1.22,0.426
+63-01,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,b uː,ب,ُ,0.77,1.359
+63-02,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,a,,,0.64,2.673
+63-03,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,q u,ق,ُ,0.9,1.373
+63-04,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,l uː,ل,ُ,1.34,0.292
+63-05,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,o,,,0.77,0.181
+63-06,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,n u,ن,ُ,0.9,0.185
+63-07,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,m uː,م,ُ,1.28,0.186
+63-08,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,k l oː,ك,ُ,1.79,0.217
+63-09,qaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ق,ُ,l uː,ل,ُ,1.09,0.18
+64-00,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.15,0.179
+64-01,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,0.96,0.174
+64-02,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.02,0.17
+64-03,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,q a,ق,َ,1.02,0.167
+64-04,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.09,0.173
+64-05,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.09,0.172
+64-06,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,0.83,0.224
+64-07,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.15,0.183
+64-08,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.86,0.243
+64-09,kaf_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,َ,k a,ك,َ,1.09,0.209
+65-00,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,1.09,0.172
+65-01,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,ɡ i,ج,ِ,0.83,0.17
+65-02,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k iː,ك,ِ,0.77,0.164
+65-03,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,0.7,0.16
+65-04,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,1.41,0.206
+65-05,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,0.96,0.183
+65-06,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,0.9,0.195
+65-07,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,1.41,0.211
+65-08,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,1.92,0.289
+65-09,kaf_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ِ,k i,ك,ِ,1.15,0.185
+66-00,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k u,ك,ُ,1.02,0.174
+66-01,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k oː r,ك,ُ,0.96,0.177
+66-02,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k oː,ك,ُ,0.77,0.166
+66-03,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,q uː,ق,ُ,0.7,0.172
+66-04,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k u,ك,ُ,1.34,0.23
+66-05,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k uː,ك,ُ,0.7,0.162
+66-06,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k u,ك,ُ,0.7,0.203
+66-07,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k uː,ك,ُ,1.15,0.199
+66-08,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k,ك,,1.73,0.215
+66-09,kaf_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ك,ُ,k o,ك,ُ,1.22,0.181
+67-00,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.02,0.171
+67-01,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,0.9,0.169
+67-02,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l aː,ل,َ,0.96,0.174
+67-03,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,0.83,0.163
+67-04,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.34,0.199
+67-05,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.02,0.181
+67-06,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,0.96,0.171
+67-07,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.15,0.182
+67-08,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.34,0.201
+67-09,lam_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,َ,l a,ل,َ,1.09,0.171
+68-00,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.28,0.178
+68-01,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.02,0.172
+68-02,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l iː,ل,ِ,0.77,0.171
+68-03,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,0.77,0.161
+68-04,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.22,0.186
+68-05,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,0.9,0.167
+68-06,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,0.96,0.171
+68-07,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.54,0.212
+68-08,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.54,0.207
+68-09,lam_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ِ,l i,ل,ِ,1.28,0.181
+69-00,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l u,ل,ُ,1.22,0.181
+69-01,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l oː,ل,ُ,0.9,0.167
+69-02,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,h l oː,ه,ُ,0.58,0.145
+69-03,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l oː,ل,ُ,0.77,0.162
+69-04,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l oː r,ل,ُ,1.09,0.171
+69-05,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l uː,ل,ُ,0.83,0.17
+69-06,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l u,ل,ُ,0.77,0.16
+69-07,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l u,ل,ُ,1.09,0.169
+69-08,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l oː,ل,ُ,1.86,0.229
+69-09,lam_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ل,ُ,l o,ل,ُ,1.22,0.178
+70-00,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.22,0.182
+70-01,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,n a,ن,َ,1.22,0.179
+70-02,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,0.96,0.167
+70-03,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.02,0.169
+70-04,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.15,0.183
+70-05,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,0.96,0.179
+70-06,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,0.96,0.175
+70-07,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.28,0.184
+70-08,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.41,0.204
+70-09,mim_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,َ,m a,م,َ,1.34,0.199
+71-00,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,1.22,0.194
+71-01,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,ʌ,,,0.9,0.169
+71-02,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,0.77,0.164
+71-03,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,0.9,0.169
+71-04,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,l u,ل,ُ,1.28,0.188
+71-05,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,0.96,0.171
+71-06,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,0.9,0.17
+71-07,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,1.09,0.17
+71-08,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,m i,م,ِ,1.54,0.213
+71-09,mim_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ِ,n eɪ,ن,,1.15,0.181
+72-00,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m u,م,ُ,1.22,0.177
+72-01,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,a l,ل,,0.83,0.166
+72-02,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m,م,,0.83,0.164
+72-03,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m u,م,ُ,0.77,0.163
+72-04,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,o,,,1.02,0.173
+72-05,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,a,,,0.83,0.164
+72-06,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m u,م,ُ,0.9,0.166
+72-07,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m o,م,ُ,1.28,0.181
+72-08,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,n u,ن,ُ,1.41,0.209
+72-09,mim_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,م,ُ,m o,م,ُ,1.41,0.206
+73-00,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.15,0.18
+73-01,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,l a,ل,َ,0.96,0.169
+73-02,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,l a,ل,َ,0.9,0.165
+73-03,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,0.83,0.165
+73-04,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.41,0.21
+73-05,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,0.96,0.18
+73-06,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.34,0.205
+73-07,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.15,0.183
+73-08,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.54,0.212
+73-09,nun_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,َ,n a,ن,َ,1.15,0.179
+74-00,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n e,ن,ِ,1.34,0.199
+74-01,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n uː,ن,ُ,0.9,0.164
+74-02,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n iː,ن,ِ,0.77,0.164
+74-03,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n eɪ,ن,,0.7,0.159
+74-04,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,m i,م,ِ,1.34,0.201
+74-05,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n i,ن,ِ,0.96,0.173
+74-06,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n iː r,ن,ِ,0.96,0.169
+74-07,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n i,ن,ِ,1.09,0.172
+74-08,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n i,ن,ِ,1.47,0.207
+74-09,nun_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ِ,n i,ن,ِ,1.28,0.187
+75-00,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n u,ن,ُ,1.28,0.184
+75-01,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,l ɜː,ل,,0.83,0.17
+75-02,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,l o,ل,ُ,0.58,0.14
+75-03,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n o,ن,ُ,0.9,0.168
+75-04,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n o,ن,ُ,1.34,0.202
+75-05,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,l o,ل,ُ,0.64,0.143
+75-06,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n o,ن,ُ,1.02,0.173
+75-07,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n oː,ن,ُ,1.22,0.185
+75-08,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n o,ن,ُ,1.54,0.209
+75-09,nun_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ن,ُ,n o,ن,ُ,1.34,0.198
+76-00,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h,ه,,1.15,0.178
+76-01,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,eː,,,1.02,0.173
+76-02,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h aː,ه,َ,0.7,0.164
+76-03,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,,,,0.83,0.168
+76-04,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h əɜ,ه,,1.22,0.186
+76-05,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,a h aː,ه,َ,1.22,0.177
+76-06,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h,ه,,1.22,0.18
+76-07,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h ɛ,ه,ِ,1.15,0.173
+76-08,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h əɜ,ه,,1.22,0.176
+76-09,Ha_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,َ,h ɛ,ه,ِ,1.41,0.199
+77-00,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,h i,ه,ِ,1.15,0.177
+77-01,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,i,,,0.83,0.168
+77-02,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,ʒ i,ج,ِ,0.64,0.145
+77-03,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,h i,ه,ِ,0.77,0.164
+77-04,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,i,,,1.34,0.197
+77-05,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,v i,,,0.96,0.17
+77-06,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,h i,ه,ِ,0.9,0.17
+77-07,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,dʒ i,ج,ِ,1.34,0.195
+77-08,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,h i,ه,ِ,1.41,0.205
+77-09,Ha_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ِ,h i5,ه,,1.47,0.206
+78-00,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h uː,ه,ُ,1.47,0.21
+78-01,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h uː,ه,ُ,0.77,0.168
+78-02,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h o,ه,ُ,0.58,0.143
+78-03,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,uː,,,0.77,0.163
+78-04,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,,,,1.28,0.183
+78-05,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,uː,,,0.96,0.168
+78-06,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h u,ه,ُ,0.96,0.177
+78-07,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,uː,,,1.09,0.177
+78-08,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h u5,ه,,1.47,0.211
+78-09,Ha_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ه,ُ,h uː,ه,ُ,1.73,0.218
+79-00,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,1.22,0.184
+79-01,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,0.96,0.172
+79-02,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,0.83,0.177
+79-03,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,0.9,0.17
+79-04,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,p w a,و,َ,1.47,0.206
+79-05,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,1.02,0.179
+79-06,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,0.96,0.171
+79-07,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,0.96,0.175
+79-08,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,1.73,0.224
+79-09,waw_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,َ,w a,و,َ,1.6,0.215
+80-00,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,1.41,0.208
+80-01,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,0.7,0.159
+80-02,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,0.58,0.142
+80-03,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,0.9,0.162
+80-04,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,1.28,0.185
+80-05,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,0.96,0.18
+80-06,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,0.83,0.168
+80-07,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,1.02,0.168
+80-08,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,1.34,0.212
+80-09,waw_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ِ,w i,و,ِ,1.66,0.216
+81-00,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,uː,,,1.41,0.204
+81-01,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,u,,,0.9,0.168
+81-02,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,w u,و,ُ,0.58,0.144
+81-03,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,v uː,,,0.64,0.14
+81-04,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,v uː r,ر,,1.41,0.205
+81-05,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,k w a l ɨ,ك,َ,0.83,0.168
+81-06,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,v uː,,,0.83,0.168
+81-07,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,uː,,,1.09,0.173
+81-08,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,v uː,,,1.6,0.22
+81-09,waw_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,و,ُ,o,,,1.6,0.21
+82-00,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.15,0.175
+82-01,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,0.83,0.173
+82-02,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,0.9,0.169
+82-03,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,0.9,0.168
+82-04,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.15,0.176
+82-05,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.02,0.173
+82-06,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.02,0.167
+82-07,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.28,0.177
+82-08,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.47,0.207
+82-09,ya_fathah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,َ,j a,ي,َ,1.6,0.21
+83-00,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,j i,ي,ِ,1.15,0.181
+83-01,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,i,,,0.9,0.168
+83-02,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,i,,,0.64,0.151
+83-03,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,i,,,0.7,0.16
+83-04,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,j eɪ,ي,,1.34,0.2
+83-05,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,,,,0.9,0.166
+83-06,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,,,,0.83,0.167
+83-07,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,i,,,0.96,0.168
+83-08,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,j i,ي,ِ,1.41,0.202
+83-09,ya_kasroh,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ِ,j,ي,,1.6,0.209
+84-00,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j u,ي,ُ,1.34,0.195
+84-01,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː v ɐ,ي,ُ,0.83,0.163
+84-02,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,0.77,0.164
+84-03,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,0.58,0.14
+84-04,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,1.41,0.196
+84-05,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,1.34,0.197
+84-06,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,0.83,0.163
+84-07,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j uː,ي,ُ,1.15,0.174
+84-08,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j oʊ,ي,,1.34,0.197
+84-09,ya_dommah,espeak,facebook/wav2vec2-xlsr-53-espeak-cv-ft,ي,ُ,j o,ي,ُ,1.66,0.209

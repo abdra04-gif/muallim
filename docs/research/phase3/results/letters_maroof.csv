@@ -1,0 +1,841 @@
+﻿clip,class,system,model,expected_letter,expected_vowel,output,got_letter,got_vowel,audio_s,compute_s
+01-00,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,1.22,2.331
+01-01,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< h,ء,,0.9,0.276
+01-02,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,q aa,ق,َ,1.54,0.31
+01-03,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< a aa,ء,َ,1.09,0.203
+01-04,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,1.02,0.203
+01-05,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,q AA l,ق,َ,0.83,0.206
+01-06,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,1.02,0.224
+01-07,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,1.28,0.214
+01-08,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,0.83,0.187
+01-09,alif_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,َ,< aa,ء,َ,1.28,0.213
+02-00,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< i l,ء,ِ,1.22,0.214
+02-01,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.41,0.231
+02-02,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,0.7,0.185
+02-03,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.09,0.197
+02-04,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< y,ء,,1.15,0.196
+02-05,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.22,0.226
+02-06,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.02,0.311
+02-07,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.41,0.519
+02-08,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< y,ء,,1.54,3.13
+02-09,alif_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ِ,< ii,ء,ِ,1.34,2.743
+03-00,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< uu uu,ء,ُ,1.28,1.552
+03-01,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< h,ء,,1.28,0.296
+03-02,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< uu,ء,ُ,0.7,0.193
+03-03,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< a uu,ء,َ,0.77,0.193
+03-04,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< uu uu,ء,ُ,1.41,0.232
+03-05,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< uu,ء,ُ,1.22,0.214
+03-06,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,l aa ii,ل,َ,0.7,0.183
+03-07,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< m,ء,,1.22,0.199
+03-08,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< a uu,ء,َ,1.54,0.22
+03-09,alif_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ء,ُ,< uu m,ء,ُ,2.18,0.3
+04-00,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,1.09,0.209
+04-01,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa l,ب,َ,1.41,0.239
+04-02,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,0.7,0.194
+04-03,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa h,ب,َ,0.64,0.168
+04-04,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa h,ب,َ,1.34,0.221
+04-05,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,1.15,0.198
+04-06,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,0.96,0.193
+04-07,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,1.22,0.202
+04-08,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,1.41,0.235
+04-09,ba_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,َ,b aa,ب,َ,1.54,0.288
+05-00,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b aa aa,ب,َ,1.28,0.207
+05-01,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,f ii h,ف,ِ,1.22,0.198
+05-02,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,0.77,0.184
+05-03,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,0.77,0.184
+05-04,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,1.28,0.213
+05-05,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,1.02,0.208
+05-06,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,0.9,0.223
+05-07,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,1.09,0.214
+05-08,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,1.34,0.227
+05-09,ba_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ِ,b ii,ب,ِ,1.34,0.271
+06-00,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,b uu,ب,ُ,1.15,0.225
+06-01,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,^ r,ث,,1.34,0.246
+06-02,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,b uu uu,ب,ُ,0.7,0.217
+06-03,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,t uu m,ت,ُ,0.64,0.195
+06-04,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,T uu uu,ط,ُ,1.47,0.227
+06-05,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,b uu,ب,ُ,0.96,0.203
+06-06,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,b uu,ب,ُ,0.77,0.194
+06-07,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,d uu b,د,ُ,1.15,0.215
+06-08,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,t uu uu,ت,ُ,1.47,0.236
+06-09,ba_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ب,ُ,b uu uu,ب,ُ,1.28,0.211
+07-00,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,t aa,ت,َ,1.15,0.205
+07-01,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,t a E,ت,َ,1.15,0.201
+07-02,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T AA E,ط,َ,0.83,0.19
+07-03,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T AA E,ط,َ,0.7,0.184
+07-04,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T AA h,ط,َ,1.47,0.227
+07-05,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,t aa,ت,َ,1.09,0.208
+07-06,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T aa,ط,َ,0.9,0.185
+07-07,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,t aa,ت,َ,1.15,0.212
+07-08,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T AA aa,ط,َ,1.34,0.282
+07-09,ta_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,َ,T AA m,ط,َ,1.66,0.251
+08-00,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,t ii l,ت,ِ,1.22,0.213
+08-01,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,d a n n,د,َ,1.28,0.211
+08-02,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,t ii,ت,ِ,0.77,0.19
+08-03,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,T ii ii,ط,ِ,0.64,0.17
+08-04,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,d ii,د,ِ,1.28,0.229
+08-05,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,t ii,ت,ِ,1.02,0.216
+08-06,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,T ii,ط,ِ,0.77,0.2
+08-07,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,t ii,ت,ِ,1.41,0.239
+08-08,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,T ii y,ط,ِ,1.02,0.197
+08-09,ta_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ِ,t ii,ت,ِ,1.66,0.242
+09-00,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,1.22,0.201
+09-01,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,0.96,0.203
+09-02,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,0.64,0.171
+09-03,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t a b,ت,َ,0.58,0.172
+09-04,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,1.34,0.226
+09-05,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,0.9,0.185
+09-06,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu uu,ت,ُ,0.77,0.182
+09-07,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu b,ت,ُ,1.73,0.244
+09-08,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,t uu m,ت,ُ,1.15,0.205
+09-09,ta_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ت,ُ,T UU uu,ط,ُ,1.6,0.249
+10-00,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,s aa,س,َ,1.15,0.197
+10-01,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,s aa H,س,َ,1.22,0.201
+10-02,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,f aa E,ف,َ,0.83,0.198
+10-03,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,f aa,ف,َ,0.58,0.16
+10-04,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,S AA h,ص,َ,1.15,0.225
+10-05,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,f aa,ف,َ,1.09,0.203
+10-06,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,aa,,,0.83,0.192
+10-07,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,s aa,س,َ,1.22,0.198
+10-08,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,f aa,ف,َ,1.41,0.222
+10-09,tsa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,َ,aa aa,,,1.34,0.242
+11-00,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,ii,,,1.22,0.196
+11-01,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,s ii,س,ِ,0.96,0.193
+11-02,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,f ii ii,ف,ِ,0.64,0.155
+11-03,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,f ii,ف,ِ,0.7,0.176
+11-04,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,^ ii,ث,ِ,1.15,0.201
+11-05,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,s ii,س,ِ,1.09,0.213
+11-06,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,f ii,ف,ِ,0.77,0.189
+11-07,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,s ii,س,ِ,1.09,0.195
+11-08,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,f ii,ف,ِ,1.15,0.2
+11-09,tsa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ِ,f ii,ف,ِ,1.66,0.235
+12-00,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,t uu m,ت,ُ,1.09,0.214
+12-01,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,S f,ص,,1.02,0.197
+12-02,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,S w f,ص,,0.83,0.194
+12-03,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,^ uu,ث,ُ,0.58,0.166
+12-04,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,S f,ص,,1.41,0.227
+12-05,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,S uu,ص,ُ,0.9,0.196
+12-06,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,s,س,,0.77,0.183
+12-07,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,^ u uu,ث,ُ,1.34,0.234
+12-08,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,s uu,س,ُ,1.41,0.223
+12-09,tsa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ث,ُ,^ uu uu,ث,ُ,1.73,0.354
+13-00,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,y aa,ي,َ,1.15,0.226
+13-01,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,t aa aa,ت,َ,1.22,0.208
+13-02,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa h,ج,َ,0.96,0.194
+13-03,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa h,ج,َ,0.7,0.189
+13-04,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,d aa h,د,َ,1.34,0.228
+13-05,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa,ج,َ,0.96,0.187
+13-06,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa,ج,َ,0.96,0.198
+13-07,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa,ج,َ,1.34,0.231
+13-08,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,j aa aa,ج,َ,1.15,0.203
+13-09,jim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,َ,t aa aa,ت,َ,1.73,0.237
+14-00,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,d ii ii,د,ِ,1.47,0.227
+14-01,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,t ii,ت,ِ,0.96,0.195
+14-02,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,j ii,ج,ِ,0.9,0.19
+14-03,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,j y ii,ج,ِ,0.58,0.163
+14-04,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,j ii,ج,ِ,1.6,0.247
+14-05,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,d ii,د,ِ,0.83,0.188
+14-06,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,d ii,د,ِ,0.9,0.191
+14-07,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,d ii,د,ِ,1.22,0.202
+14-08,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,j y,ج,,1.34,0.228
+14-09,jim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ِ,t ii,ت,ِ,1.86,0.246
+15-00,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,j uu uu,ج,ُ,1.22,0.209
+15-01,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,j a h,ج,َ,1.02,0.199
+15-02,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,j uu uu,ج,ُ,0.77,0.195
+15-03,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,uu h,ه,,0.7,0.194
+15-04,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,d uu r,د,ُ,1.34,0.255
+15-05,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,j uu m,ج,ُ,0.96,0.207
+15-06,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,d uu uu,د,ُ,0.77,0.186
+15-07,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,d uu,د,ُ,1.47,0.239
+15-08,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,j uu,ج,ُ,1.54,0.233
+15-09,jim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ج,ُ,t uu m,ت,ُ,1.73,0.247
+16-00,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa,ح,َ,1.22,0.202
+16-01,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa h,ح,َ,0.96,0.192
+16-02,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa,ح,َ,0.83,0.184
+16-03,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa aa,ح,َ,1.54,0.238
+16-04,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa aa,ح,َ,1.22,0.223
+16-05,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa,ح,َ,0.9,0.185
+16-06,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa aa,ح,َ,0.83,0.19
+16-07,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,h aa,ه,َ,1.15,0.207
+16-08,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa aa,ح,َ,1.15,0.217
+16-09,hah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,َ,H aa,ح,َ,1.79,0.258
+17-00,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H ii l,ح,ِ,1.28,0.215
+17-01,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,f ii h,ف,ِ,1.28,0.209
+17-02,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H a y,ح,َ,0.83,0.188
+17-03,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H a y h,ح,َ,0.83,0.189
+17-04,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,$ ii,ش,ِ,1.28,0.205
+17-05,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H y,ح,,0.83,0.19
+17-06,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H ii,ح,ِ,0.9,0.191
+17-07,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,h a y,ه,َ,1.54,0.225
+17-08,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H a y,ح,َ,1.15,0.197
+17-09,hah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ِ,H ii n,ح,ِ,1.98,0.275
+18-00,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,1.28,0.211
+18-01,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,x uu,خ,ُ,0.9,0.193
+18-02,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,0.77,0.185
+18-03,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,0.64,0.158
+18-04,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,h uu,ه,ُ,1.09,0.194
+18-05,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,0.77,0.186
+18-06,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,0.9,0.183
+18-07,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,1.54,0.232
+18-08,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,h a uu,ه,َ,1.54,0.226
+18-09,hah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ح,ُ,H uu,ح,ُ,1.54,0.23
+19-00,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA uu,خ,َ,1.22,0.204
+19-01,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA AA,خ,َ,1.15,0.196
+19-02,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA h,خ,َ,0.83,0.199
+19-03,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA AA,خ,َ,0.83,0.188
+19-04,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA h,خ,َ,1.09,0.202
+19-05,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA,خ,َ,0.7,0.176
+19-06,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA,خ,َ,0.9,0.19
+19-07,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA,خ,َ,1.6,0.235
+19-08,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA AA,خ,َ,1.54,0.245
+19-09,kha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,َ,x AA,خ,َ,1.6,0.259
+20-00,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x y,خ,,1.15,0.208
+20-01,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x A f,خ,َ,1.15,0.213
+20-02,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,A,,,0.77,0.195
+20-03,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x II h,خ,ِ,0.77,0.188
+20-04,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x y,خ,,1.09,0.197
+20-05,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,II,,,0.83,0.19
+20-06,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x,خ,,0.9,0.186
+20-07,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x y,خ,,1.54,0.242
+20-08,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x A y,خ,َ,1.22,0.248
+20-09,kha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ِ,x U y,خ,ُ,1.34,1.037
+21-00,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x uu,خ,ُ,1.09,0.667
+21-01,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,< a x D,ء,َ,0.9,0.199
+21-02,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,H ii,ح,ِ,0.58,0.166
+21-03,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,uu,,,0.77,0.184
+21-04,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x UU,خ,ُ,1.02,0.198
+21-05,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x,خ,,0.64,0.159
+21-06,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x UU,خ,ُ,0.9,0.204
+21-07,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x U m,خ,ُ,1.79,0.256
+21-08,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x A w m,خ,َ,1.66,0.263
+21-09,kha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,خ,ُ,x uu,خ,ُ,1.41,0.246
+22-00,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa aa,ت,َ,1.22,0.21
+22-01,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa r,ت,َ,1.15,0.205
+22-02,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,d aa aa,د,َ,0.83,0.182
+22-03,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa h,ت,َ,1.09,0.199
+22-04,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa h,ت,َ,1.02,0.202
+22-05,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,d aa,د,َ,0.9,0.192
+22-06,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,d aa,د,َ,1.02,0.205
+22-07,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,d aa,د,َ,1.28,0.215
+22-08,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa aa,ت,َ,1.41,0.239
+22-09,dal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,َ,t aa,ت,َ,1.47,0.24
+23-00,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii ii,ت,ِ,1.09,0.189
+23-01,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii,ت,ِ,0.96,0.191
+23-02,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii,ت,ِ,0.7,0.183
+23-03,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii,ت,ِ,0.9,0.192
+23-04,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii,ت,ِ,0.96,0.197
+23-05,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,d ii,د,ِ,0.9,0.185
+23-06,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,d ii ii,د,ِ,0.9,0.193
+23-07,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,d ii,د,ِ,1.15,0.202
+23-08,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,t ii,ت,ِ,1.41,0.226
+23-09,dal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ِ,T ii,ط,ِ,1.41,0.229
+24-00,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,t uu m,ت,ُ,1.41,0.218
+24-01,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,t uu m,ت,ُ,1.09,0.196
+24-02,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,d uu h,د,ُ,0.7,0.192
+24-03,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,t uu h,ت,ُ,0.64,0.163
+24-04,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,t uu m,ت,ُ,1.09,0.202
+24-05,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,d uu,د,ُ,0.96,0.208
+24-06,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,d uu uu,د,ُ,0.77,0.189
+24-07,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,d uu uu,د,ُ,1.09,0.196
+24-08,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,d uu,د,ُ,1.6,0.24
+24-09,dal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,د,ُ,t uu m,ت,ُ,1.6,0.233
+25-00,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,d aa,د,َ,1.15,0.205
+25-01,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* aa h,ذ,َ,0.96,0.194
+25-02,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* aa aa,ذ,َ,0.9,0.193
+25-03,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,z aa aa,ز,َ,0.83,0.19
+25-04,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* h,ذ,,1.09,0.195
+25-05,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* aa,ذ,َ,1.47,0.224
+25-06,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* aa,ذ,َ,1.02,0.199
+25-07,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,z aa,ز,َ,1.47,0.235
+25-08,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,* aa,ذ,َ,1.54,0.221
+25-09,dzal_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,َ,d aa aa,د,َ,1.22,0.202
+26-00,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii y,ذ,ِ,1.34,0.224
+26-01,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,^ ii,ث,ِ,0.96,0.191
+26-02,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii y,ذ,ِ,0.7,0.174
+26-03,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii,ذ,ِ,0.83,0.188
+26-04,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii,ذ,ِ,1.09,0.226
+26-05,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii,ذ,ِ,1.22,0.216
+26-06,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii y,ذ,ِ,0.96,0.207
+26-07,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii,ذ,ِ,1.34,0.233
+26-08,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,* ii,ذ,ِ,1.73,0.243
+26-09,dzal_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ِ,d ii,د,ِ,1.41,0.232
+27-00,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu uu,ذ,ُ,1.22,0.209
+27-01,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,s uu,س,ُ,0.9,0.191
+27-02,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu uu,ذ,ُ,0.77,0.186
+27-03,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu,ذ,ُ,0.83,0.183
+27-04,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu uu,ذ,ُ,1.15,0.206
+27-05,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu,ذ,ُ,1.28,0.209
+27-06,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu uu,ذ,ُ,0.83,0.194
+27-07,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu,ذ,ُ,1.28,0.209
+27-08,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,* uu,ذ,ُ,1.41,0.229
+27-09,dzal_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ذ,ُ,d uu n,د,ُ,1.66,0.249
+28-00,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r uu,ر,ُ,1.02,0.206
+28-01,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa h,ر,َ,0.96,0.191
+28-02,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa aa,ر,َ,0.96,0.197
+28-03,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa h,ر,َ,0.83,0.2
+28-04,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa h,ر,َ,1.22,0.228
+28-05,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa,ر,َ,1.15,0.226
+28-06,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa aa,ر,َ,0.9,0.204
+28-07,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r uu,ر,ُ,1.34,0.232
+28-08,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r uu,ر,ُ,1.54,0.236
+28-09,ra_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,َ,r aa,ر,َ,1.6,0.249
+29-00,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r ii y,ر,ِ,1.02,0.203
+29-01,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,f ii,ف,ِ,0.96,0.233
+29-02,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r y,ر,,0.77,0.21
+29-03,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r ii,ر,ِ,0.77,0.198
+29-04,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r y,ر,,1.22,0.199
+29-05,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,x A h,خ,َ,1.02,0.198
+29-06,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r y,ر,,0.9,0.187
+29-07,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r y,ر,,1.22,0.203
+29-08,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,r y,ر,,1.47,0.227
+29-09,ra_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ِ,E y,ع,,1.73,0.242
+30-00,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,t uu m,ت,ُ,1.09,0.202
+30-01,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,f ii m,ف,ِ,0.96,0.191
+30-02,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu uu,ر,ُ,0.9,0.19
+30-03,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu,ر,ُ,0.64,0.165
+30-04,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu uu,ر,ُ,1.02,0.21
+30-05,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu uu,ر,ُ,0.96,0.204
+30-06,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu,ر,ُ,0.96,0.194
+30-07,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu,ر,ُ,1.34,0.223
+30-08,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu,ر,ُ,1.28,0.213
+30-09,ra_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ر,ُ,r uu,ر,ُ,1.41,0.228
+31-00,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.09,0.195
+31-01,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,s aa h,س,َ,1.09,0.198
+31-02,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa h,ز,َ,0.77,0.182
+31-03,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa h,ز,َ,1.22,0.205
+31-04,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.15,0.2
+31-05,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.41,0.226
+31-06,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa aa,ز,َ,1.09,0.198
+31-07,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.09,0.195
+31-08,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.34,0.227
+31-09,zay_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,َ,z aa,ز,َ,1.41,0.222
+32-00,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii n,ز,ِ,1.15,0.198
+32-01,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,s ii,س,ِ,0.9,0.186
+32-02,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii,ز,ِ,0.96,0.195
+32-03,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii ii,ز,ِ,0.77,0.186
+32-04,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii,ز,ِ,1.15,0.2
+32-05,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii,ز,ِ,0.9,0.189
+32-06,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z y,ز,,0.9,0.19
+32-07,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii,ز,ِ,1.09,0.204
+32-08,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z y,ز,,1.15,0.201
+32-09,zay_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ِ,z ii n,ز,ِ,1.34,0.236
+33-00,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu uu,ز,ُ,1.41,0.24
+33-01,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,s r,س,,0.77,0.188
+33-02,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu,ز,ُ,0.77,0.187
+33-03,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu uu,ز,ُ,0.83,0.189
+33-04,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu uu,ز,ُ,1.15,0.212
+33-05,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu uu,ز,ُ,1.02,0.203
+33-06,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu,ز,ُ,0.83,0.182
+33-07,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu,ز,ُ,1.28,0.219
+33-08,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu,ز,ُ,1.22,0.202
+33-09,zay_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ز,ُ,z uu,ز,ُ,1.28,0.213
+34-00,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa,س,َ,1.09,0.2
+34-01,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa E,س,َ,0.96,0.195
+34-02,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,S E,ص,,1.09,0.212
+34-03,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa h,س,َ,1.22,0.212
+34-04,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,S E,ص,,1.09,0.204
+34-05,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,< i s E aa,ء,ِ,1.09,0.204
+34-06,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa,س,َ,1.15,0.2
+34-07,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa,س,َ,1.28,0.209
+34-08,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,S aa,ص,َ,1.47,0.238
+34-09,sin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,َ,s aa,س,َ,1.15,0.197
+35-00,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii n,س,ِ,1.09,0.206
+35-01,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,0.83,0.19
+35-02,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii ii,س,ِ,0.77,0.185
+35-03,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,1.02,0.205
+35-04,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,1.15,0.203
+35-05,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,0.96,0.191
+35-06,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,1.02,0.194
+35-07,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,0.96,0.195
+35-08,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s y,س,,1.66,0.249
+35-09,sin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ِ,s ii,س,ِ,1.09,0.198
+36-00,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,s uu uu,س,ُ,1.34,0.235
+36-01,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,s f,س,,0.7,0.178
+36-02,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,S f,ص,,0.83,0.187
+36-03,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,s uu,س,ُ,0.7,0.178
+36-04,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,S h,ص,,0.96,0.194
+36-05,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,$ uu h,ش,ُ,0.77,0.186
+36-06,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,uu,,,0.83,0.185
+36-07,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,s uu,س,ُ,1.22,0.202
+36-08,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,S uu,ص,ُ,1.22,0.212
+36-09,sin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,س,ُ,S uu,ص,ُ,1.47,0.23
+37-00,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa,ش,َ,1.02,0.193
+37-01,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ E E,ش,,0.9,0.192
+37-02,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa E,ش,َ,1.09,0.202
+37-03,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa h,ش,َ,1.02,0.199
+37-04,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa E,ش,َ,1.41,0.23
+37-05,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa,ش,َ,1.09,0.202
+37-06,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa E,ش,َ,1.22,0.208
+37-07,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa aa,ش,َ,1.28,0.208
+37-08,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa,ش,َ,1.15,0.206
+37-09,shin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,َ,$ aa aa,ش,َ,1.22,0.202
+38-00,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y,ش,,1.09,0.199
+38-01,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y h,ش,,0.96,0.205
+38-02,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y,ش,,0.77,0.191
+38-03,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ ii h,ش,ِ,0.96,0.188
+38-04,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ ii,ش,ِ,1.28,0.208
+38-05,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,< i s n ii ii,ء,ِ,1.09,0.199
+38-06,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ ii,ش,ِ,0.96,0.194
+38-07,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y,ش,,1.28,0.201
+38-08,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y,ش,,1.41,0.245
+38-09,shin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ِ,$ y,ش,,1.34,0.229
+39-00,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu m,ش,ُ,1.28,0.208
+39-01,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$,ش,,0.7,0.192
+39-02,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ h,ش,,0.64,0.159
+39-03,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu h,ش,ُ,0.83,0.182
+39-04,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu,ش,ُ,1.15,0.199
+39-05,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu r,ش,ُ,1.09,0.196
+39-06,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu,ش,ُ,0.64,0.166
+39-07,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu,ش,ُ,1.22,0.199
+39-08,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu,ش,ُ,1.47,0.222
+39-09,shin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ش,ُ,$ uu,ش,ُ,1.34,0.22
+40-00,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,$ aa,ش,َ,1.09,0.197
+40-01,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,s aa,س,َ,0.9,0.195
+40-02,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,S AA h,ص,َ,0.77,0.193
+40-03,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,$ aa h,ش,َ,1.34,0.236
+40-04,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,S uu H,ص,ُ,1.09,0.201
+40-05,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,S h,ص,,0.96,0.201
+40-06,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,S AA,ص,َ,0.77,0.183
+40-07,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,$ uu m,ش,ُ,1.34,0.22
+40-08,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,S uu,ص,ُ,1.41,0.225
+40-09,sad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,َ,$ r,ش,,1.41,0.229
+41-00,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,$ a l,ش,َ,1.34,0.226
+41-01,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,$ y,ش,,0.9,0.186
+41-02,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,S ii,ص,ِ,0.7,0.18
+41-03,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,$ ii,ش,ِ,0.83,0.189
+41-04,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,< ii ii,ء,ِ,1.22,0.209
+41-05,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,S ii,ص,ِ,1.02,0.194
+41-06,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,s ii,س,ِ,0.83,0.187
+41-07,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,$ y,ش,,1.28,0.216
+41-08,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,S y,ص,,1.79,0.251
+41-09,sad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ِ,$ y,ش,,1.28,0.234
+42-00,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,$ uu,ش,ُ,1.22,0.24
+42-01,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,s uu,س,ُ,0.9,0.192
+42-02,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,l,ل,,0.77,0.183
+42-03,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,$ a h,ش,َ,0.9,0.191
+42-04,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,s uu H,س,ُ,1.02,0.202
+42-05,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,S uu,ص,ُ,0.9,0.186
+42-06,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,S h,ص,,0.9,0.182
+42-07,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,S uu,ص,ُ,1.66,0.252
+42-08,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,S uu m,ص,ُ,1.47,0.236
+42-09,sad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ص,ُ,$ uu,ش,ُ,1.47,0.233
+43-00,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,d uu m,د,ُ,1.02,0.198
+43-01,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,D UU a,ض,ُ,1.09,0.188
+43-02,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,D AA E,ض,َ,0.83,0.182
+43-03,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,n uu uu,ن,ُ,0.96,0.19
+43-04,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,d uu h,د,ُ,0.96,0.19
+43-05,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,D E,ض,,1.02,0.197
+43-06,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,D AA aa,ض,َ,0.9,0.19
+43-07,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,D UU w,ض,ُ,1.02,0.192
+43-08,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,Z UU uu,ظ,ُ,1.41,0.233
+43-09,dad_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,َ,d uu m,د,ُ,1.15,0.202
+44-00,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d ii ii,د,ِ,1.09,0.2
+44-01,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d u y,د,ُ,1.15,0.203
+44-02,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,D II y,ض,ِ,0.7,0.182
+44-03,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d ii,د,ِ,0.83,0.181
+44-04,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d ii,د,ِ,0.96,0.189
+44-05,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,D y,ض,,1.02,0.191
+44-06,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d ii,د,ِ,0.96,0.202
+44-07,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d ii,د,ِ,1.22,0.207
+44-08,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,D y,ض,,1.6,0.235
+44-09,dad_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ِ,d uu ii,د,ُ,1.41,0.231
+45-00,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,d uu uu,د,ُ,1.15,0.198
+45-01,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,D uu uu,ض,ُ,1.34,0.226
+45-02,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,D UU,ض,ُ,0.58,0.162
+45-03,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,d uu uu,د,ُ,0.9,0.191
+45-04,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,d uu h,د,ُ,1.09,0.207
+45-05,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,Z UU uu,ظ,ُ,0.96,0.195
+45-06,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,Z uu,ظ,ُ,1.02,0.219
+45-07,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,n uu uu,ن,ُ,1.28,0.214
+45-08,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,D uu uu,ض,ُ,1.54,0.246
+45-09,dad_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ض,ُ,d uu uu,د,ُ,1.34,0.22
+46-00,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,t uu m,ت,ُ,1.09,0.195
+46-01,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,t uu m,ت,ُ,1.02,0.194
+46-02,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,D AA aa,ض,َ,0.83,0.189
+46-03,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,t uu m,ت,ُ,1.73,0.246
+46-04,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,T UU h,ط,ُ,1.15,0.199
+46-05,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,T uu m,ط,ُ,1.15,0.202
+46-06,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,D AA h,ض,َ,1.28,0.211
+46-07,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,b uu m,ب,ُ,1.15,0.2
+46-08,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,T uu m,ط,ُ,1.41,0.227
+46-09,tah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,َ,n aa,ن,َ,1.41,0.233
+47-00,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,T II y,ط,ِ,1.15,0.204
+47-01,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,t ii,ت,ِ,0.83,0.189
+47-02,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,D y,ض,,0.7,0.185
+47-03,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,D II ii,ض,ِ,0.83,0.188
+47-04,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,T U w ii,ط,ُ,1.09,0.205
+47-05,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,D y,ض,,1.02,0.2
+47-06,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,D II y,ض,ِ,0.83,0.185
+47-07,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,D II y,ض,ِ,1.15,0.207
+47-08,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,T II y,ط,ِ,1.41,0.224
+47-09,tah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ِ,y,ي,,1.41,0.221
+48-00,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,t uu m,ت,ُ,1.02,0.206
+48-01,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,t uu m,ت,ُ,0.77,0.187
+48-02,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,D U h,ض,ُ,0.77,0.194
+48-03,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,T UU h,ط,ُ,0.77,0.184
+48-04,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,T UU b,ط,ُ,1.15,0.205
+48-05,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,q A f,ق,َ,0.77,0.181
+48-06,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,D uu,ض,ُ,0.9,0.187
+48-07,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,T UU m,ط,ُ,1.28,0.204
+48-08,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,T UU w,ط,ُ,0.83,0.187
+48-09,tah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ط,ُ,D uu,ض,ُ,1.28,0.205
+49-00,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,z aa,ز,َ,1.15,0.207
+49-01,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,z uu E,ز,ُ,1.02,0.192
+49-02,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,z AA E,ز,َ,0.9,0.182
+49-03,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,z w h,ز,,0.77,0.193
+49-04,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,* uu h,ذ,ُ,1.15,0.2
+49-05,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,z uu,ز,ُ,1.22,0.199
+49-06,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,Z AA h,ظ,َ,1.02,0.196
+49-07,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,Z uu <,ظ,ُ,1.22,0.201
+49-08,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,D UU uu,ض,ُ,1.28,0.208
+49-09,zah_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,َ,j uu m,ج,ُ,1.15,0.211
+50-00,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,* ii l,ذ,ِ,1.34,0.228
+50-01,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,z y,ز,,1.02,0.194
+50-02,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,Z II,ظ,ِ,0.7,0.179
+50-03,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,z ii,ز,ِ,0.77,0.181
+50-04,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,* ii,ذ,ِ,1.15,0.2
+50-05,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,Z y,ظ,,1.09,0.197
+50-06,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,Z ii,ظ,ِ,0.96,0.195
+50-07,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,D y,ض,,1.02,0.201
+50-08,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,D y,ض,,1.09,0.199
+50-09,zah_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ِ,d ii,د,ِ,1.15,0.204
+51-00,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,* uu m,ذ,ُ,1.09,0.197
+51-01,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,E a zz uu uu,ع,َ,1.54,0.239
+51-02,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,z uu r,ز,ُ,0.7,0.184
+51-03,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,z uu,ز,ُ,0.77,0.183
+51-04,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,* uu uu,ذ,ُ,1.41,0.233
+51-05,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,z uu,ز,ُ,0.96,0.191
+51-06,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,Z uu,ظ,ُ,0.96,0.19
+51-07,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,Z uu,ظ,ُ,1.15,0.196
+51-08,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,Z uu uu,ظ,ُ,1.54,0.253
+51-09,zah_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ظ,ُ,d uu n,د,ُ,1.28,0.224
+52-00,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,E a n,ع,َ,1.09,0.214
+52-01,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,< a l l,ء,َ,0.9,0.234
+52-02,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,E aa aa,ع,َ,0.83,0.207
+52-03,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,g AA h,غ,َ,0.9,0.205
+52-04,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,E a h,ع,َ,1.54,0.273
+52-05,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,E aa,ع,َ,1.02,0.221
+52-06,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,g AA AA,غ,َ,0.96,0.249
+52-07,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,q AA m,ق,َ,1.15,0.213
+52-08,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,E aa,ع,َ,1.47,0.231
+52-09,ain_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,َ,g aa n,غ,َ,1.41,0.296
+53-00,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a y,ع,َ,1.41,0.265
+53-01,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a y n,ع,َ,0.77,0.187
+53-02,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a n ii,ع,َ,0.7,0.191
+53-03,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a y,ع,َ,0.7,0.214
+53-04,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a n ii,ع,َ,1.41,0.324
+53-05,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a n,ع,َ,1.15,0.578
+53-06,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a n ii,ع,َ,0.83,1.347
+53-07,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a l,ع,َ,1.09,0.685
+53-08,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E a y n,ع,َ,1.54,0.3
+53-09,ain_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ِ,E n ii,ع,ِ,1.34,0.221
+54-00,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a n,ع,َ,1.28,0.21
+54-01,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,< a w h,ء,َ,0.96,0.193
+54-02,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a w m,ع,َ,0.7,0.184
+54-03,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a m,ع,َ,0.77,0.196
+54-04,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E u m,ع,ُ,1.34,0.228
+54-05,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a h,ع,َ,0.96,0.196
+54-06,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E A n ii,ع,َ,0.9,0.191
+54-07,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a w m,ع,َ,1.41,0.221
+54-08,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,E a n n,ع,َ,1.22,0.205
+54-09,ain_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ع,ُ,g A y m,غ,َ,1.47,0.234
+55-00,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,m aa D,م,َ,1.15,0.2
+55-01,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,l,ل,,0.83,0.197
+55-02,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g AA,غ,َ,0.9,0.198
+55-03,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,Z h,ظ,,0.9,0.19
+55-04,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g h,غ,,1.09,0.207
+55-05,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g AA,غ,َ,0.9,0.212
+55-06,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g AA AA,غ,َ,0.9,0.204
+55-07,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,AA h,ه,,1.54,0.234
+55-08,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g <,غ,,1.41,0.224
+55-09,ghaiin_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,َ,g AA AA,غ,َ,1.09,0.194
+56-00,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,w y,و,,1.22,0.207
+56-01,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,q U l,ق,ُ,0.7,0.189
+56-02,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g y,غ,,0.77,0.184
+56-03,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,b ii y,ب,ِ,0.58,0.168
+56-04,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g II ii,غ,ِ,0.96,0.201
+56-05,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g y,غ,,1.09,0.203
+56-06,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g II,غ,ِ,0.83,0.187
+56-07,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g y,غ,,1.47,0.234
+56-08,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g A y,غ,َ,1.47,0.225
+56-09,ghaiin_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ِ,g u r,غ,ُ,0.9,0.184
+57-00,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,j uu uu,ج,ُ,1.47,0.231
+57-01,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,E uu,ع,ُ,0.77,0.187
+57-02,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,uu,,,0.7,0.18
+57-03,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,b uu uu,ب,ُ,0.77,0.192
+57-04,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,g uu,غ,ُ,1.09,0.202
+57-05,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,g uu,غ,ُ,1.02,0.198
+57-06,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,Z UU uu,ظ,ُ,0.9,0.195
+57-07,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,Z UU uu,ظ,ُ,1.28,0.213
+57-08,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,g U uu,غ,ُ,1.34,0.227
+57-09,ghaiin_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,غ,ُ,Z uu uu,ظ,ُ,1.54,0.232
+58-00,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,0.96,0.193
+58-01,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa E,ف,َ,0.9,0.184
+58-02,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,0.9,0.182
+58-03,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,0.77,0.186
+58-04,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa h,ف,َ,1.15,0.202
+58-05,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,0.9,0.189
+58-06,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,s aa,س,َ,0.96,0.191
+58-07,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,1.34,0.22
+58-08,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,1.41,0.225
+58-09,fa_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,َ,f aa,ف,َ,1.41,0.223
+59-00,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f y,ف,,1.15,0.2
+59-01,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,0.83,0.192
+59-02,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,0.83,0.193
+59-03,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,0.7,0.184
+59-04,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,1.02,0.204
+59-05,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,0.96,0.199
+59-06,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f y,ف,,0.9,0.187
+59-07,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,1.47,0.239
+59-08,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f y,ف,,1.47,0.234
+59-09,fa_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ِ,f ii,ف,ِ,1.28,0.205
+60-00,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu,ف,ُ,1.47,0.227
+60-01,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu h,ف,ُ,0.83,0.185
+60-02,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f,ف,,0.58,0.162
+60-03,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f,ف,,0.64,0.163
+60-04,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu h,ف,ُ,0.96,0.188
+60-05,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f,ف,,0.83,0.189
+60-06,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu,ف,ُ,0.83,0.185
+60-07,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu,ف,ُ,1.28,0.203
+60-08,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu,ف,ُ,1.47,0.23
+60-09,fa_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ف,ُ,f uu,ف,ُ,1.28,0.208
+61-00,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,q AA l,ق,َ,1.15,0.199
+61-01,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,g AA h,غ,َ,0.96,0.19
+61-02,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,< h,ء,,0.83,0.185
+61-03,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,q AA l,ق,َ,0.9,0.191
+61-04,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,l a h,ل,َ,1.15,0.196
+61-05,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,l aa,ل,َ,1.02,0.199
+61-06,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,l a h,ل,َ,0.9,0.189
+61-07,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,m aa,م,َ,1.47,0.231
+61-08,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,q AA w,ق,َ,1.6,0.237
+61-09,qaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,َ,l aa,ل,َ,1.09,0.259
+62-00,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q A l,ق,َ,1.28,0.22
+62-01,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,w y,و,,0.83,0.193
+62-02,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q A ii,ق,َ,0.77,0.187
+62-03,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q II,ق,ِ,0.58,0.169
+62-04,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,T II y,ط,ِ,1.09,0.202
+62-05,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q y,ق,,0.9,0.202
+62-06,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,D II y,ض,ِ,0.9,0.194
+62-07,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q U ii,ق,ُ,1.02,0.193
+62-08,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,D II y,ض,ِ,1.54,0.24
+62-09,qaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ِ,q y,ق,,1.22,0.208
+63-00,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,q UU uu,ق,ُ,1.22,0.203
+63-01,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,b uu b,ب,ُ,0.77,0.185
+63-02,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,< a n,ء,َ,0.64,0.168
+63-03,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,q UU uu,ق,ُ,0.9,0.186
+63-04,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,l h,ل,,1.34,0.228
+63-05,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,q uu,ق,ُ,0.77,0.19
+63-06,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,m a uu,م,َ,0.9,0.193
+63-07,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,D UU uu,ض,ُ,1.28,0.213
+63-08,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,q w,ق,,1.79,0.255
+63-09,qaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ق,ُ,< a uu,ء,َ,1.09,0.211
+64-00,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.15,0.2
+64-01,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k a E,ك,َ,0.96,0.192
+64-02,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.02,0.207
+64-03,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,q AA h,ق,َ,1.02,0.198
+64-04,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.09,0.198
+64-05,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.09,0.3
+64-06,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,0.83,0.352
+64-07,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.15,0.336
+64-08,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.86,0.258
+64-09,kaf_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,َ,k aa,ك,َ,1.09,0.193
+65-00,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii l,ك,ِ,1.09,0.197
+65-01,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k a l,ك,َ,0.83,0.189
+65-02,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k a m,ك,َ,0.77,0.183
+65-03,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,q II II,ق,ِ,0.7,0.183
+65-04,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii,ك,ِ,1.41,0.226
+65-05,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii,ك,ِ,0.96,0.193
+65-06,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii,ك,ِ,0.9,0.191
+65-07,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii,ك,ِ,1.41,0.227
+65-08,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k a y,ك,َ,1.92,0.256
+65-09,kaf_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ِ,k ii,ك,ِ,1.15,0.199
+66-00,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k uu uu,ك,ُ,1.02,0.192
+66-01,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,q U r,ق,ُ,0.96,0.198
+66-02,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k uu uu,ك,ُ,0.77,0.19
+66-03,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,q UU uu,ق,ُ,0.7,0.179
+66-04,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,q uu uu,ق,ُ,1.34,0.235
+66-05,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k uu uu,ك,ُ,0.7,0.186
+66-06,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k m,ك,,0.7,0.18
+66-07,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k uu,ك,ُ,1.15,0.21
+66-08,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,k uu,ك,ُ,1.73,0.25
+66-09,kaf_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ك,ُ,q uu,ق,ُ,1.22,0.208
+67-00,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa,ل,َ,1.02,0.199
+67-01,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa E,ل,َ,0.9,0.186
+67-02,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa h,ل,َ,0.96,0.194
+67-03,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,r aa h,ر,َ,0.83,0.192
+67-04,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l a h,ل,َ,1.34,0.241
+67-05,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l h,ل,,1.02,0.195
+67-06,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa,ل,َ,0.96,0.249
+67-07,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa,ل,َ,1.15,0.206
+67-08,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa,ل,َ,1.34,0.229
+67-09,lam_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,َ,l aa,ل,َ,1.09,0.195
+68-00,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,1.28,0.207
+68-01,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,1.02,0.196
+68-02,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,0.77,0.197
+68-03,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,E ii h,ع,ِ,0.77,0.184
+68-04,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,1.22,0.2
+68-05,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,0.9,0.185
+68-06,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,0.96,0.197
+68-07,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l y,ل,,1.54,0.237
+68-08,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l y,ل,,1.54,0.233
+68-09,lam_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ِ,l ii,ل,ِ,1.28,0.205
+69-00,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,r uu uu,ر,ُ,1.22,0.208
+69-01,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l a w m,ل,َ,0.9,0.192
+69-02,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,0.58,0.163
+69-03,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,0.77,0.185
+69-04,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,E uu r,ع,ُ,1.09,0.199
+69-05,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,0.83,0.187
+69-06,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,0.77,0.186
+69-07,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,1.09,0.2
+69-08,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l a w,ل,َ,1.86,0.256
+69-09,lam_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ل,ُ,l uu,ل,ُ,1.22,0.209
+70-00,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,1.22,0.205
+70-01,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa E,م,َ,1.22,0.209
+70-02,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa aa,م,َ,0.96,0.187
+70-03,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,1.02,0.197
+70-04,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa h,م,َ,1.15,0.212
+70-05,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,0.96,0.191
+70-06,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,0.96,0.194
+70-07,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,1.28,0.206
+70-08,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,1.41,0.231
+70-09,mim_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,َ,m aa,م,َ,1.34,0.232
+71-00,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii n,م,ِ,1.22,0.204
+71-01,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,h aa,ه,َ,0.9,0.183
+71-02,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii ii,م,ِ,0.77,0.185
+71-03,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii,م,ِ,0.9,0.195
+71-04,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii,م,ِ,1.28,0.209
+71-05,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii,م,ِ,0.96,0.201
+71-06,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii,م,ِ,0.9,0.193
+71-07,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,m ii,م,ِ,1.09,0.2
+71-08,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,n ii,ن,ِ,1.54,0.24
+71-09,mim_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ِ,n aa ii,ن,َ,1.15,0.211
+72-00,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,n uu m,ن,ُ,1.22,0.206
+72-01,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,h aa,ه,َ,0.83,0.188
+72-02,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,m h,م,,0.83,0.195
+72-03,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,m uu uu,م,ُ,0.77,0.183
+72-04,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,h h,ه,,1.02,0.195
+72-05,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,< a r,ء,َ,0.83,0.196
+72-06,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,m m,م,,0.9,0.188
+72-07,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,b uu m,ب,ُ,1.28,0.213
+72-08,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,n uu m,ن,ُ,1.41,0.224
+72-09,mim_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,م,ُ,m D,م,,1.41,0.222
+73-00,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,n aa,ن,َ,1.15,0.203
+73-01,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,l aa,ل,َ,0.96,0.203
+73-02,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,l aa,ل,َ,0.9,0.194
+73-03,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,m aa,م,َ,0.83,0.184
+73-04,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,l h,ل,,1.41,0.218
+73-05,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,m aa,م,َ,0.96,0.196
+73-06,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,n aa h,ن,َ,1.34,0.222
+73-07,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,l aa,ل,َ,1.15,0.201
+73-08,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,m aa,م,َ,1.54,0.228
+73-09,nun_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,َ,n aa aa,ن,َ,1.15,0.2
+74-00,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii ii,ن,ِ,1.34,0.23
+74-01,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n a ii,ن,َ,0.9,0.186
+74-02,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii,ن,ِ,0.77,0.188
+74-03,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii,ن,ِ,0.7,0.178
+74-04,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,m ii,م,ِ,1.34,0.232
+74-05,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii,ن,ِ,0.96,0.193
+74-06,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii ii,ن,ِ,0.96,0.196
+74-07,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii,ن,ِ,1.09,0.203
+74-08,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n a y,ن,َ,1.47,0.233
+74-09,nun_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ِ,n ii,ن,ِ,1.28,0.21
+75-00,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n uu m,ن,ُ,1.28,0.207
+75-01,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,l aa,ل,َ,0.83,0.186
+75-02,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a w m,ن,َ,0.58,0.164
+75-03,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a h,ن,َ,0.9,0.188
+75-04,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a h,ن,َ,1.34,0.233
+75-05,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,t uu m,ت,ُ,0.64,0.166
+75-06,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a uu,ن,َ,1.02,0.205
+75-07,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a m,ن,َ,1.22,0.203
+75-08,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n a m,ن,َ,1.54,0.234
+75-09,nun_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ن,ُ,n uu m,ن,ُ,1.34,0.221
+76-00,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.15,0.206
+76-01,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,H aa aa,ح,َ,1.02,0.201
+76-02,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,0.7,0.19
+76-03,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa aa,ه,َ,0.83,0.198
+76-04,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.22,0.206
+76-05,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,< h aa,ء,َ,1.22,0.206
+76-06,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.22,0.205
+76-07,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.15,0.201
+76-08,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.22,0.211
+76-09,Ha_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,َ,h aa,ه,َ,1.41,0.229
+77-00,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h l,ه,,1.15,0.204
+77-01,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h ii,ه,ِ,0.83,0.193
+77-02,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h ii,ه,ِ,0.64,0.163
+77-03,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h ii,ه,ِ,0.77,0.185
+77-04,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h ii,ه,ِ,1.34,0.223
+77-05,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,f ii,ف,ِ,0.96,0.19
+77-06,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h,ه,,0.9,0.192
+77-07,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,j ii,ج,ِ,1.34,0.235
+77-08,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h y,ه,,1.41,0.223
+77-09,Ha_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ِ,h ii,ه,ِ,1.47,0.227
+78-00,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,1.47,0.224
+78-01,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,0.77,0.185
+78-02,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,0.58,0.16
+78-03,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h h,ه,,0.77,0.184
+78-04,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,1.28,0.215
+78-05,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,0.96,0.201
+78-06,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,0.96,0.199
+78-07,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,1.09,0.2
+78-08,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,1.47,0.229
+78-09,Ha_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ه,ُ,h uu,ه,ُ,1.73,0.246
+79-00,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,1.22,0.207
+79-01,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,0.96,0.195
+79-02,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,0.83,0.185
+79-03,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,0.9,0.184
+79-04,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w h,و,,1.47,0.239
+79-05,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,1.02,0.198
+79-06,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,0.96,0.192
+79-07,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,0.96,0.193
+79-08,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,1.73,0.241
+79-09,waw_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,َ,w aa,و,َ,1.6,0.234
+80-00,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w y,و,,1.41,0.222
+80-01,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w y,و,,0.7,0.178
+80-02,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w ii,و,ِ,0.58,0.158
+80-03,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,h ii,ه,ِ,0.9,0.195
+80-04,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w ii,و,ِ,1.28,0.208
+80-05,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w ii,و,ِ,0.96,0.196
+80-06,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w ii y,و,ِ,0.83,0.186
+80-07,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w y,و,,1.02,0.198
+80-08,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,w y,و,,1.34,0.227
+80-09,waw_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ِ,h u ii,ه,ُ,1.66,0.222
+81-00,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,h uu,ه,ُ,1.41,0.225
+81-01,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,< r,ء,,0.9,0.239
+81-02,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,w h,و,,0.58,0.189
+81-03,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,h uu,ه,ُ,0.64,0.207
+81-04,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,D uu r,ض,ُ,1.41,0.232
+81-05,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,< u E uu m,ء,ُ,0.83,0.189
+81-06,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,Z uu,ظ,ُ,0.83,0.184
+81-07,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,m ii,م,ِ,1.09,0.194
+81-08,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,b uu,ب,ُ,1.6,0.24
+81-09,waw_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,و,ُ,h uu,ه,ُ,1.6,0.233
+82-00,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.15,0.202
+82-01,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa E,ي,َ,0.83,0.186
+82-02,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,0.9,0.183
+82-03,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,0.9,0.193
+82-04,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.15,0.206
+82-05,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa a,ي,َ,1.02,0.206
+82-06,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.02,0.199
+82-07,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.28,0.214
+82-08,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.47,0.236
+82-09,ya_fathah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,َ,y aa,ي,َ,1.6,0.234
+83-00,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,l ii,ل,ِ,1.15,0.21
+83-01,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,< ii,ء,ِ,0.9,0.187
+83-02,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,y ii,ي,ِ,0.64,0.165
+83-03,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,l ii h,ل,ِ,0.7,0.18
+83-04,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,y ii,ي,ِ,1.34,0.228
+83-05,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,y ii,ي,ِ,0.9,0.187
+83-06,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,l ii,ل,ِ,0.83,0.182
+83-07,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,l ii,ل,ِ,0.96,0.191
+83-08,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,j ii,ج,ِ,1.41,0.231
+83-09,ya_kasroh,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ِ,l ii,ل,ِ,1.6,0.238
+84-00,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y uu w m,ي,ُ,1.34,0.226
+84-01,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y uu aa,ي,ُ,0.83,0.179
+84-02,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y h,ي,,0.77,0.187
+84-03,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y a h,ي,َ,0.58,0.16
+84-04,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y uu,ي,ُ,1.41,0.233
+84-05,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y uu,ي,ُ,1.34,0.224
+84-06,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y a uu,ي,َ,0.83,0.191
+84-07,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y uu,ي,ُ,1.15,0.204
+84-08,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y a uu,ي,َ,1.34,0.227
+84-09,ya_dommah,maroof,MostafaMaroof/wav2vec2-arabic-phoneme-asr,ي,ُ,y a w m,ي,َ,1.66,0.239
