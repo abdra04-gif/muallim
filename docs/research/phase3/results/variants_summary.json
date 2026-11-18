@@ -1,0 +1,5066 @@
+{
+ "summary": {
+  "clips": 840,
+  "swap_letter_trials": 600,
+  "swap_vowel_trials": 1680,
+  "margins": {
+   "0.0": {
+    "correct_passed": 76.1,
+    "lookalike_passed": 18.0,
+    "other_vowel_passed": 3.2
+   },
+   "2.0": {
+    "correct_passed": 54.3,
+    "lookalike_passed": 9.8,
+    "other_vowel_passed": 0.4
+   },
+   "4.0": {
+    "correct_passed": 20.8,
+    "lookalike_passed": 2.5,
+    "other_vowel_passed": 0.1
+   }
+  }
+ },
+ "rows": [
+  {
+   "item": "alif_fathah",
+   "clip": 1,
+   "margin": 5.907,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 2,
+   "margin": 3.906,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 3,
+   "margin": 3.369,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 4,
+   "margin": 4.717,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 5,
+   "margin": 4.898,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 6,
+   "margin": 1.145,
+   "rival": "no vowel"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 7,
+   "margin": 3.843,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 8,
+   "margin": 4.149,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 9,
+   "margin": 5.196,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 10,
+   "margin": 2.849,
+   "rival": "letter:ع"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 1,
+   "margin": -1.116,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 2,
+   "margin": 4.361,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 3,
+   "margin": 1.354,
+   "rival": "no vowel"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 4,
+   "margin": 4.14,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 5,
+   "margin": 3.597,
+   "rival": "no vowel"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 6,
+   "margin": 4.277,
+   "rival": "no vowel"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 7,
+   "margin": 3.828,
+   "rival": "no vowel"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 8,
+   "margin": 4.397,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 9,
+   "margin": 3.804,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 10,
+   "margin": 4.417,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 1,
+   "margin": 3.293,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 2,
+   "margin": -0.23,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 3,
+   "margin": 3.024,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 4,
+   "margin": 1.825,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 5,
+   "margin": 2.079,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 6,
+   "margin": 2.538,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 7,
+   "margin": -4.693,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 8,
+   "margin": -0.005,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 9,
+   "margin": 3.718,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 10,
+   "margin": 1.148,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 1,
+   "margin": 4.794,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 2,
+   "margin": 2.931,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 3,
+   "margin": 4.357,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 4,
+   "margin": 3.318,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 5,
+   "margin": 3.237,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 6,
+   "margin": 3.977,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 7,
+   "margin": 4.673,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 8,
+   "margin": 5.206,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 9,
+   "margin": 4.968,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 10,
+   "margin": 4.165,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 1,
+   "margin": -2.163,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 2,
+   "margin": 2.36,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 3,
+   "margin": 4.295,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 4,
+   "margin": 4.384,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 5,
+   "margin": 5.168,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 6,
+   "margin": 4.705,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 7,
+   "margin": 3.198,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 8,
+   "margin": 4.877,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 9,
+   "margin": 4.547,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 10,
+   "margin": 5.067,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 1,
+   "margin": 4.38,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 2,
+   "margin": -0.086,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 3,
+   "margin": 2.918,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 4,
+   "margin": 0.757,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 5,
+   "margin": 2.929,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 6,
+   "margin": 4.211,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 7,
+   "margin": 1.729,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 8,
+   "margin": 1.143,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 9,
+   "margin": 2.716,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 10,
+   "margin": 4.19,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 1,
+   "margin": 2.428,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 2,
+   "margin": 2.491,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 3,
+   "margin": -4.485,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 4,
+   "margin": -2.834,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 5,
+   "margin": -5.55,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 6,
+   "margin": 1.974,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 7,
+   "margin": -0.998,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 8,
+   "margin": 0.951,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 9,
+   "margin": -4.381,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 10,
+   "margin": -1.843,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 1,
+   "margin": 1.629,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 2,
+   "margin": -2.33,
+   "rival": "letter:د"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 3,
+   "margin": 4.527,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 4,
+   "margin": -1.14,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 5,
+   "margin": -2.33,
+   "rival": "letter:د"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 6,
+   "margin": 1.589,
+   "rival": "letter:د"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 7,
+   "margin": -0.346,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 8,
+   "margin": 4.933,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 9,
+   "margin": -0.196,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 10,
+   "margin": 0.225,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 1,
+   "margin": 2.913,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 2,
+   "margin": 2.389,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 3,
+   "margin": 2.07,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 4,
+   "margin": -0.124,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 5,
+   "margin": 1.099,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 6,
+   "margin": 2.371,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 7,
+   "margin": 3.553,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 8,
+   "margin": 2.174,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 9,
+   "margin": 1.247,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 10,
+   "margin": -2.751,
+   "rival": "letter:ط"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 1,
+   "margin": -7.193,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 2,
+   "margin": -8.26,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 3,
+   "margin": -3.657,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 4,
+   "margin": -1.938,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 5,
+   "margin": -4.51,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 6,
+   "margin": -0.89,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 7,
+   "margin": -0.208,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 8,
+   "margin": -7.867,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 9,
+   "margin": -1.338,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 10,
+   "margin": -1.412,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 1,
+   "margin": -1.456,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 2,
+   "margin": -3.501,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 3,
+   "margin": -1.574,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 4,
+   "margin": 1.148,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 5,
+   "margin": 3.863,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 6,
+   "margin": -5.096,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 7,
+   "margin": -0.286,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 8,
+   "margin": -0.229,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 9,
+   "margin": 0.077,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 10,
+   "margin": -0.517,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 1,
+   "margin": 2.085,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 2,
+   "margin": -6.275,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 3,
+   "margin": -4.381,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 4,
+   "margin": 0.797,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 5,
+   "margin": -4.13,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 6,
+   "margin": -3.53,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 7,
+   "margin": -1.172,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 8,
+   "margin": 1.807,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 9,
+   "margin": -1.26,
+   "rival": "letter:س"
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 10,
+   "margin": 2.372,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 1,
+   "margin": 5.085,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 2,
+   "margin": 4.779,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 3,
+   "margin": 3.999,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 4,
+   "margin": 3.071,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 5,
+   "margin": 4.269,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 6,
+   "margin": 5.194,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 7,
+   "margin": 4.885,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 8,
+   "margin": 4.843,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 9,
+   "margin": 4.551,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 10,
+   "margin": 2.74,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 1,
+   "margin": 4.318,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 2,
+   "margin": 3.902,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 3,
+   "margin": 4.969,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 4,
+   "margin": 1.773,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 5,
+   "margin": 4.696,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 6,
+   "margin": 3.33,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 7,
+   "margin": 3.794,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 8,
+   "margin": 4.375,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 9,
+   "margin": 4.201,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 10,
+   "margin": 4.596,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 1,
+   "margin": 4.339,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 2,
+   "margin": -1.436,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 3,
+   "margin": 3.368,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 4,
+   "margin": 1.31,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 5,
+   "margin": 3.073,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 6,
+   "margin": 1.459,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 7,
+   "margin": 1.899,
+   "rival": "no vowel"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 8,
+   "margin": 3.18,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 9,
+   "margin": 3.76,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 10,
+   "margin": 1.924,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 1,
+   "margin": 1.49,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 2,
+   "margin": 2.0,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 3,
+   "margin": 4.946,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 4,
+   "margin": 0.996,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 5,
+   "margin": 1.803,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 6,
+   "margin": 4.229,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 7,
+   "margin": 1.825,
+   "rival": "no vowel"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 8,
+   "margin": -2.475,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 9,
+   "margin": 3.105,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 10,
+   "margin": 4.028,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 1,
+   "margin": 1.053,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 2,
+   "margin": 0.373,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 3,
+   "margin": 1.488,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 4,
+   "margin": 0.801,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 5,
+   "margin": 2.266,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 6,
+   "margin": 1.807,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 7,
+   "margin": 1.55,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 8,
+   "margin": -0.607,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 9,
+   "margin": 2.933,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 10,
+   "margin": 3.003,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 1,
+   "margin": 4.512,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 2,
+   "margin": -0.961,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 3,
+   "margin": 3.089,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 4,
+   "margin": 1.238,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 5,
+   "margin": -3.155,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 6,
+   "margin": 2.454,
+   "rival": "no vowel"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 7,
+   "margin": 2.635,
+   "rival": "no vowel"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 8,
+   "margin": 2.045,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 9,
+   "margin": -2.269,
+   "rival": "letter:ه"
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 10,
+   "margin": 3.038,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 1,
+   "margin": 0.225,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 2,
+   "margin": 3.346,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 3,
+   "margin": 1.512,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 4,
+   "margin": 3.34,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 5,
+   "margin": 1.034,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 6,
+   "margin": 1.211,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 7,
+   "margin": 1.274,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 8,
+   "margin": 2.615,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 9,
+   "margin": 1.69,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 10,
+   "margin": 4.419,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 1,
+   "margin": 2.415,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 2,
+   "margin": 0.046,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 3,
+   "margin": -0.996,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 4,
+   "margin": 1.056,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 5,
+   "margin": 3.504,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 6,
+   "margin": 0.534,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 7,
+   "margin": 0.036,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 8,
+   "margin": 3.296,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 9,
+   "margin": 1.922,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 10,
+   "margin": 1.481,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 1,
+   "margin": 3.992,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 2,
+   "margin": 0.241,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 3,
+   "margin": -0.688,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 4,
+   "margin": 3.302,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 5,
+   "margin": 3.305,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 6,
+   "margin": -1.194,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 7,
+   "margin": 0.953,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 8,
+   "margin": 1.055,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 9,
+   "margin": -0.244,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 10,
+   "margin": 2.487,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 1,
+   "margin": -4.585,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 2,
+   "margin": -3.191,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 3,
+   "margin": 5.117,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 4,
+   "margin": -2.926,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 5,
+   "margin": -2.51,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 6,
+   "margin": 5.813,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 7,
+   "margin": 6.541,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 8,
+   "margin": 5.687,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 9,
+   "margin": -4.142,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 10,
+   "margin": -4.596,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 1,
+   "margin": -5.196,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 2,
+   "margin": -5.199,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 3,
+   "margin": -4.178,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 4,
+   "margin": -5.339,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 5,
+   "margin": -4.577,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 6,
+   "margin": 5.283,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 7,
+   "margin": 1.423,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 8,
+   "margin": 4.699,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 9,
+   "margin": -6.155,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 10,
+   "margin": -1.307,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 1,
+   "margin": -8.806,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 2,
+   "margin": -8.542,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 3,
+   "margin": 3.137,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 4,
+   "margin": -6.348,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 5,
+   "margin": -7.672,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 6,
+   "margin": 4.729,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 7,
+   "margin": 3.473,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 8,
+   "margin": 3.992,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 9,
+   "margin": 2.52,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 10,
+   "margin": -8.557,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 1,
+   "margin": 1.137,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 2,
+   "margin": 0.015,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 3,
+   "margin": 5.063,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 4,
+   "margin": -1.678,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 5,
+   "margin": 3.526,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 6,
+   "margin": 3.575,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 7,
+   "margin": 5.562,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 8,
+   "margin": -4.063,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 9,
+   "margin": 3.242,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 10,
+   "margin": 1.753,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 1,
+   "margin": 4.156,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 2,
+   "margin": 2.452,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 3,
+   "margin": 2.017,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 4,
+   "margin": 3.854,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 5,
+   "margin": 4.639,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 6,
+   "margin": 4.987,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 7,
+   "margin": 1.659,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 8,
+   "margin": 1.245,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 9,
+   "margin": 5.094,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 10,
+   "margin": 1.686,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 1,
+   "margin": 0.205,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 2,
+   "margin": -2.621,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 3,
+   "margin": 3.413,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 4,
+   "margin": 0.946,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 5,
+   "margin": 4.299,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 6,
+   "margin": 5.466,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 7,
+   "margin": 2.227,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 8,
+   "margin": 2.437,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 9,
+   "margin": 4.661,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 10,
+   "margin": 0.416,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 1,
+   "margin": -0.998,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 2,
+   "margin": 2.028,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 3,
+   "margin": 2.954,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 4,
+   "margin": 2.064,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 5,
+   "margin": -0.281,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 6,
+   "margin": 0.69,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 7,
+   "margin": 1.738,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 8,
+   "margin": -1.183,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 9,
+   "margin": -2.214,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 10,
+   "margin": 1.721,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 1,
+   "margin": 3.331,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 2,
+   "margin": 3.396,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 3,
+   "margin": 2.747,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 4,
+   "margin": 4.008,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 5,
+   "margin": 4.562,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 6,
+   "margin": -3.294,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 7,
+   "margin": 1.044,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 8,
+   "margin": 3.722,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 9,
+   "margin": 4.118,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 10,
+   "margin": 3.672,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 1,
+   "margin": 2.658,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 2,
+   "margin": 0.675,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 3,
+   "margin": 2.222,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 4,
+   "margin": 2.2,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 5,
+   "margin": 3.577,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 6,
+   "margin": 2.797,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 7,
+   "margin": 2.865,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 8,
+   "margin": 4.053,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 9,
+   "margin": 3.896,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 10,
+   "margin": 4.064,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 1,
+   "margin": 5.047,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 2,
+   "margin": 1.665,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 3,
+   "margin": 1.542,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 4,
+   "margin": 2.899,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 5,
+   "margin": 3.31,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 6,
+   "margin": 4.151,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 7,
+   "margin": 5.094,
+   "rival": "letter:ذ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 8,
+   "margin": 3.67,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 9,
+   "margin": 3.983,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 10,
+   "margin": 3.06,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 1,
+   "margin": 1.295,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 2,
+   "margin": 3.102,
+   "rival": "letter:ذ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 3,
+   "margin": 4.043,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 4,
+   "margin": 3.127,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 5,
+   "margin": 3.654,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 6,
+   "margin": 3.645,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 7,
+   "margin": 2.427,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 8,
+   "margin": 3.778,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 9,
+   "margin": 3.924,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 10,
+   "margin": 2.755,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 1,
+   "margin": 4.707,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 2,
+   "margin": -0.744,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 3,
+   "margin": 4.065,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 4,
+   "margin": 2.727,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 5,
+   "margin": 2.05,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 6,
+   "margin": 3.469,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 7,
+   "margin": 2.101,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 8,
+   "margin": 4.154,
+   "rival": "letter:ذ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 9,
+   "margin": 2.728,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 10,
+   "margin": 1.7,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 1,
+   "margin": 4.748,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 2,
+   "margin": 3.025,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 3,
+   "margin": -3.96,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 4,
+   "margin": 2.388,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 5,
+   "margin": -3.0,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 6,
+   "margin": 0.87,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 7,
+   "margin": 2.967,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 8,
+   "margin": 3.287,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 9,
+   "margin": -3.018,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 10,
+   "margin": 2.661,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 1,
+   "margin": 2.171,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 2,
+   "margin": 4.318,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 3,
+   "margin": 3.755,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 4,
+   "margin": 3.289,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 5,
+   "margin": 5.146,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 6,
+   "margin": 3.583,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 7,
+   "margin": 4.202,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 8,
+   "margin": 4.498,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 9,
+   "margin": 3.557,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 10,
+   "margin": 3.785,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 1,
+   "margin": 4.373,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 2,
+   "margin": 0.763,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 3,
+   "margin": -2.439,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 4,
+   "margin": 2.843,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 5,
+   "margin": -1.872,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 6,
+   "margin": -0.156,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 7,
+   "margin": 0.785,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 8,
+   "margin": 3.915,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 9,
+   "margin": -4.124,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 10,
+   "margin": -0.681,
+   "rival": "letter:ص"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 1,
+   "margin": 3.65,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 2,
+   "margin": 2.615,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 3,
+   "margin": 3.645,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 4,
+   "margin": 3.894,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 5,
+   "margin": 3.134,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 6,
+   "margin": 2.973,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 7,
+   "margin": 3.099,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 8,
+   "margin": 4.637,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 9,
+   "margin": 3.981,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 10,
+   "margin": 3.839,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 1,
+   "margin": 4.147,
+   "rival": "no vowel"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 2,
+   "margin": -1.035,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 3,
+   "margin": 3.338,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 4,
+   "margin": 0.959,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 5,
+   "margin": 4.127,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 6,
+   "margin": 1.226,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 7,
+   "margin": 2.612,
+   "rival": "no vowel"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 8,
+   "margin": 3.341,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 9,
+   "margin": 3.154,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 10,
+   "margin": 3.442,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 1,
+   "margin": 2.652,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 2,
+   "margin": -0.684,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 3,
+   "margin": -0.146,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 4,
+   "margin": 1.239,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 5,
+   "margin": 1.988,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 6,
+   "margin": 1.38,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 7,
+   "margin": 1.245,
+   "rival": "no vowel"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 8,
+   "margin": 3.725,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 9,
+   "margin": 3.148,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 10,
+   "margin": 2.79,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 1,
+   "margin": -3.911,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 2,
+   "margin": -2.538,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 3,
+   "margin": 2.179,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 4,
+   "margin": -2.665,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 5,
+   "margin": 0.095,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 6,
+   "margin": 0.356,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 7,
+   "margin": 0.878,
+   "rival": "no vowel"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 8,
+   "margin": -1.721,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 9,
+   "margin": -0.422,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 10,
+   "margin": -2.735,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 1,
+   "margin": -3.831,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 2,
+   "margin": -5.319,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 3,
+   "margin": 3.12,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 4,
+   "margin": -3.882,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 5,
+   "margin": -2.266,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 6,
+   "margin": 3.452,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 7,
+   "margin": -5.464,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 8,
+   "margin": -1.781,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 9,
+   "margin": 4.278,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 10,
+   "margin": -3.133,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 1,
+   "margin": -4.791,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 2,
+   "margin": -3.867,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 3,
+   "margin": 1.027,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 4,
+   "margin": -4.366,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 5,
+   "margin": -1.309,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 6,
+   "margin": 1.311,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 7,
+   "margin": 1.125,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 8,
+   "margin": 1.539,
+   "rival": "letter:س"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 9,
+   "margin": 1.726,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 10,
+   "margin": -2.827,
+   "rival": "letter:س"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 1,
+   "margin": -6.407,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 2,
+   "margin": 1.295,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 3,
+   "margin": 2.938,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 4,
+   "margin": -6.963,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 5,
+   "margin": -6.811,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 6,
+   "margin": 1.08,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 7,
+   "margin": 0.804,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 8,
+   "margin": -0.901,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 9,
+   "margin": -0.959,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 10,
+   "margin": -6.666,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 1,
+   "margin": -4.68,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 2,
+   "margin": -4.516,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 3,
+   "margin": 2.868,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 4,
+   "margin": -7.98,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 5,
+   "margin": -7.403,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 6,
+   "margin": 4.55,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 7,
+   "margin": -7.712,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 8,
+   "margin": -6.194,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 9,
+   "margin": 3.858,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 10,
+   "margin": -5.158,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 1,
+   "margin": -6.763,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 2,
+   "margin": 3.165,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 3,
+   "margin": 1.12,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 4,
+   "margin": -8.205,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 5,
+   "margin": -6.352,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 6,
+   "margin": 2.551,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 7,
+   "margin": 3.981,
+   "rival": "no vowel"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 8,
+   "margin": -6.561,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 9,
+   "margin": 2.966,
+   "rival": "letter:د"
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 10,
+   "margin": -7.569,
+   "rival": "letter:د"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 1,
+   "margin": -1.334,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 2,
+   "margin": -6.665,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 3,
+   "margin": 1.907,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 4,
+   "margin": -3.139,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 5,
+   "margin": -0.282,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 6,
+   "margin": -0.648,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 7,
+   "margin": 1.633,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 8,
+   "margin": -0.475,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 9,
+   "margin": -1.861,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 10,
+   "margin": -2.097,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 1,
+   "margin": 3.742,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 2,
+   "margin": -1.163,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 3,
+   "margin": 2.26,
+   "rival": "no vowel"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 4,
+   "margin": 3.277,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 5,
+   "margin": 3.543,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 6,
+   "margin": 2.719,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 7,
+   "margin": 1.983,
+   "rival": "no vowel"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 8,
+   "margin": 2.876,
+   "rival": "no vowel"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 9,
+   "margin": 4.307,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 10,
+   "margin": 3.299,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 1,
+   "margin": -1.693,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 2,
+   "margin": -6.53,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 3,
+   "margin": 1.361,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 4,
+   "margin": 0.665,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 5,
+   "margin": 1.432,
+   "rival": "letter:ت"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 6,
+   "margin": 0.705,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 7,
+   "margin": 3.644,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 8,
+   "margin": 1.894,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 9,
+   "margin": 3.018,
+   "rival": "no vowel"
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 10,
+   "margin": 4.316,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 1,
+   "margin": -9.488,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 2,
+   "margin": -2.089,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 3,
+   "margin": -0.711,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 4,
+   "margin": -8.436,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 5,
+   "margin": -0.831,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 6,
+   "margin": -2.051,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 7,
+   "margin": 1.513,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 8,
+   "margin": -0.175,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 9,
+   "margin": -0.725,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 10,
+   "margin": -4.737,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 1,
+   "margin": -0.538,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 2,
+   "margin": -9.793,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 3,
+   "margin": 0.815,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 4,
+   "margin": -6.441,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 5,
+   "margin": -1.109,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 6,
+   "margin": 4.098,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 7,
+   "margin": 0.78,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 8,
+   "margin": 3.355,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 9,
+   "margin": 2.777,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 10,
+   "margin": -2.592,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 1,
+   "margin": -4.072,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 2,
+   "margin": -3.649,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 3,
+   "margin": -4.367,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 4,
+   "margin": -9.341,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 5,
+   "margin": -1.124,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 6,
+   "margin": -7.563,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 7,
+   "margin": 1.101,
+   "rival": "no vowel"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 8,
+   "margin": 4.403,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 9,
+   "margin": 3.299,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 10,
+   "margin": -3.116,
+   "rival": "letter:ز"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 1,
+   "margin": 0.072,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 2,
+   "margin": -1.074,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 3,
+   "margin": 4.826,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 4,
+   "margin": 0.92,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 5,
+   "margin": 2.616,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 6,
+   "margin": 1.95,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 7,
+   "margin": 2.728,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 8,
+   "margin": -1.076,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 9,
+   "margin": 3.708,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 10,
+   "margin": 1.587,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 1,
+   "margin": 2.579,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 2,
+   "margin": 0.738,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 3,
+   "margin": -0.066,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 4,
+   "margin": 0.354,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 5,
+   "margin": 0.379,
+   "rival": "letter:ء"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 6,
+   "margin": 2.08,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 7,
+   "margin": 1.456,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 8,
+   "margin": 1.016,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 9,
+   "margin": 1.982,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 10,
+   "margin": 3.257,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 1,
+   "margin": -2.107,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 2,
+   "margin": -2.585,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 3,
+   "margin": -0.875,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 4,
+   "margin": -0.109,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 5,
+   "margin": -0.462,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 6,
+   "margin": -2.613,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 7,
+   "margin": -2.86,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 8,
+   "margin": 0.61,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 9,
+   "margin": -1.648,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 10,
+   "margin": -2.4,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 1,
+   "margin": -0.045,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 2,
+   "margin": 0.752,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 3,
+   "margin": 2.158,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 4,
+   "margin": 1.299,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 5,
+   "margin": 0.381,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 6,
+   "margin": 2.493,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 7,
+   "margin": 2.12,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 8,
+   "margin": 0.112,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 9,
+   "margin": 1.645,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 10,
+   "margin": 2.374,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 1,
+   "margin": 3.777,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 2,
+   "margin": -1.787,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 3,
+   "margin": 2.715,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 4,
+   "margin": 1.299,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 5,
+   "margin": 3.366,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 6,
+   "margin": 2.92,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 7,
+   "margin": 1.84,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 8,
+   "margin": 3.188,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 9,
+   "margin": 2.089,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 10,
+   "margin": -0.746,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 1,
+   "margin": 3.866,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 2,
+   "margin": 0.804,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 3,
+   "margin": 1.933,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 4,
+   "margin": 2.631,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 5,
+   "margin": 2.72,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 6,
+   "margin": 3.375,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 7,
+   "margin": 2.224,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 8,
+   "margin": 3.318,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 9,
+   "margin": 2.895,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 10,
+   "margin": 3.005,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 1,
+   "margin": 1.908,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 2,
+   "margin": 3.995,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 3,
+   "margin": 1.389,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 4,
+   "margin": 2.431,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 5,
+   "margin": 2.899,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 6,
+   "margin": 2.446,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 7,
+   "margin": 3.529,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 8,
+   "margin": 1.916,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 9,
+   "margin": 3.6,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 10,
+   "margin": 1.752,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 1,
+   "margin": 3.974,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 2,
+   "margin": 3.419,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 3,
+   "margin": 4.246,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 4,
+   "margin": 0.965,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 5,
+   "margin": 5.223,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 6,
+   "margin": 3.653,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 7,
+   "margin": 1.41,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 8,
+   "margin": 5.508,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 9,
+   "margin": 4.577,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 10,
+   "margin": 5.456,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 1,
+   "margin": 4.458,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 2,
+   "margin": 0.659,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 3,
+   "margin": 0.185,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 4,
+   "margin": 0.392,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 5,
+   "margin": 0.033,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 6,
+   "margin": -0.255,
+   "rival": "no vowel"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 7,
+   "margin": 2.558,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 8,
+   "margin": 4.208,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 9,
+   "margin": 3.446,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 10,
+   "margin": 2.604,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 1,
+   "margin": 4.388,
+   "rival": "no vowel"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 2,
+   "margin": 1.258,
+   "rival": "no vowel"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 3,
+   "margin": 0.687,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 4,
+   "margin": 0.923,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 5,
+   "margin": 1.108,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 6,
+   "margin": 1.796,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 7,
+   "margin": 0.286,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 8,
+   "margin": 2.266,
+   "rival": "letter:ك"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 9,
+   "margin": -1.454,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 10,
+   "margin": 2.807,
+   "rival": "letter:ك"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 1,
+   "margin": 0.825,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 2,
+   "margin": 2.369,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 3,
+   "margin": 2.38,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 4,
+   "margin": 0.918,
+   "rival": "no vowel"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 5,
+   "margin": 4.618,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 6,
+   "margin": 2.484,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 7,
+   "margin": 2.861,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 8,
+   "margin": 2.605,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 9,
+   "margin": 2.92,
+   "rival": "no vowel"
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 10,
+   "margin": 3.913,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 1,
+   "margin": 2.867,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 2,
+   "margin": 0.753,
+   "rival": "no vowel"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 3,
+   "margin": -1.537,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 4,
+   "margin": 1.727,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 5,
+   "margin": 1.599,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 6,
+   "margin": 1.078,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 7,
+   "margin": 2.326,
+   "rival": "letter:ك"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 8,
+   "margin": 2.915,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 9,
+   "margin": 3.25,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 10,
+   "margin": 2.517,
+   "rival": "letter:ك"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 1,
+   "margin": 4.257,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 2,
+   "margin": 3.959,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 3,
+   "margin": 4.582,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 4,
+   "margin": -8.106,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 5,
+   "margin": 2.616,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 6,
+   "margin": 2.871,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 7,
+   "margin": 2.989,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 8,
+   "margin": 2.321,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 9,
+   "margin": 3.848,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 10,
+   "margin": 2.487,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 1,
+   "margin": 0.05,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 2,
+   "margin": -0.265,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 3,
+   "margin": 0.17,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 4,
+   "margin": -5.976,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 5,
+   "margin": 4.576,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 6,
+   "margin": 3.764,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 7,
+   "margin": 3.811,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 8,
+   "margin": 4.164,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 9,
+   "margin": 2.715,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 10,
+   "margin": 3.053,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 1,
+   "margin": 0.835,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 2,
+   "margin": -4.052,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 3,
+   "margin": 3.004,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 4,
+   "margin": -6.686,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 5,
+   "margin": -0.452,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 6,
+   "margin": 2.073,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 7,
+   "margin": 1.594,
+   "rival": "no vowel"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 8,
+   "margin": 4.918,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 9,
+   "margin": 2.702,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 10,
+   "margin": -3.222,
+   "rival": "letter:ق"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 1,
+   "margin": 4.813,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 2,
+   "margin": 4.394,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 3,
+   "margin": 4.481,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 4,
+   "margin": 2.159,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 5,
+   "margin": 2.875,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 6,
+   "margin": 5.564,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 7,
+   "margin": 4.424,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 8,
+   "margin": 4.801,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 9,
+   "margin": 4.303,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 10,
+   "margin": 4.457,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 1,
+   "margin": 4.771,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 2,
+   "margin": 5.184,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 3,
+   "margin": 3.021,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 4,
+   "margin": 0.246,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 5,
+   "margin": 5.285,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 6,
+   "margin": 4.117,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 7,
+   "margin": 3.711,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 8,
+   "margin": 4.752,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 9,
+   "margin": 3.626,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 10,
+   "margin": 4.42,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 1,
+   "margin": 3.059,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 2,
+   "margin": 1.126,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 3,
+   "margin": 1.789,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 4,
+   "margin": 2.228,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 5,
+   "margin": 0.921,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 6,
+   "margin": 3.026,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 7,
+   "margin": 3.73,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 8,
+   "margin": 4.614,
+   "rival": "no vowel"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 9,
+   "margin": 2.949,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 10,
+   "margin": 3.406,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 1,
+   "margin": 7.448,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 2,
+   "margin": 4.191,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 3,
+   "margin": 6.027,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 4,
+   "margin": 6.441,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 5,
+   "margin": 5.506,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 6,
+   "margin": 4.916,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 7,
+   "margin": 7.562,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 8,
+   "margin": 5.35,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 9,
+   "margin": 4.668,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 10,
+   "margin": 7.134,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 1,
+   "margin": 1.332,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 2,
+   "margin": -3.888,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 3,
+   "margin": 4.574,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 4,
+   "margin": 2.615,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 5,
+   "margin": 2.258,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 6,
+   "margin": 4.993,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 7,
+   "margin": 4.54,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 8,
+   "margin": 3.304,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 9,
+   "margin": 4.776,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 10,
+   "margin": 2.994,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 1,
+   "margin": -1.537,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 2,
+   "margin": -7.608,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 3,
+   "margin": -0.974,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 4,
+   "margin": 2.345,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 5,
+   "margin": 0.372,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 6,
+   "margin": -0.759,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 7,
+   "margin": 1.319,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 8,
+   "margin": -2.219,
+   "rival": "no vowel"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 9,
+   "margin": 1.938,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 10,
+   "margin": -0.877,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 1,
+   "margin": 5.771,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 2,
+   "margin": 7.874,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 3,
+   "margin": 6.782,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 4,
+   "margin": 7.356,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 5,
+   "margin": 4.158,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 6,
+   "margin": 5.351,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 7,
+   "margin": 4.489,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 8,
+   "margin": 5.198,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 9,
+   "margin": 6.58,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 10,
+   "margin": 6.412,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 1,
+   "margin": 3.312,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 2,
+   "margin": 2.75,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 3,
+   "margin": 5.13,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 4,
+   "margin": 2.422,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 5,
+   "margin": 2.874,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 6,
+   "margin": 4.642,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 7,
+   "margin": 2.523,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 8,
+   "margin": 5.181,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 9,
+   "margin": 2.144,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 10,
+   "margin": 3.373,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 1,
+   "margin": 2.281,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 2,
+   "margin": -4.218,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 3,
+   "margin": -1.342,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 4,
+   "margin": 1.695,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 5,
+   "margin": 0.312,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 6,
+   "margin": -0.01,
+   "rival": "no vowel"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 7,
+   "margin": 2.568,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 8,
+   "margin": 1.649,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 9,
+   "margin": 0.848,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 10,
+   "margin": 0.636,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 1,
+   "margin": 7.809,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 2,
+   "margin": -1.034,
+   "rival": "letter:ح"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 3,
+   "margin": 4.941,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 4,
+   "margin": 5.386,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 5,
+   "margin": 5.926,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 6,
+   "margin": 5.97,
+   "rival": "letter:ح"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 7,
+   "margin": 7.168,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 8,
+   "margin": 6.918,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 9,
+   "margin": 6.023,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 10,
+   "margin": 6.938,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 1,
+   "margin": -0.785,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 2,
+   "margin": 4.55,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 3,
+   "margin": 1.188,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 4,
+   "margin": 4.073,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 5,
+   "margin": 4.672,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 6,
+   "margin": 0.518,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 7,
+   "margin": -0.275,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 8,
+   "margin": 3.166,
+   "rival": "letter:ح"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 9,
+   "margin": 3.77,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 10,
+   "margin": 4.418,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 1,
+   "margin": 4.294,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 2,
+   "margin": 1.608,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 3,
+   "margin": 2.447,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 4,
+   "margin": 2.006,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 5,
+   "margin": 4.43,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 6,
+   "margin": 1.034,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 7,
+   "margin": 3.164,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 8,
+   "margin": 1.951,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 9,
+   "margin": 4.916,
+   "rival": "no vowel"
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 10,
+   "margin": 3.338,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 1,
+   "margin": 2.273,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 2,
+   "margin": 2.543,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 3,
+   "margin": 2.819,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 4,
+   "margin": 2.105,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 5,
+   "margin": 2.316,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 6,
+   "margin": 3.956,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 7,
+   "margin": 0.272,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 8,
+   "margin": 2.65,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 9,
+   "margin": 2.782,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 10,
+   "margin": 0.604,
+   "rival": "vowel:ُ"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 1,
+   "margin": 3.785,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 2,
+   "margin": 3.205,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 3,
+   "margin": 1.608,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 4,
+   "margin": 2.468,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 5,
+   "margin": 4.657,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 6,
+   "margin": 3.977,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 7,
+   "margin": 1.07,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 8,
+   "margin": 3.571,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 9,
+   "margin": 3.827,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 10,
+   "margin": 4.725,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 1,
+   "margin": 3.174,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 2,
+   "margin": -0.536,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 3,
+   "margin": 1.06,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 4,
+   "margin": 0.319,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 5,
+   "margin": 0.241,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 6,
+   "margin": 0.604,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 7,
+   "margin": 0.568,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 8,
+   "margin": -4.889,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 9,
+   "margin": 1.439,
+   "rival": "no vowel"
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 10,
+   "margin": 2.264,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 1,
+   "margin": 5.23,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 2,
+   "margin": 3.974,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 3,
+   "margin": 6.964,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 4,
+   "margin": 4.498,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 5,
+   "margin": 4.256,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 6,
+   "margin": 4.961,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 7,
+   "margin": 6.406,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 8,
+   "margin": 5.553,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 9,
+   "margin": 5.177,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 10,
+   "margin": 5.153,
+   "rival": "vowel:ِ"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 1,
+   "margin": 2.96,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 2,
+   "margin": 0.64,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 3,
+   "margin": 0.306,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 4,
+   "margin": 1.32,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 5,
+   "margin": 3.138,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 6,
+   "margin": 0.767,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 7,
+   "margin": -0.488,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 8,
+   "margin": 0.595,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 9,
+   "margin": 3.146,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 10,
+   "margin": 2.74,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 1,
+   "margin": 1.413,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 2,
+   "margin": -1.34,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 3,
+   "margin": 2.827,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 4,
+   "margin": 0.655,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 5,
+   "margin": 3.88,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 6,
+   "margin": 2.859,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 7,
+   "margin": 2.696,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 8,
+   "margin": 5.058,
+   "rival": "no vowel"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 9,
+   "margin": 1.91,
+   "rival": "vowel:َ"
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 10,
+   "margin": -0.704,
+   "rival": "vowel:َ"
+  }
+ ]
+}

@@ -26,6 +26,7 @@ FIELDS = [
     "list84_best", "list84_p_asked", "list84_decision",
     "sound_letter_heard", "sound_letter_conf", "sound_letter_gop",
     "sound_vowel_heard", "sound_vowel_conf", "sound_vowel_gop", "sound_decision",
+    "variants_rival", "variants_margin", "variants_decision",
     "maroof_heard", "espeak_heard", "tarteel_heard", "whisper_heard",
     "models_disagreeing_with_asked", "teacher_heard", "teacher_verdict",
 ]  # fmt: skip
@@ -50,6 +51,12 @@ def main() -> None:
     data = json.loads((args.align / "align.json").read_text(encoding="utf-8"))
     names = data["summary"]["names"]
     frames = np.load(args.align / "align_clips.npz")
+    vpath = args.align / "variants.json"
+    var = (
+        {(v["item"], v["clip"]): v for v in json.loads(vpath.read_text(encoding="utf-8"))["rows"]}
+        if vpath.exists()
+        else {}
+    )
     demo = {it["name"]: it for it in json.loads(args.demo.read_text(encoding="utf-8"))}
 
     with args.out.open("w", encoding="utf-8", newline="") as f:
@@ -75,6 +82,9 @@ def main() -> None:
                 "maroof_heard": d["out"]["maroof"], "espeak_heard": d["out"]["espeak"],
                 "tarteel_heard": d["out"]["tarteel"], "whisper_heard": d["out"]["whisper"],
                 "models_disagreeing_with_asked": sum(1 for k in ("muaalem", "maroof", "espeak", "tarteel") if not d["ok"][k]),
+                "variants_rival": var.get((r["item"], r["clip"]), {}).get("rival", ""),
+                "variants_margin": var.get((r["item"], r["clip"]), {}).get("margin", ""),
+                "variants_decision": ("accept" if var[(r["item"], r["clip"])]["margin"] >= 0 else "error") if (r["item"], r["clip"]) in var else "",
                 "teacher_heard": "", "teacher_verdict": "",
             })  # fmt: skip
     sys.stdout.write(f"{len(data['rows'])} rows → {args.out}\n")

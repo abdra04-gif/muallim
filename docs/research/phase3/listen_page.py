@@ -190,6 +190,13 @@ def main() -> None:
     frames = np.load(args.align / "align_clips.npz")
     demo = {it["name"]: it for it in json.loads(args.demo.read_text(encoding="utf-8"))}
     rows = data["rows"]
+    vpath = args.align / "variants.json"
+    vdata = (
+        json.loads(vpath.read_text(encoding="utf-8"))
+        if vpath.exists()
+        else {"rows": [], "summary": None}
+    )
+    var = {(v["item"], v["clip"]): v for v in vdata["rows"]}
 
     def ok(r: dict) -> bool:
         return min(r["gop_letter"], r["gop_vowel"]) > PASS_AT
@@ -229,6 +236,23 @@ def main() -> None:
         lp = frames[f"{r['item']}-{r['clip']}"]
         img = picture(samples, lp, r, names)
         check_ok = ok(r)
+        v = var.get((r["item"], r["clip"]))
+        v_ok = v is not None and v["margin"] >= 0
+        rival = (v or {}).get("rival", "")
+        rival_ru = (
+            ("другая огласовка " + rival.split(":")[1])
+            if rival.startswith("vowel:")
+            else ("похожая буква " + rival.split(":")[1])
+            if rival.startswith("letter:")
+            else "без гласной"
+            if rival == "no vowel"
+            else rival
+        )
+        var_row = (
+            f'<tr class="learner"><td><b>4 · Варианты карточки — этот ответ видит ученик</b></td><td>верное чтение против «{rival_ru}»: разница {v["margin"]:+.1f}</td><td class="{"ok" if v_ok else "no"}">{"«засчитано»" if v_ok else "«ты сказал: " + rival_ru + "»"}</td></tr>'
+            if v
+            else ""
+        )
         blocks.append(f"""<div class="clip">
 <div class="top"><span class="ar">{html.escape(demo[r["item"]]["text"])}</span><span class="meta">{html.escape(r["item"])}, ученик {r["clip"]}</span>
 <audio controls src="data:audio/wav;base64,{wav_b64(samples)}"></audio></div>
@@ -236,7 +260,7 @@ def main() -> None:
 <table><tr><th>Способ</th><th>Что услышал / как оценил</th><th>Решение</th></tr>
 <tr><td>1 · Бот сейчас (Muaalem + сравнение строк)</td><td class="ar2">{html.escape(d["out"]["muaalem"] or "—")} · балл {d["bot"]["score"]}</td><td class="{"ok" if d["bot"]["verdict"] != "failed" else "no"}">{VERDICT_RU[d["bot"]["verdict"]]}</td></tr>
 <tr><td>2 · Выбор из 84 слогов</td><td>уверенность в заданном слоге {d["cls"]["p"]:.2f}</td><td class="{"ok" if d["cls"]["decision"] == "accept" else "no"}">{CLS_RU[d["cls"]["decision"]]}</td></tr>
-<tr><td>3 · Проверка каждого звука</td><td>буква {r["gop_letter"]:+.2f} · огласовка {r["gop_vowel"]:+.2f}</td><td class="{"ok" if check_ok else "no"}">{"«засчитано»" if check_ok else "«ошибка»"}</td></tr></table>
+<tr><td>3 · Проверка каждого звука</td><td>буква {r["gop_letter"]:+.2f} · огласовка {r["gop_vowel"]:+.2f}</td><td class="{"ok" if check_ok else "no"}">{"«засчитано»" if check_ok else "«ошибка»"}</td></tr>{var_row}</table>
 {explain(r, d, lp, names, demo[r["item"]]["text"])}
 <p class="ask">Послушайте: что на самом деле прочитано? Совпадает ли нарезка с тем, что слышно?</p>
 </div>""")
@@ -256,13 +280,15 @@ h1{{font-size:26px}} h2{{font-size:20px;margin-top:36px;border-bottom:2px solid 
 .top{{display:flex;gap:16px;align-items:center;flex-wrap:wrap}} .ar{{font-family:'Noto Naskh Arabic',serif;font-size:44px}} .ar2{{font-family:'Noto Naskh Arabic',serif;font-size:20px}}
 .meta{{color:var(--muted)}} img{{max-width:100%;margin-top:8px}} table{{border-collapse:collapse;width:100%;margin-top:6px}}
 td,th{{text-align:left;padding:6px 8px;border-bottom:1px solid #E6EAE6;font-size:15px}} .ok{{color:var(--ok);font-weight:700}} .no{{color:var(--no);font-weight:700}}
-.why{{background:#EEF6F1;border-left:5px solid #1F6F55;padding:10px 14px;margin-top:10px;font-size:15px;line-height:1.5}} .ask{{color:#8A4E12;background:#FFF6E8;padding:8px 12px;margin-top:10px}} .box{{background:var(--card);padding:14px 18px;border-radius:8px}}
+.why{{background:#EEF6F1;border-left:5px solid #1F6F55;padding:10px 14px;margin-top:10px;font-size:15px;line-height:1.5}} .ask{{color:#8A4E12;background:#FFF6E8;padding:8px 12px;margin-top:10px}} tr.learner td{{background:#EEF6F1}} .box{{background:var(--card);padding:14px 18px;border-radius:8px}}
 </style></head><body>
-<h1>Прослушивание: как три способа проверяют одну и ту же запись</h1>
-<div class="box"><p><b>Что здесь.</b> Настоящие записи открытого набора (индонезийские школьники, Pelafalan Huruf Hijaiyah, AFL-3.0). Для каждой: запись, картинка — где модель нашла букву и огласовку, — и решения трёх способов.</p>
+<h1>Прослушивание: как четыре способа проверяют одну и ту же запись</h1>
+<div class="box"><p><b>Что здесь.</b> Настоящие записи открытого набора (индонезийские школьники, Pelafalan Huruf Hijaiyah, AFL-3.0). Для каждой: запись, картинка — где модель нашла букву и огласовку, — и решения четырёх способов. <b>Ученик будет видеть только способ 4</b>; учитель видит все и отмечает, кто прав.</p>
+<p><b>Способ 4 — варианты карточки.</b> Для карточки заранее известно верное чтение и типичные ошибки: другая огласовка, без гласной, похожая буква. Модель оценивает, на какой вариант запись похожа больше; разница больше 0 — победило верное чтение. Протяжная гласная не ошибка. Ничего не обучалось.</p>
 <p><b>Способ 3 — проверка каждого звука.</b> Бот знает, что задано. Выравнивание находит в записи место каждого ожидаемого звука, затем сравнивает, насколько этот звук похож на ожидаемый по сравнению с самым похожим другим звуком того же вида. Число больше 0 — ожидаемый звук победил; засчитано, если победили и буква, и огласовка. Протяжная гласная здесь не считается ошибкой. Ничего не обучалось.</p>
 <p><b>Итог на {s["clips"]} записях</b> (верные — запись проверена как то, что задано; подмены — та же запись проверена как похожая буква, {s["swap_letter_trials"]} проверок, или другая огласовка, {s["swap_vowel_trials"]}):</p>
-<table><tr><th>Порог</th><th>Верных засчитано, %</th><th>Похожая буква пропущена, %</th><th>Другая огласовка пропущена, %</th></tr>{th}</table></div>
+<table><tr><th>Порог</th><th>Верных засчитано, %</th><th>Похожая буква пропущена, %</th><th>Другая огласовка пропущена, %</th></tr>{th}</table>
+{"" if not vdata["summary"] else "<p><b>Способ 4 на тех же записях</b> (порог — на сколько верное чтение должно опережать лучшую ошибку):</p><table><tr><th>Порог</th><th>Верных засчитано, %</th><th>Похожая буква пропущена, %</th><th>Другая огласовка пропущена, %</th></tr>" + "".join(f"<tr><td>{k}</td><td>{x['correct_passed']}</td><td>{x['lookalike_passed']}</td><td>{x['other_vowel_passed']}</td></tr>" for k, x in vdata["summary"]["margins"].items()) + "</table>"}</div>
 {"".join(blocks)}
 </body></html>"""
     args.out.write_text(page, encoding="utf-8")

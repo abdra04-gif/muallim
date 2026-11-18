@@ -416,6 +416,18 @@ Compared on the same kind of trials: free transcription with the same model pass
 
 What this shows: per-sound checking is better than free transcription and far better than the bot today, works without training and extends to any text, but on single letters it is clearly weaker than the closed-set classifier, and it lets look-alike consonants through as often as transcription does. A second finding from the listening page (`listen_page.py`): CTC models mark each sound by a short spike of one or two frames, not by its real duration — the vowel spike sits at the end of the voiced part. The alignment therefore gives *where* a sound is, not *how long* it lasts; shadda and madd length cannot be read from these spikes and need a duration-aware aligner or frame-level scoring. Not yet tested: words, sukun, shadda, madd; Muaalem as the listening model.
 
+### 11.8c Prototype: choose among the card's variants (the answer the learner will see)
+
+Author’s decision (2026-11-19): the learner sees only this method; the teacher sees all methods and marks which was right. For each card the variants are the correct reading and its typical errors — the other two vowels, the letter without a vowel, each look-alike letter with the same vowel; a held vowel counts as correct. The model scores how likely the recording is under each variant (CTC forward probability over the frame probabilities saved by `align_check.py`); the correct reading must beat the best error by the margin. `variants_check.py`, same 840 recordings, nothing trained, 5 s for all recordings.
+
+| Margin | Correct passed | Look-alike letter passed (600) | Other vowel passed (1,680) |
+|---|---|---|---|
+| 0 | 76.1 % | 18.0 % | 3.2 % |
+| 2 | 54.3 % | 9.8 % | 0.4 % |
+| 4 | 20.8 % | 2.5 % | 0.1 % |
+
+Side by side at the working thresholds: the bot today passes 14 % of these 840; free transcription 47 %; per-sound check 63 %; card variants 76 %; the 84-syllable classifier 91 % (§11.5, trained, single syllables only). Look-alike letters still slip through in about 1 of 5 trials; most frequent “errors” named on correct readings are س (40), fatha (33), ت (25), ز (22), د (18). The method extends to any card for which typical errors can be listed (sukun, words), which the classifier cannot. Not tested yet on words; the error lists for later cards are a methodology decision.
+
 **Baseline “before training”** — `results/baseline_840.csv`, one row per recording (840): what was asked; what the bot heard, its score, verdict and errors; the 84-syllable choice (best syllable, probability of the asked one, decision); the per-sound check (sound heard on the letter and on the vowel, confidence, GOP, decision); what the four other models wrote; how many models disagree with the asked syllable; empty columns `teacher_heard` and `teacher_verdict` for a teacher. Built by `baseline.py` from `align_check.py` and `demo_data.py`; `results/align_summary.json` keeps the alignment of every recording. After any training or change of model, rebuild the same table and compare it row by row with this file (and with the teacher columns once they are filled).
 
 ### 11.9 How to repeat
