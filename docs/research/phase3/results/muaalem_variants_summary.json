@@ -1,0 +1,4227 @@
+{
+ "summary": {
+  "model": "Muaalem",
+  "clips": 840,
+  "swap_letter_trials": 600,
+  "swap_vowel_trials": 1680,
+  "margins": {
+   "0.0": {
+    "correct_passed": 62.0,
+    "lookalike_passed": 18.5,
+    "other_vowel_passed": 7.7
+   },
+   "2.0": {
+    "correct_passed": 47.9,
+    "lookalike_passed": 7.3,
+    "other_vowel_passed": 3.6
+   },
+   "4.0": {
+    "correct_passed": 34.3,
+    "lookalike_passed": 2.5,
+    "other_vowel_passed": 1.4
+   }
+  }
+ },
+ "rows": [
+  {
+   "item": "alif_fathah",
+   "clip": 1,
+   "margin": 9.547
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 2,
+   "margin": 2.253
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 3,
+   "margin": 6.996
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 4,
+   "margin": 2.885
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 5,
+   "margin": 5.683
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 6,
+   "margin": 5.545
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 7,
+   "margin": 5.045
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 8,
+   "margin": 6.243
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 9,
+   "margin": 2.259
+  },
+  {
+   "item": "alif_fathah",
+   "clip": 10,
+   "margin": 3.506
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 1,
+   "margin": 0.973
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 2,
+   "margin": 0.371
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 3,
+   "margin": 0.501
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 4,
+   "margin": 0.276
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 5,
+   "margin": -5.302
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 6,
+   "margin": -3.684
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 7,
+   "margin": 7.266
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 8,
+   "margin": 0.352
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 9,
+   "margin": 6.944
+  },
+  {
+   "item": "alif_kasroh",
+   "clip": 10,
+   "margin": -2.594
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 1,
+   "margin": -15.584
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 2,
+   "margin": -0.846
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 3,
+   "margin": 0.924
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 4,
+   "margin": -2.966
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 5,
+   "margin": 5.87
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 6,
+   "margin": 0.282
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 7,
+   "margin": -3.187
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 8,
+   "margin": 1.359
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 9,
+   "margin": -2.569
+  },
+  {
+   "item": "alif_dommah",
+   "clip": 10,
+   "margin": 0.29
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 1,
+   "margin": 12.87
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 2,
+   "margin": 3.179
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 3,
+   "margin": 19.846
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 4,
+   "margin": 7.28
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 5,
+   "margin": 8.96
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 6,
+   "margin": 7.533
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 7,
+   "margin": 26.594
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 8,
+   "margin": 6.796
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 9,
+   "margin": 18.96
+  },
+  {
+   "item": "ba_fathah",
+   "clip": 10,
+   "margin": 13.876
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 1,
+   "margin": -1.849
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 2,
+   "margin": 3.624
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 3,
+   "margin": 20.49
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 4,
+   "margin": 17.568
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 5,
+   "margin": 18.4
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 6,
+   "margin": -3.02
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 7,
+   "margin": 23.948
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 8,
+   "margin": 4.482
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 9,
+   "margin": 0.265
+  },
+  {
+   "item": "ba_kasroh",
+   "clip": 10,
+   "margin": 5.936
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 1,
+   "margin": 2.273
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 2,
+   "margin": 1.498
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 3,
+   "margin": 3.06
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 4,
+   "margin": 2.299
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 5,
+   "margin": 12.711
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 6,
+   "margin": 2.896
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 7,
+   "margin": 6.128
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 8,
+   "margin": 1.143
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 9,
+   "margin": 4.052
+  },
+  {
+   "item": "ba_dommah",
+   "clip": 10,
+   "margin": 7.7
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 1,
+   "margin": 6.415
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 2,
+   "margin": 3.135
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 3,
+   "margin": 3.322
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 4,
+   "margin": 3.018
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 5,
+   "margin": 0.601
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 6,
+   "margin": 6.447
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 7,
+   "margin": 1.513
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 8,
+   "margin": 4.975
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 9,
+   "margin": 3.941
+  },
+  {
+   "item": "ta_fathah",
+   "clip": 10,
+   "margin": -0.331
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 1,
+   "margin": -2.919
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 2,
+   "margin": 4.246
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 3,
+   "margin": 5.662
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 4,
+   "margin": 1.785
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 5,
+   "margin": 0.294
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 6,
+   "margin": 4.825
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 7,
+   "margin": -1.458
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 8,
+   "margin": 7.187
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 9,
+   "margin": -1.159
+  },
+  {
+   "item": "ta_kasroh",
+   "clip": 10,
+   "margin": 1.388
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 1,
+   "margin": 5.411
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 2,
+   "margin": 0.324
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 3,
+   "margin": 0.357
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 4,
+   "margin": -1.608
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 5,
+   "margin": 1.686
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 6,
+   "margin": 7.622
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 7,
+   "margin": 4.572
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 8,
+   "margin": 8.34
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 9,
+   "margin": 1.434
+  },
+  {
+   "item": "ta_dommah",
+   "clip": 10,
+   "margin": -1.405
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 1,
+   "margin": -2.195
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 2,
+   "margin": -3.772
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 3,
+   "margin": -2.287
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 4,
+   "margin": -1.458
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 5,
+   "margin": -2.309
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 6,
+   "margin": -1.755
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 7,
+   "margin": -2.161
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 8,
+   "margin": -4.293
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 9,
+   "margin": -0.158
+  },
+  {
+   "item": "tsa_fathah",
+   "clip": 10,
+   "margin": -2.162
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 1,
+   "margin": -3.527
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 2,
+   "margin": -2.312
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 3,
+   "margin": -1.483
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 4,
+   "margin": -1.594
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 5,
+   "margin": -1.487
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 6,
+   "margin": -0.478
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 7,
+   "margin": -0.565
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 8,
+   "margin": -2.259
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 9,
+   "margin": -2.706
+  },
+  {
+   "item": "tsa_kasroh",
+   "clip": 10,
+   "margin": -2.493
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 1,
+   "margin": -2.638
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 2,
+   "margin": -3.795
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 3,
+   "margin": -2.508
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 4,
+   "margin": -1.988
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 5,
+   "margin": -1.943
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 6,
+   "margin": -2.414
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 7,
+   "margin": -1.672
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 8,
+   "margin": -1.785
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 9,
+   "margin": -2.294
+  },
+  {
+   "item": "tsa_dommah",
+   "clip": 10,
+   "margin": 1.219
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 1,
+   "margin": 24.265
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 2,
+   "margin": 9.278
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 3,
+   "margin": 10.603
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 4,
+   "margin": 4.37
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 5,
+   "margin": 9.233
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 6,
+   "margin": 10.324
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 7,
+   "margin": 29.854
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 8,
+   "margin": 14.332
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 9,
+   "margin": 19.328
+  },
+  {
+   "item": "jim_fathah",
+   "clip": 10,
+   "margin": 18.254
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 1,
+   "margin": 18.853
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 2,
+   "margin": 9.936
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 3,
+   "margin": 9.449
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 4,
+   "margin": -2.307
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 5,
+   "margin": 15.575
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 6,
+   "margin": -1.484
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 7,
+   "margin": 9.886
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 8,
+   "margin": 10.914
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 9,
+   "margin": 29.081
+  },
+  {
+   "item": "jim_kasroh",
+   "clip": 10,
+   "margin": 19.033
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 1,
+   "margin": 17.208
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 2,
+   "margin": -1.45
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 3,
+   "margin": 3.806
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 4,
+   "margin": -0.538
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 5,
+   "margin": 3.585
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 6,
+   "margin": 15.17
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 7,
+   "margin": 15.144
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 8,
+   "margin": 1.889
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 9,
+   "margin": 0.521
+  },
+  {
+   "item": "jim_dommah",
+   "clip": 10,
+   "margin": 3.866
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 1,
+   "margin": 3.729
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 2,
+   "margin": 0.24
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 3,
+   "margin": 4.715
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 4,
+   "margin": 1.236
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 5,
+   "margin": 3.231
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 6,
+   "margin": 2.617
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 7,
+   "margin": 3.097
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 8,
+   "margin": 2.159
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 9,
+   "margin": 4.34
+  },
+  {
+   "item": "hah_fathah",
+   "clip": 10,
+   "margin": 2.583
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 1,
+   "margin": 4.918
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 2,
+   "margin": -1.919
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 3,
+   "margin": 6.299
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 4,
+   "margin": 0.496
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 5,
+   "margin": -8.062
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 6,
+   "margin": 5.323
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 7,
+   "margin": 7.296
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 8,
+   "margin": 0.599
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 9,
+   "margin": 4.322
+  },
+  {
+   "item": "hah_kasroh",
+   "clip": 10,
+   "margin": 5.896
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 1,
+   "margin": 7.222
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 2,
+   "margin": -5.545
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 3,
+   "margin": 2.418
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 4,
+   "margin": 0.092
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 5,
+   "margin": -0.167
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 6,
+   "margin": 5.457
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 7,
+   "margin": 5.951
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 8,
+   "margin": 0.057
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 9,
+   "margin": -3.453
+  },
+  {
+   "item": "hah_dommah",
+   "clip": 10,
+   "margin": -1.281
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 1,
+   "margin": 23.958
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 2,
+   "margin": 20.595
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 3,
+   "margin": 9.813
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 4,
+   "margin": 21.792
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 5,
+   "margin": 14.839
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 6,
+   "margin": 14.681
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 7,
+   "margin": 28.562
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 8,
+   "margin": 20.735
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 9,
+   "margin": 28.408
+  },
+  {
+   "item": "kha_fathah",
+   "clip": 10,
+   "margin": 23.854
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 1,
+   "margin": 7.691
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 2,
+   "margin": -5.286
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 3,
+   "margin": 4.286
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 4,
+   "margin": 19.614
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 5,
+   "margin": -1.695
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 6,
+   "margin": 18.412
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 7,
+   "margin": 33.002
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 8,
+   "margin": -2.107
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 9,
+   "margin": -5.9
+  },
+  {
+   "item": "kha_kasroh",
+   "clip": 10,
+   "margin": -1.374
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 1,
+   "margin": -12.489
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 2,
+   "margin": -2.081
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 3,
+   "margin": 1.677
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 4,
+   "margin": -2.207
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 5,
+   "margin": -1.171
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 6,
+   "margin": 0.455
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 7,
+   "margin": 23.726
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 8,
+   "margin": 3.361
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 9,
+   "margin": 3.686
+  },
+  {
+   "item": "kha_dommah",
+   "clip": 10,
+   "margin": -14.998
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 1,
+   "margin": -6.727
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 2,
+   "margin": -5.89
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 3,
+   "margin": 3.753
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 4,
+   "margin": -6.007
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 5,
+   "margin": -5.76
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 6,
+   "margin": 1.055
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 7,
+   "margin": 4.327
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 8,
+   "margin": 2.846
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 9,
+   "margin": -7.004
+  },
+  {
+   "item": "dal_fathah",
+   "clip": 10,
+   "margin": -5.993
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 1,
+   "margin": -6.684
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 2,
+   "margin": -6.482
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 3,
+   "margin": -4.614
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 4,
+   "margin": -4.618
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 5,
+   "margin": -5.243
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 6,
+   "margin": 2.626
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 7,
+   "margin": 1.436
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 8,
+   "margin": 1.58
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 9,
+   "margin": -6.091
+  },
+  {
+   "item": "dal_kasroh",
+   "clip": 10,
+   "margin": -3.333
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 1,
+   "margin": -10.358
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 2,
+   "margin": -7.107
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 3,
+   "margin": 3.285
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 4,
+   "margin": -4.959
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 5,
+   "margin": -9.298
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 6,
+   "margin": 6.651
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 7,
+   "margin": 5.45
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 8,
+   "margin": 4.216
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 9,
+   "margin": -7.04
+  },
+  {
+   "item": "dal_dommah",
+   "clip": 10,
+   "margin": -6.311
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 1,
+   "margin": 2.999
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 2,
+   "margin": -1.452
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 3,
+   "margin": 2.774
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 4,
+   "margin": 0.076
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 5,
+   "margin": 3.292
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 6,
+   "margin": 0.526
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 7,
+   "margin": 3.147
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 8,
+   "margin": -2.442
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 9,
+   "margin": 5.89
+  },
+  {
+   "item": "dzal_fathah",
+   "clip": 10,
+   "margin": 2.189
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 1,
+   "margin": 10.512
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 2,
+   "margin": -3.165
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 3,
+   "margin": 2.833
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 4,
+   "margin": 1.023
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 5,
+   "margin": 2.448
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 6,
+   "margin": -2.812
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 7,
+   "margin": 0.667
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 8,
+   "margin": 3.087
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 9,
+   "margin": 4.208
+  },
+  {
+   "item": "dzal_kasroh",
+   "clip": 10,
+   "margin": 2.138
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 1,
+   "margin": -1.668
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 2,
+   "margin": -1.479
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 3,
+   "margin": -1.159
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 4,
+   "margin": -1.341
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 5,
+   "margin": -2.001
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 6,
+   "margin": 6.676
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 7,
+   "margin": -0.733
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 8,
+   "margin": 2.89
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 9,
+   "margin": -1.642
+  },
+  {
+   "item": "dzal_dommah",
+   "clip": 10,
+   "margin": -1.661
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 1,
+   "margin": 10.541
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 2,
+   "margin": 8.476
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 3,
+   "margin": 8.897
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 4,
+   "margin": 7.528
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 5,
+   "margin": 5.414
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 6,
+   "margin": 15.423
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 7,
+   "margin": 17.819
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 8,
+   "margin": 7.403
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 9,
+   "margin": 23.52
+  },
+  {
+   "item": "ra_fathah",
+   "clip": 10,
+   "margin": 15.315
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 1,
+   "margin": 18.769
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 2,
+   "margin": 21.502
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 3,
+   "margin": 8.014
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 4,
+   "margin": 8.058
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 5,
+   "margin": 20.97
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 6,
+   "margin": 9.716
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 7,
+   "margin": 12.075
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 8,
+   "margin": 18.932
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 9,
+   "margin": 20.231
+  },
+  {
+   "item": "ra_kasroh",
+   "clip": 10,
+   "margin": -1.732
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 1,
+   "margin": 13.763
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 2,
+   "margin": -2.218
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 3,
+   "margin": 5.4
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 4,
+   "margin": 2.097
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 5,
+   "margin": 8.135
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 6,
+   "margin": 5.26
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 7,
+   "margin": 13.777
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 8,
+   "margin": 4.657
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 9,
+   "margin": 6.03
+  },
+  {
+   "item": "ra_dommah",
+   "clip": 10,
+   "margin": -2.221
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 1,
+   "margin": 2.934
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 2,
+   "margin": 1.48
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 3,
+   "margin": 0.821
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 4,
+   "margin": 5.099
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 5,
+   "margin": 0.673
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 6,
+   "margin": 1.039
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 7,
+   "margin": -0.541
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 8,
+   "margin": 2.774
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 9,
+   "margin": 3.496
+  },
+  {
+   "item": "zay_fathah",
+   "clip": 10,
+   "margin": 4.206
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 1,
+   "margin": 1.469
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 2,
+   "margin": 1.445
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 3,
+   "margin": -0.447
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 4,
+   "margin": -0.754
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 5,
+   "margin": -4.803
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 6,
+   "margin": -1.129
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 7,
+   "margin": -0.722
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 8,
+   "margin": -2.381
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 9,
+   "margin": -0.782
+  },
+  {
+   "item": "zay_kasroh",
+   "clip": 10,
+   "margin": 2.247
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 1,
+   "margin": 4.18
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 2,
+   "margin": -0.472
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 3,
+   "margin": 1.838
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 4,
+   "margin": 2.617
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 5,
+   "margin": 3.655
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 6,
+   "margin": 3.021
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 7,
+   "margin": -3.91
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 8,
+   "margin": 1.078
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 9,
+   "margin": -1.728
+  },
+  {
+   "item": "zay_dommah",
+   "clip": 10,
+   "margin": -7.198
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 1,
+   "margin": 2.001
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 2,
+   "margin": 2.607
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 3,
+   "margin": -0.939
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 4,
+   "margin": -1.547
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 5,
+   "margin": -1.526
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 6,
+   "margin": 3.218
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 7,
+   "margin": 0.024
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 8,
+   "margin": 2.719
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 9,
+   "margin": 0.151
+  },
+  {
+   "item": "sin_fathah",
+   "clip": 10,
+   "margin": 3.14
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 1,
+   "margin": 0.463
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 2,
+   "margin": 0.847
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 3,
+   "margin": 1.37
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 4,
+   "margin": -1.894
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 5,
+   "margin": -7.569
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 6,
+   "margin": -0.53
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 7,
+   "margin": -3.204
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 8,
+   "margin": 3.759
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 9,
+   "margin": -0.045
+  },
+  {
+   "item": "sin_kasroh",
+   "clip": 10,
+   "margin": 0.287
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 1,
+   "margin": 3.607
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 2,
+   "margin": -1.044
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 3,
+   "margin": -0.34
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 4,
+   "margin": 1.937
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 5,
+   "margin": -1.935
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 6,
+   "margin": -2.61
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 7,
+   "margin": -2.095
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 8,
+   "margin": 2.663
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 9,
+   "margin": -3.72
+  },
+  {
+   "item": "sin_dommah",
+   "clip": 10,
+   "margin": 2.592
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 1,
+   "margin": 19.076
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 2,
+   "margin": 2.316
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 3,
+   "margin": 6.635
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 4,
+   "margin": 13.443
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 5,
+   "margin": 9.64
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 6,
+   "margin": 22.032
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 7,
+   "margin": 20.918
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 8,
+   "margin": 14.865
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 9,
+   "margin": 25.087
+  },
+  {
+   "item": "shin_fathah",
+   "clip": 10,
+   "margin": 16.975
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 1,
+   "margin": 6.926
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 2,
+   "margin": -3.8
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 3,
+   "margin": 0.655
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 4,
+   "margin": 3.895
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 5,
+   "margin": -9.245
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 6,
+   "margin": -2.35
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 7,
+   "margin": 6.466
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 8,
+   "margin": 9.079
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 9,
+   "margin": -1.953
+  },
+  {
+   "item": "shin_kasroh",
+   "clip": 10,
+   "margin": -7.075
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 1,
+   "margin": 8.959
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 2,
+   "margin": 0.099
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 3,
+   "margin": -0.254
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 4,
+   "margin": 3.0
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 5,
+   "margin": 6.137
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 6,
+   "margin": 14.685
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 7,
+   "margin": 14.743
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 8,
+   "margin": 3.574
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 9,
+   "margin": 4.016
+  },
+  {
+   "item": "shin_dommah",
+   "clip": 10,
+   "margin": 2.125
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 1,
+   "margin": 0.829
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 2,
+   "margin": -2.054
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 3,
+   "margin": 5.07
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 4,
+   "margin": 1.425
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 5,
+   "margin": 2.73
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 6,
+   "margin": 3.769
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 7,
+   "margin": 3.732
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 8,
+   "margin": 4.408
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 9,
+   "margin": 5.899
+  },
+  {
+   "item": "sad_fathah",
+   "clip": 10,
+   "margin": 2.811
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 1,
+   "margin": -1.057
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 2,
+   "margin": -0.056
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 3,
+   "margin": 4.288
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 4,
+   "margin": 0.113
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 5,
+   "margin": 3.945
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 6,
+   "margin": 3.716
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 7,
+   "margin": 1.933
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 8,
+   "margin": 9.114
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 9,
+   "margin": 11.537
+  },
+  {
+   "item": "sad_kasroh",
+   "clip": 10,
+   "margin": 2.686
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 1,
+   "margin": 0.246
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 2,
+   "margin": -0.75
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 3,
+   "margin": 0.137
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 4,
+   "margin": 0.363
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 5,
+   "margin": -0.514
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 6,
+   "margin": 1.591
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 7,
+   "margin": 2.559
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 8,
+   "margin": 2.897
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 9,
+   "margin": 0.197
+  },
+  {
+   "item": "sad_dommah",
+   "clip": 10,
+   "margin": -0.735
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 1,
+   "margin": -1.02
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 2,
+   "margin": 3.014
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 3,
+   "margin": 6.802
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 4,
+   "margin": -3.689
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 5,
+   "margin": -1.668
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 6,
+   "margin": 2.01
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 7,
+   "margin": 3.687
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 8,
+   "margin": 4.27
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 9,
+   "margin": 2.072
+  },
+  {
+   "item": "dad_fathah",
+   "clip": 10,
+   "margin": -1.624
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 1,
+   "margin": -3.858
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 2,
+   "margin": -1.309
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 3,
+   "margin": 0.721
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 4,
+   "margin": -1.46
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 5,
+   "margin": -3.743
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 6,
+   "margin": 3.3
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 7,
+   "margin": -2.951
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 8,
+   "margin": -3.093
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 9,
+   "margin": -1.25
+  },
+  {
+   "item": "dad_kasroh",
+   "clip": 10,
+   "margin": -2.437
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 1,
+   "margin": -3.16
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 2,
+   "margin": 0.102
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 3,
+   "margin": -0.328
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 4,
+   "margin": -4.117
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 5,
+   "margin": -4.359
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 6,
+   "margin": 0.905
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 7,
+   "margin": 2.182
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 8,
+   "margin": -1.98
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 9,
+   "margin": 1.844
+  },
+  {
+   "item": "dad_dommah",
+   "clip": 10,
+   "margin": -5.024
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 1,
+   "margin": 5.88
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 2,
+   "margin": -2.575
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 3,
+   "margin": 0.214
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 4,
+   "margin": 1.916
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 5,
+   "margin": -1.668
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 6,
+   "margin": 3.763
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 7,
+   "margin": 4.518
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 8,
+   "margin": 1.798
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 9,
+   "margin": 4.009
+  },
+  {
+   "item": "tah_fathah",
+   "clip": 10,
+   "margin": -1.453
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 1,
+   "margin": 1.783
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 2,
+   "margin": -1.15
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 3,
+   "margin": 1.757
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 4,
+   "margin": 2.1
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 5,
+   "margin": 1.483
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 6,
+   "margin": 4.38
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 7,
+   "margin": -0.51
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 8,
+   "margin": -2.189
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 9,
+   "margin": 7.7
+  },
+  {
+   "item": "tah_kasroh",
+   "clip": 10,
+   "margin": 2.54
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 1,
+   "margin": 2.671
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 2,
+   "margin": -4.098
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 3,
+   "margin": -0.664
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 4,
+   "margin": 0.765
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 5,
+   "margin": -0.981
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 6,
+   "margin": -1.708
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 7,
+   "margin": 0.933
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 8,
+   "margin": -1.767
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 9,
+   "margin": -3.335
+  },
+  {
+   "item": "tah_dommah",
+   "clip": 10,
+   "margin": -0.844
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 1,
+   "margin": -7.266
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 2,
+   "margin": -0.997
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 3,
+   "margin": 4.671
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 4,
+   "margin": -6.808
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 5,
+   "margin": -3.329
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 6,
+   "margin": -1.221
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 7,
+   "margin": 1.068
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 8,
+   "margin": -1.665
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 9,
+   "margin": -0.78
+  },
+  {
+   "item": "zah_fathah",
+   "clip": 10,
+   "margin": -3.37
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 1,
+   "margin": -4.603
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 2,
+   "margin": -2.36
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 3,
+   "margin": 2.585
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 4,
+   "margin": -1.732
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 5,
+   "margin": -0.928
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 6,
+   "margin": 0.851
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 7,
+   "margin": -0.671
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 8,
+   "margin": 2.917
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 9,
+   "margin": -0.335
+  },
+  {
+   "item": "zah_kasroh",
+   "clip": 10,
+   "margin": -3.747
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 1,
+   "margin": -6.847
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 2,
+   "margin": -7.453
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 3,
+   "margin": -0.831
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 4,
+   "margin": -6.602
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 5,
+   "margin": -3.879
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 6,
+   "margin": -1.9
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 7,
+   "margin": 3.906
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 8,
+   "margin": -0.006
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 9,
+   "margin": -2.104
+  },
+  {
+   "item": "zah_dommah",
+   "clip": 10,
+   "margin": -4.928
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 1,
+   "margin": -1.396
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 2,
+   "margin": -3.313
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 3,
+   "margin": -2.557
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 4,
+   "margin": 0.978
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 5,
+   "margin": -2.896
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 6,
+   "margin": 0.696
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 7,
+   "margin": -2.141
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 8,
+   "margin": -1.461
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 9,
+   "margin": -2.01
+  },
+  {
+   "item": "ain_fathah",
+   "clip": 10,
+   "margin": -1.733
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 1,
+   "margin": -4.599
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 2,
+   "margin": -4.16
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 3,
+   "margin": -3.29
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 4,
+   "margin": -2.524
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 5,
+   "margin": 4.479
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 6,
+   "margin": -2.257
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 7,
+   "margin": 3.181
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 8,
+   "margin": -1.721
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 9,
+   "margin": 1.691
+  },
+  {
+   "item": "ain_kasroh",
+   "clip": 10,
+   "margin": 5.906
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 1,
+   "margin": -7.135
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 2,
+   "margin": -10.621
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 3,
+   "margin": -2.293
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 4,
+   "margin": -2.642
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 5,
+   "margin": -3.133
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 6,
+   "margin": -3.489
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 7,
+   "margin": -5.481
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 8,
+   "margin": -2.862
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 9,
+   "margin": -5.08
+  },
+  {
+   "item": "ain_dommah",
+   "clip": 10,
+   "margin": -3.285
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 1,
+   "margin": 13.859
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 2,
+   "margin": 11.268
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 3,
+   "margin": 3.589
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 4,
+   "margin": 14.584
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 5,
+   "margin": 18.167
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 6,
+   "margin": 4.913
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 7,
+   "margin": 22.885
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 8,
+   "margin": 15.83
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 9,
+   "margin": 7.838
+  },
+  {
+   "item": "ghaiin_fathah",
+   "clip": 10,
+   "margin": 11.445
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 1,
+   "margin": 23.543
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 2,
+   "margin": -4.765
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 3,
+   "margin": 0.043
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 4,
+   "margin": 8.947
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 5,
+   "margin": 8.297
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 6,
+   "margin": 9.333
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 7,
+   "margin": 14.315
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 8,
+   "margin": -0.696
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 9,
+   "margin": -6.263
+  },
+  {
+   "item": "ghaiin_kasroh",
+   "clip": 10,
+   "margin": -1.04
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 1,
+   "margin": 0.559
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 2,
+   "margin": -1.184
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 3,
+   "margin": -1.229
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 4,
+   "margin": 4.719
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 5,
+   "margin": 2.485
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 6,
+   "margin": -2.125
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 7,
+   "margin": 5.201
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 8,
+   "margin": 3.207
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 9,
+   "margin": -8.071
+  },
+  {
+   "item": "ghaiin_dommah",
+   "clip": 10,
+   "margin": -7.079
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 1,
+   "margin": 27.702
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 2,
+   "margin": 9.844
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 3,
+   "margin": 7.316
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 4,
+   "margin": 11.582
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 5,
+   "margin": 6.17
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 6,
+   "margin": 4.085
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 7,
+   "margin": 27.438
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 8,
+   "margin": 8.681
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 9,
+   "margin": 19.892
+  },
+  {
+   "item": "fa_fathah",
+   "clip": 10,
+   "margin": 14.421
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 1,
+   "margin": 24.446
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 2,
+   "margin": -1.362
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 3,
+   "margin": 21.855
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 4,
+   "margin": 18.478
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 5,
+   "margin": -14.146
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 6,
+   "margin": 14.451
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 7,
+   "margin": 20.93
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 8,
+   "margin": 29.348
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 9,
+   "margin": -0.897
+  },
+  {
+   "item": "fa_kasroh",
+   "clip": 10,
+   "margin": 19.233
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 1,
+   "margin": 18.8
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 2,
+   "margin": 1.435
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 3,
+   "margin": 0.16
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 4,
+   "margin": 5.055
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 5,
+   "margin": 8.653
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 6,
+   "margin": 1.071
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 7,
+   "margin": 19.935
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 8,
+   "margin": 5.168
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 9,
+   "margin": 1.118
+  },
+  {
+   "item": "fa_dommah",
+   "clip": 10,
+   "margin": 6.035
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 1,
+   "margin": 5.037
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 2,
+   "margin": 2.477
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 3,
+   "margin": 2.194
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 4,
+   "margin": 5.779
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 5,
+   "margin": 1.893
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 6,
+   "margin": 2.043
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 7,
+   "margin": 2.751
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 8,
+   "margin": 5.027
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 9,
+   "margin": 6.132
+  },
+  {
+   "item": "qaf_fathah",
+   "clip": 10,
+   "margin": 1.811
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 1,
+   "margin": 0.079
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 2,
+   "margin": -2.638
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 3,
+   "margin": -2.109
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 4,
+   "margin": 1.968
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 5,
+   "margin": 3.841
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 6,
+   "margin": 0.484
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 7,
+   "margin": 2.352
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 8,
+   "margin": 4.115
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 9,
+   "margin": -4.667
+  },
+  {
+   "item": "qaf_kasroh",
+   "clip": 10,
+   "margin": 3.184
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 1,
+   "margin": -2.506
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 2,
+   "margin": -2.086
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 3,
+   "margin": -2.47
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 4,
+   "margin": -3.549
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 5,
+   "margin": -7.294
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 6,
+   "margin": -0.636
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 7,
+   "margin": -6.473
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 8,
+   "margin": -0.452
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 9,
+   "margin": -6.117
+  },
+  {
+   "item": "qaf_dommah",
+   "clip": 10,
+   "margin": -0.726
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 1,
+   "margin": 6.629
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 2,
+   "margin": 2.074
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 3,
+   "margin": 2.974
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 4,
+   "margin": -2.02
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 5,
+   "margin": 1.111
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 6,
+   "margin": 5.991
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 7,
+   "margin": 3.167
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 8,
+   "margin": 4.346
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 9,
+   "margin": 6.046
+  },
+  {
+   "item": "kaf_fathah",
+   "clip": 10,
+   "margin": 2.734
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 1,
+   "margin": 0.894
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 2,
+   "margin": -2.323
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 3,
+   "margin": -0.981
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 4,
+   "margin": -2.713
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 5,
+   "margin": -9.483
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 6,
+   "margin": -1.808
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 7,
+   "margin": -4.822
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 8,
+   "margin": -0.902
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 9,
+   "margin": 1.606
+  },
+  {
+   "item": "kaf_kasroh",
+   "clip": 10,
+   "margin": -0.087
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 1,
+   "margin": 3.312
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 2,
+   "margin": -1.202
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 3,
+   "margin": 0.207
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 4,
+   "margin": -2.328
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 5,
+   "margin": -2.928
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 6,
+   "margin": -0.515
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 7,
+   "margin": -2.821
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 8,
+   "margin": 6.451
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 9,
+   "margin": 3.859
+  },
+  {
+   "item": "kaf_dommah",
+   "clip": 10,
+   "margin": 1.217
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 1,
+   "margin": 14.726
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 2,
+   "margin": 2.754
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 3,
+   "margin": 6.747
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 4,
+   "margin": 8.33
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 5,
+   "margin": 5.369
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 6,
+   "margin": 0.972
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 7,
+   "margin": 12.991
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 8,
+   "margin": 3.513
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 9,
+   "margin": 13.217
+  },
+  {
+   "item": "lam_fathah",
+   "clip": 10,
+   "margin": 10.308
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 1,
+   "margin": 10.779
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 2,
+   "margin": 3.579
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 3,
+   "margin": 8.474
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 4,
+   "margin": 2.183
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 5,
+   "margin": 2.128
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 6,
+   "margin": 12.847
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 7,
+   "margin": -1.396
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 8,
+   "margin": 5.917
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 9,
+   "margin": 0.032
+  },
+  {
+   "item": "lam_kasroh",
+   "clip": 10,
+   "margin": 24.147
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 1,
+   "margin": 5.705
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 2,
+   "margin": -0.764
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 3,
+   "margin": -0.881
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 4,
+   "margin": -0.418
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 5,
+   "margin": 3.102
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 6,
+   "margin": 4.362
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 7,
+   "margin": 10.845
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 8,
+   "margin": 6.969
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 9,
+   "margin": -0.899
+  },
+  {
+   "item": "lam_dommah",
+   "clip": 10,
+   "margin": 5.992
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 1,
+   "margin": 31.924
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 2,
+   "margin": 5.527
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 3,
+   "margin": 6.883
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 4,
+   "margin": 9.513
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 5,
+   "margin": 10.078
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 6,
+   "margin": 3.664
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 7,
+   "margin": 26.772
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 8,
+   "margin": 8.027
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 9,
+   "margin": 11.97
+  },
+  {
+   "item": "mim_fathah",
+   "clip": 10,
+   "margin": 21.564
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 1,
+   "margin": 13.602
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 2,
+   "margin": -6.506
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 3,
+   "margin": 11.08
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 4,
+   "margin": 16.278
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 5,
+   "margin": -10.914
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 6,
+   "margin": 0.892
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 7,
+   "margin": -10.119
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 8,
+   "margin": -4.518
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 9,
+   "margin": 27.632
+  },
+  {
+   "item": "mim_kasroh",
+   "clip": 10,
+   "margin": -5.452
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 1,
+   "margin": -7.671
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 2,
+   "margin": -6.333
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 3,
+   "margin": -2.433
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 4,
+   "margin": -3.018
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 5,
+   "margin": -1.031
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 6,
+   "margin": -2.392
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 7,
+   "margin": 0.037
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 8,
+   "margin": 1.29
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 9,
+   "margin": 9.222
+  },
+  {
+   "item": "mim_dommah",
+   "clip": 10,
+   "margin": 4.185
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 1,
+   "margin": 21.131
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 2,
+   "margin": 6.566
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 3,
+   "margin": 3.857
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 4,
+   "margin": 6.517
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 5,
+   "margin": 13.287
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 6,
+   "margin": 10.711
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 7,
+   "margin": 14.999
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 8,
+   "margin": 7.106
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 9,
+   "margin": 7.321
+  },
+  {
+   "item": "nun_fathah",
+   "clip": 10,
+   "margin": 6.907
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 1,
+   "margin": -1.119
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 2,
+   "margin": -4.974
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 3,
+   "margin": -2.623
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 4,
+   "margin": 4.216
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 5,
+   "margin": -6.045
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 6,
+   "margin": -2.94
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 7,
+   "margin": -9.255
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 8,
+   "margin": -1.28
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 9,
+   "margin": 28.683
+  },
+  {
+   "item": "nun_kasroh",
+   "clip": 10,
+   "margin": -5.834
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 1,
+   "margin": 7.622
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 2,
+   "margin": -4.773
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 3,
+   "margin": 0.019
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 4,
+   "margin": 6.899
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 5,
+   "margin": 1.343
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 6,
+   "margin": 0.794
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 7,
+   "margin": 17.631
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 8,
+   "margin": 3.181
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 9,
+   "margin": 12.275
+  },
+  {
+   "item": "nun_dommah",
+   "clip": 10,
+   "margin": 2.937
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 1,
+   "margin": 1.791
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 2,
+   "margin": 0.632
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 3,
+   "margin": 1.363
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 4,
+   "margin": 1.457
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 5,
+   "margin": 1.981
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 6,
+   "margin": 1.144
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 7,
+   "margin": -1.888
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 8,
+   "margin": 1.606
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 9,
+   "margin": -1.773
+  },
+  {
+   "item": "Ha_fathah",
+   "clip": 10,
+   "margin": 1.214
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 1,
+   "margin": -4.088
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 2,
+   "margin": -1.518
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 3,
+   "margin": -0.531
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 4,
+   "margin": -0.915
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 5,
+   "margin": -4.921
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 6,
+   "margin": -1.815
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 7,
+   "margin": -2.57
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 8,
+   "margin": -0.062
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 9,
+   "margin": -0.807
+  },
+  {
+   "item": "Ha_kasroh",
+   "clip": 10,
+   "margin": -7.877
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 1,
+   "margin": -4.428
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 2,
+   "margin": -2.335
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 3,
+   "margin": -0.992
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 4,
+   "margin": -10.303
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 5,
+   "margin": 1.113
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 6,
+   "margin": 0.973
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 7,
+   "margin": -0.385
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 8,
+   "margin": -2.473
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 9,
+   "margin": -2.142
+  },
+  {
+   "item": "Ha_dommah",
+   "clip": 10,
+   "margin": -5.963
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 1,
+   "margin": 22.465
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 2,
+   "margin": 5.258
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 3,
+   "margin": 5.31
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 4,
+   "margin": 10.726
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 5,
+   "margin": 9.19
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 6,
+   "margin": 13.615
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 7,
+   "margin": 26.308
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 8,
+   "margin": 6.388
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 9,
+   "margin": 15.973
+  },
+  {
+   "item": "waw_fathah",
+   "clip": 10,
+   "margin": 9.294
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 1,
+   "margin": 17.768
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 2,
+   "margin": -1.407
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 3,
+   "margin": 15.989
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 4,
+   "margin": 18.586
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 5,
+   "margin": 28.601
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 6,
+   "margin": 30.577
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 7,
+   "margin": 22.164
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 8,
+   "margin": 5.449
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 9,
+   "margin": 22.511
+  },
+  {
+   "item": "waw_kasroh",
+   "clip": 10,
+   "margin": 13.859
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 1,
+   "margin": -8.274
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 2,
+   "margin": -2.176
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 3,
+   "margin": -1.419
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 4,
+   "margin": -3.848
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 5,
+   "margin": 3.449
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 6,
+   "margin": -6.321
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 7,
+   "margin": -5.545
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 8,
+   "margin": -0.326
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 9,
+   "margin": 5.834
+  },
+  {
+   "item": "waw_dommah",
+   "clip": 10,
+   "margin": 2.741
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 1,
+   "margin": 24.914
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 2,
+   "margin": 5.656
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 3,
+   "margin": 12.072
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 4,
+   "margin": 11.251
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 5,
+   "margin": 8.953
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 6,
+   "margin": 12.803
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 7,
+   "margin": 26.971
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 8,
+   "margin": 11.842
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 9,
+   "margin": 20.271
+  },
+  {
+   "item": "ya_fathah",
+   "clip": 10,
+   "margin": 16.796
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 1,
+   "margin": -0.653
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 2,
+   "margin": -2.268
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 3,
+   "margin": -1.288
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 4,
+   "margin": -1.299
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 5,
+   "margin": -3.27
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 6,
+   "margin": -2.749
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 7,
+   "margin": -4.542
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 8,
+   "margin": -1.372
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 9,
+   "margin": 10.35
+  },
+  {
+   "item": "ya_kasroh",
+   "clip": 10,
+   "margin": -8.735
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 1,
+   "margin": 6.775
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 2,
+   "margin": 0.645
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 3,
+   "margin": -0.555
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 4,
+   "margin": 1.778
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 5,
+   "margin": 3.384
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 6,
+   "margin": 1.707
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 7,
+   "margin": 15.13
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 8,
+   "margin": 7.65
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 9,
+   "margin": -3.762
+  },
+  {
+   "item": "ya_dommah",
+   "clip": 10,
+   "margin": 4.919
+  }
+ ]
+}

@@ -428,6 +428,17 @@ Author’s decision (2026-11-19): the learner sees only this method; the teacher
 
 Side by side at the working thresholds: the bot today passes 14 % of these 840; free transcription 47 %; per-sound check 63 %; card variants 76 %; the 84-syllable classifier 91 % (§11.5, trained, single syllables only). Look-alike letters still slip through in about 1 of 5 trials; most frequent “errors” named on correct readings are س (40), fatha (33), ت (25), ز (22), د (18). The method extends to any card for which typical errors can be listed (sukun, words), which the classifier cannot. Not tested yet on words; the error lists for later cards are a methodology decision.
 
+### 11.8c-bis Card variants on the bot's model Muaalem (ADR-0086, point 7)
+
+Same 840 recordings and variants, written in Muaalem's phonetic script; a held vowel allowed for every variant. `muaalem_variants.py`, CPU, ≈25 min.
+
+| Model | Correct passed | Look-alike passed | Other vowel passed |
+|---|---|---|---|
+| MostafaMaroof (§11.8c) | 76.1 % | 18.0 % | 3.2 % |
+| Muaalem | 62.0 % | 18.5 % | 7.7 % |
+
+(margin 0; at margin 2: Muaalem 47.9 / 7.3 / 3.6.) Muaalem is worse on single syllables — fewer correct readings passed and more vowel swaps let through, consistent with its bias towards “a” (§3.3). By the rule of ADR-0086, point 7, MostafaMaroof is added as a second listening model for the card-variants check; Muaalem stays for the rest. Even Muaalem with card variants passes 62 of 100 against 14 for the bot today.
+
 ### 11.8d Card variants on whole phrases (stage II: words and lines)
 
 No open recordings of learners reading words were found with a clear licence (`Buraaq/quran-md-words` states none). Material: 300 random phrases of IqraEval `Iqra_train` dev (CC BY-NC 4.0; Common Voice MSA and Quran, **correct** readings by fluent speakers) with their phoneme transcription in the same symbols as MostafaMaroof. Error variants are made by the draft rules of `error_rules.py` (`ERROR_RULES_DRAFT.md`), two positions per rule and phrase; the model scores the correct reading against each variant (CTC forward). `words_check.py`.
