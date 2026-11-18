@@ -400,6 +400,24 @@ A side finding about the bot’s references: for a single letter the second acce
 
 Who is right in each recording cannot be known without a teacher. The commonest reason, a long vowel on a single letter, is the student holding the sound, which is how a letter is usually said alone; this supports improvement 5 in `MUALLIM_AND_THE_FIELD.md` (methodology — the author’s decision).
 
+### 11.8b Prototype: check each expected sound (forced alignment + GOP)
+
+Why: the closed-set check covers only single syllables; the whole book (sukun, shadda, madd, words, lines) needs a method that works for any expected text and needs no training on our data. Prototype `align_check.py`: the expected syllable becomes the model’s symbols (letter, vowel; plain and doubled letters merged, short and long vowel merged so that a held vowel is not an error); CTC Viterbi forced alignment finds the frames of each expected sound; for each sound, GOP = mean over its frames of log P(expected) − max log P(another unit of the same kind). Pass when both letter and vowel score above the threshold. Model: MostafaMaroof; the same 840 recordings as step 1; nothing trained.
+
+| Threshold | Correct passed | Look-alike letter passed (600 checks) | Other vowel passed (1,680 checks) |
+|---|---|---|---|
+| −1 | 68.9 % | 18.8 % | 7.1 % |
+| 0 | 62.9 % | 14.8 % | 4.3 % |
+| +1 | 56.1 % | 13.0 % | 2.4 % |
+
+At threshold 0: the vowel fails in 55 of 840 recordings, the letter in 281 (most often ث ظ ط ض د ص ق — the look-alike letters).
+
+Compared on the same kind of trials: free transcription with the same model passes 47.2 % of correct readings and 13.1 % of look-alike swaps; the closed-set classifier 90.5 % and 5.2 % (8,904 recordings, §11.5); the bot today passes 14 % (840, §11.8a).
+
+What this shows: per-sound checking is better than free transcription and far better than the bot today, works without training and extends to any text, but on single letters it is clearly weaker than the closed-set classifier, and it lets look-alike consonants through as often as transcription does. A second finding from the listening page (`listen_page.py`): CTC models mark each sound by a short spike of one or two frames, not by its real duration — the vowel spike sits at the end of the voiced part. The alignment therefore gives *where* a sound is, not *how long* it lasts; shadda and madd length cannot be read from these spikes and need a duration-aware aligner or frame-level scoring. Not yet tested: words, sukun, shadda, madd; Muaalem as the listening model.
+
+**Baseline “before training”** — `results/baseline_840.csv`, one row per recording (840): what was asked; what the bot heard, its score, verdict and errors; the 84-syllable choice (best syllable, probability of the asked one, decision); the per-sound check (sound heard on the letter and on the vowel, confidence, GOP, decision); what the four other models wrote; how many models disagree with the asked syllable; empty columns `teacher_heard` and `teacher_verdict` for a teacher. Built by `baseline.py` from `align_check.py` and `demo_data.py`; `results/align_summary.json` keeps the alignment of every recording. After any training or change of model, rebuild the same table and compare it row by row with this file (and with the teacher columns once they are filled).
+
 ### 11.9 How to repeat
 
 ```sh
