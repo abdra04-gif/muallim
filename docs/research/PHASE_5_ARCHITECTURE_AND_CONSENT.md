@@ -57,7 +57,7 @@ Decisions about consent wording, licence, minors, database schema and hosting be
 | Goal | Reason |
 |---|---|
 | No recording is stored or used beyond what the learner agreed to | Telegram terms; law; trust |
-| The learner gets feedback from one stable system while others are evaluated silently | Phase 3 was not run; ADR-0051 already plans a shadow mode |
+| The learner gets feedback from one stable system while others are evaluated silently | Phase 3 was only a preliminary test on public recordings; ADR-0051 already plans a shadow mode |
 | Stage I (single letters) and Stage II (words) can use different mechanisms | Phase 1, section 8 |
 | Every decision can be reproduced later | Already a project principle (ADR-0019) |
 | A withdrawal reaches every copy we control | Law; consent promise |
@@ -115,7 +115,7 @@ flowchart TD
 
 ### 3.5 Hosting and load
 
-| Question | Finding |
+| Aspect | Finding |
 |---|---|
 | Hardware for the bot | The primary model (0.6B parameters) already runs. Shadow models of 20–300M parameters add little; they run after the reply and may be queued. |
 | Development machine (M1 Air, 8 GB) | Enough for development and for small shadow models one at a time; not for training (Phase answer of 2026-11-16) |
@@ -227,7 +227,7 @@ Whether minors' recordings may even be *stored* for internal research is a separ
 
 ### 6.4 Other decisions
 
-| Question | Recommendation |
+| Topic | Recommendation |
 |---|---|
 | Recordings made under the old consent | Publish only if the learner accepts the new text, and ask explicitly whether earlier recordings are included |
 | Prayer question | Do not publish (Phase 4). Consider whether it is needed at all, given that it is sensitive data |

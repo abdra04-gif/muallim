@@ -99,7 +99,7 @@
 
 ## 4. L2-KSU in detail
 
-| Question | Finding |
+| Aspect | Finding |
 |---|---|
 | Who speaks | 40 non-native students from Central and West Africa enrolled in an Arabic language institute; 40 native speakers. First languages not listed. |
 | Level | Not stated. Institute students read full sentences, so they are not beginners from zero. |

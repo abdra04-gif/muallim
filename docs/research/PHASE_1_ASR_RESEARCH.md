@@ -81,7 +81,7 @@ Findings:
 | Model | Base / size | Output | Reported result | Licence | Evidence |
 |---|---|---|---|---|---|
 | `nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0` | FastConformer hybrid RNN-T + CTC | Arabic text with diacritics and punctuation; trained on MSA + 392 h Quran (EveryAyah) | WER with diacritics 1.55 % / 6.65 % on EveryAyah (before / after overlap removal); 12.94–25.60 % on MSA sets | Paper says "commercial license"; exact terms **[?]** | [P] arXiv:2507.13977 |
-| `tarteel-ai/whisper-base-ar-quran`, `whisper-tiny-ar-quran` | Whisper base / tiny | Quran text | WER 5.75 / 7.05 on an unnamed evaluation set | **[?]** | [S] model cards |
+| `tarteel-ai/whisper-base-ar-quran`, `whisper-tiny-ar-quran` | Whisper base / tiny | Quran text | WER 5.75 / 7.05 on an unnamed evaluation set | Apache-2.0 (model page, checked in Phase 3) | [S] model cards |
 | Other Whisper Quran / tashkeel fine-tunes (`IJyad/whisper-large-v3-Tarteel`, `WajeehAzeemX/base-finetune`) | Whisper | Text, some with diacritics | Not comparable (different test sets) | **[?]** | [S] |
 
 These models can show vowel-sign errors but still decode words through an internal language model. Whether they report a wrong vowel or silently restore the expected one is unknown and is a Phase 3 question.
@@ -302,7 +302,7 @@ Every row cites the section where the source is given. "Fit" is my judgement for
 **Do not claim in the thesis**
 
 - That any model "works for beginners": no published evidence exists.
-- That Muallim's model choice was validated: Phase 3 was not run.
+- That Muallim's model choice was validated: the Phase 3 test was preliminary and did not use our learners.
 
 ---
 

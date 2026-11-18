@@ -2,7 +2,7 @@
 
 **Project:** Muallim (Telegram reading trainer, textbook *al-Muallim ath-Thani*)
 **Date:** 2026-11-17
-**Status:** one preliminary experiment, run in full. Five systems, 840 public recordings of single vowelled letters. **No recording of a Muallim learner was used**, because no teacher-labelled recordings of our learners exist yet.
+**Status:** two experiments, run in full. Step 1: five ready-made systems on 840 public recordings of single vowelled letters. Step 2 (section 11): four candidate checkers **built by us** on one model and tested on all 8,904 recordings, each clip judged by a checker that never heard its speaker. **No recording of a Muallim learner was used**, because no teacher-labelled recordings of our learners exist yet.
 **Builds on:** `PHASE_1_ASR_RESEARCH.md` (shortlist, section 8), `PHASE_2_DATASET_RESEARCH.md` (letter dataset, section 3.2).
 
 Every number in this report was produced by the scripts in `docs/research/phase3/` and can be recomputed from the CSV files in `docs/research/phase3/results/`. Nothing is estimated.
@@ -18,6 +18,7 @@ Every number in this report was produced by the scripts in `docs/research/phase3
 5. **Text recognisers turn sounds into words.** Whisper wrote a vowel sign in 3 of 840 clips. The Quran-trained Whisper often answered with a real word instead of the letter.
 6. **Speed is not a constraint** for phoneme models: about 0.2 seconds per clip on a laptop.
 7. **What this test cannot say:** how well any model judges *our* learners, and how often a mismatch is the student's error rather than the model's. See section 7.
+8. **Built and tested (step 2): a small classifier over the 84 letter–vowel answers is right in 88.0 % of clips from students it never heard**, against 47.2 % for free transcription by the same model. Used as the bot would use it — "was the expected item read?" — it accepts 90.5 % of the readings and wrongly accepts 5.2 % of readings where a confusable letter was said instead. Free transcription accepts only 47.2 % of the readings. Section 11.
 
 ---
 
@@ -258,7 +259,158 @@ Files:
 
 ## 10. Recommended next steps
 
-1. Train and test the closed-set letter classifier on this dataset, split by speaker.
-2. Test comparison with the bot's reference recordings on the same clips.
+1. ~~Train and test the closed-set letter classifier on this dataset, split by speaker.~~ Done in step 2, section 11.
+2. Test comparison with the bot's reference recordings on the same clips. Tried in step 2: the library recordings are not usable for this (section 11.6).
 3. Request access to L2-KSU for a test with real error labels on words and sentences.
 4. Above all: collect and label the first batch of our own learners' recordings, then repeat this comparison on them.
+
+---
+
+## 11. Step 2 — candidate checkers built and tested
+
+### 11.1 Question
+
+Step 1 ran ready-made systems as published. Phases 1 and 2 and both surveys pointed to a different design for the first stage of the book: do not transcribe freely, but *verify* the expected item from a small closed set. Step 2 builds that design and measures it against free transcription on the same data.
+
+### 11.2 What was built
+
+All four candidates use the same listening model, `MostafaMaroof/wav2vec2-arabic-phoneme-asr`, the strongest of step 1. They differ only in how the decision is made.
+
+| Candidate | How it decides | Needs training data | Family in the surveys |
+|---|---|---|---|
+| **Free transcription** | Reads the first letter and vowel from the model's ordinary output (as in step 1) | No | Sounds, free |
+| **Constrained choice** | Lets the model choose only among the 28 letters and 3 vowels: the letter whose symbol scored highest anywhere in the clip | No | Sounds, verified |
+| **Template comparison** | Compares the clip's inner representation with the average representation of each of the 84 classes from other speakers | Yes, examples only | Comparison with references |
+| **Trained classifier** | A single linear layer over the model's inner representation (three layers averaged over time), 84 outputs, plain regularised softmax; nothing tuned | Yes | Classifier per letter |
+
+### 11.3 Test design
+
+| Item | Value |
+|---|---|
+| Data | All 8,904 clips of `Reinjin/Pelafalan_Huruf_Hijaiyah`, 84 classes |
+| Speakers | 48 groups. Students appear under a full name in most folders and a shortened name in a few; a first check that used the full name split one student into two and let some voices into both training and test. The final split groups by first name, which is stricter than needed |
+| Split | Five folds by speaker: each clip is judged by a checker trained on the other four fifths of the speakers and **never on its own speaker** |
+| Label | The class the student was asked to read (no teacher verification exists in this dataset) |
+| Computation | One pass of the model over all clips (≈40 minutes on a MacBook Air M1), then training and testing in a few minutes |
+
+### 11.4 Results — which letter and vowel was read
+
+| Candidate | Letter right | Vowel right | Both right |
+|---|---|---|---|
+| Free transcription | 63.2 % | 70.9 % | 47.2 % |
+| Constrained choice | 62.4 % | 86.2 % | 55.3 % |
+| Template comparison | 70.9 % | 96.9 % | 69.6 % |
+| **Trained classifier** | **88.5 %** | **99.0 %** | **88.0 %** |
+
+Free transcription gives 47.2 % on all 8,904 clips, close to the 50.0 % measured on the 840-clip sample in step 1.
+
+95 % intervals over students (bootstrap, 2,000 resamples of the 48 speaker groups, seed 0): trained classifier 88.0 % [86.8–89.1], free transcription 47.2 % [45.2–49.2]. Per student the classifier ranges from 71 % to 96 % (median 89 %); free transcription from 29 % to 61 % (median 46 %).
+
+Letters that were hardest for free transcription, and the classifier on the same letters:
+
+| Letter | ث | ظ | ض | ص | د | ق | ط |
+|---|---|---|---|---|---|---|---|
+| Free transcription | 17.9 % | 8.8 % | 18.6 % | 24.2 % | 25.8 % | 26.1 % | 27.4 % |
+| Trained classifier | 82.7 % | 53.5 % | 77.4 % | 84.6 % | 86.2 % | 82.4 % | 79.6 % |
+
+### 11.5 Results — the question the bot actually asks
+
+The bot always knows what the learner should read. Its real question is "was the expected item read?" — accept or reject. Two kinds of trial were built from the same clips:
+
+- **genuine:** the clip is checked against the item the student was asked to read;
+- **substitute:** the clip is checked against a different item, as if the student had been asked for that one and said this instead. Three kinds: same letter with another vowel; a letter from a confusable pair (د/ت, ص/س, ض/د, ط/ت, ظ/ز, ث/س, ح/ه, ع/ء, ق/ك, ذ/ز, both directions); a random other letter.
+
+| Checker | Correct readings accepted | Wrong vowel accepted | Confusable letter accepted | Random letter accepted |
+|---|---|---|---|---|
+| Free transcription | 47.2 % | 3.2 % | 13.1 % | 1.0 % |
+| Classifier, accept at probability 0.1 | 94.3 % | 0.7 % | 9.9 % | 1.1 % |
+| **Classifier, accept at 0.3** | **90.5 %** | **0.3 %** | **5.2 %** | **0.6 %** |
+| Classifier, accept at 0.5 | 86.5 % | 0.2 % | 3.5 % | 0.3 % |
+
+Read the first row as a learner would: with free transcription, more than half of the students who read the item as asked would be told they made an error. The classifier at 0.3 tells this to fewer than one in ten, and lets through about one confusable substitution in twenty.
+
+Per confusable pair, at 0.3:
+
+| Expected | Said instead | Correct accepted | Substitute accepted |
+|---|---|---|---|
+| د | ت | 89.0 % | 4.7 % |
+| ص | س | 88.4 % | 6.3 % |
+| ض | د | 83.3 % | 8.5 % |
+| ط | ت | 81.8 % | 4.7 % |
+| ظ | ز | 58.5 % | 3.1 % |
+| ث | س | 85.8 % | 11.0 % |
+| ح | ه | 92.5 % | 2.8 % |
+| ع | ء | 93.4 % | 0.9 % |
+| ق | ك | 86.2 % | 1.6 % |
+| ذ | ز | 76.4 % | 2.5 % |
+| س | ث | 93.1 % | 16.4 % |
+
+The reverse directions of the other pairs are in `results/candidates.json`; all lie between 1.3 % and 7.5 % substitutes accepted.
+
+**"Not sure" instead of a verdict.** When the classifier answers only if its top choice has at least a given probability:
+
+| Answers when the top probability is at least | Clips answered | Right among answered |
+|---|---|---|
+| any | 100 % | 88.0 % |
+| 0.5 | 96.5 % | 89.7 % |
+| 0.7 | 88.4 % | 92.9 % |
+| 0.9 | 75.0 % | 95.8 % |
+
+**Two signals.** When the classifier and the constrained choice name the same letter and vowel (57.5 % of clips), the classifier is right in 92.1 % of them.
+
+### 11.6 Check on the bot's own recordings
+
+The project holds 84 library recordings of single vowelled letters (`curriculum/audio/library`, SRC-144). They were run through the classifier with `check_recordings.py`. The classifier's best guess matched the label in 22 of 84; the vowel was most often heard as a (55 of 84).
+
+This result does not measure the classifier. The project already records that these files are mislabelled in places, and each of them contains the spoken name of the vowel ("fatha", "kasra", "damma") besides the syllable, which the classifier never saw in training. A real check needs voice messages with the syllable alone.
+
+### 11.7 What this shows
+
+1. **Verification over the closed set is the right design for the first stage.** On speakers it never heard, a simple classifier is right in 88 % of clips, against 47 % for free transcription by the same model. Nothing was tuned; the gain comes from the design.
+2. **It answers the bot's real question far better.** It accepts 90.5 % of correct readings instead of 47.2 %, while letting through 5.2 % of confusable substitutions.
+3. **A "not sure" zone works as expected.** Answering three clips out of four raises correctness to 95.8 %.
+4. **Weak spots remain where they were:** ظ (58.5 % of correct readings accepted) and the pair ث/س (11–16 % of substitutes accepted).
+
+### 11.8 Limitations of step 2
+
+- **The labels say what the student was asked to read, not what was said.** The classifier learns how these students pronounce each item. If a group of students systematically says ز for ظ, the classifier learns to accept that. The substitute trials show that attempts at each letter of a pair are mostly kept apart, but whether any attempt was correct can only be known from teacher labels.
+- **Substitutions are simulated** from other students' attempts at the other letter, not from real errors.
+- **Not our learners.** Indonesian school students, not Russian-speaking adults. A classifier must be retrained on our own recordings.
+- **One listening model.** The same comparison with Muaalem or other encoders was not run.
+- Speakers were grouped by first name; two different students with the same first name are counted as one.
+- Step 1 chose "ten different students" per class by spacing file names; because of the name variants found here, a few of those ten may be the same student.
+
+### 11.8a What the bot itself would say today
+
+The bot’s own decision code — its two accepted references (joined reading and reading with a stop, `infrastructure/asr/muaalem.py`), its comparison (`domain/assessment.py`) and its pass marks of 80 and 90 (`domain/policy.py`) — was run on the bot model’s output for the 840 recordings of step 1 (`demo_data.py`).
+
+| Outcome | Recordings of 840 |
+|---|---|
+| “Repeat” (score under 80) | 725 (86.3%) |
+| Passed | 72 |
+| Excellent | 43 |
+
+Most frequent errors the bot would name: vowel too long in 443 recordings, another letter in 268, extra sound in 174, several sounds replaced in 123 (a recording can carry several). In 204 of the 725 “repeat” recordings “vowel too long” is the only error (counted from the output of `demo_data.py`).
+
+The trained classifier on the same 840 recordings, at the same thresholds as section 11.5: accept 739 (88.0%), “say it again” 41, name an error 60.
+
+On the 725 “repeat” recordings the classifier accepts 629, asks again 37 and names an error 59.
+
+A side finding about the bot’s references: for a single letter the second accepted reference, the reading with a stop, carries no vowel sign (أَ → `ءَ / ء`, ضَ → `ضَ / ض`, بَ → `بَ / بڇ`). The bot therefore passes a letter whose vowel the model did not hear at all: 7 of the 115 passed recordings contain no short-vowel sign in the model’s output (for example إِ heard as `ء`, scored 100). Whether single-letter items should accept the stop reading is a methodology decision for the author.
+
+Who is right in each recording cannot be known without a teacher. The commonest reason, a long vowel on a single letter, is the student holding the sound, which is how a letter is usually said alone; this supports improvement 5 in `MUALLIM_AND_THE_FIELD.md` (methodology — the author’s decision).
+
+### 11.9 How to repeat
+
+```sh
+# 1. Model features for every clip (one pass, resumable):
+.venv/bin/python -I docs/research/phase3/features.py DATA FEATURES
+# 2. Build and compare the four candidates; writes results/candidates.json
+#    and results/letter_classifier.npz (the classifier trained on all clips):
+.venv/bin/python -I docs/research/phase3/candidates.py FEATURES docs/research/phase3/results
+# 3. Check any recordings: a CSV with columns file,text (e.g. ba.ogg,بَ):
+.venv/bin/python -I docs/research/phase3/check_recordings.py \
+    docs/research/phase3/results/letter_classifier.npz RECORDINGS.csv OUT.csv
+```
+
+`features.py` stores speakers only as short hashes; no student name is written anywhere.

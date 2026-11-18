@@ -1,0 +1,293 @@
+{
+ "clips": 8904,
+ "speakers": 48,
+ "folds": 5,
+ "methods": {
+  "free transcription": {
+   "letter": 63.2,
+   "vowel": 70.9,
+   "both": 47.2
+  },
+  "constrained choice": {
+   "letter": 62.4,
+   "vowel": 86.2,
+   "both": 55.3
+  },
+  "template comparison": {
+   "letter": 70.9,
+   "vowel": 96.9,
+   "both": 69.6
+  },
+  "trained classifier": {
+   "letter": 88.5,
+   "vowel": 99.0,
+   "both": 88.0
+  }
+ },
+ "letters": {
+  "free transcription": {
+   "ء": 89.3,
+   "ب": 78.3,
+   "ت": 47.8,
+   "ث": 17.9,
+   "ج": 56.6,
+   "ح": 75.2,
+   "خ": 94.7,
+   "د": 25.8,
+   "ذ": 73.0,
+   "ر": 89.3,
+   "ز": 90.9,
+   "س": 79.2,
+   "ش": 95.9,
+   "ص": 24.2,
+   "ض": 18.6,
+   "ط": 27.4,
+   "ظ": 8.8,
+   "ع": 63.8,
+   "غ": 38.7,
+   "ف": 90.3,
+   "ق": 26.1,
+   "ك": 75.2,
+   "ل": 82.7,
+   "م": 92.1,
+   "ن": 72.3,
+   "ه": 94.3,
+   "و": 66.4,
+   "ي": 76.1
+  },
+  "constrained choice": {
+   "ء": 88.7,
+   "ب": 78.3,
+   "ت": 44.3,
+   "ث": 17.9,
+   "ج": 56.6,
+   "ح": 73.9,
+   "خ": 97.2,
+   "د": 25.2,
+   "ذ": 72.0,
+   "ر": 85.5,
+   "ز": 93.4,
+   "س": 78.0,
+   "ش": 97.8,
+   "ص": 23.0,
+   "ض": 15.4,
+   "ط": 24.8,
+   "ظ": 7.9,
+   "ع": 59.4,
+   "غ": 40.3,
+   "ف": 91.5,
+   "ق": 18.9,
+   "ك": 73.9,
+   "ل": 81.4,
+   "م": 92.8,
+   "ن": 70.1,
+   "ه": 94.3,
+   "و": 67.0,
+   "ي": 77.4
+  },
+  "trained classifier": {
+   "ء": 95.9,
+   "ب": 96.5,
+   "ت": 90.6,
+   "ث": 82.7,
+   "ج": 89.9,
+   "ح": 92.1,
+   "خ": 97.2,
+   "د": 86.2,
+   "ذ": 69.2,
+   "ر": 97.2,
+   "ز": 94.0,
+   "س": 89.6,
+   "ش": 96.9,
+   "ص": 84.6,
+   "ض": 77.4,
+   "ط": 79.6,
+   "ظ": 53.5,
+   "ع": 94.0,
+   "غ": 82.1,
+   "ف": 96.2,
+   "ق": 82.4,
+   "ك": 92.1,
+   "ل": 95.9,
+   "م": 91.2,
+   "ن": 89.0,
+   "ه": 94.0,
+   "و": 91.2,
+   "ي": 97.2
+  }
+ },
+ "not_sure": [
+  {
+   "threshold": 0.0,
+   "answered": 100.0,
+   "right_when_answered": 88.0
+  },
+  {
+   "threshold": 0.5,
+   "answered": 96.5,
+   "right_when_answered": 89.7
+  },
+  {
+   "threshold": 0.7,
+   "answered": 88.4,
+   "right_when_answered": 92.9
+  },
+  {
+   "threshold": 0.9,
+   "answered": 75.0,
+   "right_when_answered": 95.8
+  }
+ ],
+ "two_signals": {
+  "agree": 57.5,
+  "right_when_agree": 92.1
+ },
+ "verification": {
+  "free transcription": {
+   "genuine": 47.2,
+   "other_vowel": 3.2,
+   "confusable_letter": 13.1,
+   "random_letter": 1.0
+  },
+  "classifier, accept at 0.1": {
+   "genuine": 94.3,
+   "other_vowel": 0.7,
+   "confusable_letter": 9.9,
+   "random_letter": 1.1
+  },
+  "classifier, accept at 0.3": {
+   "genuine": 90.5,
+   "other_vowel": 0.3,
+   "confusable_letter": 5.2,
+   "random_letter": 0.6
+  },
+  "classifier, accept at 0.5": {
+   "genuine": 86.5,
+   "other_vowel": 0.2,
+   "confusable_letter": 3.5,
+   "random_letter": 0.3
+  }
+ },
+ "pairs": [
+  {
+   "expected": "د",
+   "said_instead": "ت",
+   "correct_accepted": 89.0,
+   "substitute_accepted": 4.7
+  },
+  {
+   "expected": "ص",
+   "said_instead": "س",
+   "correct_accepted": 88.4,
+   "substitute_accepted": 6.3
+  },
+  {
+   "expected": "ض",
+   "said_instead": "د",
+   "correct_accepted": 83.3,
+   "substitute_accepted": 8.5
+  },
+  {
+   "expected": "ط",
+   "said_instead": "ت",
+   "correct_accepted": 81.8,
+   "substitute_accepted": 4.7
+  },
+  {
+   "expected": "ظ",
+   "said_instead": "ز",
+   "correct_accepted": 58.5,
+   "substitute_accepted": 3.1
+  },
+  {
+   "expected": "ث",
+   "said_instead": "س",
+   "correct_accepted": 85.8,
+   "substitute_accepted": 11.0
+  },
+  {
+   "expected": "ح",
+   "said_instead": "ه",
+   "correct_accepted": 92.5,
+   "substitute_accepted": 2.8
+  },
+  {
+   "expected": "ع",
+   "said_instead": "ء",
+   "correct_accepted": 93.4,
+   "substitute_accepted": 0.9
+  },
+  {
+   "expected": "ق",
+   "said_instead": "ك",
+   "correct_accepted": 86.2,
+   "substitute_accepted": 1.6
+  },
+  {
+   "expected": "ذ",
+   "said_instead": "ز",
+   "correct_accepted": 76.4,
+   "substitute_accepted": 2.5
+  },
+  {
+   "expected": "ت",
+   "said_instead": "د",
+   "correct_accepted": 91.5,
+   "substitute_accepted": 2.5
+  },
+  {
+   "expected": "س",
+   "said_instead": "ص",
+   "correct_accepted": 93.1,
+   "substitute_accepted": 7.5
+  },
+  {
+   "expected": "د",
+   "said_instead": "ض",
+   "correct_accepted": 89.0,
+   "substitute_accepted": 5.3
+  },
+  {
+   "expected": "ت",
+   "said_instead": "ط",
+   "correct_accepted": 91.5,
+   "substitute_accepted": 6.3
+  },
+  {
+   "expected": "ز",
+   "said_instead": "ظ",
+   "correct_accepted": 95.9,
+   "substitute_accepted": 6.0
+  },
+  {
+   "expected": "س",
+   "said_instead": "ث",
+   "correct_accepted": 93.1,
+   "substitute_accepted": 16.4
+  },
+  {
+   "expected": "ه",
+   "said_instead": "ح",
+   "correct_accepted": 95.3,
+   "substitute_accepted": 2.5
+  },
+  {
+   "expected": "ء",
+   "said_instead": "ع",
+   "correct_accepted": 95.3,
+   "substitute_accepted": 2.5
+  },
+  {
+   "expected": "ك",
+   "said_instead": "ق",
+   "correct_accepted": 93.1,
+   "substitute_accepted": 1.3
+  },
+  {
+   "expected": "ز",
+   "said_instead": "ذ",
+   "correct_accepted": 95.9,
+   "substitute_accepted": 6.9
+  }
+ ]
+}

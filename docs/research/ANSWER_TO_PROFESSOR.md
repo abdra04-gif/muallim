@@ -10,7 +10,7 @@
 
 | Question | Answer |
 |---|---|
-| 1. Which models or solutions can transcribe beginner audio? | **None is proven for our learners.** No model, open or commercial, has published results on adults who start from zero, or on Russian- or Kazakh-speaking learners. The best-supported design is a phoneme model without a language model, checked sound by sound against the known text. Our own first test on single letters shows that free transcription is right in only 39–50 % of clips, so Stage I of the book needs a different mechanism. |
+| 1. Which models or solutions can transcribe beginner audio? | **None is proven for our learners.** No model, open or commercial, has published results on adults who start from zero, or on Russian- or Kazakh-speaking learners. The best-supported design is a phoneme model without a language model, checked sound by sound against the known text. Our own first test on single letters shows that free transcription is right in only 39–50 % of clips. We then built the recommended alternative for Stage I — verifying the expected letter from a closed set of 84 — and on speakers it never heard it was right in 88 % of clips. |
 | 2. What is the dataset format? | One record per attempt (one voice message, one textbook item). Original audio plus one JSON Lines table, published on Hugging Face in its audio-folder layout. Three transcription layers kept apart: expected, heard by the model, verified by teachers. Split by learner. |
 | 3. How do we make the public release clear to learners? | One screen before the first recording. Its title and its main button both say that recordings will be published. A second button lets a person practise without recording. Telegram's own rules require this kind of consent, so it is not optional. A draft text is ready for approval. |
 
@@ -87,6 +87,21 @@ What this shows:
 - The speakers are Indonesian school students, not Russian-speaking adults.
 - 840 of 8,904 clips were used.
 - Each system was used as published, without adaptation.
+
+### 1.5a Candidates built and tested (Phase 3, step 2)
+
+Step 1 only ran ready-made systems. In step 2 we built four ways of deciding on top of the strongest listening model and tested them on all 8,904 public letter recordings. Each clip was judged by a checker trained on other students only.
+
+| Candidate | Letter and vowel both right | Correct readings accepted |
+|---|---|---|
+| Free transcription | 47.2 % | 47.2 % |
+| Constrained choice among the 28 letters and 3 vowels | 55.3 % | — |
+| Comparison with other students' average recording | 69.6 % | — |
+| **Trained classifier over the 84 answers** | **88.0 %** | **90.5 %**, with 5.2 % of confusable substitutions let through |
+
+The design change alone — verifying the expected item instead of transcribing — raises the result by 41 points. Answering only when confident (three clips out of four) raises correctness to 95.8 %. The weak spots stay the same: ظ, and the pair ث/س.
+
+Limits: labels say what the student was asked to read, not what was said; substitutions are simulated; the students are not ours. The classifier must be retrained on our own labelled recordings. The bot's library recordings could not serve as a check: they contain the spoken name of the vowel besides the syllable, and some are mislabelled.
 
 ### 1.6 Recommended design
 
@@ -240,10 +255,12 @@ This is not legal advice. The university's ethics body must confirm the consent 
 |---|---|---|
 | 1. Speech models | Done, desk research with sources; three revisions | `PHASE_1_ASR_RESEARCH.md` |
 | 2. Datasets | Done, desk research with sources; L2-KSU's Springer paper could not be opened | `PHASE_2_DATASET_RESEARCH.md` |
-| 3. Experiments | **Preliminary only:** five systems on public letter recordings. No test on our learners, because no labelled recordings of them exist yet | `PHASE_3_EXPERIMENTAL_RESULTS.md` |
+| 3. Experiments | **Two steps:** five ready-made systems on public letter recordings; then four candidate checkers built by us and tested across speakers. No test on our learners, because no labelled recordings of them exist yet | `PHASE_3_EXPERIMENTAL_RESULTS.md` |
 | 4. Dataset specification | Done as a proposal | `PHASE_4_DATASET_SPECIFICATION.md` |
 | 5. Architecture and consent | Done as a proposal | `PHASE_5_ARCHITECTURE_AND_CONSENT.md` |
-| Extra: how Arabic solutions are built | Done | `SOLUTIONS_ARABIC.md` |
+| Survey A: how Arabic solutions are built | Done; products described from their own pages, none installed | `SOLUTIONS_ARABIC.md` |
+| Survey B: solutions in other languages | Done at survey depth; five sources read, the rest from search summaries | `SOLUTIONS_WORLD.md` |
+| Synthesis: Muallim against the field, improvements for the bot | Done | `MUALLIM_AND_THE_FIELD.md` |
 
 Not tested, and why: Quran Lab TajweedFormer V4 (licence decision and server access), Azure and Gemini (learner audio would leave our server), L2-KSU (access request not yet sent), comparison with teacher recordings and the letter classifier (next step).
 
@@ -251,7 +268,7 @@ Not tested, and why: Quran Lab TajweedFormer V4 (licence decision and server acc
 
 ## 5. Decisions needed
 
-| # | Question | Recommendation |
+| # | Decision | Recommendation |
 |---|---|---|
 | 1 | Consent model | Option C: "Continue" means publication; a second button allows practice without recording |
 | 2 | Wording of the consent screen | Approve or correct the draft in section 3.3 |
