@@ -26,7 +26,7 @@
 | посмотреть данные, написать свой SQL-запрос | `data/browsing.md`, `data/sql-guide.md` |
 | разметить данные | `data/annotation-guide.md` |
 | построить отчёт | `data/reports.md` |
-| показать профессорам первую версию: демо уроков, исследование, экраны 2.0 (RU/EN) | `site/` (`make site`), виджеты — `design/widgets/`, замечания — `research/professor-feedback-2026-11.md` |
+| показать профессорам первую версию: демо уроков, исследование, экраны 2.0 (RU/EN) | `site/` (`make site`), виджеты — `design/widgets/`, задание на бота 2.0 — `design/handoff/`, замечания — `research/professor-feedback-2026-11.md` |
 | узнать про книгу и методику | `pedagogy/` |
 | безопасность, персональные данные, этика | `security/` |
 | как работать с агентами, хуки, TDD | `process/` |
