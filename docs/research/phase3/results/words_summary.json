@@ -1,0 +1,398 @@
+{
+ "summary": {
+  "phrases": 300,
+  "pair_accuracy": {
+   "vowel": {
+    "pairs": 600,
+    "correct_wins": 96.2
+   },
+   "vowel_on_sukun": {
+    "pairs": 540,
+    "correct_wins": 96.3
+   },
+   "no_shadda": {
+    "pairs": 265,
+    "correct_wins": 89.8
+   },
+   "short_madd": {
+    "pairs": 538,
+    "correct_wins": 91.3
+   },
+   "added_length": {
+    "pairs": 600,
+    "correct_wins": 98.8
+   },
+   "lookalike": {
+    "pairs": 599,
+    "correct_wins": 98.8
+   }
+  },
+  "false_alarm_phrases": {
+   "0.0": 34.0,
+   "-2.0": 17.0,
+   "-4.0": 6.0
+  }
+ },
+ "examples": [
+  {
+   "id": "66328",
+   "text": "مَا رَشَأَ الْأُنْسُ بِمُسْتَأْنَسٍ",
+   "correct": "m aa r a $ a < a l < u n s u b i m u s t a < n a s",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 11,
+   "rival": "m aa r a $ a < a l < u n a s u b i m u s t a < n a s",
+   "margin": 1.72
+  },
+  {
+   "id": "66900",
+   "text": "وَإِذَا قِيلَ لَهُمُ ارْكَعُوا لَا يَرْكَعُونَ",
+   "correct": "w a < i * aa q II l a l a h u m u r k a E uu l aa y a r k a E uu n",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 16,
+   "rival": "w a < i * aa q II l a l a h u m u r a k a E uu l aa y a r k a E uu n",
+   "margin": 2.59
+  },
+  {
+   "id": "71286",
+   "text": "وَأَمَّا الَّذِينَ كَفَرُوا وَكَذَّبُوا بِآيَاتِنَا وَلِقَاءِ الْآخِرَةِ فَأُولَٰئِكَ فِي الْعَذَابِ مُحْضَرُونَ",
+   "correct": "w a < a mm aa ll a * ii n a k a f a r uu w a k a ** a b uu b i < aa y aa t i n aa w a l I q AA < i l < aa x I r a t i f a < uu l a < i k a f ii l E a * aa b i m u H D A r uu n",
+   "rival_rule": "vowel",
+   "rival_pos": 73,
+   "rival": "w a < a mm aa ll a * ii n a k a f a r uu w a k a ** a b uu b i < aa y aa t i n aa w a l I q AA < i l < aa x I r a t i f a < uu l a < i k a f ii l E a * aa b i m a H D A r uu n",
+   "margin": 3.21
+  },
+  {
+   "id": "67920",
+   "text": "قُلْتُ ثَقُلْتُ إذْ أَتَيْتُ مِرَارًا",
+   "correct": "q U l t u ^ A q U l t u < i * < a t a y t u m i r aa r aa",
+   "rival_rule": "vowel",
+   "rival_pos": 21,
+   "rival": "q U l t u ^ A q U l t u < i * < a t a y t i m i r aa r aa",
+   "margin": 1.75
+  },
+  {
+   "id": "72036",
+   "text": "يَا أَخَا الْحَارِثِ بْنِ كَعْبِ بْنِ عُمَرَ",
+   "correct": "y aa < a x AA l H aa r i ^ i b n i k a E b i b n i E u m a r",
+   "rival_rule": "short_madd",
+   "rival_pos": 5,
+   "rival": "y aa < a x A l H aa r i ^ i b n i k a E b i b n i E u m a r",
+   "margin": -1.07
+  },
+  {
+   "id": "67345",
+   "text": "هَذِهِ قِصَّةٌ حَقِيقِيَّةٌ",
+   "correct": "h aa * i h i q I SS A H A q II q II y a",
+   "rival_rule": "no_shadda",
+   "rival_pos": 8,
+   "rival": "h aa * i h i q I S A H A q II q II y a",
+   "margin": 2.0
+  },
+  {
+   "id": "72281",
+   "text": "بِعَزِيمَتِي بِإِرَادَتِي",
+   "correct": "b i E a z ii m a t ii b i < i r aa d a t ii",
+   "rival_rule": "vowel",
+   "rival_pos": 7,
+   "rival": "b i E a z ii m i t ii b i < i r aa d a t ii",
+   "margin": 4.23
+  },
+  {
+   "id": "66407",
+   "text": "لَمْ أَنْتَ مُتْعِبٌ الْيَوْمَ",
+   "correct": "l a m < a n t a m u t E i b l y a w m",
+   "rival_rule": "vowel",
+   "rival_pos": 12,
+   "rival": "l a m < a n t a m u t E u b l y a w m",
+   "margin": 2.54
+  },
+  {
+   "id": "68140",
+   "text": "تَعَجَّبْتُ مِنْ أُنْثَى يُقَاوِمُ مُكْرَهًا",
+   "correct": "t a E a jj a b t u m i n < u n ^ aa y U q AA w i m u m u k r a h aa",
+   "rival_rule": "short_madd",
+   "rival_pos": 16,
+   "rival": "t a E a jj a b t u m i n < u n ^ a y U q AA w i m u m u k r a h aa",
+   "margin": -0.31
+  },
+  {
+   "id": "73521",
+   "text": "إِنَّهُ لَقَوْلُ رَسُولٍ كَرِيمٍ",
+   "correct": "< i nn a h u l A q A w l u r a s uu l k a r ii m",
+   "rival_rule": "no_shadda",
+   "rival_pos": 2,
+   "rival": "< i n a h u l A q A w l u r a s uu l k a r ii m",
+   "margin": 4.25
+  },
+  {
+   "id": "67057",
+   "text": "أَلَمْ تَرَى اشَارَةَ الْوُقُوفِ كَانَ مِنْ الْمُمْكِنِ أَنْ تَقْتُلَنَا",
+   "correct": "< a l a m t a r aa $ aa r a t a l w U q UU f i k aa n a m i n l m u m k i n i < a n t A q t u l a n aa",
+   "rival_rule": "short_madd",
+   "rival_pos": 8,
+   "rival": "< a l a m t a r a $ aa r a t a l w U q UU f i k aa n a m i n l m u m k i n i < a n t A q t u l a n aa",
+   "margin": -3.13
+  },
+  {
+   "id": "72328",
+   "text": "بَعْد أَنْ فَارَقْتْ لَيْلِي مُرْغَمًا",
+   "correct": "b a E d < a n f aa r A q t l a y l ii m u r g A m aa",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 3,
+   "rival": "b a E d a < a n f aa r A q t l a y l ii m u r g A m aa",
+   "margin": -3.62
+  },
+  {
+   "id": "65913",
+   "text": "نَعَمْ الْإِعَانَةُ رَمْزًا فِي خُفًّا لُطَفٌ",
+   "correct": "n a E a m l < i E aa n a t u r a m z aa f ii x U ff aa l U T A f",
+   "rival_rule": "no_shadda",
+   "rival_pos": 23,
+   "rival": "n a E a m l < i E aa n a t u r a m z aa f ii x U f aa l U T A f",
+   "margin": -4.89
+  },
+  {
+   "id": "69321",
+   "text": "نَحْنُ نُحِبُّهُ كَثِيرًا",
+   "correct": "n a H n u n u H i bb u h u k a ^ ii r aa",
+   "rival_rule": "vowel",
+   "rival_pos": 10,
+   "rival": "n a H n u n u H i bb i h u k a ^ ii r aa",
+   "margin": 2.76
+  },
+  {
+   "id": "69524",
+   "text": "مُتَّكِئِينَ فِيهَا يَدْعُونَ فِيهَا بِفَاكِهَةٍ كَثِيرَةٍ وَشَرَابٍ",
+   "correct": "m u tt a k i < ii n a f ii h aa y a d E uu n a f ii h aa b i f aa k i h a k a ^ ii r a w a $ a r aa b",
+   "rival_rule": "added_length",
+   "rival_pos": 40,
+   "rival": "m u tt a k i < ii n a f ii h aa y a d E uu n a f ii h aa b i f aa k i h a k a ^ ii r a w aa $ a r aa b",
+   "margin": 2.18
+  },
+  {
+   "id": "64917",
+   "text": "أَنَا سَاخِرٌ مُتَهَكِّمٌ لا تَاعِسٌ",
+   "correct": "< a n aa s aa x I r m u t a h a kk i m l aa t aa E i s",
+   "rival_rule": "no_shadda",
+   "rival_pos": 15,
+   "rival": "< a n aa s aa x I r m u t a h a k i m l aa t aa E i s",
+   "margin": 2.5
+  },
+  {
+   "id": "70108",
+   "text": "وَعِلْمُ الْمُنَاظِرِ عَلَيْهِ مَشْهُورٌ",
+   "correct": "w a E i l m u l m u n AA Z I r i E a l a y h i m a $ h uu r",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 4,
+   "rival": "w a E i l a m u l m u n AA Z I r i E a l a y h i m a $ h uu r",
+   "margin": 2.76
+  },
+  {
+   "id": "69339",
+   "text": "نَاوَلَنِي عُلْبَةَ زُبْدَةِ الْفُولِ السُّودَانِيِّ مَعَ الْمُرَبَّى إِذَا سَمَحَتَ",
+   "correct": "n aa w a l a n ii E u l b a t a z u b d a t i l f uu l i ss uu d aa n ii y i m a E a l m u r a bb aa < i * aa s a m a H a t",
+   "rival_rule": "short_madd",
+   "rival_pos": 45,
+   "rival": "n aa w a l a n ii E u l b a t a z u b d a t i l f uu l i ss uu d aa n ii y i m a E a l m u r a bb a < i * aa s a m a H a t",
+   "margin": 0.32
+  },
+  {
+   "id": "71528",
+   "text": "سَيَكُونُ شَيْئًا عَلَيَّ بَرْمَجْتُهُ",
+   "correct": "s a y a k uu n u $ a y < aa E a l a yy a b a r m a j t u h",
+   "rival_rule": "no_shadda",
+   "rival_pos": 17,
+   "rival": "s a y a k uu n u $ a y < aa E a l a y a b a r m a j t u h",
+   "margin": 2.68
+  },
+  {
+   "id": "71047",
+   "text": "إفْعَلُ كُلِّ مَا هُوَ مَطْلُوبٌ",
+   "correct": "< i f E a l u k u ll i m aa h u w a m A T l uu b",
+   "rival_rule": "no_shadda",
+   "rival_pos": 9,
+   "rival": "< i f E a l u k u l i m aa h u w a m A T l uu b",
+   "margin": 3.78
+  },
+  {
+   "id": "70275",
+   "text": "تَقُولُ أَنَّكَ تَتَعَمَّدُ إخْفَاءَ مَظْهَرِكَ الْحُسْنِ",
+   "correct": "t A q UU l u < a nn a k a t a t a E a mm a d u < i x f aa < a m A Z h a r i k a l H u s n",
+   "rival_rule": "lookalike",
+   "rival_pos": 2,
+   "rival": "t A k UU l u < a nn a k a t a t a E a mm a d u < i x f aa < a m A Z h a r i k a l H u s n",
+   "margin": -5.53
+  },
+  {
+   "id": "70621",
+   "text": "أُجْنِي مِئَةَ يُورُو فِي الْيَوْمِ",
+   "correct": "< u j n ii m i < a t a y uu r uu f ii l y a w m",
+   "rival_rule": "vowel",
+   "rival_pos": 1,
+   "rival": "< a j n ii m i < a t a y uu r uu f ii l y a w m",
+   "margin": -3.13
+  },
+  {
+   "id": "70396",
+   "text": "لَوْ تَدَارَكَتْنِي بِوَعْدِ غُرُورٍ",
+   "correct": "l a w t a d aa r a k a t n ii b i w a E d i w a",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 11,
+   "rival": "l a w t a d aa r a k a t a n ii b i w a E d i w a",
+   "margin": -2.97
+  },
+  {
+   "id": "67517",
+   "text": "إِنْ يَثْقَفُوكُمْ يَكُونُوا لَكُمْ أَعْدَاءً وَيَبْسُطُوا إِلَيْكُمْ أَيْدِيَهُمْ وَأَلْسِنَتَهُمْ بِالسُّوءِ وَوَدُّوا لَوْ تَكْفُرُونَ",
+   "correct": "< i n y a ^ q A f uu k u m y a k uu n uu l a k u m < a E d aa < w a y a b s U T UU < i l a y k u m < a y d i y a h u m w a < a l s i n a t a h u m b i ss uu < i w a w a dd uu l a w t a k f u r uu n",
+   "rival_rule": "short_madd",
+   "rival_pos": 18,
+   "rival": "< i n y a ^ q A f uu k u m y a k uu n u l a k u m < a E d aa < w a y a b s U T UU < i l a y k u m < a y d i y a h u m w a < a l s i n a t a h u m b i ss uu < i w a w a dd uu l a w t a k f u r uu n",
+   "margin": 4.0
+  },
+  {
+   "id": "68116",
+   "text": "حَقٌّ عَيْنَيٌّ رُؤْيَةِ الْوَجْهِ الْمَلِيحِ",
+   "correct": "H A qq E a y n a yy r u < y a t i l w a j h i l m a l ii H",
+   "rival_rule": "no_shadda",
+   "rival_pos": 8,
+   "rival": "H A qq E a y n a y r u < y a t i l w a j h i l m a l ii H",
+   "margin": -3.52
+  },
+  {
+   "id": "70607",
+   "text": "شُكْرًا جَزِيلًا لَكَ يَا دُكْتُورُ",
+   "correct": "$ u k r aa j a z ii l aa l a k a y aa d u k t uu r",
+   "rival_rule": "short_madd",
+   "rival_pos": 4,
+   "rival": "$ u k r a j a z ii l aa l a k a y aa d u k t uu r",
+   "margin": 0.78
+  },
+  {
+   "id": "73617",
+   "text": "أَلَمْ يَأْتِ بَوبَ إلَى هُنَا",
+   "correct": "< a l a m y a < t i b a w b a < i l aa h u n aa",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 12,
+   "rival": "< a l a m y a < t i b a w a b a < i l aa h u n aa",
+   "margin": 1.34
+  },
+  {
+   "id": "68664",
+   "text": "هَلْ أَنْتَ قَرِيبُهُ",
+   "correct": "h a l < a n t a q A r ii b u h",
+   "rival_rule": "vowel",
+   "rival_pos": 13,
+   "rival": "h a l < a n t a q A r ii b a h",
+   "margin": 2.77
+  },
+  {
+   "id": "66969",
+   "text": "وَمَا يُدْرِيكَ لَعَلَّهُ يَزَّكَّىٰ",
+   "correct": "w a m aa y u d r ii k a l a E a ll a h u y a zz a kk aa",
+   "rival_rule": "no_shadda",
+   "rival_pos": 21,
+   "rival": "w a m aa y u d r ii k a l a E a ll a h u y a z a kk aa",
+   "margin": 2.28
+  },
+  {
+   "id": "70763",
+   "text": "حِرْمَانُ ذِي أَدَبٍ وَحَظْوَةِ جَاهِلٍ",
+   "correct": "H i r m aa n u * ii < a d a b w a H A Z w a t i j aa h i l",
+   "rival_rule": "short_madd",
+   "rival_pos": 8,
+   "rival": "H i r m aa n u * i < a d a b w a H A Z w a t i j aa h i l",
+   "margin": 2.97
+  },
+  {
+   "id": "64542",
+   "text": "وَلِرُبَّ نَازِلَةٍ يَضِيقُ لَهَا الْفَتَى",
+   "correct": "w a l i r u bb a n aa z i l a y A D II q U l a h aa l f a t aa",
+   "rival_rule": "lookalike",
+   "rival_pos": 16,
+   "rival": "w a l i r u bb a n aa z i l a y A d II q U l a h aa l f a t aa",
+   "margin": -5.78
+  },
+  {
+   "id": "71588",
+   "text": "لَقَالُوا إِنَّمَا سُكِّرَتْ أَبْصَارُنَا بَلْ نَحْنُ قَوْمٌ مَسْحُورُونَ",
+   "correct": "l A q AA l uu < i nn a m aa s u kk i r a t < a b S AA r u n aa b a l n a H n u q A w m m a s H uu r uu n",
+   "rival_rule": "no_shadda",
+   "rival_pos": 14,
+   "rival": "l A q AA l uu < i nn a m aa s u k i r a t < a b S AA r u n aa b a l n a H n u q A w m m a s H uu r uu n",
+   "margin": 2.33
+  },
+  {
+   "id": "68516",
+   "text": "خُذْ أَيْ الْكِتَابَيْنِ تُرِيدُ",
+   "correct": "x U * < a y l k i t aa b a y n i t u r ii d",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 5,
+   "rival": "x U * < a y a l k i t aa b a y n i t u r ii d",
+   "margin": 1.89
+  },
+  {
+   "id": "70462",
+   "text": "بَدَأَ فَاضِلٌ يُحَوِّلُ مَلْكِيَّةَ مَنْزِلَ لَيْلَى إِلَى إِسْمِهِ",
+   "correct": "b a d a < a f AA D I l y u H a ww i l u m a l k ii y a t a m a n z i l a l a y l aa < i l aa < i s m i h",
+   "rival_rule": "no_shadda",
+   "rival_pos": 15,
+   "rival": "b a d a < a f AA D I l y u H a w i l u m a l k ii y a t a m a n z i l a l a y l aa < i l aa < i s m i h",
+   "margin": 2.41
+  },
+  {
+   "id": "63725",
+   "text": "أَنَا مُتْعِبٌ أَعْتَقِدُ أَنَّنِي سَأَخْلُدُ إِلَى السَّرِيرِ",
+   "correct": "< a n aa m u t E i b < a E t A q I d u < a nn a n ii s a < a x l u d u < i l aa ss a r ii r",
+   "rival_rule": "vowel_on_sukun",
+   "rival_pos": 6,
+   "rival": "< a n aa m u t a E i b < a E t A q I d u < a nn a n ii s a < a x l u d u < i l aa ss a r ii r",
+   "margin": -1.6
+  },
+  {
+   "id": "67823",
+   "text": "عَادَتْ أَغَانِي الْعُرْسِ رَجَعَ نَوَاحِ",
+   "correct": "E aa d a t < a g AA n ii l E u r s i r a j a E a n a w aa H",
+   "rival_rule": "short_madd",
+   "rival_pos": 10,
+   "rival": "E aa d a t < a g AA n i l E u r s i r a j a E a n a w aa H",
+   "margin": 0.2
+  },
+  {
+   "id": "69692",
+   "text": "وَطُمِسَتْ أَعْلَامهُ",
+   "correct": "w A T U m i s a t < a E l aa m h",
+   "rival_rule": "vowel",
+   "rival_pos": 7,
+   "rival": "w A T U m i s i t < a E l aa m h",
+   "margin": 3.0
+  },
+  {
+   "id": "65048",
+   "text": "يَا أَيُّهَا الْبَيْتُ الْعَتِيقُ تَعَالَى",
+   "correct": "y aa < a yy u h aa l b a y t u l E a t ii q U t a E aa l aa",
+   "rival_rule": "lookalike",
+   "rival_pos": 12,
+   "rival": "y aa < a yy u h aa l b a y T u l E a t ii q U t a E aa l aa",
+   "margin": -3.58
+  },
+  {
+   "id": "69498",
+   "text": "كُلُّ نَفْسٍ بِمَا كَسَبَتْ رَهِينَةٌ",
+   "correct": "k u ll u n a f s b i m aa k a s a b a t r a h ii n a",
+   "rival_rule": "no_shadda",
+   "rival_pos": 2,
+   "rival": "k u l u n a f s b i m aa k a s a b a t r a h ii n a",
+   "margin": 0.63
+  },
+  {
+   "id": "66965",
+   "text": "أَمْ حَسِبْتُمْ أَنْ تَدْخُلُوا الْجَنَّةَ وَلَمَّا يَعْلَمِ اللَّهُ الَّذِينَ جَاهَدُوا مِنْكُمْ وَيَعْلَمَ الصَّابِرِينَ",
+   "correct": "< a m H a s i b t u m < a n t a d x U l uu l j a nn a t a w a l a mm aa y a E l a m i ll a h u ll a * ii n a j aa h a d uu m i n k u m w a y a E l a m a SS AA b i r ii n",
+   "rival_rule": "no_shadda",
+   "rival_pos": 72,
+   "rival": "< a m H a s i b t u m < a n t a d x U l uu l j a nn a t a w a l a mm aa y a E l a m i ll a h u ll a * ii n a j aa h a d uu m i n k u m w a y a E l a m a S AA b i r ii n",
+   "margin": 3.66
+  }
+ ]
+}

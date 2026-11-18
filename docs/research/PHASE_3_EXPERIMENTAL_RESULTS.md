@@ -428,6 +428,23 @@ Author’s decision (2026-11-19): the learner sees only this method; the teacher
 
 Side by side at the working thresholds: the bot today passes 14 % of these 840; free transcription 47 %; per-sound check 63 %; card variants 76 %; the 84-syllable classifier 91 % (§11.5, trained, single syllables only). Look-alike letters still slip through in about 1 of 5 trials; most frequent “errors” named on correct readings are س (40), fatha (33), ت (25), ز (22), د (18). The method extends to any card for which typical errors can be listed (sukun, words), which the classifier cannot. Not tested yet on words; the error lists for later cards are a methodology decision.
 
+### 11.8d Card variants on whole phrases (stage II: words and lines)
+
+No open recordings of learners reading words were found with a clear licence (`Buraaq/quran-md-words` states none). Material: 300 random phrases of IqraEval `Iqra_train` dev (CC BY-NC 4.0; Common Voice MSA and Quran, **correct** readings by fluent speakers) with their phoneme transcription in the same symbols as MostafaMaroof. Error variants are made by the draft rules of `error_rules.py` (`ERROR_RULES_DRAFT.md`), two positions per rule and phrase; the model scores the correct reading against each variant (CTC forward). `words_check.py`.
+
+| Rule | Pairs | Correct reading wins |
+|---|---|---|
+| another vowel | 600 | 96.2 % |
+| vowel added on a sukun | 540 | 96.3 % |
+| shadda dropped | 265 | 89.8 % |
+| madd shortened | 538 | 91.3 % |
+| short vowel lengthened | 600 | 98.8 % |
+| look-alike letter | 599 | 98.8 % |
+
+Per phrase (about 12 variants each), the share of correct phrases where at least one error variant wins — the bot would scold a correct reader: 34 % if any lead counts, 17 % with a tolerance of 2, 6 % with a tolerance of 4 (log-probability). Weakest rules: shadda and madd — the duration problem of §11.8b.
+
+Caveats: the speakers are fluent, not beginners; MostafaMaroof was trained on IqraEval `Iqra_train` (its train split, not dev), so the material is close to its training data and the numbers are optimistic; only “does it leave a correct reading alone” is measured, not real learner errors. A first bug — the word-boundary symbol “|” was not folded into the blank, which made every inserted vowel look likely (2 % instead of 96 % for the sukun rule) — was found on a single phrase and fixed before these numbers.
+
 **Baseline “before training”** — `results/baseline_840.csv`, one row per recording (840): what was asked; what the bot heard, its score, verdict and errors; the 84-syllable choice (best syllable, probability of the asked one, decision); the per-sound check (sound heard on the letter and on the vowel, confidence, GOP, decision); what the four other models wrote; how many models disagree with the asked syllable; empty columns `teacher_heard` and `teacher_verdict` for a teacher. Built by `baseline.py` from `align_check.py` and `demo_data.py`; `results/align_summary.json` keeps the alignment of every recording. After any training or change of model, rebuild the same table and compare it row by row with this file (and with the teacher columns once they are filled).
 
 ### 11.9 How to repeat
