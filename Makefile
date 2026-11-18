@@ -5,7 +5,7 @@
 ifeq ($(shell uname),Darwin)
 LIBS := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
 endif
-.PHONY: logs model-check try syllables thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
+.PHONY: logs model-check try syllables thesis thesis-ru annotation proposal research papers thesis-check trace library-sounds design site help setup check lint test cov run run-stub db-sync db-up db-down db-shell backup backup-db db-roles restore migrate migration report errors verify diagrams audit hygiene
 
 help: ## Список команд
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -118,6 +118,13 @@ trace: ## Трассировка: требования ↔ тесты сейча
 design: ## Макеты экранов бота из кода → docs/design/screens/
 	$(LIBS) uv run python scripts/render_screens.py
 	uv run python scripts/render_mockups.py
+
+site: ## Сайт-описание и демо для профессоров → docs/site/build (index, spec для ChatGPT, lessons, demo, compare, widgets)
+	uv run python scripts/site/build.py
+	uv run python scripts/site/lessons.py
+	uv run python scripts/site/demo.py
+	uv run python scripts/site/compare.py
+	uv run python scripts/site/widgets_preview.py
 
 diagrams: ## Перерисовать схемы в docs/architecture/diagrams
 	scripts/render_diagrams.sh

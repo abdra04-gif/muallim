@@ -48,3 +48,6 @@ logs/
 
 # Картинки страниц книги для «📄 Страница книги» (scripts/book/pages.py), как и скан — вне git
 curriculum/book_pages/*.jpg
+
+# снимки браузера (Playwright)
+.playwright-mcp/

@@ -1,0 +1,711 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Muallim — how the bot hears a beginner</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500..800&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap">
+<style>:root {
+  --ink: #14262E;
+  --paper: #F6F3EA;
+  --paper2: #ECE6D6;
+  --card: #FCFAF5;
+  --body: #46545B;
+  --teal: #0B6B5D;
+  --tealsoft: #DCEBE5;
+  --tealline: #A9CFC3;
+  --gold: #94590A;
+  --goldsoft: #F4E4C6;
+  --goldline: #E3C58E;
+  --line: #D6CCB4;
+  --muted: #6F8E87;
+  --ondark: #C9D8D4;
+  --golddark: #E2B467;
+}
+
+section {
+  padding: 128px 128px 160px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', 'Noto Naskh Arabic', Arial, sans-serif;
+  font-size: 30px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  counter-increment: page;
+}
+section.alt { background: var(--paper2); }
+section.dark { background: var(--ink); color: var(--paper); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0px); }
+}
+.anim { animation: rise 520ms ease-out both; animation-delay: calc(var(--i) * 110ms); }
+
+.head { display: flex; flex-direction: column; gap: 12px; }
+.eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+section.dark .eyebrow { color: var(--golddark); }
+.title { font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 64px; font-weight: 700; line-height: 1.1; color: var(--ink); }
+section.dark .title { color: var(--paper); }
+.lead { font-size: 30px; line-height: 1.45; color: var(--body); }
+section.dark .lead { color: var(--ondark); }
+
+.foot { position: absolute; left: 128px; bottom: 64px; width: 1664px; display: flex; justify-content: space-between; font-size: 24px; color: var(--body); }
+section.dark .foot { color: var(--ondark); }
+.foot .num::after { content: counter(page); }
+
+.row { display: flex; gap: 32px; }
+.col { display: flex; flex-direction: column; gap: 24px; }
+.card { flex: 1; background: var(--card); border: 2px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+.card.teal { background: var(--tealsoft); border: 2px solid var(--tealline); }
+.card.gold { background: var(--goldsoft); border: 2px solid var(--goldline); }
+.h { font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 32px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+.t { font-size: 24px; line-height: 1.45; color: var(--body); }
+.tb { font-size: 26px; line-height: 1.45; color: var(--ink); }
+.k { font-size: 24px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); }
+.kg { font-size: 24px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+.big { font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 72px; font-weight: 800; line-height: 1; color: var(--teal); }
+.ar { font-family: 'Noto Naskh Arabic', serif; }
+.sample { font-size: 40px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+
+.flow { display: flex; align-items: stretch; gap: 16px; }
+.step { width: 272px; flex: none; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 24px 24px 28px; display: flex; flex-direction: column; gap: 10px; }
+.step.teal { background: var(--tealsoft); border: 2px solid var(--tealline); }
+.step.gold { background: var(--goldsoft); border: 2px solid var(--goldline); }
+.arr { flex: none; width: 40px; height: 24px; align-self: center; background: var(--teal); }
+.sn { font-size: 24px; font-weight: 700; color: var(--teal); }
+.sh { font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+
+.band { background: var(--ink); color: var(--paper); border-radius: 18px; padding: 28px 36px; display: flex; gap: 28px; align-items: center; }
+.band .bk { font-size: 24px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--golddark); flex: none; }
+.band .bt { font-size: 26px; line-height: 1.45; color: var(--paper); }
+
+.bars { display: flex; flex-direction: column; gap: 18px; }
+.brow { display: flex; align-items: center; gap: 24px; }
+.blabel { flex: none; font-size: 24px; line-height: 1.3; color: var(--ink); }
+.bar { flex: none; height: 44px; border-radius: 8px; background: var(--muted); }
+.bar.hi { background: var(--teal); }
+.bar.bot { background: var(--gold); }
+.bval { flex: none; font-size: 28px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.tbl { width: 1664px; font-size: 24px; color: var(--ink); }
+.tbl2 { font-size: 26px; color: var(--ink); }
+.hrow { background: var(--paper2); }
+section.alt .hrow { background: var(--paper); }
+
+.layer { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 20px 28px; display: flex; gap: 24px; align-items: center; }
+.layer.teal { background: var(--tealsoft); border: 2px solid var(--tealline); }
+.lname { flex: none; width: 250px; font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+
+.why { display: flex; gap: 20px; align-items: flex-start; }
+.why x-icon { flex: none; width: 40px; height: 40px; color: var(--teal); }
+
+.phone { flex: none; width: 660px; background: var(--card); border: 2px solid var(--line); border-radius: 28px; padding: 32px; display: flex; flex-direction: column; gap: 14px; }
+.ph { font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ink); }
+.btn { background: var(--teal); color: var(--paper); border-radius: 14px; padding: 14px 20px; font-size: 24px; font-weight: 600; text-align: center; }
+.btn2 { border: 2px solid var(--teal); color: var(--teal); border-radius: 14px; padding: 12px 20px; font-size: 24px; font-weight: 600; text-align: center; }
+
+.tl { display: flex; gap: 20px; }
+.ts { flex: 1; border-top: 6px solid var(--teal); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.ts.gold { border-top: 6px solid var(--gold); }
+
+.item { display: flex; gap: 28px; align-items: flex-start; }
+.inum { flex: none; width: 64px; font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 48px; font-weight: 800; line-height: 1; color: var(--gold); }
+
+.cover { justify-content: center; gap: 36px; }
+.hero { width: 1150px; font-family: 'Manrope', 'Inter', Arial, sans-serif; font-size: 112px; font-weight: 800; line-height: 1.04; color: var(--paper); }
+.deco { position: absolute; left: 1280px; top: 190px; width: 520px; font-family: 'Noto Naskh Arabic', serif; font-size: 400px; line-height: 1.2; text-align: center; color: var(--golddark); opacity: 0.3; }
+.pill { align-self: flex-start; background: var(--golddark); color: var(--ink); border-radius: 999px; padding: 10px 26px; font-size: 24px; font-weight: 700; }
+
+.list2 { display: flex; flex-direction: column; gap: 18px; }
+.li { display: flex; gap: 18px; align-items: flex-start; }
+.li x-icon { flex: none; width: 36px; height: 36px; color: var(--golddark); }
+.li .x { flex: none; width: 36px; font-size: 32px; font-weight: 700; line-height: 1.1; color: var(--golddark); text-align: center; }
+.dt { font-size: 28px; line-height: 1.4; color: var(--paper); }
+
+.foot .num2 { }
+
+* { margin:0; box-sizing:border-box; }
+html,body { background:#0d1a20; height:100%; overflow:hidden; }
+h1,h2,h3 { font-weight:inherit; }
+#stage { position:absolute; left:50%; top:50%; width:1920px; height:1080px; transform-origin:center center; }
+#stage > section { position:absolute; inset:0; width:1920px; height:1080px; overflow:hidden; display:none; }
+#stage > section.on { display:flex; }
+aside { display:none !important; }
+.xi { flex:none; width:40px; height:40px; color:var(--teal); }
+.li .xi { width:36px; height:36px; color:var(--golddark); }
+.xarrow { clip-path: polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%); }
+.tbl, .tbl2 { border-collapse:collapse; }
+.tbl th, .tbl td, .tbl2 th, .tbl2 td { padding:.35em .6em; text-align:left; border-bottom:2px solid var(--line); vertical-align:top; }
+#hint { position:fixed; right:16px; bottom:12px; color:#8aa; font:14px sans-serif; }
+@media print {
+  @page { size: 1920px 1080px; margin:0; }
+  html,body { overflow:visible; height:auto; background:none; }
+  #stage { position:static; transform:none !important; width:auto; height:auto; }
+  #stage > section { position:relative; display:flex !important; page-break-after:always; break-after:page; }
+  .anim { animation:none !important; }
+  #hint { display:none; }
+}
+</style></head><body>
+<div id="stage">
+<section id="e-cover" class="dark cover">
+<p class="deco" aria-hidden="true">بَ</p>
+<p class="eyebrow anim" style="--i:0">Muallim · technical review · November 2026</p>
+<h1 class="hero anim" style="--i:1">How the bot hears a beginner</h1>
+<p class="lead anim" style="--i:2; width:1100px">What the bot does today, what our research found about speech models, and where we are going: the checking pipeline, the dataset and the plan.</p>
+<p class="pill anim" style="--i:3">English · Русская версия — со слайда 17</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">1</p></div>
+<aside>Purpose of the talk: show what we analysed. Three parts — what the bot does now, what we found in models and papers plus our own test, and where we are going technically. The Russian version of the same slides starts at slide 17.</aside>
+</section>
+<section id="e-task">
+<div class="head anim" style="--i:0"><p class="eyebrow">Today · The task</p><h2 class="title">Hear the mistakes, don’t guess the words</h2></div>
+<p class="lead anim" style="--i:1">A learner reads a text we already know: a letter with a vowel sign, a syllable, a word. We need to know which sounds were actually said, including the wrong ones. In research this is called <b>mispronunciation detection</b>, not ordinary speech recognition.</p>
+<div class="row anim" style="--i:2">
+<div class="card"><p class="k" style="color:var(--body)">Ordinary recogniser</p><h3 class="h">“Which word was most likely said?”</h3><p class="t">It is built to fix what it hears and write a real word. A mistake disappears on the way.</p><p class="t">Whisper on the syllable <span class="ar">بَ</span> answered <span class="ar">بي</span>, <span class="ar">نعم</span>, <span class="ar">لا</span> — and wrote a vowel sign in only 3 of 840 clips.</p></div>
+<div class="card teal"><p class="k">Sound-level checker</p><h3 class="h">“Which sounds were actually produced?”</h3><p class="t">It writes sounds, not words, and has no language model to “correct” them. A wrong sound stays visible.</p><p class="t">Same kind of clip → <b>b a</b>. Now the bot can compare it with the book and explain the error.</p></div>
+</div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">2</p></div>
+<aside>Key point: ordinary speech recognition is the wrong tool. It is trained to output the most probable word, so it hides exactly what we need to see. That is why the bot uses a model that writes sounds (phonemes) without a language model.</aside>
+</section>
+<section id="e-today" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Today · How it works</p><h2 class="title">What happens to one voice message</h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step"><p class="sn">1</p><h3 class="sh">Voice message</h3><p class="t">The learner reads a line of the book and sends a voice note in Telegram.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">2</p><h3 class="sh">Clean-up</h3><p class="t">ffmpeg turns it into standard audio: 16 kHz, one channel.</p></div>
+<div class="arr xarrow"></div>
+<div class="step teal"><p class="sn">3</p><h3 class="sh">Listening</h3><p class="t">The Muaalem model writes the sounds it heard and how each was made.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">4</p><h3 class="sh">Comparing</h3><p class="t">Sound by sound against the book. Rules and thresholds decide what counts as an error.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">5</p><h3 class="sh">Explaining</h3><p class="t">The learner gets the result and each error explained in Russian.</p></div>
+</div>
+<div class="band anim" style="--i:2"><p class="bk">Kept every time</p><p class="bt">The audio, the text from the book, the model’s raw answer, the model and rule versions. Teachers add their labels later. This is already the seed of the dataset.</p></div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">3</p></div>
+<aside>Walk through the five steps. Stress step 3: the model does not guess words, it writes sounds plus articulation features. And the dark band: every attempt is stored with the full trace, so any decision can be repeated and checked later.</aside>
+</section>
+<section id="e-example">
+<div class="head anim" style="--i:0"><p class="eyebrow">Today · One attempt</p><h2 class="title">How the bot judges the syllable <span class="ar">بَ</span> today</h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step" style="width:340px"><p class="k">The book shows</p><p class="sample ar" style="font-size:64px">بَ</p><p class="t">letter ba with a short “a” (fatha)</p></div>
+<div class="arr xarrow"></div>
+<div class="step" style="width:340px"><p class="k">Expected sounds</p><p class="sample">b · a</p><p class="t">a short vowel</p></div>
+<div class="arr xarrow"></div>
+<div class="step teal" style="width:340px"><p class="k">Model heard</p><p class="sample"><span class="ar">بَاا</span> = b · aa</p><p class="t">a long vowel</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold" style="width:340px"><p class="kg">Verdict</p><p class="sample" style="font-size:34px">“Vowel too long”</p><p class="t">shown to the learner</p></div>
+</div>
+<div class="card gold anim" style="--i:2; flex:none"><p class="tb">This is a real output from our test. The bot’s model wrote a long vowel in <b>411 of 840</b> single-letter clips — far more often than students could have held it. The reason: it learned from professional reciters reading verses, not from beginners reading one letter slowly. For a beginner this means a false “mistake” in the very first lesson.</p></div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">4</p></div>
+<aside>This slide shows the logic and the problem at once. The chain itself is right: book, expected sounds, heard sounds, verdict. The weak link is the model, which was trained on experts. This is why the research focused on the model and the checking step.</aside>
+</section>
+<section id="e-arch" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Today · Architecture</p><h2 class="title">Built so the model can be replaced</h2></div>
+<div class="row anim" style="--i:1; gap:56px">
+<div class="col" style="width:960px; flex:none; gap:14px">
+<div class="layer"><p class="lname">Telegram</p><p class="t">Screens, buttons, texts in Russian. Knows nothing about models.</p></div>
+<div class="layer"><p class="lname">Scenarios</p><p class="t">Lesson, attempt, consent, progress: what happens in which order.</p></div>
+<div class="layer teal"><p class="lname">Rules</p><p class="t">Compare sounds, error types, thresholds. Plain Python, no model inside — easy to test.</p></div>
+<div class="layer"><p class="lname">Adapters</p><p class="t">PostgreSQL, ffmpeg, audio files — and the speech model behind one “recogniser” interface.</p></div>
+</div>
+<div class="col" style="flex:1; gap:28px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><p class="tb">A new model is one adapter class. The rules and screens stay as they are.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><p class="tb">Several models can run on the same recording and be compared.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><p class="tb">Raw output and versions are stored, so every verdict can be repeated.</p></div>
+</div>
+</div>
+<p class="t anim" style="--i:2">Python 3.12 · aiogram 3 · PostgreSQL 16 · Muaalem model · layer rules checked automatically on every change</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">5</p></div>
+<aside>Why this matters for the research: because the model sits behind an interface, we can test new models on real attempts without rewriting the bot. The rules layer is independent of any model, so the teaching logic is stable while the "ears" change.</aside>
+</section>
+<section id="e-landscape">
+<div class="head anim" style="--i:0"><p class="eyebrow">Research · What exists</p><h2 class="title">About 40 models and services, seven families</h2></div>
+<table class="tbl anim" style="--i:1">
+<tr class="hrow"><th style="width:29%">Family</th><th style="width:27%">Examples</th><th style="width:14%">Hears wrong sounds</th><th style="width:12%">Vowel signs</th><th style="width:18%">Role for us</th></tr>
+<tr><td>A. Arabic sound models, no language model</td><td>Muaalem (bot), TajweedFormer, tajweed-v2</td><td>Yes</td><td>Yes</td><td style="color:var(--teal)"><b>Core</b></td></tr>
+<tr><td>B. Text recognisers with vowel signs</td><td>Tarteel Whisper, NVIDIA FastConformer</td><td>Partly</td><td>Yes</td><td>Control</td></tr>
+<tr><td>C. General Arabic recognisers</td><td>Whisper, OmniASR, Qwen3-ASR</td><td>No</td><td>No</td><td>Control only</td></tr>
+<tr><td>D. Universal phone recognisers</td><td>XLSR-espeak, ZIPA</td><td>Yes</td><td>Quality only</td><td>Second opinion</td></tr>
+<tr><td>E. Commercial services</td><td>Azure Pronunciation</td><td>Score only</td><td>Unknown</td><td>No: audio leaves us</td></tr>
+<tr><td>F. Audio language models</td><td>Gemini, Qwen-Omni</td><td>Weak</td><td>Weak</td><td>No</td></tr>
+<tr><td>G. No recogniser at all</td><td>Letter classifier, compare with teacher</td><td>“How far”</td><td>—</td><td style="color:var(--teal)"><b>For letters</b></td></tr>
+</table>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">6</p></div>
+<aside>We examined about forty models and services in papers, model cards and catalogues. Only family A really fits: models that write sounds with vowel signs and do not correct them. Families B and C are useful only as controls to show how much ordinary recognition hides. Family G is new for us and turned out to be the most promising for single letters.</aside>
+</section>
+<section id="e-evidence" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Research · What the papers say</p><h2 class="title">Nothing has been tested on learners like ours</h2></div>
+<div class="row anim" style="--i:1; gap:24px">
+<div class="card"><p class="big">0</p><p class="t">published results on adults who start from zero, or on Russian- or Kazakh-speaking learners.</p></div>
+<div class="card"><p class="big">32–46%</p><p class="t">of real learner errors caught by the best documented system (TajweedFormer V4). More than half are missed.</p></div>
+<div class="card"><p class="big">&lt;2%</p><p class="t">error is reached only on professional reciters. On amateurs and phone audio the same models show 4–9%.</p></div>
+<div class="card"><p class="big">81/94</p><p class="t">clips where a model wrote what the rule says instead of what was said. Its own authors call this canonical bias.</p></div>
+</div>
+<div class="band anim" style="--i:2"><p class="bk">So</p><p class="bt">Real mistakes matter more than volume: at the IQRA 2026 challenge, 1,333 real mispronounced recordings helped the top systems more than 55,400 synthetic ones. We need our own recordings.</p></div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">7</p></div>
+<aside>Four facts from the literature. Nobody has measured these models on beginners like ours. The best system misses most real errors. The impressive numbers come from professionals. And models trained on correct recitation tend to "hear the rule". Conclusion: the decisive step is our own labelled data.</aside>
+</section>
+<section id="e-test">
+<div class="head anim" style="--i:0"><p class="eyebrow">Research · Our own test</p><h2 class="title">Five systems, the same 840 recordings</h2></div>
+<div class="row anim" style="--i:1; gap:56px">
+<div class="col" style="width:600px; flex:none; gap:22px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg><p class="tb"><b>28 letters × 3 vowel signs × 10 speakers</b> = 840 clips of single letters</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.5 4 6"/></svg><p class="tb">Public set of Indonesian school students (Pelafalan Huruf Hijaiyah)</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p class="tb">Ordinary laptop (M1, 8 GB): about 0.2 s per clip for sound models</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="tb">Checked: are the first letter and vowel what the student was asked to read?</p></div>
+</div>
+<div class="col" style="flex:1; gap:16px">
+<p class="k">Real answers for two students reading <span class="ar">بَ</span></p>
+<table class="tbl2" style="width:1008px">
+<tr class="hrow"><th style="width:56%">System</th><th style="width:22%">Student 1</th><th style="width:22%">Student 2</th></tr>
+<tr><td><b>Muaalem</b> — the bot’s model</td><td class="ar">بَاا</td><td class="ar">تَ</td></tr>
+<tr><td>MostafaMaroof — Arabic sounds</td><td>b aa</td><td>b aa l</td></tr>
+<tr><td>XLSR-espeak — any language</td><td>b aː</td><td>p ɛ</td></tr>
+<tr><td>Tarteel Whisper — Quran text</td><td class="ar">ب</td><td class="ar">ف</td></tr>
+<tr><td>Whisper — general text</td><td class="ar">بااااااااااا</td><td class="ar">بي</td></tr>
+</table>
+<p class="t">Same audio, five different answers. Sound models write sounds; text models write words or loop.</p>
+</div>
+</div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">8</p></div>
+<aside>This is the hands-on part: we installed five systems and ran them on the same clips. The table shows their real output for two clips of the syllable ba. The sound models give something we can compare with the book. Whisper gives words, no vowel signs, and sometimes repeats a letter until its length limit.</aside>
+</section>
+<section id="e-results" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Research · Results</p><h2 class="title">No system reads a single letter reliably</h2></div>
+<div class="row anim" style="--i:1; gap:64px">
+<div class="col" style="width:930px; flex:none; gap:20px">
+<p class="k">Letter and vowel both right, % of 840 clips</p>
+<div class="bars">
+<div class="brow"><p class="blabel" style="width:330px"><b>MostafaMaroof</b><br>Arabic sounds</p><div class="bar hi" style="width:425px"></div><p class="bval">50.0%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>XLSR-espeak</b><br>any language</p><div class="bar" style="width:422px"></div><p class="bval">49.6%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Muaalem</b><br>the bot’s model</p><div class="bar bot" style="width:335px"></div><p class="bval">39.4%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Tarteel Whisper</b><br>Quran text</p><div class="bar" style="width:208px"></div><p class="bval">24.5%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Whisper small</b><br>general text</p><div class="bar" style="width:4px"></div><p class="bval">0.1%</p></div>
+</div>
+</div>
+<div class="col" style="flex:1; gap:26px">
+<div><p class="tb"><b>The bot’s model is not the best here.</b></p><p class="t">It learned from verses by professionals; one short letter is far from that.</p></div>
+<div><p class="tb"><b>Models confuse what learners confuse.</b></p><p class="t"><span class="ar">‎ض‎→‎د‎ · ‎ط‎→‎ت‎ · ‎ظ‎→‎ز‎ · ‎د‎→‎ت‎ · ‎ث‎→‎س‎</span> — the model is weakest exactly where we need it.</p></div>
+<div><p class="tb"><b>Speed is not a problem.</b></p><p class="t">Sound models need about 0.2 s per clip on a laptop.</p></div>
+</div>
+</div>
+<p class="t anim" style="--i:2">A lower bound, not a final score: the set has no “right / wrong” labels, and the speakers are not our learners.</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">9</p></div>
+<aside>Best result is 50 percent: half the time the system gets letter and vowel right. The bot's current model gets 39 percent. Important: the confused pairs — emphatic and plain, voiced and voiceless — are the same pairs a Russian speaker confuses. Honest limit: we cannot tell whether the model misheard or the student misread, because the set has no error labels.</aside>
+</section>
+<section id="e-verify">
+<div class="head anim" style="--i:0"><p class="eyebrow">Research · The key idea</p><h2 class="title">Check the expected letter, don’t guess</h2></div>
+<p class="lead anim" style="--i:1">In the first lessons the answer is one of only 84 options (28 letters × 3 vowels). So we built four checkers on top of the strongest listening model and tested them on all 8,904 public clips — always on students the checker had never heard.</p>
+<div class="bars anim" style="--i:2">
+<div class="brow"><p class="blabel" style="width:560px">Free transcription (today’s approach)</p><div class="bar" style="width:401px"></div><p class="bval">47.2%</p></div>
+<div class="brow"><p class="blabel" style="width:560px">Choose among 28 letters and 3 vowels</p><div class="bar" style="width:470px"></div><p class="bval">55.3%</p></div>
+<div class="brow"><p class="blabel" style="width:560px">Compare with other students’ recordings</p><div class="bar" style="width:592px"></div><p class="bval">69.6%</p></div>
+<div class="brow"><p class="blabel" style="width:560px"><b>Trained checker over the 84 answers</b></p><div class="bar hi" style="width:748px"></div><p class="bval">88.0%</p></div>
+<div class="brow"><p class="blabel" style="width:560px"><b>Same, answering only when sure</b> (3 of 4 clips)</p><div class="bar bot" style="width:814px"></div><p class="bval">95.8%</p></div>
+</div>
+<p class="t anim" style="--i:3">Letter and vowel both right. +41 points from the change of design alone. Still weak: <span class="ar">ظ</span> and the pair <span class="ar">ث / س</span>. Must be retrained on our own learners.</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">10</p></div>
+<aside>The main finding of the hands-on work. Free transcription asks the model "what did you hear?" Verification asks "is this the letter we expected, or one of its neighbours?" On beginner material the second question is much easier. When the checker is allowed to say "not sure" on a quarter of clips, it is right 96 percent of the time on the rest.</aside>
+</section>
+<section id="e-future" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Direction · The target pipeline</p><h2 class="title">How checking will work</h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step"><p class="sn">1</p><h3 class="sh">Voice + consent</h3><p class="t">Nothing is stored beyond what the learner agreed to.</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold"><p class="sn" style="color:var(--gold)">2 · new</p><h3 class="sh">Quality check</h3><p class="t">Silence, too short, too quiet → “please record again”.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">3</p><h3 class="sh">Main model</h3><p class="t">Sounds plus how sure it is about each one.</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold"><p class="sn" style="color:var(--gold)">4 · new</p><h3 class="sh">Verifier</h3><p class="t">For each expected sound: correct · error · not sure.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">5</p><h3 class="sh">Explanation</h3><p class="t">In Russian; “not sure” becomes “say it again”.</p></div>
+</div>
+<div class="row anim" style="--i:2; gap:24px">
+<div class="card teal"><p class="k">Stage I · letters and syllables</p><p class="t">The checker over 84 answers, plus comparison with the teacher’s recording.</p></div>
+<div class="card teal"><p class="k">Stage II · words and lines</p><p class="t">Sound model; each expected sound scored against its likely substitutes, own threshold per error type.</p></div>
+<div class="card"><p class="k" style="color:var(--body)">In the shadow</p><p class="t">Other models run after the reply on the same audio. The learner never sees them; we compare them.</p></div>
+</div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">11</p></div>
+<aside>The pipeline keeps everything that already works and adds two steps: a quality check before the model and a verifier after it. The verifier is where the two kinds of book material get different mechanisms. Shadow models let us measure every candidate on real attempts without changing what the learner sees.</aside>
+</section>
+<section id="e-changes">
+<div class="head anim" style="--i:0"><p class="eyebrow">Direction · Changes in the bot</p><h2 class="title">Five changes, in the order they unblock each other</h2></div>
+<div class="col anim" style="--i:1; gap:30px">
+<div class="item"><p class="inum">1</p><div><p class="tb"><b>Consent screen for public release</b></p><p class="t">Telegram requires explicit consent for datasets. Without it no recording can be published.</p></div></div>
+<div class="item"><p class="inum">2</p><div><p class="tb"><b>Answers “not sure” and “say it again”</b></p><p class="t">The best systems miss over half of real errors; a false verdict hurts a beginner more than none.</p></div></div>
+<div class="item"><p class="inum">3</p><div><p class="tb"><b>Judge only what the lesson teaches; no “too long” on single letters</b></p><p class="t">Removes the false alarm seen in 411 of 840 clips.</p></div></div>
+<div class="item"><p class="inum">4</p><div><p class="tb"><b>The letter checker for Stage I</b></p><p class="t">88% against 47% on students it had never heard.</p></div></div>
+<div class="item"><p class="inum">5</p><div><p class="tb"><b>A second model in the shadow; confusable pairs go to teachers first</b></p><p class="t">Shows where the main model is wrong; labels arrive where they are needed most.</p></div></div>
+</div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">12</p></div>
+<aside>All five are proposals; methodology and texts for learners are decided by the author. Order matters: consent first, because without it there is no data; then the changes that protect beginners from false alarms; then the new checker and the shadow comparison.</aside>
+</section>
+<section id="e-dataset" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Direction · The dataset</p><h2 class="title">One record per attempt, three layers</h2></div>
+<div class="row anim" style="--i:1; gap:24px">
+<div class="card"><p class="k">What should be read</p><p class="sample"><span class="ar">بَ</span> → b · a</p><p class="t">From the book, checked by a person.</p></div>
+<div class="card"><p class="k">What the system heard</p><p class="sample">b · aa</p><p class="t">The model’s answer with its confidence for each sound.</p></div>
+<div class="card teal"><p class="k">What was actually read</p><p class="sample">b · a ✓</p><p class="t">Teachers’ labels. “Verified” only when two agree.</p></div>
+</div>
+<div class="row anim" style="--i:2; gap:24px">
+<div class="card"><p class="h" style="font-size:28px">Audio</p><p class="t">Original Telegram voice message, unedited; loaders convert to 16 kHz.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Table</p><p class="t">metadata.jsonl — one line per attempt, plus speakers and items.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Publication</p><p class="t">Hugging Face, audio-folder layout, access after accepting terms.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Split</p><p class="t">By learner, never by recording. Test learners fixed in advance.</p></div>
+</div>
+<p class="tb anim" style="--i:3">New for the field: the same beginners followed through a graded textbook, with teacher labels per sound and the system’s own answer beside each recording.</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">13</p></div>
+<aside>The format is close to the IQRA benchmark so results can be compared. The three layers never overwrite each other: expected, heard by the model, verified by teachers. Splitting by learner prevents the model from being tested on voices it has already heard. Not published: name, Telegram ID, exact dates, the questionnaire answer about prayer.</aside>
+</section>
+<section id="e-consent">
+<div class="head anim" style="--i:0"><p class="eyebrow">Direction · Public data</p><h2 class="title">Learners must know their voices go public</h2></div>
+<div class="row anim" style="--i:1; gap:64px; align-items:flex-start">
+<div class="col" style="flex:1; gap:28px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5M12 18v.5"/></svg><p class="tb">Telegram’s rules for bots forbid collecting data for datasets and models — unless the user gives <b>explicit, active and revocable</b> consent.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p class="tb">Today’s screen says “only researchers will hear”. Recordings made under it cannot go public.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.5 4 6"/></svg><p class="tb">Three states per learner: not answered · practice without recording · public release. Under 18: never published.</p></div>
+</div>
+<div class="phone">
+<p class="ph">Your recordings will become part of an open dataset</p>
+<p class="t">• Published online; researchers in any country can listen<br>• Not published: name, Telegram account, phone<br>• A voice can be recognised by people who know you<br>• Change your mind any time: /privacy</p>
+<p class="btn">Continue — I agree to publication</p>
+<p class="btn2">Practise without recording</p>
+</div>
+</div>
+<p class="t anim" style="--i:2">Draft only. The final text is approved by the author and the university ethics body.</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">14</p></div>
+<aside>This is both a legal and a technical requirement. Telegram's developer terms allow data for machine learning only with individual, explicit, active and revocable consent. The screen says "published" in the title and on the button, and offers practice without recording, so agreement is voluntary. Withdrawal removes the recordings from our storage and from future releases; copies already downloaded cannot be recalled, and the screen says so.</aside>
+</section>
+<section id="e-roadmap" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Direction · Plan</p><h2 class="title">From consent to a model chosen on evidence</h2></div>
+<div class="tl anim" style="--i:1">
+<div class="ts"><p class="sn">1</p><p class="sh">Consent screen</p><p class="t">in the bot, with practice-only option</p></div>
+<div class="ts"><p class="sn">2</p><p class="sh">Pilot</p><p class="t">20–40 adult beginners record lessons</p></div>
+<div class="ts"><p class="sn">3</p><p class="sh">Teacher labels</p><p class="t">two per recording; test part labelled blind</p></div>
+<div class="ts"><p class="sn">4</p><p class="sh">Compare models</p><p class="t">all candidates on our own learners</p></div>
+<div class="ts gold"><p class="sn" style="color:var(--gold)">5</p><p class="sh">Results</p><p class="t">retrained checker, thesis chapter, public dataset</p></div>
+</div>
+<div class="col anim" style="--i:2; gap:16px">
+<p class="k">What we need</p>
+<div class="row" style="gap:24px">
+<div class="card"><p class="h" style="font-size:28px">Learners</p><p class="t">20–40 adults who start from zero</p></div>
+<div class="card"><p class="h" style="font-size:28px">Teachers</p><p class="t">at least two to label each recording</p></div>
+<div class="card"><p class="h" style="font-size:28px">Approval</p><p class="t">ethics body; country where data is hosted</p></div>
+<div class="card"><p class="h" style="font-size:28px">Server</p><p class="t">main model already runs; shadow models add little</p></div>
+</div>
+</div>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">15</p></div>
+<aside>Until teacher-labelled recordings of our own learners exist, no model can be chosen on evidence. So the order is: consent, pilot, labels, comparison. The comparison uses one figure that punishes both missed errors and false alarms: on a balanced set, a system that never flags anything scores 50 percent.</aside>
+</section>
+<section id="e-close" class="dark">
+<div class="head anim" style="--i:0"><p class="eyebrow">Summary</p><h2 class="title">What we can say now, and what we cannot yet</h2></div>
+<div class="row anim" style="--i:1; gap:80px">
+<div class="col" style="flex:1; gap:20px">
+<p class="kg" style="color:var(--golddark)">Can say now</p>
+<div class="list2">
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">The design follows the best-supported family of methods</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">No published system serves these learners and this material</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">We know where every available model fails on single letters</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">Checking the expected letter beat free transcription by 41 points</p></div>
+</div>
+</div>
+<div class="col" style="flex:1; gap:20px">
+<p class="kg" style="color:var(--golddark)">Not yet</p>
+<div class="list2">
+<div class="li"><p class="x">–</p><p class="dt">That the bot is accurate on beginners</p></div>
+<div class="li"><p class="x">–</p><p class="dt">That the chosen model is the best one</p></div>
+<div class="li"><p class="x">–</p><p class="dt">That the dataset exists</p></div>
+<div class="li"><p class="x">–</p><p class="dt">That 88% holds for Russian-speaking adults</p></div>
+</div>
+</div>
+</div>
+<p class="pill anim" style="--i:2">The decisive step: our own recordings, labelled by teachers</p>
+<div class="foot"><p>Muallim · speech checking research</p><p class="num2">16</p></div>
+<aside>Close honestly. The research shows the direction is right and where the weak points are, but accuracy claims must wait for our own labelled data. Ask for the decisions: consent model and wording, dataset licence, ethics body, hosting country, and whether we may contact the authors of RetaSy, Horouf and Quran Lab.</aside>
+</section>
+<section id="r-cover" class="dark cover">
+<p class="deco" aria-hidden="true">بَ</p>
+<p class="eyebrow anim" style="--i:0">Muallim · технический обзор · ноябрь 2026</p>
+<h1 class="hero anim" style="--i:1">Как бот слышит новичка</h1>
+<p class="lead anim" style="--i:2; width:1100px">Что бот делает сейчас, что исследование показало о моделях распознавания речи и куда мы идём: схема проверки, датасет и план.</p>
+<p class="pill anim" style="--i:3">Русская версия · English — slides 1–16</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">17</p></div>
+<aside>Цель доклада — показать, что мы проанализировали. Три части: что бот делает сейчас; что нашли в моделях, статьях и в собственном тесте; куда идём в технической части.</aside>
+</section>
+<section id="r-task">
+<div class="head anim" style="--i:0"><p class="eyebrow">Сегодня · Задача</p><h2 class="title">Слышать ошибки, а не угадывать слова</h2></div>
+<p class="lead anim" style="--i:1">Ученик читает текст, который мы знаем заранее: букву с огласовкой, слог, слово. Нужно понять, какие звуки он на самом деле произнёс, в том числе неправильные. В науке это называется <b>обнаружением ошибок произношения</b>, а не обычным распознаванием речи.</p>
+<div class="row anim" style="--i:2">
+<div class="card"><p class="k" style="color:var(--body)">Обычный распознаватель</p><h3 class="h">«Какое слово, скорее всего, сказали?»</h3><p class="t">Он создан исправлять услышанное и писать настоящее слово. Ошибка по дороге исчезает.</p><p class="t">Whisper на слог <span class="ar">بَ</span> ответил <span class="ar">بي</span>, <span class="ar">نعم</span>, <span class="ar">لا</span> — и написал огласовку лишь в 3 записях из 840.</p></div>
+<div class="card teal"><p class="k">Проверка по звукам</p><h3 class="h">«Какие звуки на самом деле прозвучали?»</h3><p class="t">Пишет звуки, а не слова, и у неё нет языковой модели, которая бы их «исправила». Неверный звук остаётся видимым.</p><p class="t">Такая же запись → <b>b a</b>. Теперь бот может сравнить с книгой и объяснить ошибку.</p></div>
+</div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">18</p></div>
+<aside>Главное: обычное распознавание речи — не тот инструмент. Оно обучено выдавать самое вероятное слово и поэтому прячет как раз то, что нам нужно увидеть. Поэтому бот использует модель, которая пишет звуки (фонемы) без языковой модели.</aside>
+</section>
+<section id="r-today" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Сегодня · Как это работает</p><h2 class="title">Что происходит с одним голосовым</h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step"><p class="sn">1</p><h3 class="sh">Голосовое</h3><p class="t">Ученик читает строку из книги и отправляет голосовое в Telegram.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">2</p><h3 class="sh">Подготовка</h3><p class="t">ffmpeg приводит звук к стандарту: 16 кГц, один канал.</p></div>
+<div class="arr xarrow"></div>
+<div class="step teal"><p class="sn">3</p><h3 class="sh">Слушает</h3><p class="t">Модель Muaalem записывает услышанные звуки и то, как каждый был произнесён.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">4</p><h3 class="sh">Сравнивает</h3><p class="t">Звук за звуком с книгой. Правила и пороги решают, что считать ошибкой.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">5</p><h3 class="sh">Объясняет</h3><p class="t">Ученик получает результат и объяснение каждой ошибки по-русски.</p></div>
+</div>
+<div class="band anim" style="--i:2"><p class="bk">Сохраняется</p><p class="bt">Запись, текст из книги, «сырой» ответ модели, версии модели и правил. Позже учителя добавляют разметку. Это уже зародыш датасета.</p></div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">19</p></div>
+<aside>Пройти пять шагов. Подчеркнуть шаг 3: модель не угадывает слова, а записывает звуки и признаки артикуляции. И тёмную полосу: каждая попытка хранится с полным следом, поэтому любое решение можно повторить и проверить.</aside>
+</section>
+<section id="r-example">
+<div class="head anim" style="--i:0"><p class="eyebrow">Сегодня · Одна попытка</p><h2 class="title">Как бот сейчас оценивает слог <span class="ar">بَ</span></h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step" style="width:340px"><p class="k">В книге</p><p class="sample ar" style="font-size:64px">بَ</p><p class="t">буква ба с коротким «а» (фатха)</p></div>
+<div class="arr xarrow"></div>
+<div class="step" style="width:340px"><p class="k">Ожидаем</p><p class="sample">b · a</p><p class="t">короткий гласный</p></div>
+<div class="arr xarrow"></div>
+<div class="step teal" style="width:340px"><p class="k">Модель услышала</p><p class="sample"><span class="ar">بَاا</span> = b · aa</p><p class="t">долгий гласный</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold" style="width:340px"><p class="kg">Вердикт</p><p class="sample" style="font-size:34px">«Гласный слишком долгий»</p><p class="t">видит ученик</p></div>
+</div>
+<div class="card gold anim" style="--i:2; flex:none"><p class="tb">Это настоящий ответ из нашего теста. Модель бота написала долгий гласный в <b>411 записях из 840</b> — гораздо чаще, чем ученики могли его тянуть. Причина: она училась на профессиональных чтецах, читающих аяты, а не на новичках, медленно читающих одну букву. Для новичка это ложная «ошибка» уже на первом уроке.</p></div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">20</p></div>
+<aside>Слайд показывает и логику, и проблему. Сама цепочка правильная: книга, ожидаемые звуки, услышанные звуки, вердикт. Слабое звено — модель, обученная на мастерах. Поэтому исследование сосредоточилось на модели и на шаге проверки.</aside>
+</section>
+<section id="r-arch" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Сегодня · Архитектура</p><h2 class="title">Модель можно заменить, не трогая бота</h2></div>
+<div class="row anim" style="--i:1; gap:56px">
+<div class="col" style="width:960px; flex:none; gap:14px">
+<div class="layer"><p class="lname">Telegram</p><p class="t">Экраны, кнопки, тексты по-русски. Ничего не знает о моделях.</p></div>
+<div class="layer"><p class="lname">Сценарии</p><p class="t">Урок, попытка, согласие, прогресс: что и в каком порядке происходит.</p></div>
+<div class="layer teal"><p class="lname">Правила</p><p class="t">Сравнение звуков, типы ошибок, пороги. Чистый Python, без модели внутри — легко проверять.</p></div>
+<div class="layer"><p class="lname">Адаптеры</p><p class="t">PostgreSQL, ffmpeg, аудиофайлы — и модель речи за одним интерфейсом «распознаватель».</p></div>
+</div>
+<div class="col" style="flex:1; gap:28px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><p class="tb">Новая модель — это один класс-адаптер. Правила и экраны не меняются.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><p class="tb">Несколько моделей можно запустить на одной записи и сравнить.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><p class="tb">Сырой ответ и версии хранятся, поэтому любой вердикт можно повторить.</p></div>
+</div>
+</div>
+<p class="t anim" style="--i:2">Python 3.12 · aiogram 3 · PostgreSQL 16 · модель Muaalem · границы слоёв проверяются автоматически при каждом изменении</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">21</p></div>
+<aside>Почему это важно для исследования: модель стоит за интерфейсом, поэтому новые модели можно проверять на настоящих попытках, не переписывая бота. Слой правил не зависит от модели: методика стабильна, меняются только «уши».</aside>
+</section>
+<section id="r-landscape">
+<div class="head anim" style="--i:0"><p class="eyebrow">Исследование · Что существует</p><h2 class="title">Около 40 моделей и сервисов, семь семейств</h2></div>
+<table class="tbl anim" style="--i:1">
+<tr class="hrow"><th style="width:29%">Семейство</th><th style="width:27%">Примеры</th><th style="width:14%">Слышит неверный звук</th><th style="width:12%">Огласовки</th><th style="width:18%">Роль для нас</th></tr>
+<tr><td>A. Арабские модели звуков, без языковой модели</td><td>Muaalem (бот), TajweedFormer, tajweed-v2</td><td>Да</td><td>Да</td><td style="color:var(--teal)"><b>Основа</b></td></tr>
+<tr><td>B. Распознаватели текста с огласовками</td><td>Tarteel Whisper, NVIDIA FastConformer</td><td>Частично</td><td>Да</td><td>Контроль</td></tr>
+<tr><td>C. Общие арабские распознаватели</td><td>Whisper, OmniASR, Qwen3-ASR</td><td>Нет</td><td>Нет</td><td>Только контроль</td></tr>
+<tr><td>D. Универсальные распознаватели звуков</td><td>XLSR-espeak, ZIPA</td><td>Да</td><td>Только качество</td><td>Второе мнение</td></tr>
+<tr><td>E. Коммерческие сервисы</td><td>Azure Pronunciation</td><td>Только балл</td><td>Неизвестно</td><td>Нет: звук уходит</td></tr>
+<tr><td>F. Аудио-языковые модели</td><td>Gemini, Qwen-Omni</td><td>Слабо</td><td>Слабо</td><td>Нет</td></tr>
+<tr><td>G. Без распознавателя</td><td>Классификатор букв, сравнение с учителем</td><td>«Насколько далеко»</td><td>—</td><td style="color:var(--teal)"><b>Для букв</b></td></tr>
+</table>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">22</p></div>
+<aside>Мы изучили около сорока моделей и сервисов по статьям, карточкам моделей и каталогам. Подходит по-настоящему только семейство A: модели пишут звуки с огласовками и не исправляют их. B и C полезны только как контроль. Семейство G для нас новое и оказалось самым перспективным для отдельных букв.</aside>
+</section>
+<section id="r-evidence" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Исследование · Что говорят статьи</p><h2 class="title">На таких учениках, как наши, никто не проверял</h2></div>
+<div class="row anim" style="--i:1; gap:24px">
+<div class="card"><p class="big">0</p><p class="t">опубликованных результатов на взрослых, начинающих с нуля, и на русско- или казахоязычных учениках.</p></div>
+<div class="card"><p class="big">32–46%</p><p class="t">настоящих ошибок учеников ловит лучшая описанная система (TajweedFormer V4). Больше половины пропускает.</p></div>
+<div class="card"><p class="big">&lt;2%</p><p class="t">ошибок — только на профессиональных чтецах. На любителях и записи с телефона те же модели дают 4–9%.</p></div>
+<div class="card"><p class="big">81/94</p><p class="t">записей, где модель написала то, что требует правило, а не то, что прозвучало. Сами авторы называют это «смещением к эталону».</p></div>
+</div>
+<div class="band anim" style="--i:2"><p class="bk">Вывод</p><p class="bt">Настоящие ошибки важнее объёма: на конкурсе IQRA 2026 1 333 записи с реальными ошибками помогли лучшим системам больше, чем 55 400 синтетических. Нужны наши собственные записи.</p></div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">23</p></div>
+<aside>Четыре факта из литературы. Никто не измерял эти модели на таких новичках. Лучшая система пропускает большинство настоящих ошибок. Впечатляющие цифры получены на профессионалах. Модели, обученные на правильном чтении, «слышат правило». Вывод: решающий шаг — наши размеченные данные.</aside>
+</section>
+<section id="r-test">
+<div class="head anim" style="--i:0"><p class="eyebrow">Исследование · Наш тест</p><h2 class="title">Пять систем, одни и те же 840 записей</h2></div>
+<div class="row anim" style="--i:1; gap:56px">
+<div class="col" style="width:600px; flex:none; gap:22px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg><p class="tb"><b>28 букв × 3 огласовки × 10 дикторов</b> = 840 записей отдельных букв</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.5 4 6"/></svg><p class="tb">Открытый набор индонезийских школьников (Pelafalan Huruf Hijaiyah)</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p class="tb">Обычный ноутбук (M1, 8 ГБ): около 0,2 с на запись у моделей звуков</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="tb">Проверяли: первая буква и огласовка — те, что ученика просили прочитать?</p></div>
+</div>
+<div class="col" style="flex:1; gap:16px">
+<p class="k">Настоящие ответы для двух учеников, читающих <span class="ar">بَ</span></p>
+<table class="tbl2" style="width:1008px">
+<tr class="hrow"><th style="width:56%">Система</th><th style="width:22%">Ученик 1</th><th style="width:22%">Ученик 2</th></tr>
+<tr><td><b>Muaalem</b> — модель бота</td><td class="ar">بَاا</td><td class="ar">تَ</td></tr>
+<tr><td>MostafaMaroof — арабские звуки</td><td>b aa</td><td>b aa l</td></tr>
+<tr><td>XLSR-espeak — любой язык</td><td>b aː</td><td>p ɛ</td></tr>
+<tr><td>Tarteel Whisper — текст Корана</td><td class="ar">ب</td><td class="ar">ف</td></tr>
+<tr><td>Whisper — обычный текст</td><td class="ar">بااااااااااا</td><td class="ar">بي</td></tr>
+</table>
+<p class="t">Одна запись — пять разных ответов. Модели звуков пишут звуки; текстовые — слова или зацикливаются.</p>
+</div>
+</div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">24</p></div>
+<aside>Практическая часть: мы установили пять систем и прогнали их на одних и тех же записях. В таблице — их настоящий вывод для двух записей слога «ба». Модели звуков дают то, что можно сравнить с книгой. Whisper даёт слова без огласовок и иногда повторяет букву до предела длины.</aside>
+</section>
+<section id="r-results" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Исследование · Результаты</p><h2 class="title">Ни одна система надёжно не читает отдельную букву</h2></div>
+<div class="row anim" style="--i:1; gap:64px">
+<div class="col" style="width:930px; flex:none; gap:20px">
+<p class="k">Буква и огласовка обе верны, % из 840 записей</p>
+<div class="bars">
+<div class="brow"><p class="blabel" style="width:330px"><b>MostafaMaroof</b><br>арабские звуки</p><div class="bar hi" style="width:425px"></div><p class="bval">50,0%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>XLSR-espeak</b><br>любой язык</p><div class="bar" style="width:422px"></div><p class="bval">49,6%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Muaalem</b><br>модель бота</p><div class="bar bot" style="width:335px"></div><p class="bval">39,4%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Tarteel Whisper</b><br>текст Корана</p><div class="bar" style="width:208px"></div><p class="bval">24,5%</p></div>
+<div class="brow"><p class="blabel" style="width:330px"><b>Whisper small</b><br>обычный текст</p><div class="bar" style="width:4px"></div><p class="bval">0,1%</p></div>
+</div>
+</div>
+<div class="col" style="flex:1; gap:26px">
+<div><p class="tb"><b>Модель бота здесь не лучшая.</b></p><p class="t">Она училась на аятах в исполнении профессионалов; короткая буква далека от этого.</p></div>
+<div><p class="tb"><b>Модели путают то же, что и ученики.</b></p><p class="t"><span class="ar">‎ض‎→‎د‎ · ‎ط‎→‎ت‎ · ‎ظ‎→‎ز‎ · ‎د‎→‎ت‎ · ‎ث‎→‎س‎</span> — модель слабее всего там, где она нужнее всего.</p></div>
+<div><p class="tb"><b>Скорость — не проблема.</b></p><p class="t">Моделям звуков нужно около 0,2 с на запись на ноутбуке.</p></div>
+</div>
+</div>
+<p class="t anim" style="--i:2">Это нижняя граница, а не итоговая оценка: в наборе нет меток «верно / неверно», и дикторы — не наши ученики.</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">25</p></div>
+<aside>Лучший результат — 50 процентов: в половине случаев система верно определяет и букву, и огласовку. Нынешняя модель бота — 39 процентов. Важно: путаются пары — твёрдые и мягкие, звонкие и глухие — те же, что путает русскоязычный ученик. Честное ограничение: мы не можем отличить ошибку модели от ошибки ученика, в наборе нет разметки ошибок.</aside>
+</section>
+<section id="r-verify">
+<div class="head anim" style="--i:0"><p class="eyebrow">Исследование · Главная идея</p><h2 class="title">Проверять ожидаемую букву, а не угадывать</h2></div>
+<p class="lead anim" style="--i:1">На первых уроках ответ — один из всего 84 вариантов (28 букв × 3 огласовки). Поэтому мы построили четыре проверки поверх лучшей «слушающей» модели и испытали их на всех 8 904 открытых записях — всегда на учениках, которых проверка раньше не слышала.</p>
+<div class="bars anim" style="--i:2">
+<div class="brow"><p class="blabel" style="width:560px">Свободная запись звуков (как сейчас)</p><div class="bar" style="width:401px"></div><p class="bval">47,2%</p></div>
+<div class="brow"><p class="blabel" style="width:560px">Выбор из 28 букв и 3 огласовок</p><div class="bar" style="width:470px"></div><p class="bval">55,3%</p></div>
+<div class="brow"><p class="blabel" style="width:560px">Сравнение с записями других учеников</p><div class="bar" style="width:592px"></div><p class="bval">69,6%</p></div>
+<div class="brow"><p class="blabel" style="width:560px"><b>Обученная проверка по 84 ответам</b></p><div class="bar hi" style="width:748px"></div><p class="bval">88,0%</p></div>
+<div class="brow"><p class="blabel" style="width:560px"><b>То же, отвечает только когда уверена</b> (3 из 4)</p><div class="bar bot" style="width:814px"></div><p class="bval">95,8%</p></div>
+</div>
+<p class="t anim" style="--i:3">Буква и огласовка обе верны. +41 пункт только за счёт смены подхода. Слабые места остаются: <span class="ar">ظ</span> и пара <span class="ar">ث / س</span>. Нужно переобучить на наших учениках.</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">26</p></div>
+<aside>Главный результат практической части. Свободная запись спрашивает модель: «что ты услышала?» Проверка спрашивает: «это та буква, которую ждали, или её соседка?» На материале новичка второй вопрос гораздо проще. Если разрешить проверке говорить «не уверена» на четверти записей, на остальных она права в 96 процентах.</aside>
+</section>
+<section id="r-future" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Куда идём · Целевая схема</p><h2 class="title">Как будет работать проверка</h2></div>
+<div class="flow anim" style="--i:1">
+<div class="step"><p class="sn">1</p><h3 class="sh">Голос + согласие</h3><p class="t">Хранится только то, на что ученик согласился.</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold"><p class="sn" style="color:var(--gold)">2 · новое</p><h3 class="sh">Качество записи</h3><p class="t">Тишина, слишком коротко, тихо → «запишите ещё раз».</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">3</p><h3 class="sh">Основная модель</h3><p class="t">Звуки и уверенность в каждом.</p></div>
+<div class="arr xarrow"></div>
+<div class="step gold"><p class="sn" style="color:var(--gold)">4 · новое</p><h3 class="sh">Проверка</h3><p class="t">Для каждого ожидаемого звука: верно · ошибка · не уверен.</p></div>
+<div class="arr xarrow"></div>
+<div class="step"><p class="sn">5</p><h3 class="sh">Объяснение</h3><p class="t">По-русски; «не уверен» превращается в «скажите ещё раз».</p></div>
+</div>
+<div class="row anim" style="--i:2; gap:24px">
+<div class="card teal"><p class="k">Этап I · буквы и слоги</p><p class="t">Проверка по 84 ответам плюс сравнение с записью учителя.</p></div>
+<div class="card teal"><p class="k">Этап II · слова и строки</p><p class="t">Модель звуков; каждый ожидаемый звук сравнивается с типичными заменами, свой порог для каждого типа ошибки.</p></div>
+<div class="card"><p class="k" style="color:var(--body)">В тени</p><p class="t">Другие модели работают после ответа на той же записи. Ученик их не видит; мы их сравниваем.</p></div>
+</div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">27</p></div>
+<aside>Схема сохраняет всё, что уже работает, и добавляет два шага: проверку качества записи до модели и проверку звуков после неё. Именно здесь два вида материала книги получают разные механизмы. Теневые модели позволяют измерить каждого кандидата на настоящих попытках, не меняя того, что видит ученик.</aside>
+</section>
+<section id="r-changes">
+<div class="head anim" style="--i:0"><p class="eyebrow">Куда идём · Изменения в боте</p><h2 class="title">Пять изменений — в порядке, где одно открывает другое</h2></div>
+<div class="col anim" style="--i:1; gap:30px">
+<div class="item"><p class="inum">1</p><div><p class="tb"><b>Экран согласия на публикацию</b></p><p class="t">Telegram требует явного согласия для датасетов. Без него ни одну запись нельзя публиковать.</p></div></div>
+<div class="item"><p class="inum">2</p><div><p class="tb"><b>Ответы «не уверен» и «скажите ещё раз»</b></p><p class="t">Лучшие системы пропускают больше половины ошибок; ложный вердикт вредит новичку больше, чем его отсутствие.</p></div></div>
+<div class="item"><p class="inum">3</p><div><p class="tb"><b>Оценивать только то, чему учит урок; без «слишком долго» на отдельных буквах</b></p><p class="t">Убирает ложную тревогу, замеченную в 411 записях из 840.</p></div></div>
+<div class="item"><p class="inum">4</p><div><p class="tb"><b>Проверка букв для этапа I</b></p><p class="t">88% против 47% на учениках, которых она раньше не слышала.</p></div></div>
+<div class="item"><p class="inum">5</p><div><p class="tb"><b>Вторая модель в тени; похожие пары — учителям в первую очередь</b></p><p class="t">Показывает, где ошибается основная модель; разметка приходит туда, где она нужнее всего.</p></div></div>
+</div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">28</p></div>
+<aside>Все пять — предложения; методику и тексты для ученика решает автор. Порядок важен: сначала согласие, без него нет данных; затем изменения, защищающие новичка от ложных тревог; затем новая проверка и сравнение в тени.</aside>
+</section>
+<section id="r-dataset" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Куда идём · Датасет</p><h2 class="title">Одна попытка — одна запись, три слоя</h2></div>
+<div class="row anim" style="--i:1; gap:24px">
+<div class="card"><p class="k">Что надо прочитать</p><p class="sample"><span class="ar">بَ</span> → b · a</p><p class="t">Из книги, проверено человеком.</p></div>
+<div class="card"><p class="k">Что услышала система</p><p class="sample">b · aa</p><p class="t">Ответ модели и её уверенность для каждого звука.</p></div>
+<div class="card teal"><p class="k">Что прочитано на деле</p><p class="sample">b · a ✓</p><p class="t">Разметка учителей. «Проверено» — только когда двое согласны.</p></div>
+</div>
+<div class="row anim" style="--i:2; gap:24px">
+<div class="card"><p class="h" style="font-size:28px">Звук</p><p class="t">Исходное голосовое из Telegram без обработки; при загрузке — 16 кГц.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Таблица</p><p class="t">metadata.jsonl — строка на попытку, плюс дикторы и задания.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Публикация</p><p class="t">Hugging Face, папка с аудио, доступ после принятия условий.</p></div>
+<div class="card"><p class="h" style="font-size:28px">Деление</p><p class="t">По ученикам, не по записям. Тестовые ученики выбраны заранее.</p></div>
+</div>
+<p class="tb anim" style="--i:3">Новое для области: одни и те же новички по шагам учебника, разметка учителей по звукам и ответ самой системы рядом с каждой записью.</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">29</p></div>
+<aside>Формат близок к бенчмарку IQRA, чтобы результаты можно было сравнивать. Три слоя никогда не перезаписывают друг друга: ожидаемое, услышанное моделью, проверенное учителями. Деление по ученикам не даёт проверять модель на голосах, которые она уже слышала. Не публикуются: имя, Telegram ID, точные даты, ответ анкеты о намазе.</aside>
+</section>
+<section id="r-consent">
+<div class="head anim" style="--i:0"><p class="eyebrow">Куда идём · Открытые данные</p><h2 class="title">Ученик должен знать, что записи опубликуют</h2></div>
+<div class="row anim" style="--i:1; gap:64px; align-items:flex-start">
+<div class="col" style="flex:1; gap:28px">
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5M12 18v.5"/></svg><p class="tb">Правила Telegram для ботов запрещают собирать данные для датасетов и моделей — если пользователь не дал <b>явного, активного и отзываемого</b> согласия.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p class="tb">Нынешний экран обещает «слушают только исследователи». Записи, сделанные по нему, публиковать нельзя.</p></div>
+<div class="why"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.5 4 6"/></svg><p class="tb">Три состояния: нет ответа · практика без записи · публикация. Младше 18 — никогда не публикуется.</p></div>
+</div>
+<div class="phone">
+<p class="ph">Ваши записи станут частью открытого датасета</p>
+<p class="t">• Публикуются в интернете; их смогут слушать исследователи из любой страны<br>• Не публикуются: имя, аккаунт Telegram, телефон<br>• Голос могут узнать знакомые<br>• Передумать можно в любой момент: /privacy</p>
+<p class="btn">Продолжить — согласен на публикацию</p>
+<p class="btn2">Заниматься без записи</p>
+</div>
+</div>
+<p class="t anim" style="--i:2">Это черновик. Окончательный текст утверждают автор и этический комитет университета.</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">30</p></div>
+<aside>Это требование и юридическое, и техническое. Условия Telegram для разработчиков разрешают данные для машинного обучения только с индивидуальным, явным, активным и отзываемым согласием. Слово «публикация» стоит в заголовке и на кнопке, а вторая кнопка позволяет заниматься без записи, поэтому согласие добровольное. Отзыв удаляет записи из нашего хранилища и из следующих версий; уже скачанные копии вернуть нельзя, и экран говорит об этом.</aside>
+</section>
+<section id="r-roadmap" class="alt">
+<div class="head anim" style="--i:0"><p class="eyebrow">Куда идём · План</p><h2 class="title">От согласия к модели, выбранной по данным</h2></div>
+<div class="tl anim" style="--i:1">
+<div class="ts"><p class="sn">1</p><p class="sh">Экран согласия</p><p class="t">в боте, с вариантом без записи</p></div>
+<div class="ts"><p class="sn">2</p><p class="sh">Пилот</p><p class="t">20–40 взрослых новичков записывают уроки</p></div>
+<div class="ts"><p class="sn">3</p><p class="sh">Разметка</p><p class="t">два учителя на запись; тестовая часть — вслепую</p></div>
+<div class="ts"><p class="sn">4</p><p class="sh">Сравнение</p><p class="t">все кандидаты на наших учениках</p></div>
+<div class="ts gold"><p class="sn" style="color:var(--gold)">5</p><p class="sh">Результаты</p><p class="t">переобученная проверка, глава диссертации, открытый датасет</p></div>
+</div>
+<div class="col anim" style="--i:2; gap:16px">
+<p class="k">Что нужно</p>
+<div class="row" style="gap:24px">
+<div class="card"><p class="h" style="font-size:28px">Ученики</p><p class="t">20–40 взрослых, начинающих с нуля</p></div>
+<div class="card"><p class="h" style="font-size:28px">Учителя</p><p class="t">минимум двое на каждую запись</p></div>
+<div class="card"><p class="h" style="font-size:28px">Одобрение</p><p class="t">этический комитет; страна хранения данных</p></div>
+<div class="card"><p class="h" style="font-size:28px">Сервер</p><p class="t">основная модель уже работает; теневые добавляют мало</p></div>
+</div>
+</div>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">31</p></div>
+<aside>Пока нет записей наших учеников с разметкой учителей, модель нельзя выбрать на основании данных. Поэтому порядок: согласие, пилот, разметка, сравнение. Сравнение — одной цифрой, которая наказывает и за пропущенные ошибки, и за ложные тревоги: на сбалансированном наборе система, которая ничего не отмечает, получает 50 процентов.</aside>
+</section>
+<section id="r-close" class="dark">
+<div class="head anim" style="--i:0"><p class="eyebrow">Итог</p><h2 class="title">Что можно утверждать сейчас — и чего пока нельзя</h2></div>
+<div class="row anim" style="--i:1; gap:80px">
+<div class="col" style="flex:1; gap:20px">
+<p class="kg" style="color:var(--golddark)">Можно сейчас</p>
+<div class="list2">
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">Подход совпадает с самым обоснованным семейством методов</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">Ни одна опубликованная система не обслуживает таких учеников и такой материал</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">Мы знаем, где каждая доступная модель ошибается на буквах</p></div>
+<div class="li"><svg class="xi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><p class="dt">Проверка ожидаемой буквы обошла свободную запись на 41 пункт</p></div>
+</div>
+</div>
+<div class="col" style="flex:1; gap:20px">
+<p class="kg" style="color:var(--golddark)">Пока нельзя</p>
+<div class="list2">
+<div class="li"><p class="x">–</p><p class="dt">Что бот точен на новичках</p></div>
+<div class="li"><p class="x">–</p><p class="dt">Что выбранная модель — лучшая</p></div>
+<div class="li"><p class="x">–</p><p class="dt">Что датасет уже существует</p></div>
+<div class="li"><p class="x">–</p><p class="dt">Что 88% сохранятся на русскоязычных взрослых</p></div>
+</div>
+</div>
+</div>
+<p class="pill anim" style="--i:2">Решающий шаг: наши записи с разметкой учителей</p>
+<div class="foot"><p>Muallim · исследование проверки чтения</p><p class="num2">32</p></div>
+<aside>Честное завершение. Исследование показывает, что направление верное и где слабые места, но утверждения о точности ждут наших размеченных данных. Попросить решения: модель согласия и текст, лицензия датасета, этический комитет, страна хранения, можно ли писать авторам RetaSy, Horouf и Quran Lab.</aside>
+</section>
+
+</div>
+<div id="hint">← → листать · ⌘P → PDF</div>
+<script>
+const s=[...document.querySelectorAll('#stage > section')];let i=0;
+const st=document.getElementById('stage');
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform=`translate(-50%,-50%) scale(${k})`;}
+function show(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach((x,j)=>x.classList.toggle('on',j===i));location.hash=i+1;}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))show(i+1);if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);if(e.key==='Home')show(0);if(e.key==='End')show(s.length-1);});
+addEventListener('click',e=>show(e.clientX>innerWidth/2?i+1:i-1));
+fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>

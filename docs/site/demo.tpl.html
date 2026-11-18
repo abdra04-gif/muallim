@@ -1,0 +1,442 @@
+<title>Muallim Reading Trainer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap">
+<style>
+/* Layout: hero with a live Telegram simulator → journey → lesson steps → how reading is checked →
+   home/map/progress → milestone & Stage II → principles → message types → decisions → next steps */
+:root{
+  --bg:#FFF8EA; --paper:#FFFDF7; --panel:#FFFFFF; --fg:#17231B; --muted:#5F665D; --line:#E9DCC4;
+  --g:#176B3A; --gd:#124B2D; --gs:#E5F0D8; --au:#B07D1E; --sec:#F6EFDF; --chat:#E8EDDC; --out:#DCF0C6;
+  --body:'Manrope',system-ui,sans-serif; --ar:'Amiri','Geeza Pro','Noto Naskh Arabic',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141812; --paper:#191E17; --panel:#22281F; --fg:#EEF0E8; --muted:#A9B0A1; --line:#3A4234;
+  --g:#6FBF86; --gd:#A6D9B2; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --chat:#1A2017; --out:#2E4A2A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141812; --paper:#191E17; --panel:#22281F; --fg:#EEF0E8; --muted:#A9B0A1; --line:#3A4234;
+  --g:#6FBF86; --gd:#A6D9B2; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --chat:#1A2017; --out:#2E4A2A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);padding-block:0 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1160px;margin:0 auto}
+.ar{font-family:var(--ar);direction:rtl;unicode-bidi:isolate}
+h1{font-size:clamp(32px,5vw,54px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;color:var(--gd);text-wrap:balance}
+h2{font-size:clamp(24px,3.2vw,34px);line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;color:var(--gd);text-wrap:balance}
+h3{font-size:18px;margin:0 0 6px}
+p{max-width:68ch;margin:0 0 12px}.lead{font-size:18px;color:var(--muted)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--au);margin-bottom:10px}
+section{padding-block:64px 8px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.star{display:inline-block;width:22px;height:22px;vertical-align:-4px;margin-right:6px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:48px;align-items:start;padding-block:48px 24px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.badges span{padding:6px 12px;border-radius:99px;background:var(--gs);color:var(--gd);font-size:13px;font-weight:700}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-top:18px;font-size:14.5px}
+.howto ol{margin:6px 0 0;padding-left:20px}.howto li{margin:3px 0}
+.sim{position:sticky;top:16px}
+.lang{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
+.lang button,.ctl button{font:600 13px var(--body);padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.lang .on{background:var(--g);border-color:var(--g);color:#fff}
+.ctl{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+button:focus-visible{outline:2px solid var(--au);outline-offset:2px}
+
+/* phone */
+.phone{background:var(--chat);border:9px solid #1E241C;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 24px 50px -24px rgba(30,40,25,.45)}
+.top{background:var(--panel);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.ava{width:36px;height:36px;border-radius:18px;background:var(--g);color:#fff;display:grid;place-items:center;font:700 18px var(--ar)}
+.nm{font-weight:800;font-size:14.5px;line-height:1.2}.sb{font-size:12px;color:var(--muted)}
+.chat{padding:12px 10px;display:flex;flex-direction:column;gap:7px;min-width:0;overflow-y:auto;
+  background-image:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0);background-size:18px 18px}
+.sim .chat{height:560px;scroll-behavior:smooth}
+.chat>*{flex-shrink:0}
+.msg{background:var(--panel);border-radius:16px;overflow:hidden;width:92%;align-self:flex-start;animation:msg .3s ease-out}
+@keyframes msg{from{transform:translateY(10px)}}
+.msg.me{background:var(--out);align-self:flex-end;width:auto}
+.txt{padding:8px 12px;font-size:13.5px;line-height:1.45;overflow-wrap:anywhere}.dim{color:var(--muted)}
+.vid{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#2C3A2E,#1C251E);display:grid;place-items:center;color:#fff}
+.vid .pl{width:46px;height:46px;border-radius:23px;background:rgba(255,255,255,.92);color:#1C251E;display:grid;place-items:center;padding-left:3px}
+.vid .du{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);padding:0 8px;border-radius:99px;font-size:12px}
+.vid .lt{position:absolute;top:10px;left:0;right:0;text-align:center;font:700 30px var(--ar)}
+.vid .su{position:absolute;bottom:32px;left:8px;right:8px;text-align:center;font-size:11px}
+.vid .su span{background:rgba(0,0,0,.55);padding:1px 7px;border-radius:4px}
+.voice{display:flex;align-items:center;gap:9px;padding:8px 12px}
+.voice .p{width:32px;height:32px;border-radius:16px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.voice .w{display:flex;gap:2px;align-items:center;height:22px}.voice .w i{display:block;width:3px;border-radius:2px;background:var(--g)}
+.voice small{color:var(--muted);font-size:12px}
+.typing{font-size:12px;color:var(--muted);padding:4px 10px}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
+.bar .in{flex:1;padding:8px 12px;border-radius:99px;background:var(--sec);color:var(--muted);font-size:13px}
+.mic{width:38px;height:38px;border-radius:19px;border:0;background:var(--sec);font-size:17px;cursor:pointer;flex:none}
+.mic.live{background:var(--g);animation:ring 1.6s infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(23,107,58,.55)}80%{box-shadow:0 0 0 12px rgba(23,107,58,0)}}
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px;min-height:2.6em}
+.wb{--tg-theme-bg-color:var(--panel);--tg-theme-text-color:var(--fg);--tg-theme-hint-color:var(--muted);
+  --tg-theme-button-color:var(--g);--tg-theme-button-text-color:#fff;--tg-theme-secondary-bg-color:var(--sec);
+  --tg-theme-section-separator-color:var(--line)}
+
+/* journey */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px;counter-reset:s}
+.flow div{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.flow div::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:14px;
+  background:var(--g);color:#fff;font-weight:800;font-size:13px;margin-bottom:8px}
+.flow b{display:block;font-size:15px}.flow span{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+.flow .gold{border-color:var(--au);background:var(--sec)}.flow .gold::before{background:var(--au)}
+
+/* galleries */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px;margin-top:24px}
+.gal figure{margin:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.gal .phone{border-width:7px;border-radius:32px}
+.gal .chat{min-height:470px;justify-content:flex-end}
+.gal figcaption b{display:block;font-size:16px}
+.gal dl{margin:6px 0 0;font-size:13.5px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+.gal dt{font-weight:700;color:var(--g)}.gal dd{margin:0;color:var(--muted)}
+
+/* checking */
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;margin-top:22px}
+.pipe div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;position:relative}
+.pipe div b{display:block;font-size:14.5px;margin-bottom:3px}.pipe div span{font-size:13px;color:var(--muted)}
+.pipe div i{font-style:normal;font-size:22px;display:block;margin-bottom:4px}
+.check{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:36px;margin-top:28px;align-items:start}
+.errs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:12px 0}
+.errs div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px}
+.errs b{color:var(--gd)}
+.note{background:var(--sec);border-left:3px solid var(--au);padding:11px 15px;border-radius:0 12px 12px 0;max-width:72ch;font-size:14.5px;margin:14px 0}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px}
+.cards div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.cards b{display:block;font-size:16px;margin-bottom:4px;color:var(--gd)}.cards span{font-size:14px;color:var(--muted)}
+.tw{overflow-x:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--sec)}
+.q{display:grid;gap:12px;margin-top:18px}
+.q div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 18px}
+.q b{display:block;font-size:16px;color:var(--gd);margin-bottom:4px}
+.q ul{margin:6px 0 0;padding-left:20px;font-size:14.5px}.q em{font-style:normal;font-weight:700;color:var(--g)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:18px}
+.steps div{border-top:3px solid var(--g);background:var(--panel);border-radius:0 0 14px 14px;padding:13px 15px;font-size:14.5px}
+.steps b{display:block;color:var(--gd)}
+.art{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:20px}
+.art .phone{border-width:7px;border-radius:32px}
+.art .chat{min-height:0}
+.diagram{background:var(--sec);display:grid;place-items:center;aspect-ratio:4/3}
+.diagram svg{width:78%;height:auto}
+.diagram .face{fill:none;stroke:var(--muted);stroke-width:2.2}.diagram .pt{fill:var(--au)}.diagram text{fill:var(--muted);font:600 11px var(--body)}
+.link{display:block;margin:0 10px 10px;padding:9px;border-radius:12px;background:var(--gs);color:var(--gd);font-weight:700;font-size:13px;text-align:center;text-decoration:none}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}
+@media(max-width:900px){.hero,.check{grid-template-columns:1fr}.sim{position:static;max-width:400px;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){.msg,.mic.live{animation:none}.sim .chat{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+<section class="hero">
+  <div>
+    <div class="eyebrow">Proposal for approval · first version</div>
+    <h1>Muallim: learning to read Arabic from zero, inside Telegram</h1>
+    <p class="lead">A reading trainer for Russian-speaking adults, built on <i>al-Muallim ath-Thani</i>. Every lesson follows one simple path: watch a short teacher video, hear the lesson words from a real teacher, read them aloud in a voice message, and get friendly feedback.</p>
+    <div class="badges"><span>Stage I: letters &amp; vowel marks</span><span>Arabic script and sound only</span><span>Real teachers, real voices</span><span>Strict book order</span></div>
+    <div class="howto"><b>Try the live demo on the right.</b> It behaves like the real bot:
+      <ol><li>Tap <b>Continue</b> in the first message.</li>
+      <li>Watch the video, then tap words to hear the teacher.</li>
+      <li>When the microphone below glows, tap it to “send” a voice message.</li>
+      <li>See the feedback, continue, open the letter map, or jump to the milestone.</li></ol>
+    </div>
+    <p class="dim" style="margin-top:14px;font-size:14px">The Arabic letters and syllables in this demo are placeholders to show the layout. The real lesson content follows the book and will be confirmed by the teaching team.</p>
+  </div>
+  <div class="sim">
+    <div class="lang" id="lang"><button data-l="en" class="on">English</button><button data-l="ru">Русский (learner view)</button></div>
+    <div class="phone">
+      <div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb" id="status">bot</div></div></div>
+      <div class="chat" id="chat"></div>
+      <div class="bar"><div class="in" id="ph">Message</div><button class="mic" id="mic" aria-label="Send a voice message">🎤</button></div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="ctl"><button id="restart">↺ Restart</button><button id="jumpMap">🗺 Letter map</button><button id="jumpMs">🏆 Milestone</button></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">The learner journey</div>
+  <h2>One path, one action at a time</h2>
+  <p>The learner never has to search for what to do next. Each message has a single main action, and progress is always visible.</p>
+  <div class="flow">
+    <div><b>Home</b><span>Stage, overall progress, streak, one “Continue” button</span></div>
+    <div><b>Video</b><span>A real teacher explains 1–3 letters, in Arabic with subtitles, up to 5 minutes</span></div>
+    <div><b>Words</b><span>The lesson words in Arabic script; tap a word to hear the teacher</span></div>
+    <div><b>Read aloud</b><span>The learner records a normal Telegram voice message</span></div>
+    <div><b>Feedback</b><span>Words marked ✓ or !, 1–3 friendly tips, try again or move on</span></div>
+    <div class="gold"><b>Milestone</b><span>All letters with vowel marks read: celebration and Stage II</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Inside a lesson</div>
+  <h2>Four steps in one message</h2>
+  <p>A lesson is a single interactive message that moves through four steps as the learner works. The video and the recordings arrive as ordinary Telegram messages around it, so they play with Telegram's own player.</p>
+  <div class="gal">
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      __VIDEO__<div class="msg"><div class="wb" data-w="lesson" data-state='{"lg":"en","l":1,"s":1,"k":2,"a":"ا ب ت","w":["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"]}'></div></div></div></div>
+      <figcaption><b>Step 1 · Video</b><dl><dt>Receives</dt><dd>A teacher video (≤ 5 min) on the lesson's letters</dd><dt>Does</dt><dd>Watches, then taps “I watched the video”</dd></dl></figcaption></figure>
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="lesson" data-state='{"lg":"en","l":1,"s":2,"k":2,"a":"ا ب ت","w":["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"]}'></div></div>__VOICE_T__</div></div>
+      <figcaption><b>Step 2 · Words</b><dl><dt>Receives</dt><dd>The lesson words and the teacher's recording of each word</dd><dt>Does</dt><dd>Listens as many times as needed</dd></dl></figcaption></figure>
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="lesson" data-state='{"lg":"en","l":1,"s":3,"k":2,"a":"ا ب ت","w":["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"]}'></div></div>__VOICE_ME__</div></div>
+      <figcaption><b>Step 3 · Read aloud</b><dl><dt>Receives</dt><dd>A short instruction and a reminder how to record</dd><dt>Sends</dt><dd>One voice message, recorded with Telegram's microphone</dd></dl></figcaption></figure>
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="lesson" data-state='{"lg":"en","l":1,"s":4,"k":3,"dn":1,"a":"ا ب ت","w":["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"],"r":[1,1,1,1,0,1,1,1,0]}'></div>
+      <div class="txt">Attempt accepted! 7 of 9 correct. Listen again to <span class="ar">بِ</span> and <span class="ar">تُ</span>.</div></div></div></div>
+      <figcaption><b>Step 4 · Feedback</b><dl><dt>Receives</dt><dd>Each word marked ✓ or !, with 1–3 tips</dd><dt>Does</dt><dd>Tries again or goes to the next lesson</dd></dl></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">How reading is checked</div>
+  <h2>From a voice message to friendly feedback</h2>
+  <p>The check runs on our server. It compares what the learner actually pronounced with what the lesson words require, sound by sound.</p>
+  <div class="pipe">
+    <div><i>🎤</i><b>Voice message</b><span>Recorded with Telegram's standard microphone</span></div>
+    <div><i>🎚</i><b>Audio preparation</b><span>Converted to a clean mono recording for the model</span></div>
+    <div><i>🧠</i><b>Phoneme recognition</b><span>The Quran Muaalem model hears which sounds were read</span></div>
+    <div><i>⚖️</i><b>Comparison</b><span>Matched against the expected sounds of each lesson word</span></div>
+    <div><i>💬</i><b>Feedback</b><span>Words marked ✓ or !, at most 1–3 tips in plain language</span></div>
+    <div><i>🗂</i><b>Research record</b><span>The attempt is stored under a pseudonym for the study</span></div>
+  </div>
+  <div class="check">
+    <div>
+      <h3>What the check can notice</h3>
+      <div class="errs">
+        <div><b>Wrong letter</b>: one consonant read as another</div>
+        <div><b>Wrong vowel mark</b>: fatha, kasra or damma mixed up</div>
+        <div><b>Missing vowel</b>: a short vowel left out</div>
+        <div><b>Too short</b>: a long vowel not held</div>
+        <div><b>Too long</b>: a short vowel stretched</div>
+        <div><b>Missing shadda</b>: a doubled consonant not doubled</div>
+        <div><b>Missing sound</b>: a sound skipped</div>
+        <div><b>Extra sound</b>: a sound that is not in the word</div>
+      </div>
+      <div class="note">Feedback encourages and never blocks. The learner always sees what went well first, gets only the most important tips, and can move on. Perfecting the articulation points is a long process that a real teacher completes over time.</div>
+    </div>
+    <div class="phone" style="border-width:7px;border-radius:32px"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="lesson" data-state='{"lg":"en","l":1,"s":4,"k":3,"a":"ا ب ت","w":["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"],"r":[1,1,1,1,0,1,1,1,0]}'></div>
+      <div class="txt"><b>!</b> <span class="ar">بِ</span>: the vowel sounded like a fatha. Listen to the teacher and try once more.</div></div></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Home, letter map and progress</div>
+  <h2>Always clear where the learner is</h2>
+  <p>Progress, letters and streak come from the server, so they are the same on every device and survive restarts. The streak encourages; it never scolds.</p>
+  <div class="gal">
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="home" data-state='{"lg":"en","n":3,"t":28,"k":2,"nx":2}'></div></div></div></div>
+      <figcaption><b>Home</b><dl><dt>Shows</dt><dd>Stage I, letters read, streak</dd><dt>Main action</dt><dd>Continue with the next lesson</dd></dl></figcaption></figure>
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="path" data-state='{"lg":"en","tab":1,"L":"ابتثجحخدذرزسشصضطظعغفقكلمنهوي","m":"DDDDDDDDDDDCNNNNNNNNNNNNNNNN","n":11,"t":28,"u":4,"U":10,"k":6}'></div></div></div></div>
+      <figcaption><b>Letter map</b><dl><dt>Shows</dt><dd>Letters read, the current one, the ones ahead</dd><dt>Does</dt><dd>Taps a read letter to repeat its lesson</dd></dl></figcaption></figure>
+    <figure><div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="path" data-state='{"lg":"en","tab":2,"L":"ابتثجحخدذرزسشصضطظعغفقكلمنهوي","m":"DDDDDDDDDDDCNNNNNNNNNNNNNNNN","n":11,"t":28,"u":4,"U":10,"k":6}'></div></div></div></div>
+      <figcaption><b>Progress</b><dl><dt>Shows</dt><dd>Only real numbers: letters, lessons, streak</dd><dt>No</dt><dd>Invented badges or points</dd></dl></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">The big milestone</div>
+  <h2>“I covered all the letters and learnt to read”</h2>
+  <div class="check">
+    <div>
+      <p>Reading every letter with its vowel marks is one big milestone. When the learner reaches it, the bot celebrates and opens Stage II.</p>
+      <h3>Stage II and extra resources</h3>
+      <div class="cards" style="margin-top:10px">
+        <div><b>Articulation guide</b><span>A still diagram and a short text show where each sound is produced.</span></div>
+        <div><b>Real people pronouncing</b><span>Short videos of teachers saying the sound, for those who want to dig deeper.</span></div>
+        <div><b>An online teacher</b><span>For the most diligent learners: a way to continue with a live teacher.</span></div>
+      </div>
+    </div>
+    <div class="phone" style="border-width:7px;border-radius:32px"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat">
+      <div class="msg"><div class="wb" data-w="milestone" data-state='{"lg":"en","t":28,"u":28,"k":21,"s2":1}'></div></div></div></div>
+  </div>
+  <div class="art">
+    <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot · extra resource</div></div></div><div class="chat">
+      <div class="msg"><div class="diagram"><svg viewBox="0 0 250 160" role="img" aria-label="Where the sound is produced (placeholder)"><path class="face" d="M30 120 C30 45 120 12 190 42 C226 58 232 96 216 118 L182 124 L150 140 L60 145 Z"/><path class="face" d="M95 112 C120 92 160 88 196 98"/><circle class="pt" cx="200" cy="99" r="7"/><text x="140" y="80">tongue tip</text></svg></div>
+      <div class="txt"><b>Where <span class="ar">و</span> comes from</b><br><span class="dim">A still diagram and a short explanation (illustration to be provided by the teaching team).</span></div>
+      <a class="link" href="https://youtube.com/shorts/A2UDb0hFeMM" target="_blank" rel="noopener">▶ Watch a teacher pronounce <span class="ar">و</span></a></div></div></div>
+    <div class="cards" style="margin-top:0;grid-template-columns:1fr">
+      <div><b>Optional, never required</b><span>Extra resources sit behind a “Learn more” button. The main path stays as light as possible.</span></div>
+      <div><b>Real people only</b><span>Articulation is learnt by imitating real people. Example: the short explanations by Dr. Ayman Swaid linked from the letter <span class="ar">و</span>.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Principles</div>
+  <h2>What the design commits to</h2>
+  <div class="cards">
+    <div><b>Arabic script and sound only</b><span>No transliteration in Cyrillic letters. A sound is taught by hearing it, not by spelling it.</span></div>
+    <div><b>Real teachers, real voices</b><span>All videos and recordings are made by people. No synthetic voices or generated images.</span></div>
+    <div><b>Strict book order</b><span>Lessons follow al-Muallim ath-Thani. Lesson words use only the letters already taught.</span></div>
+    <div><b>A light path</b><span>The minimum is to read every lesson's words once. Feedback is given, perfection is not demanded.</span></div>
+    <div><b>Short lessons</b><span>One to three letters per lesson, a video of at most five minutes.</span></div>
+    <div><b>Encouragement</b><span>Progress inside the lesson and overall, congratulations, and a streak that motivates without punishing.</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Built on Telegram's interactive messages</div>
+  <h2>What is interactive and what is a regular message</h2>
+  <p>Since November 2026 a Telegram message can contain a small interactive app. Muallim uses it for navigation and progress, and keeps media as regular messages.</p>
+  <div class="tw"><table>
+    <tr><th>Interactive messages</th><th>Regular Telegram messages</th></tr>
+    <tr><td>Home screen, the lesson with its four steps, letter map and progress, the milestone celebration</td><td>Teacher videos, teacher recordings, the learner's voice message, written feedback</td></tr>
+    <tr><td>Update in place: no flood of new messages as the learner advances</td><td>Play in Telegram's own players, work offline once downloaded</td></tr>
+    <tr><td>Follow the learner's Telegram theme, light or dark</td><td>Older Telegram apps show a plain-text version of every interactive message</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">For your approval</div>
+  <h2>Decisions we need from you</h2>
+  <div class="q">
+    <div><b>1. What exactly are the “28 items”?</b><ul><li>28 letters of the alphabet</li><li>28 items of the curriculum</li><li>28 letters, each with its vowel marks as one item</li></ul></div>
+    <div><b>2. Which letters do lessons 1–3 cover?</b><ul><li>In the order of the book (our proposal), 1–3 letters per lesson</li><li>A different grouping you prefer</li></ul></div>
+    <div><b>3. When is a lesson complete?</b><ul><li><em>Proposed:</em> after one voice attempt covering all the lesson words; feedback is shown but not required to be perfect</li><li>Only after a minimum score</li></ul></div>
+    <div><b>4. Four steps per lesson?</b><ul><li><em>Proposed:</em> Video → Words → Read aloud → Feedback, with progress and congratulations shown in the feedback step</li><li>Five steps, with a separate summary screen</li></ul></div>
+    <div><b>5. Videos and recordings</b><ul><li>Who records the lesson videos (≤ 5 min) and the word recordings?</li><li>One recording per word, or one recording of all lesson words?</li></ul></div>
+    <div><b>6. Stage II</b><ul><li>Which items of your table go into Stage II, and in what order?</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Next steps</div>
+  <h2>From approval to the first learners</h2>
+  <div class="steps">
+    <div><b>1. Lock the details</b>Your answers above, the lesson content for lessons 1–3, the video and recording plan.</div>
+    <div><b>2. One complete lesson</b>Lesson 1 working end to end: video, words, voice, check, feedback, progress.</div>
+    <div><b>3. Lessons 2–3, map and progress</b>The same flow for the first three lessons, letter map, streak.</div>
+    <div><b>4. Device testing</b>iPhone, Android, desktop; light and dark themes; older Telegram versions.</div>
+    <div><b>5. Pilot</b>A small group of learners, with consent, to collect feedback and research data.</div>
+  </div>
+  <footer>Muallim · reading trainer for <i>al-Muallim ath-Thani</i>. The interactive messages on this page run the same code the bot will send; Arabic content shown here is a placeholder until confirmed.</footer>
+</section>
+</div>
+
+<script>
+var WIDGETS = __WIDGETS__;
+var WORDS = ["أَ","بَ","تَ","إِ","بِ","تِ","أُ","بُ","تُ"];
+var LETTERS = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي";
+var TX = {
+  en: {ph: "Message", status: "bot", typing: "Muallim is typing…", video: "Lesson 1 · <span class=\"ar\">ا ب ت</span> · teacher video", subs: "subtitles", teacher: "teacher's recording", all: "all lesson words",
+    fb: "Attempt accepted! 7 of 9 correct. Listen again to <span class=\"ar\">بِ</span> and <span class=\"ar\">تُ</span>: tap them above.",
+    next: "Well done! Lesson 1 is complete. Next: lesson 2.", open: "Opening the lesson…", st2: "Stage II is open: the articulation guide, videos of real teachers, and an option to work with an online teacher.",
+    hStart: "Tap “Continue” in the message.", hWords: "Tap words to hear the teacher, then “I'm ready to read”.", hMic: "Tap the glowing 🎤 to send your reading.", hCheck: "The bot is checking the reading…", hFb: "Tap a word marked ! to hear it, or go to the next lesson.", hDone: "Try the letter map, progress or the milestone below.", hVideo: "Watch the video, then tap “I watched the video”."},
+  ru: {ph: "Сообщение", status: "бот", typing: "Муаллим печатает…", video: "Урок 1 · <span class=\"ar\">ا ب ت</span> · видео учителя", subs: "русские субтитры", teacher: "запись учителя", all: "все слова урока",
+    fb: "Попытка принята! 7 из 9 верно. Послушайте ещё раз <span class=\"ar\">بِ</span> и <span class=\"ar\">تُ</span>: нажмите на них выше.",
+    next: "Отлично! Урок 1 пройден. Дальше: урок 2.", open: "Открываю урок…", st2: "Этап II открыт: артикуляция, видео с живыми учителями и возможность заниматься с онлайн-учителем.",
+    hStart: "Tap “Continue” in the message.", hWords: "Tap words to hear the teacher, then “I'm ready to read”.", hMic: "Tap the glowing 🎤 to send your reading.", hCheck: "The bot is checking the reading…", hFb: "Tap a word marked ! to hear it, or go to the next lesson.", hDone: "Try the letter map, progress or the milestone below.", hVideo: "Watch the video, then tap “I watched the video”."}
+};
+var BARS = [8,16,20,11,18,9,16,13,20,10,15,7].map(function (h) { return '<i style="height:' + h + 'px"></i>'; }).join("");
+
+/* --- mounting an interactive message: the real widget code with a stand-in for Telegram --- */
+function mount(host, state, onRequest) {
+  var root = host.attachShadow({mode: "open"});
+  var tpl = document.createElement("template");
+  tpl.innerHTML = WIDGETS[host.dataset.w];
+  var scripts = Array.prototype.slice.call(tpl.content.querySelectorAll("script"));
+  var code = scripts.map(function (s) { return s.textContent; }).join("\n");
+  scripts.forEach(function (s) { s.remove(); });
+  root.appendChild(tpl.content);
+  var handlers = [];
+  var T = {
+    chatData: JSON.stringify(state), isPreview: false,
+    onEvent: function (n, f) { if (n === "chatDataChanged") { handlers.push(f); } },
+    request: function (d) { return new Promise(function (ok) { setTimeout(function () { if (onRequest) { onRequest(d); } ok({result: null}); }, 250); }); },
+    HapticFeedback: {impactOccurred: function () {}, selectionChanged: function () {}, notificationOccurred: function () {}}
+  };
+  var doc = {getElementById: function (id) { return root.getElementById(id); }, createElement: function (t) { return document.createElement(t); }, createTextNode: function (t) { return document.createTextNode(t); }};
+  try { new Function("window", "document", "matchMedia", code)({TelegramWidget: T}, doc, window.matchMedia.bind(window)); }
+  catch (e) { host.textContent = "Widget error: " + e.message; }
+  return function (patch) {
+    Object.assign(state, patch);
+    T.chatData = JSON.stringify(state);
+    handlers.forEach(function (f) { f(); });
+  };
+}
+
+/* static examples on the page */
+document.querySelectorAll("section .wb").forEach(function (host) { mount(host, JSON.parse(host.dataset.state), null); });
+
+/* --- the live simulator --- */
+var chat = document.getElementById("chat"), mic = document.getElementById("mic"), hint = document.getElementById("hint");
+var lang = "en", lesson = null, lessonMsg = null, waitingVoice = false, timers = [];
+function t() { return TX[lang]; }
+function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+function scroll() { chat.scrollTop = chat.scrollHeight; }
+function bubble(html, me) { var m = document.createElement("div"); m.className = "msg" + (me ? " me" : ""); m.innerHTML = html; chat.appendChild(m); scroll(); return m; }
+function botText(html) { bubble('<div class="txt">' + html + "</div>"); }
+function teacherVoice(word) {
+  bubble('<div class="voice"><div class="p">▶</div><div class="w">' + BARS + "</div><small>0:0" + (word ? 2 : 9) + " · " + t().teacher + (word ? ' <span class="ar">' + word + "</span>" : " · " + t().all) + "</small></div>");
+}
+function widget(name, state, caption) {
+  var m = bubble('<div class="wb" data-w="' + name + '"></div>' + (caption ? '<div class="txt">' + caption + "</div>" : ""));
+  var set = mount(m.querySelector(".wb"), state, function (d) { handle(d, set, m); });
+  later(scroll, 80); later(scroll, 500);
+  return {set: set, msg: m};
+}
+function say(h) { hint.textContent = h; }
+function setMic(on) { waitingVoice = on; mic.classList.toggle("live", on); }
+
+function startLesson() {
+  bubble('<div class="vid"><div class="lt">ا ب ت</div><div class="su"><span>' + t().subs + '</span></div><div class="pl">▶</div><div class="du">4:32</div></div><div class="txt">' + t().video + "</div>");
+  later(function () {
+    var w = widget("lesson", {lg: lang, l: 1, s: 1, k: 2, a: "ا ب ت", w: WORDS});
+    lesson = w.set; lessonMsg = w.msg; say(t().hVideo);
+  }, 450);
+}
+function handle(d, set, msg) {
+  if (d === "go") { startLesson(); return; }
+  if (d === "seen") { set({s: 2}); say(t().hWords); return; }
+  if (d.indexOf("p:") === 0) { teacherVoice(WORDS[+d.slice(2)]); return; }
+  if (d === "all") { teacherVoice(""); return; }
+  if (d === "ready") { set({s: 3, c: 0, r: null, dn: 0}); setMic(true); say(t().hMic); return; }
+  if (d === "again") { lesson = set; lessonMsg = msg; set({s: 3, c: 0, r: null, dn: 0}); var c = msg.querySelector(".txt"); if (c) { c.remove(); } setMic(true); say(t().hMic); return; }
+  if (d === "next") {
+    botText(t().next);
+    later(function () { widget("home", {lg: lang, n: 3, t: 28, k: 3, nx: 2}); say(t().hDone); }, 400); return;
+  }
+  if (d === "map" || d === "prog") { openPath(d === "map" ? 1 : 2); return; }
+  if (d.indexOf("l:") === 0) { botText(t().open); later(startLesson, 400); return; }
+  if (d === "st2") { botText(t().st2); return; }
+}
+function openPath(tab) {
+  widget("path", {lg: lang, tab: tab, L: LETTERS, m: "DDDC" + "N".repeat(24), n: 3, t: 28, u: 1, U: 10, k: 3});
+}
+mic.addEventListener("click", function () {
+  if (!waitingVoice || !lesson) { return; }
+  setMic(false);
+  bubble('<div class="voice"><div class="p">▶</div><div class="w">' + BARS + "</div><small>0:12</small></div>", true);
+  lesson({c: 1}); say(t().hCheck);
+  later(function () {
+    lesson({c: 2});
+    var w = widget("lesson", {lg: lang, l: 1, s: 4, k: 3, dn: 1, a: "ا ب ت", w: WORDS, r: [1,1,1,1,0,1,1,1,0]}, t().fb);
+    lesson = w.set; lessonMsg = w.msg; say(t().hFb);
+  }, 1800);
+});
+function restart() {
+  timers.forEach(clearTimeout); timers = []; chat.innerHTML = ""; setMic(false); lesson = null;
+  document.getElementById("ph").textContent = t().ph; document.getElementById("status").textContent = t().status;
+  widget("home", {lg: lang, n: 0, t: 28, k: 2, nx: 1}); say(t().hStart);
+}
+document.getElementById("restart").addEventListener("click", restart);
+document.getElementById("jumpMap").addEventListener("click", function () { openPath(1); say(t().hDone); });
+document.getElementById("jumpMs").addEventListener("click", function () { widget("milestone", {lg: lang, t: 28, u: 28, k: 21, s2: 1}); say(""); });
+document.getElementById("lang").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) { return; }
+  lang = b.dataset.l;
+  this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
+  restart();
+});
+restart();
+</script>

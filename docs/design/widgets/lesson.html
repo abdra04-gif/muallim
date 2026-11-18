@@ -1,0 +1,74 @@
+<style>
+.w{padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,serif;color:var(--tg-theme-text-color)}
+button{font:inherit;color:inherit;border:0;background:none;padding:0}
+.hd{display:flex;align-items:center;gap:10px}
+.hd b{flex:1;font-size:15px}.hd small{display:block;font-weight:400;color:var(--tg-theme-hint-color)}
+.rg{width:46px;height:46px}.rg circle{fill:none;stroke-width:5}
+.rg .b{stroke:var(--tg-theme-secondary-bg-color)}
+.rg .f{stroke:var(--tg-theme-button-color);stroke-linecap:round;transition:stroke-dashoffset .7s}
+.fl{display:inline-block;animation:fl 1.6s ease-in-out infinite}
+@keyframes fl{50%{transform:scale(1.18)}}
+.tb{display:flex;gap:4px;margin:10px 0;padding:3px;border-radius:12px;background:var(--tg-theme-secondary-bg-color)}
+.tb button{flex:1;padding:6px 0;border-radius:9px;font-size:13px;color:var(--tg-theme-hint-color)}
+.tb .on{background:var(--tg-theme-bg-color);color:var(--tg-theme-text-color);font-weight:700}
+.vw{min-height:236px}
+.cv{overflow:hidden;touch-action:pan-y}
+.tr{display:flex;transition:transform .3s}
+.cd{flex:0 0 100%;text-align:center}
+.cd .big{font:84px/1.2 system-ui,serif}
+.cd .nm{color:var(--tg-theme-hint-color);font:20px/1.3 system-ui,serif}
+.ch{display:flex;gap:8px;justify-content:center;direction:rtl;margin-top:8px}
+.c{font:30px/1.5 system-ui,serif;min-width:62px;border-radius:12px;border:2px solid var(--tg-theme-section-separator-color);background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-text-color)}
+.c.p{border-color:var(--tg-theme-button-color);transform:scale(1.07)}
+.c.g{border-color:light-dark(#2F7A3E,#7CC58B)}.c.x{border-color:light-dark(#B7791F,#E0A94A)}
+.dt{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.dt i{width:7px;height:7px;border-radius:4px;background:var(--tg-theme-section-separator-color)}
+.dt .on{background:var(--tg-theme-button-color)}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;direction:rtl}
+.mic{margin:12px auto 4px;width:64px;height:64px;border-radius:32px;text-align:center;font-size:28px;line-height:64px;background:var(--tg-theme-button-color);box-shadow:0 0 0 0 var(--tg-theme-button-color);animation:pu 1.8s infinite}
+@keyframes pu{70%{box-shadow:0 0 0 14px transparent}}
+.tx{text-align:center;color:var(--tg-theme-hint-color);font-size:13px;margin-top:8px}
+.go{display:block;width:100%;margin-top:10px;padding:10px;border-radius:12px;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color);font-weight:700}
+</style>
+<div class="w">
+<div class="hd"><svg class="rg" viewBox="0 0 46 46"><circle class="b" cx="23" cy="23" r="19"/><circle class="f" id="rf" cx="23" cy="23" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4" transform="rotate(-90 23 23)"/></svg>
+<b id="t"></b><span><span class="fl">🔥</span> <b id="k"></b></span></div>
+<div class="tb" id="tb"></div>
+<div class="vw" id="v1"><div class="cv" id="cv"><div class="tr" id="tr"></div></div><div class="dt" id="dt"></div></div>
+<div class="vw" id="v2"><div class="mic">🎙</div><div class="tx">Зажми микрофон в чате и прочитай слоги справа налево. Идеала не нужно.</div><div class="gr" id="g2" style="margin-top:10px"></div></div>
+<div class="vw" id="v3"><div class="gr" id="g3"></div><div class="tx" id="sc"></div><button class="go" id="go">Дальше →</button></div>
+</div>
+<script>
+(function(){
+var T=window.TelegramWidget,$=function(i){return document.getElementById(i)},S,V=1,ix=0,x0=null,busy=0;
+var N=["Слушай","Читай","Итог"];
+function say(c,i){if(busy)return;busy=1;c.classList.add("p");
+T.request("p:"+i).then(function(){},function(){}).then(function(){busy=0;c.classList.remove("p")})}
+function chips(p,a,res){a.forEach(function(s,i){var c=document.createElement("button");c.className="c"+(res?res[i]?" g":" x":"");c.textContent=s;
+c.onclick=function(){say(c,i)};p.appendChild(c)})}
+function show(v){V=v;[1,2,3].forEach(function(i){$("v"+i).style.display=i==v?"block":"none"});
+$("tb").innerHTML=N.map(function(n,i){return '<button class="'+(i+1==v?"on":"")+'" data-v="'+(i+1)+'">'+n+"</button>"}).join("");
+$("tb").querySelectorAll("button").forEach(function(b){b.onclick=function(){show(+b.dataset.v)}})}
+function go(n){ix=Math.max(0,Math.min(S.a.length-1,n));$("tr").style.transform="translateX("+ix*-100+"%)";
+$("dt").innerHTML=S.a.map(function(_,i){return '<i class="'+(i==ix?"on":"")+'"></i>'}).join("")}
+function draw(){
+try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{l:1,k:0,p:0,a:[],w:[],r:[]};
+$("t").innerHTML="Урок "+S.l+"<small>"+S.a.map(function(x){return x.a}).join(" ")+"</small>";
+$("k").textContent=S.k;
+$("rf").style.strokeDashoffset=119.4*(1-S.p/4);
+var tr=$("tr");tr.innerHTML="";
+S.a.forEach(function(x){var d=document.createElement("div");d.className="cd";d.innerHTML='<div class="big">'+x.a+'</div><div class="nm">'+x.n+'</div><div class="ch"></div>';
+chips(d.lastChild,x.s);tr.appendChild(d)});
+var cv=$("cv");cv.onpointerdown=function(e){x0=e.clientX};
+cv.onpointerup=function(e){if(x0!==null&&Math.abs(e.clientX-x0)>30)go(ix+(e.clientX<x0?1:-1));x0=null};
+cv.onpointercancel=function(){x0=null};
+go(ix);
+$("g2").innerHTML="";chips($("g2"),S.w);
+$("g3").innerHTML="";chips($("g3"),S.w,S.r.length?S.r:null);
+var ok=S.r.filter(Boolean).length;$("sc").textContent=S.r.length?ok+" из "+S.r.length+" слогов верно · зелёные — хорошо, оранжевые — послушай ещё":"Прочитай слоги — здесь появится разбор";
+$("go").onclick=function(){T.request("next").then(function(){},function(){})};
+show(S.v||1);
+}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

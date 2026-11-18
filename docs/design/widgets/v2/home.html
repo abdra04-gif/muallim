@@ -1,0 +1,43 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);--on:light-dark(#fff,#10261A);padding:16px 14px max(14px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color);text-align:center}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.96)}
+.lg{display:flex;align-items:center;justify-content:center;gap:9px}
+.lg svg{width:34px;height:34px;animation:rt 14s linear infinite}@keyframes rt{to{transform:rotate(360deg)}}
+.lg b{font:700 27px/1.2 system-ui,serif;color:var(--g)}
+.sb{color:var(--tg-theme-hint-color);font-size:13px;margin-top:3px}
+.cd{margin:14px 0 12px;padding:13px;border-radius:16px;background:var(--tg-theme-secondary-bg-color)}
+.cd b{display:block;font-size:17px}.cd span{font-size:13px;color:var(--tg-theme-hint-color)}
+.n{font-weight:700;margin:10px 0 5px;font-size:15px}
+.br{height:9px;border-radius:5px;background:var(--tg-theme-bg-color);overflow:hidden}.br i{display:block;width:0;height:100%;border-radius:5px;background:var(--g);transition:width 1s ease-out}
+.k{display:inline-block;margin-top:10px;padding:4px 12px;border-radius:99px;background:var(--gs);font-size:13px;font-weight:600}
+.k i{font-style:normal;display:inline-block;animation:fl 1.6s ease-in-out infinite}@keyframes fl{50%{transform:scale(1.25)}}
+.go{display:block;width:100%;padding:13px;border-radius:15px;background:var(--g);color:var(--on);font-weight:700;font-size:16px}
+.r{display:flex;gap:8px;margin-top:8px}.r button{flex:1;padding:11px 4px;border-radius:13px;background:var(--tg-theme-secondary-bg-color);font-size:13px;font-weight:600}
+#m{font-size:12px;color:var(--tg-theme-hint-color);min-height:1.2em;margin-top:6px}
+@media (prefers-reduced-motion:reduce){.lg svg,.k i{animation:none}}
+</style>
+<div class="w">
+<div class="lg"><svg viewBox="0 0 30 30"><path fill="var(--au)" d="M15 1l4 6 7-1-1 7 6 4-6 4 1 7-7-1-4 6-4-6-7 1 1-7-6-4 6-4-1-7 7 1z"/><circle cx="15" cy="15" r="6" fill="var(--tg-theme-bg-color)"/></svg><b id="tl"></b></div>
+<div class="sb" id="sb"></div>
+<div class="cd"><b id="st"></b><span id="ss"></span><div class="n" id="n"></div><div class="br"><i id="p"></i></div><div class="k" id="k"></div></div>
+<button class="go" id="go"></button>
+<div class="r"><button id="a"></button><button id="c"></button></div>
+<div id="m"></div>
+</div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},busy=0,I;
+var R={ru:["Муаллим","Чтение по «Аль-Муаллим ас-Сани»","Этап I","Буквы и огласовки","# из #","Серия: # дн.","Начните серию сегодня","▶ Продолжить: урок #","🗺 Карта букв","📊 Прогресс","Открываю…","Не вышло, попробуйте ещё раз"],
+en:["Muallim","Reading with al-Muallim ath-Thani","Stage I","Letters and vowel marks","# of #","Streak: # days","Start your streak today","▶ Continue: lesson #","🗺 Letter map","📊 Progress","Opening…","Something went wrong, please try again"]};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.impactOccurred("light")}catch(e){}$("m").textContent=I[10];
+T.request(d).then(function(){$("m").textContent=""},function(){$("m").textContent=I[11]}).then(function(){busy=0})}
+function draw(){var S;try{S=JSON.parse(T.chatData)}catch(e){}S=S||{};I=R[S.lg]||R.ru;
+$("tl").textContent=I[0];$("sb").textContent=I[1];$("st").textContent=I[2];$("ss").textContent=I[3];
+$("n").textContent=S.t?f(I[4],S.n,S.t):"";setTimeout(function(){$("p").style.width=S.t?Math.round(S.n*100/S.t)+"%":"0"},60);
+$("k").innerHTML=S.k?"<i>🔥</i> ":"";$("k").appendChild(document.createTextNode(S.k?f(I[5],S.k):I[6]));
+$("go").textContent=f(I[7],S.nx||1);$("a").textContent=I[8];$("c").textContent=I[9]}
+$("go").onclick=function(){ask("go")};$("a").onclick=function(){ask("map")};$("c").onclick=function(){ask("prog")};
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

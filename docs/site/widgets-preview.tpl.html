@@ -1,0 +1,191 @@
+<title>Бот на виджетах Telegram</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Раскладка: идея → что меняется → поток урока → живые виджеты в телефонах → протокол → бюджет → риски */
+:root{
+  --bg:#F3EFE3; --panel:#FFFFFF; --fg:#221E1C; --muted:#5E5850; --line:#D9CFB4; --chat:#DCE3CB;
+  --btn:#5B6B4E; --btn-fg:#FFFFFF; --gold:#A9862E; --tint:#EFE6C8; --sec:#F1EEE4; --out:#E3F2C9;
+  --body:'Noto Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1B1A17; --panel:#2A2824; --fg:#F1ECE0; --muted:#B9B2A3; --line:#4A453B; --chat:#222A1E;
+  --btn:#6F8160; --gold:#D4B05A; --tint:#3A3626; --sec:#34312B; --out:#3B5230; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B1A17; --panel:#2A2824; --fg:#F1ECE0; --muted:#B9B2A3; --line:#4A453B; --chat:#222A1E;
+  --btn:#6F8160; --gold:#D4B05A; --tint:#3A3626; --sec:#34312B; --out:#3B5230; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);padding-block:32px 72px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.15;margin:0 0 8px;text-wrap:balance}
+h2{font-size:22px;margin:48px 0 6px;padding-top:20px;border-top:1px solid var(--line);text-wrap:balance}
+p{max-width:72ch}.lead{color:var(--muted);margin:0}
+.note{background:var(--tint);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 8px 8px 0;
+  max-width:78ch;margin:14px 0;font-size:14px}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14px;min-width:560px;width:100%}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--tint)}code{background:var(--tint);padding:1px 5px;border-radius:4px;font-size:.9em}
+.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;margin-top:18px}
+figure{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cap b{display:block}.cap span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.phone{background:var(--chat);border:1px solid var(--line);border-radius:26px;overflow:hidden;
+  display:flex;flex-direction:column}
+.top{background:var(--panel);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.ava{width:34px;height:34px;border-radius:17px;background:var(--gold);color:#fff;display:grid;place-items:center;font-weight:700}
+.nm{font-weight:700;font-size:14px;line-height:1.2}.sb{font-size:12px;color:var(--muted)}
+.chat{padding:12px 10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.msg{background:var(--panel);border-radius:14px;overflow:hidden;width:94%}
+.txt{padding:8px 12px;font-size:14px;overflow-wrap:anywhere}
+.dim{color:var(--muted)}
+.wb{--tg-theme-bg-color:var(--panel);--tg-theme-text-color:var(--fg);--tg-theme-hint-color:var(--muted);
+  --tg-theme-button-color:var(--btn);--tg-theme-button-text-color:var(--btn-fg);
+  --tg-theme-secondary-bg-color:var(--sec);--tg-theme-section-separator-color:var(--line)}
+.kb{display:flex;gap:4px;width:94%}
+.kb i{flex:1;font-style:normal;background:var(--btn);color:var(--btn-fg);border-radius:9px;padding:7px 4px;
+  font-size:13px;font-weight:600;text-align:center}
+.kb i.alt{background:var(--panel);color:var(--fg);border:1px solid var(--line)}
+.sw{display:flex;gap:6px;flex-wrap:wrap}
+.sw button{font:600 12px var(--body);padding:5px 10px;border-radius:99px;border:1px solid var(--line);
+  background:var(--panel);color:var(--fg);cursor:pointer}
+.sw button:focus-visible{outline:2px solid var(--gold)}
+.log{font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:8px 10px;min-height:3.2em;color:var(--muted);overflow-wrap:anywhere}
+.ok{color:#2F7A3E}.no{color:#B3402E}
+</style>
+<div class="wrap">
+<h1>Бот на новом обновлении Telegram</h1>
+<p class="lead">Первая версия как приложение внутри сообщения. Ниже живые прототипы (их HTML лежит в <code>docs/design/widgets/</code>): нажимайте, листайте буквы вбок, переключайте вкладки. Кнопок под сообщением больше нет, всё управление внутри пузыря.</p>
+<div class="note"><b>Что это не доказывает.</b> Прототипы запускаются в обычном браузере с имитацией <code>TelegramWidget</code>, не в песочнице Telegram. Проверка на тестовом сервере и на трёх платформах ещё впереди. Арабские буквы, слоги и тексты примерные, их утверждает человек.</div>
+
+<h2>Что с виджетами делают другие</h2>
+<div class="tw"><table>
+<tr><th>Что</th><th>Как устроено</th><th>Откуда</th></tr>
+<tr><td>Калькулятор, опрос, оценка 1–5, коды-промокоды</td><td>кнопки и клавиши внутри пузыря; нажатие уходит боту как запрос</td><td>примеры Telegram и сообщества</td></tr>
+<tr><td>Игры: крестики-нолики, 2048, ракетка, джойстик, Doom, Pacman</td><td>горизонтальные жесты, canvas, ход считает бот и присылает кадр</td><td>папки <code>gestures</code>, <code>interactive</code> в widget-sandbox; <code>awesome-telegram-widgets</code></td></tr>
+<tr><td>Графики, таблицы, вкладки, FAQ, канбан, посадочный талон</td><td>SVG и canvas, переключение вкладок локально без запроса боту</td><td>папки <code>compat</code>, <code>showcase</code>, <code>defaults</code></td></tr>
+<tr><td>Живые карточки: цена, опрос, чек-лист, обратный отсчёт</td><td>бот правит состояние, карточка обновляется на месте, без новых сообщений</td><td>telegram-widget-skill</td></tr>
+</table></div>
+<p>Вывод для нас: интерфейс живёт <b>внутри</b> виджета (вкладки, карусель, кольцо прогресса, анимация), локальные переключения не ходят к боту, а к боту идут только содержательные действия.</p>
+
+<h2>Урок как мини-приложение</h2>
+<p>Один виджет на урок с тремя вкладками «Слушай», «Читай», «Итог». Листайте буквы вбок, нажимайте на слоги, переключайте вкладки. Кнопки под фигурой имитируют действия бота: он меняет состояние, виджет перерисовывается и сам переходит на нужную вкладку.</p>
+<div class="row">
+<figure>
+  <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+  <div class="chat"><div class="msg"><div class="wb" data-w="lesson" data-state='{"l":1,"k":5,"p":1,"v":1,"a":[{"a":"ب","n":"باء","s":["بَ","بِ","بُ"]},{"a":"ت","n":"تاء","s":["تَ","تِ","تُ"]},{"a":"ث","n":"ثاء","s":["ثَ","ثِ","ثُ"]}],"w":["بَ","تَ","ثَ","بِ","تِ","ثِ","بُ","تُ","ثُ"],"r":[]}'></div>
+  <div class="txt dim">Урок 1 · ب ت ث · серия 5 дней. Нажми на слог, чтобы услышать.</div></div></div></div>
+  <div class="sw" data-for="lesson">
+    <button data-set='{"p":1,"v":1,"r":[]}'>бот: начал урок</button>
+    <button data-set='{"p":2,"v":2}'>бот: просит читать</button>
+    <button data-set='{"p":3,"v":3,"r":[1,1,0,1,1,1,1,0,1]}'>бот: прислал разбор</button>
+    <button data-set='{"p":4,"v":3}'>бот: урок засчитан</button></div>
+  <div class="log" data-log="lesson">журнал: пока пусто</div>
+  <div class="cap"><b>Урок-приложение</b><span>Видео и голосовые эталоны остаются обычными сообщениями. Голосовое ученик отправляет микрофоном Telegram, виджет только подсказывает.</span></div>
+</figure>
+<figure>
+  <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+  <div class="chat"><div class="msg"><div class="wb" data-w="streak" data-state='{"k":5,"t":4,"d":"1111000"}'></div>
+  <div class="txt dim">Серия: 5 дней. Занятие сегодня сохранит её.</div></div></div></div>
+  <div class="log" data-log="streak">журнал: пока пусто</div>
+  <div class="cap"><b>Серия (напоминание)</b><span>Приходит как ежедневная карточка: пламя дышит, неделя по кружкам, кнопка внутри карточки.</span></div>
+</figure>
+<figure>
+  <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+  <div class="chat"><div class="msg"><div class="wb" data-w="map" data-state='{"m":"DDDDDDDDDDDCNNNNNNNNNNNNNNNN","k":5}'></div>
+  <div class="txt dim">Путь по буквам: 11 из 28. Прочитано: ا ب ت ث ج ح خ د ذ ر ز</div></div></div></div>
+  <div class="sw" data-for="map"><button data-set='{"m":"DDDDDDDDDDDCNNNNNNNNNNNNNNNN"}'>11 из 28</button><button data-set='{"m":"DDDDDDDDDDDDDDDDDDDDDDDDDDDC"}'>27 из 28</button><button data-set='{"m":"DDDDDDDDDDDDDDDDDDDDDDDDDDDD"}'>28 из 28</button></div>
+  <div class="log" data-log="map">журнал: пока пусто</div>
+  <div class="cap"><b>Карта вехи</b><span>Клетки появляются волной, текущая буква дышит. Нажатие на пройденную открывает её урок.</span></div>
+</figure>
+<figure>
+  <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+  <div class="chat"><div class="msg"><div class="wb" data-w="milestone" data-state='{"k":21,"u":28}'></div>
+  <div class="txt dim">Веха пройдена: все 28 букв с огласовками.</div></div></div></div>
+  <div class="log" data-log="milestone">журнал: пока пусто</div>
+  <div class="cap"><b>Веха пройдена</b><span>При появлении на экране запускается конфетти на canvas, внутри две кнопки: «Открыть Этап II» и «Поделиться».</span></div>
+</figure>
+</div>
+
+<h2>Как виджет говорит с ботом</h2>
+<div class="tw"><table>
+<tr><th>Запрос виджета (≤ 64 байт)</th><th>Кто шлёт</th><th>Что делает бот</th></tr>
+<tr><td><code>p:4</code></td><td>урок</td><td>присылает голосовой эталон слога №4 и отвечает «ok»</td></tr>
+<tr><td><code>next</code></td><td>урок</td><td>открывает следующий урок (видео и новый виджет)</td></tr>
+<tr><td><code>l:5</code></td><td>карта</td><td>открывает урок буквы №5</td></tr>
+<tr><td><code>go</code></td><td>серия</td><td>открывает ближайший урок</td></tr>
+<tr><td><code>st2</code> / <code>share</code></td><td>веха</td><td>открывает Этап II / отдаёт открытку для пересылки</td></tr>
+</table></div>
+<p>Переключение вкладок, листание букв и анимации происходят в самом виджете без запросов боту. Правила Telegram, которые мы соблюдаем: ответ боту — за 15 секунд; не больше 5 запросов за 5 секунд на человека; запрос только по реальному нажатию, по одному; состояние меняет только бот (<code>editMessageWidgetData</code>), виджет его читает. Свою историю бот хранит сам и проверяет каждый запрос по ней: запросу доверять нельзя, как и <code>callback_data</code>.</p>
+<p>Состояние каждого сообщения — маленький JSON (до 1024 байт):</p>
+<div class="tw"><table>
+<tr><th>Виджет</th><th>Пример состояния</th><th>Размер</th></tr>
+__STATES__
+</table></div>
+<p>Один код панели урока годится для всех уроков: меняется только состояние. По документации это делается как «общий виджет» (<code>is_shared</code>, <code>sendSharedWidget</code>); как именно передаётся состояние при повторной отправке, нужно проверить на тестовом сервере.</p>
+
+<h2>Бюджет размера (измерено)</h2>
+<p>Лимит: 4096 байт после сжатия zlib (уровень 9) и 32 768 байт исходного HTML. Считаем так же, как сервер: <code>zlib.compress(html, 9)</code>.</p>
+<div class="tw"><table>
+<tr><th>Виджет</th><th>HTML, байт</th><th>Сжатый, байт</th><th>Запас до 4096</th></tr>
+__SIZES__
+</table></div>
+
+<h2>Ограничения и как с ними живём</h2>
+<div class="tw"><table>
+<tr><th>Ограничение</th><th>Что делаем</th></tr>
+<tr><td>В продакшне виджеты только в личном чате с ботом</td><td>наш тренажёр и так личный; группы и пересылка не нужны</td></tr>
+<tr><td>Нет аудио, видео, микрофона, ввода текста; вертикальный жест всегда принадлежит чату</td><td>эталон и видео — обычные сообщения; голос ученика — обычное голосовое</td></tr>
+<tr><td>Шрифты только системные, огласовки зависят от ОС</td><td>проверить слоги на iOS, Android, Desktop до пилота</td></tr>
+<tr><td>Код виджета нельзя поменять после отправки</td><td>меняем состояние; новая вёрстка — новое сообщение</td></tr>
+<tr><td>Старые приложения не показывают виджет</td><td>подпись под каждым виджетом несёт слова и прогресс текстом</td></tr>
+<tr><td>Размер ≤ 4 КБ сжатого</td><td>один виджет — одна задача; арабский плохо сжимается, поэтому слоги хранятся в состоянии, а не в коде</td></tr>
+<tr><td>aiogram 3.31 не умеет <code>sendWidget</code></td><td>порт и адаптер в нашем коде; ждём или пишем свой метод</td></tr>
+<tr><td>Приватность: фоновые запросы выдают открытый чат</td><td>фоновые запросы не используем; только запросы по нажатию</td></tr>
+</table></div>
+</div>
+<script>
+/* Имитация TelegramWidget в обычном браузере; настоящие виджеты запускает QuickJS Telegram. */
+var WIDGETS = __WIDGETS__;
+function mount(host, name, state, logEl) {
+  var root = host.attachShadow({mode: "open"});
+  var tpl = document.createElement("template");
+  tpl.innerHTML = WIDGETS[name];
+  var scripts = Array.prototype.slice.call(tpl.content.querySelectorAll("script"));
+  var code = scripts.map(function (s) { return s.textContent; }).join("\n");
+  scripts.forEach(function (s) { s.remove(); });
+  root.appendChild(tpl.content);
+  var handlers = {};
+  var T = {
+    chatData: JSON.stringify(state),
+    onEvent: function (n, f) { (handlers[n] = handlers[n] || []).push(f); },
+    request: function (d) {
+      logEl.innerHTML = "→ бот получил запрос <b>" + d + "</b>, отвечает «ok»";
+      return new Promise(function (ok) { setTimeout(function () { ok({result: null}); }, 600); });
+    }
+  };
+  var doc = {
+    getElementById: function (id) { return root.getElementById(id); },
+    createElement: function (t) { return document.createElement(t); }
+  };
+  new Function("window", "document", code)({TelegramWidget: T}, doc);
+  return function (s) {
+    T.chatData = JSON.stringify(s);
+    (handlers.chatDataChanged || []).forEach(function (f) { f(); });
+  };
+}
+document.querySelectorAll(".wb").forEach(function (host) {
+  var name = host.dataset.w, state = JSON.parse(host.dataset.state);
+  var logEl = document.querySelector('[data-log="' + name + '"]');
+  var set = mount(host, name, state, logEl);
+  var sw = document.querySelector('[data-for="' + name + '"]');
+  if (!sw) { return; }
+  sw.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) { return; }
+    Object.assign(state, JSON.parse(b.dataset.set));
+    set(state);
+    logEl.innerHTML = "→ бот изменил состояние: <b>" + JSON.stringify(state).slice(0, 70) + "…</b>";
+  });
+});
+</script>

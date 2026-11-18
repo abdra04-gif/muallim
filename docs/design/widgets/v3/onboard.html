@@ -1,0 +1,28 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--on:light-dark(#fff,#10261A);padding:14px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.96)}
+.dt{display:flex;gap:4px;margin-bottom:12px}.dt i{flex:1;height:5px;border-radius:3px;background:var(--tg-theme-secondary-bg-color)}.dt .on{background:var(--g)}
+h3{margin:0 0 6px;font-size:18px}.p{font-size:14px;line-height:1.45;color:var(--tg-theme-hint-color);margin:0 0 12px;white-space:pre-line}
+.o{display:grid;grid-template-columns:1fr 1fr;gap:6px}.o button{padding:12px 8px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-size:14.5px;font-weight:600}
+.b{display:block;width:100%;margin-top:4px;padding:13px;border-radius:13px;background:var(--g);color:var(--on);font-weight:700;font-size:15px}
+.n{font-size:12px;color:var(--tg-theme-hint-color);margin-top:8px;text-align:center}
+</style>
+<div class="w"><div class="dt" id="dt"></div><div id="b"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I,busy=0;
+var R={ru:{t0:"Ассаляму алейкум! 🌙",c:"Научитесь читать Коран по-арабски — с нуля, по книге «Муаллим сани».\n\nНа каком языке вам удобнее?",
+t1:"Ваши записи",c1:"Мы сохраняем ваши голосовые и ответы, чтобы проверять чтение, помогать вам и улучшать обучение.",ok:"✅ Согласен(на) — начать",pr:"Подробнее — /privacy",dn:"✅ Готово! Главный экран — ниже"},
+en:{t0:"Assalamu alaikum! 🌙",c:"Learn to read the Quran in Arabic, from zero, with the book al-Muallim ath-Thani.\n\nWhich language do you prefer?",
+t1:"Your recordings",c1:"We keep your voice messages and answers to check your reading, help you and improve the lessons.",ok:"✅ I agree, let's start",pr:"More: /privacy",dn:"✅ Done! The home screen is below"}};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.selectionChanged()}catch(e){}T.request(d).then(function(){},function(){}).then(function(){busy=0})}
+function bt(p,x,d,c){var b=el("button",c||"",x);b.onclick=function(){ask(d)};p.appendChild(b)}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{s:0};I=R[S.lg]||R.ru;var s=S.s||0,b=$("b");b.innerHTML="";
+$("dt").innerHTML="";for(var j=0;j<2;j++)$("dt").appendChild(el("i",j<=s?"on":""));
+if(s>1){b.appendChild(el("h3","",I.dn));return}
+if(s==0){b.appendChild(el("h3","",I.t0));b.appendChild(el("p","p",I.c));var o=el("div","o");bt(o,"🇷🇺 Русский","lg:0");bt(o,"🇬🇧 English","lg:1");b.appendChild(o);return}
+b.appendChild(el("h3","",I.t1));b.appendChild(el("p","p",I.c1));bt(b,I.ok,"ok","b");b.appendChild(el("div","n",I.pr))}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

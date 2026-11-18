@@ -1,0 +1,37 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);--on:light-dark(#fff,#10261A);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
+h3{margin:0 0 8px;font-size:16px}
+.top{display:flex;align-items:center;gap:12px}
+.rg{width:92px;height:92px;flex:none}.rg circle{fill:none;stroke-width:9}.rg .f{transition:stroke-dashoffset 1s ease-out}.rg text{font:700 18px system-ui;fill:var(--tg-theme-text-color)}.rg .s{font:11px system-ui;fill:var(--tg-theme-hint-color)}
+.rows{flex:1;font-size:13px;display:flex;flex-direction:column;gap:5px}.rows div{display:flex;justify-content:space-between;gap:6px}.rows b{font-weight:700;white-space:nowrap}
+.sec{margin-top:13px;font-size:13px;font-weight:700}.sub{font-size:11.5px;color:var(--tg-theme-hint-color);margin-top:6px}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:7px;text-align:center}
+.wk div{font-size:11px;color:var(--tg-theme-hint-color)}.wk i{display:grid;place-items:center;height:30px;margin-top:3px;border-radius:15px;background:var(--tg-theme-secondary-bg-color);font-style:normal;font-size:14px;color:var(--on)}
+.wk .y i{background:var(--g)}.wk .t i{outline:2px solid var(--au)}.wk .t{color:var(--tg-theme-text-color);font-weight:700}
+.lt{display:flex;gap:6px;margin-top:7px;font-size:12.5px}.lt div{flex:1;padding:8px 4px;border-radius:11px;background:var(--tg-theme-secondary-bg-color);text-align:center}.lt b{display:block;font-size:17px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}.f button{padding:10px 4px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-weight:700;font-size:13px}.f .m{background:var(--g);color:var(--on)}.f button:last-child:nth-child(odd){grid-column:1/-1}
+</style>
+<div class="w"><h3 id="h"></h3><div class="top"><svg class="rg" viewBox="0 0 96 96"><circle cx="48" cy="48" r="38" stroke="var(--tg-theme-secondary-bg-color)"/><circle class="f" id="f" cx="48" cy="48" r="38" stroke="var(--g)" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="238.8" transform="rotate(-90 48 48)"/><text id="n" x="48" y="50" text-anchor="middle"></text><text id="ns" class="s" x="48" y="66" text-anchor="middle"></text></svg><div class="rows" id="rows"></div></div>
+<div class="sec" id="c1"></div><div class="wk" id="wk"></div><div class="sub" id="c2"></div><div class="lt" id="tl"></div>
+<div class="f"><button id="hs"></button><button id="hm"></button></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I;
+var R={ru:["📊 Прогресс","букв","✅ Пройдено уроков","👁 Только просмотрено","🔥 Серия · лучшая","дн.","🎙 Голосовых","🗓 Дни занятий","✓ — день, когда вы читали или повторяли буквы","Пн,Вт,Ср,Чт,Пт,Сб,Вс","🔠 Как держатся буквы","дней на этой неделе","дней в этом месяце","-","🔁 Повторение","📜 История","🏠 На главную"],
+en:["📊 Progress","letters","✅ Lessons done","👁 Only viewed","🔥 Streak · best","days","🎙 Voice attempts","🗓 Study days","✓ — a day you read or strengthened letters","Mo,Tu,We,Th,Fr,Sa,Su","🔠 How the letters hold","days this week","days this month","-","🔁 Review","📜 History","🏠 Home"]};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function row(a,b){var d=el("div");d.appendChild(el("span","",a));d.appendChild(el("b","",b));$("rows").appendChild(d)}
+function go(d){return function(){T.request(d).then(function(){},function(){})}}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{};I=R[S.lg]||R.ru;
+$("h").textContent=I[0];$("n").textContent=(S.n||0)+"/28";$("ns").textContent=I[1];$("rows").innerHTML="";
+row(I[2],(S.u||0)+" / 15");row(I[3],S.vw||0);row(I[4],(S.k||0)+" · "+(S.b||0)+" "+I[5]);row(I[6],S.at||0);
+setTimeout(function(){$("f").style.strokeDashoffset=238.8*(1-(S.n||0)/28)},60);
+var wk=S.wk||"",dn=0;for(var j=0;j<7;j++)if(wk.charAt(j)=="1")dn++;
+$("c1").textContent=I[7];$("c2").textContent=I[8];var tl=$("tl");tl.innerHTML="";[[dn+" / 7",I[11]],[S.mo||0,I[12]]].forEach(function(x){var d=el("div");d.appendChild(el("b","",x[0]));d.appendChild(document.createTextNode(x[1]));tl.appendChild(d)});var w=$("wk");w.innerHTML="";
+I[9].split(",").forEach(function(x,j){var d=el("div",(wk.charAt(j)=="1"?"y":"")+(j==S.td?" t":""),x);d.appendChild(el("i","",wk.charAt(j)=="1"?"✓":""));w.appendChild(d)});
+$("hs").textContent=I[15];$("hm").textContent=I[16]}
+$("hm").onclick=go("home");$("hs").onclick=go("hist");T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

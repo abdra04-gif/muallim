@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-11-08T06:12:11+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-11-18T21:10:10+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `d4306d1b7e9aea59` | 129 |
-| программа (книга) | `833b71b9d7d43f21` | 4 |
+| код | `d889dd3fba677bb7` | 129 |
+| программа (книга) | `da57065c4a211250` | 4 |
 | SQL-отчёты | `1bfd72df05ffefd3` | 12 |
 | миграции | `f07073a7509b71c2` | 14 |
 | зависимости | `e33bf9dd0f3b4cc1` | 1 |
 | предрегистрация | `47d170f95f136aae` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **79 из 82**.
+Проверено зелёными тестами: **78 из 82**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -81,10 +81,10 @@
 | FR-65 | `tests/integration/test_bot_flow.py`, `tests/integration/test_cohorts.py`, `tests/integration/test_console_beginner.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-66 | `tests/integration/test_deep_bot.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_deep_screens.py`, `tests/unit/test_screens.py`, `tests/unit/test_settings_screens.py` | ✅ |
 | FR-67 | `tests/integration/test_deep_bot.py`, `tests/unit/test_deep_screens.py`, `tests/unit/test_lesson_links.py` | ✅ |
-| FR-68 | — | нет автотестов |
+| FR-68 | `tests/unit/test_nav_layout.py` | ✅ |
 | FR-69 | — | нет автотестов |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
-| NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
+| NFR-TR-02 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py`, `tests/integration/test_sura_audio_privacy.py` | ✅ |
 | NFR-TR-04 | `tests/architecture/test_hooks.py` | ✅ |
 | NFR-REL-02 | `tests/architecture/test_logging.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
@@ -100,7 +100,7 @@
 | NFR-MNT-06 | `tests/architecture/test_learner_texts.py` | ✅ |
 | NFR-MNT-07 | `tests/integration/test_console.py` | ✅ |
 | NFR-SEC-07 | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ✅ |
-| NFR-TR-05 | `tests/architecture/test_docs.py` | ✅ |
+| NFR-TR-05 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
 
 ## Исследование
 Строк в матрице: 34 — считается ✅ 9, частично 🟡 5, нет ❌ 15, данных не собираем 5.

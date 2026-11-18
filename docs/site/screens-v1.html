@@ -1,0 +1,294 @@
+<title>Экраны бота, первая версия</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&family=Noto+Sans:wght@400;600;700&display=swap">
+<style>
+/* Раскладка: четыре блока пути (главная, урок, веха, дополнительно), в каждом телефоны слева направо.
+   Палитра и тон взяты из существующих макетов проекта (docs/design/mockups.html). */
+:root{
+  --bg:#F3EFE3; --panel:#FFFFFF; --fg:#221E1C; --muted:#5E5850; --line:#D9CFB4;
+  --chat:#DCE3CB; --out:#E3F2C9; --btn:#5B6B4E; --btn-fg:#FFFFFF; --gold:#A9862E;
+  --ok:#2F7A3E; --warn:#B7791F; --bad:#B3402E; --tint:#EFE6C8;
+  --body:'Noto Sans',system-ui,sans-serif; --ar:'Noto Naskh Arabic','Geeza Pro','Traditional Arabic',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1B1A17; --panel:#2A2824; --fg:#F1ECE0; --muted:#B9B2A3; --line:#4A453B;
+  --chat:#222A1E; --out:#3B5230; --btn:#6F8160; --gold:#D4B05A;
+  --ok:#7CC58B; --warn:#E0A94A; --bad:#E28572; --tint:#3A3626; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B1A17; --panel:#2A2824; --fg:#F1ECE0; --muted:#B9B2A3; --line:#4A453B;
+  --chat:#222A1E; --out:#3B5230; --btn:#6F8160; --gold:#D4B05A;
+  --ok:#7CC58B; --warn:#E0A94A; --bad:#E28572; --tint:#3A3626; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);
+  padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1280px;margin:0 auto}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.15;margin:0 0 8px;text-wrap:balance}
+h2{font-size:22px;margin:48px 0 4px;padding-top:20px;border-top:1px solid var(--line);text-wrap:balance}
+.lead{color:var(--muted);max-width:68ch;margin:0}
+.note{background:var(--tint);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 8px 8px 0;
+  max-width:78ch;margin:16px 0;font-size:14px}
+.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:28px;margin-top:20px}
+figure{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cap b{display:block;font-size:15px}
+.cap span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;margin-right:6px;background:var(--tint);color:var(--fg)}
+.tag.u{background:var(--out)}
+
+/* телефон */
+.phone{background:var(--chat);border:1px solid var(--line);border-radius:26px;overflow:hidden;
+  display:flex;flex-direction:column;min-height:560px}
+.top{background:var(--panel);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.ava{width:34px;height:34px;border-radius:17px;background:var(--gold);color:#fff;display:grid;place-items:center;font-weight:700}
+.nm{font-weight:700;font-size:14px;line-height:1.2}.sb{font-size:12px;color:var(--muted)}
+.chat{flex:1;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-width:0}
+.msg{background:var(--panel);border-radius:14px;overflow:hidden;max-width:94%;align-self:flex-start}
+.msg.me{background:var(--out);align-self:flex-end}
+.txt{padding:9px 12px;font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.txt p{margin:0 0 6px}.txt p:last-child{margin:0}
+.dim{color:var(--muted)}
+.ar{font-family:var(--ar);font-size:1.5em;line-height:1.5;direction:rtl}
+.kb{display:flex;flex-direction:column;gap:4px;align-self:stretch}
+.kb .r{display:flex;gap:4px}
+.kb .b{flex:1;background:var(--btn);color:var(--btn-fg);border-radius:9px;padding:8px 6px;font-size:13px;font-weight:600;text-align:center}
+.kb .b.alt{background:var(--panel);color:var(--fg);border:1px solid var(--line)}
+
+/* медиа внутри сообщений */
+.vid{position:relative;aspect-ratio:16/9;background:#26302A;display:grid;place-items:center;color:#fff}
+.vid .play{width:46px;height:46px;border-radius:23px;background:rgba(255,255,255,.9);color:#26302A;display:grid;place-items:center;font-size:20px;padding-left:3px}
+.vid .dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);padding:1px 7px;border-radius:99px;font-size:12px}
+.vid .sub{position:absolute;left:8px;right:8px;bottom:28px;text-align:center}
+.vid .sub .ar{font-size:26px;display:block;line-height:1.2}
+.vid .sub small{display:block;font-size:11px;background:rgba(0,0,0,.5);border-radius:4px;padding:1px 6px;margin-top:2px}
+.pic{background:var(--tint);padding:14px 10px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.pic .ar{font-size:34px;line-height:1.35;letter-spacing:.04em}
+.pic .hd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.voice{display:flex;align-items:center;gap:9px;padding:9px 12px;min-width:210px}
+.voice .pl{width:34px;height:34px;border-radius:17px;background:var(--btn);color:#fff;display:grid;place-items:center;font-size:13px;padding-left:2px}
+.voice .wv{display:flex;gap:2px;align-items:center;height:26px;flex:1}
+.voice .wv i{display:block;width:3px;border-radius:2px;background:var(--btn)}
+.voice small{color:var(--muted);font-size:12px}
+
+/* разбор */
+.res{padding:12px 10px;display:flex;flex-direction:column;gap:8px;background:var(--tint)}
+.res .line{display:flex;justify-content:center;gap:10px;direction:rtl}
+.res .syl{min-width:58px;text-align:center;border-radius:10px;padding:2px 8px;border:2px solid var(--ok);background:var(--panel)}
+.res .syl .ar{font-size:30px;line-height:1.4;display:block}
+.res .syl.w{border-color:var(--warn)}
+.res .syl em{display:block;font-style:normal;font-size:11px;color:var(--muted);direction:ltr}
+.res .legend{font-size:11px;color:var(--muted);text-align:center}
+
+/* прогресс */
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0 2px}
+.bar i{display:block;height:100%;background:var(--btn)}
+.steps{letter-spacing:.2em;color:var(--btn);font-weight:700}
+
+/* виджет-карта */
+.map{padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.grid28{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;direction:rtl}
+.grid28 div{aspect-ratio:1/1.1;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;background:var(--panel)}
+.grid28 .ar{font-size:22px;line-height:1}
+.grid28 .d{background:var(--out);border-color:var(--btn)}
+.grid28 .c{border:2px solid var(--gold)}
+.badge{align-self:center;margin:2px 0;padding:6px 12px;border-radius:99px;background:var(--tint);border:1px solid var(--gold);font-weight:700;font-size:13px;text-align:center}
+.postcard{background:linear-gradient(160deg,var(--out),var(--tint));padding:18px 14px;text-align:center}
+.postcard .ar{font-size:42px;display:block;line-height:1.3}
+.postcard b{display:block;font-size:16px;margin-top:2px}
+.old{padding:12px;display:flex;gap:10px;align-items:center;background:var(--tint)}
+.old .ic{width:38px;height:38px;border-radius:8px;background:var(--line);display:grid;place-items:center}
+.art{padding:12px 10px;background:var(--tint);display:flex;flex-direction:column;align-items:center;gap:6px}
+.art svg{width:100%;height:auto;max-width:250px}
+.art svg .face{fill:none;stroke:var(--muted);stroke-width:2}
+.art svg .pt{fill:var(--bad)}
+.art svg .tx{fill:var(--fg);font:600 11px var(--body)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <h1>Как будет выглядеть бот: первая версия</h1>
+  <p class="lead">Экраны Этапа I: буквы и огласовки. Видео ≤ 5 мин → картинка со словами и аудио → голосовое ученика → разбор → прогресс и серия → большая веха из 28 букв. Тон и кнопки взяты из нынешнего бота, транслитерации кириллицей нет нигде.</p>
+  <div class="note"><b>Что здесь пример.</b> Буквы урока 1 (ب ت ث) и слоги — только для показа вёрстки. Какие буквы идут в уроки 1–3 и какие слова читает ученик, решает человек по книге. Слово на открытке, пояснение про звук ث и схема рта на экране «Углублённо» тоже черновики: настоящие тексты и картинки утверждает и даёт человек. Видео и эталонные записи снимают люди; ничего не сгенерировано.</div>
+
+  <h2>1 · Главная: куда идти</h2>
+  <p class="lead">Один экран, одно главное действие. Серия и общий путь Этапа I видны сразу.</p>
+  <div class="row">
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg"><div class="txt">
+            <p>🌙 <b>Ассаляму алейкум!</b></p>
+            <p>🔥 Серия: <b>3 дня</b></p>
+            <p>Этап I · буквы: <b>3 из 28</b></p>
+            <div class="bar"><i style="width:11%"></i></div>
+            <p class="dim">Дальше: <b>Урок 2</b> · <span class="ar">ج ح خ</span></p>
+          </div></div>
+          <div class="kb"><div class="r"><div class="b">▶️ Урок 2</div></div>
+            <div class="r"><div class="b alt">📊 Прогресс</div><div class="b alt">⋯ Ещё</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Главная</b><span><i class="tag">Получает</i>приветствие, серию, путь 3/28</span><span><i class="tag u">Делает</i>жмёт «Урок 2»</span></div>
+    </figure>
+  </div>
+
+  <h2>2 · Урок 1: четыре шага</h2>
+  <p class="lead">В каждом сообщении сверху «Урок · шаг n из 4». Ученик ничего не пишет, кроме одного голосового.</p>
+  <div class="row">
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="vid">
+            <div class="sub"><span class="ar">بَ تَ ثَ</span><small>Эти три буквы пишутся почти одинаково</small></div>
+            <div class="play">▶</div><div class="dur">4:48</div></div>
+            <div class="txt"><p><b>Урок 1</b> · шаг 1 из 4</p><p class="steps">▰▱▱▱</p><p class="dim">Видео-урок: <span class="ar">ب ت ث</span>. Речь арабская, русские субтитры.</p></div></div>
+          <div class="kb"><div class="r"><div class="b">Дальше → слова</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Шаг 1 · видео-урок</b><span><i class="tag">Получает</i>видео ≤ 5 мин на 1–3 буквы, живая речь</span><span><i class="tag u">Делает</i>смотрит, жмёт «Дальше»</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="pic"><div class="hd">слова урока 1</div>
+            <div class="ar">بَ &nbsp; تَ &nbsp; ثَ</div><div class="ar">بِ &nbsp; تِ &nbsp; ثِ</div><div class="ar">بُ &nbsp; تُ &nbsp; ثُ</div></div>
+            <div class="txt"><p><b>Урок 1</b> · шаг 2 из 4</p><p class="steps">▰▰▱▱</p></div></div>
+          <div class="msg"><div class="voice"><div class="pl">▶</div>
+            <div class="wv"><i style="height:8px"></i><i style="height:16px"></i><i style="height:22px"></i><i style="height:12px"></i><i style="height:20px"></i><i style="height:9px"></i><i style="height:18px"></i><i style="height:14px"></i><i style="height:22px"></i><i style="height:10px"></i><i style="height:16px"></i><i style="height:8px"></i></div>
+            <small>0:09</small></div></div>
+          <div class="msg"><div class="txt dim">Так читает учитель. Послушай и повтори.</div></div>
+          <div class="kb"><div class="r"><div class="b alt">🔊 Ещё раз</div><div class="b">🎙 Читать самому</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Шаг 2 · слова и звук</b><span><i class="tag">Получает</i>картинка со словами + голосовое-эталон</span><span><i class="tag u">Делает</i>слушает, можно повторить</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg"><div class="txt"><p><b>Урок 1</b> · шаг 3 из 4</p><p class="steps">▰▰▰▱</p>
+            <p>🎙 Прочитай <b>справа налево</b> и отправь голосовое — я проверю.</p>
+            <p class="dim">Идеала не нужно: достаточно прочитать один раз.</p></div></div>
+          <div class="msg me"><div class="voice"><div class="pl">▶</div>
+            <div class="wv"><i style="height:10px"></i><i style="height:18px"></i><i style="height:12px"></i><i style="height:22px"></i><i style="height:14px"></i><i style="height:20px"></i><i style="height:9px"></i><i style="height:16px"></i><i style="height:12px"></i><i style="height:20px"></i><i style="height:8px"></i><i style="height:14px"></i></div>
+            <small>0:14</small></div></div>
+          <div class="kb"><div class="r"><div class="b alt">⏭ Пропустить</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Шаг 3 · попытка</b><span><i class="tag">Получает</i>просьбу прочитать</span><span><i class="tag u">Отправляет</i>одно голосовое (своё чтение)</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="res">
+            <div class="line"><div class="syl"><span class="ar">بَ</span></div><div class="syl"><span class="ar">تَ</span></div><div class="syl w"><span class="ar">ثَ</span><em>услышано: تَ</em></div></div>
+            <div class="legend">зелёная рамка — верно · оранжевая — поправить</div></div>
+            <div class="txt"><p>🟡 <b>Почти!</b> Из трёх слогов два верно.</p>
+              <p>Слог <span class="ar">ثَ</span>: звук получился как в <span class="ar">تَ</span>. Кончик языка слегка между зубами, воздух проходит.</p>
+              <p class="dim">Послушай, как правильно, и попробуй ещё раз — или иди дальше.</p></div></div>
+          <div class="kb"><div class="r"><div class="b alt">🔊 Как правильно</div><div class="b alt">🔄 Ещё раз</div></div>
+            <div class="r"><div class="b">Дальше → итог урока</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Шаг 4 · разбор</b><span><i class="tag">Получает</i>картинка слогов + 1–3 пункта текстом, мягко</span><span><i class="tag u">Делает</i>слушает эталон, пробует ещё или идёт дальше</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg"><div class="txt">
+            <p>🎉 <b>Урок пройден!</b> Урок 1 · <span class="ar">ب ت ث</span> — освоен. Так держать!</p>
+            <p>🔥 Серия: <b>4 дня</b></p>
+            <p>Этап I · буквы: <b>3 из 28</b></p><div class="bar"><i style="width:11%"></i></div>
+            <p class="dim">Завтра — Урок 2: <span class="ar">ج ح خ</span></p></div></div>
+          <div class="kb"><div class="r"><div class="b">▶️ Урок 2</div></div>
+            <div class="r"><div class="b alt">📊 Прогресс</div><div class="b alt">🏠</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Конец урока</b><span><i class="tag">Получает</i>поздравление, серию, общий путь</span><span><i class="tag u">Делает</i>идёт дальше или заканчивает на сегодня</span></div>
+    </figure>
+  </div>
+
+  <h2>3 · Большая веха: все 28 букв</h2>
+  <p class="lead">Карта показывает весь путь одним взглядом. Это виджет Telegram; на старых приложениях виден только текст.</p>
+  <div class="row">
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="map">
+            <div class="grid28">
+              <div class="d"><span class="ar">ا</span></div><div class="d"><span class="ar">ب</span></div><div class="d"><span class="ar">ت</span></div><div class="d"><span class="ar">ث</span></div><div class="d"><span class="ar">ج</span></div><div class="d"><span class="ar">ح</span></div><div class="d"><span class="ar">خ</span></div>
+              <div class="d"><span class="ar">د</span></div><div class="d"><span class="ar">ذ</span></div><div class="d"><span class="ar">ر</span></div><div class="d"><span class="ar">ز</span></div><div class="c"><span class="ar">س</span></div><div><span class="ar">ش</span></div><div><span class="ar">ص</span></div>
+              <div><span class="ar">ض</span></div><div><span class="ar">ط</span></div><div><span class="ar">ظ</span></div><div><span class="ar">ع</span></div><div><span class="ar">غ</span></div><div><span class="ar">ف</span></div><div><span class="ar">ق</span></div>
+              <div><span class="ar">ك</span></div><div><span class="ar">ل</span></div><div><span class="ar">م</span></div><div><span class="ar">ن</span></div><div><span class="ar">ه</span></div><div><span class="ar">و</span></div><div><span class="ar">ي</span></div>
+            </div>
+            <div class="bar"><i style="width:43%"></i></div></div>
+            <div class="txt"><p>🗺 <b>Путь по буквам</b>: 12 из 28</p><p class="dim">Осталось 16. Рамка — следующая буква.</p></div></div>
+          <div class="kb"><div class="r"><div class="b">▶️ Урок 5</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Карта вехи (виджет)</b><span><i class="tag">Получает</i>карту 28 букв, прочитанные закрашены</span><span><i class="tag u">Делает</i>смотрит, жмёт «Продолжить»</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="postcard"><span class="ar">قَرَأْتُ</span><b>Я прочитал все буквы</b><div class="dim" style="font-size:12px">28 из 28 · серия 21 день</div></div>
+            <div class="txt"><p>🏆 <b>Веха пройдена!</b> Ты прочитал все 28 букв с огласовками.</p>
+              <p class="dim">Идеал не нужен: произношение шлифуется годами. Дальше — Этап II.</p></div></div>
+          <div class="kb"><div class="r"><div class="b">➡️ Открыть Этап II</div></div>
+            <div class="r"><div class="b alt">📤 Поделиться открыткой</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Веха пройдена</b><span><i class="tag">Получает</i>большое поздравление, открытку, доступ к Этапу II</span><span><i class="tag u">Делает</i>открывает Этап II или делится</span></div>
+    </figure>
+  </div>
+
+  <h2>4 · Дополнительно (по желанию)</h2>
+  <p class="lead">Кнопка «Углублённо» ведёт к необязательным материалам. Основной путь от них не зависит.</p>
+  <div class="row">
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="art">
+            <svg viewBox="0 0 250 150" role="img" aria-label="Схема: место образования звука">
+              <path class="face" d="M30 110 C30 40 120 10 190 40 C225 55 230 90 215 110 L180 115 L150 130 L60 135 Z"/>
+              <circle class="pt" cx="196" cy="88" r="6"/>
+              <text class="tx" x="120" y="30">язык</text><text class="tx" x="168" y="74">здесь</text>
+            </svg>
+            <div class="ar" style="font-size:30px">ث</div></div>
+            <div class="txt"><p><b>Где рождается звук</b> <span class="ar">ث</span></p>
+              <p>Кончик языка слегка выходит между верхними и нижними зубами; воздух проходит без голоса.</p>
+              <p class="dim">Схема статичная; для живого примера — ролик с человеком.</p></div></div>
+          <div class="kb"><div class="r"><div class="b alt">🎥 Живой пример (YouTube)</div></div>
+            <div class="r"><div class="b alt">👩‍🏫 Хочу учителя</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>«Углублённо»</b><span><i class="tag">Получает</i>статичная картинка + текст о месте звука, ссылка на видео с человеком</span><span><i class="tag u">Делает</i>читает или открывает ролик; «учитель» — позже, Этап II</span></div>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="top"><div class="ava">م</div><div><div class="nm">Муаллим</div><div class="sb">бот</div></div></div>
+        <div class="chat">
+          <div class="msg" style="width:94%"><div class="old"><div class="ic">▫️</div>
+            <div class="dim" style="font-size:13px">Это сообщение не поддерживается в этой версии Telegram.</div></div>
+            <div class="txt"><p>🗺 <b>Путь по буквам</b>: 12 из 28</p><p class="dim">Прочитано: ا ب ت ث ج ح خ د ذ ر ز</p></div></div>
+          <div class="kb"><div class="r"><div class="b">▶️ Урок 5</div></div></div>
+        </div>
+      </div>
+      <div class="cap"><b>Старое приложение</b><span><i class="tag">Получает</i>вместо виджета подпись: тот же прогресс текстом</span><span><i class="tag u">Делает</i>всё то же, потеряна только картинка карты</span></div>
+    </figure>
+  </div>
+</div>

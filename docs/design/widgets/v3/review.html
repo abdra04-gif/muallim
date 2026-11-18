@@ -1,0 +1,38 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);--on:light-dark(#fff,#10261A);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color);text-align:center}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.95)}
+.hd{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tg-theme-hint-color)}.hd b{color:var(--tg-theme-text-color)}
+.dt{display:flex;gap:4px;margin:7px 0 12px}.dt i{flex:1;height:5px;border-radius:3px;background:var(--tg-theme-secondary-bg-color)}.dt .ok{background:var(--g)}.dt .no{background:var(--au)}
+h3{margin:0 0 4px;font-size:16px}.y{font-size:12px;color:var(--tg-theme-hint-color);margin-bottom:10px}
+.ph{width:76px;height:76px;border-radius:38px;background:var(--g);color:var(--on);font-size:30px;margin:0 auto 6px;animation:pu 1.8s infinite}
+@keyframes pu{50%{transform:scale(1.06)}}
+.o{display:flex;gap:8px;justify-content:center;direction:rtl;margin:12px 0 6px}
+.o button{font:34px/1.5 system-ui,serif;min-width:72px;padding:2px 10px;border-radius:14px;background:var(--tg-theme-secondary-bg-color);border:2px solid transparent}
+.o .y{border-color:var(--g);background:var(--gs)}.o .n{border-color:var(--au)}
+.r{font-weight:700;min-height:1.4em;margin:4px 0}
+.end{font-size:40px;font-weight:800;color:var(--g);animation:pp .5s}@keyframes pp{from{transform:scale(.5)}}
+.f{display:flex;gap:6px;margin-top:10px}.f button{flex:1;padding:11px;border-radius:13px;font-weight:700;background:var(--tg-theme-secondary-bg-color)}.f .m{background:var(--g);color:var(--on)}
+@media (prefers-reduced-motion:reduce){.ph,.end{animation:none}}
+</style>
+<div class="w"><div class="hd"><b id="t"></b><span id="k"></span></div><div class="dt" id="dt"></div><div id="b"></div><div class="f" id="f"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I,busy=0;
+var R={ru:["🧠 Повторение","# из #","Послушайте и выберите слог","🔊","Верно!","Не совсем — послушайте ещё раз","Дальше ›","Готово: # из # верно","🏠 На главную","Ещё раунд"],
+en:["🧠 Review","# of #","Listen and choose the syllable","🔊","Correct!","Not quite: listen once more","Next ›","Done: # of # correct","🏠 Home","Another round"]};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.selectionChanged()}catch(e){}T.request(d).then(function(){},function(){}).then(function(){busy=0})}
+function btn(p,x,d,c){var b=el("button",c||"",x);b.onclick=function(){ask(d)};p.appendChild(b);return b}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{q:0,N:5,o:[],h:[]};I=R[S.lg]||R.ru;
+$("t").textContent=I[0];$("k").textContent=S.end?"":f(I[1],S.q+1,S.N);
+$("dt").innerHTML="";for(var j=0;j<S.N;j++)$("dt").appendChild(el("i",S.h[j]==1?"ok":S.h[j]==0?"no":""));
+var b=$("b"),fo=$("f");b.innerHTML="";fo.innerHTML="";
+if(S.end){b.appendChild(el("div","end",f(I[7],S.sc,S.N).split(":")[1]));b.appendChild(el("div","r",f(I[7],S.sc,S.N).split(":")[0]));btn(fo,I[8],"home");btn(fo,I[9],"again","m");return}
+b.appendChild(el("h3","",I[2]));if(S.y)b.appendChild(el("div","y",S.y));btn(b,I[3],"hear","ph");
+var o=el("div","o");S.o.forEach(function(x,k){btn(o,x,"a:"+k,S.p==k?(S.ok?"y":"n"):"")});b.appendChild(o);
+b.appendChild(el("div","r",S.p==null?"":S.ok?I[4]:I[5]));
+btn(fo,"🏠","home");if(S.ok)btn(fo,I[6],"rn","m")}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

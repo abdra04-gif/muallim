@@ -1,0 +1,38 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.97)}
+.hd b{display:block;font-size:16px}.hd span{font-size:12px;color:var(--tg-theme-hint-color)}
+.l{display:flex;flex-direction:column;gap:4px;margin-top:9px}
+.r{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:11px;background:var(--tg-theme-secondary-bg-color);text-align:left}
+.r.C{outline:2px solid var(--g)}.r i{font-style:normal;width:20px;text-align:center}.r span{flex:1;font-size:13.5px}.r small{color:var(--tg-theme-hint-color);font-size:12px}
+.r b{font:19px system-ui,serif;direction:rtl;max-width:48%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r b.t{font:12.5px system-ui,sans-serif;direction:ltr;color:var(--tg-theme-hint-color)}
+.p{height:5px;border-radius:3px;background:var(--tg-theme-bg-color);overflow:hidden;width:54px}.p u{display:block;height:100%;background:var(--g)}
+.f{display:flex;gap:6px;margin-top:8px}.f button{flex:1;padding:10px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-weight:700}
+#m{font-size:12px;color:var(--tg-theme-hint-color);min-height:1.1em;text-align:center;margin-top:5px}
+</style>
+<div class="w"><div class="hd"><b id="t"></b><span id="s"></span></div><div class="l" id="l"></div><div class="f" id="f"></div><div id="m"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I,busy=0;
+var R={ru:["📚 Книга «Муаллим сани»","Все уроки открыты всегда","✅ прочитан · 👁 просмотрен · 🟡 сейчас · 📄 правило","Урок #","стр. #–#","‹ Части","🏠 На главную","Открываю…","только правило","без уроков","Алфавит"],
+en:["📚 The book al-Muallim ath-Thani","Every lesson is always open","✅ read · 👁 viewed · 🟡 now · 📄 rule","Lesson #","pp. #–#","‹ Parts","🏠 Home","Opening…","rule only","no lessons","The alphabet"]};
+var IC={D:"✅",V:"👁",C:"🟡",N:"⚪",R:"📄"};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.selectionChanged()}catch(e){}$("m").textContent=I[7];
+T.request(d).then(function(){$("m").textContent=""},function(){$("m").textContent=""}).then(function(){busy=0})}
+function btn(p,x,d){var b=el("button","",x);b.onclick=function(){ask(d)};p.appendChild(b)}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{it:[]};I=R[S.lg]||R.ru;
+var l=$("l"),fo=$("f");l.innerHTML="";fo.innerHTML="";
+if(S.v=="pages"){$("t").textContent=S.t;$("s").textContent=I[2];
+S.it.forEach(function(x){var r=el("button","r "+x[3]);r.appendChild(el("i","",IC[x[3]]));r.appendChild(el("span","",x[0]===0?I[10]:f(I[3],x[0])));
+r.appendChild(el("b",/[؀-ۿ]/.test(x[2])&&x[2].length<12?"":"t",x[2]||I[8]));r.onclick=function(){ask("o:"+x[0])};l.appendChild(r)});
+btn(fo,I[5],"pts")}
+else{$("t").textContent=I[0];$("s").textContent=I[1];
+S.it.forEach(function(x){var r=el("button","r");r.appendChild(el("i","",x[0]));var sp=el("span","",x[1]);sp.appendChild(el("small","",(x[5]?"":" · "+I[9])));r.appendChild(sp);
+if(x[5]){var p=el("div","p"),u=el("u");u.style.width=(x[5]?Math.round(x[4]*100/x[5]):0)+"%";p.appendChild(u);r.appendChild(p)}r.onclick=function(){ask("pt:"+x[0])};l.appendChild(r)})}
+btn(fo,I[6],"home")}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

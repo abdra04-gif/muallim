@@ -1,0 +1,33 @@
+<style>
+.w{padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,serif;color:var(--tg-theme-text-color)}
+.h{display:flex;justify-content:space-between;align-items:baseline}.h b{font-size:15px}.h span{font-size:13px;color:var(--tg-theme-hint-color)}
+.g{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;direction:rtl;margin:10px 0}
+.c{font:23px/1.9 system-ui,serif;padding:0;border:1px solid var(--tg-theme-section-separator-color);border-radius:8px;background:var(--tg-theme-bg-color);color:var(--tg-theme-hint-color);animation:pop .35s backwards}
+@keyframes pop{from{transform:scale(.6)}}
+.c.D{background:light-dark(#DDEBD3,#33442C);border-color:var(--tg-theme-button-color);color:var(--tg-theme-text-color)}
+.c.C{border:2px solid var(--tg-theme-button-color);color:var(--tg-theme-text-color);animation:pop .35s backwards,cu 1.6s .4s infinite}
+@keyframes cu{50%{transform:scale(1.1)}}
+.p{height:8px;border-radius:4px;background:var(--tg-theme-secondary-bg-color);overflow:hidden}
+.p i{display:block;height:100%;background:var(--tg-theme-button-color);transition:width .6s}
+.tx{margin-top:6px;font-size:12px;color:var(--tg-theme-hint-color);min-height:1.3em}
+</style>
+<div class="w"><div class="h"><b>Путь по буквам</b><span id="n"></span></div>
+<div class="g" id="g"></div><div class="p"><i id="p" style="width:0"></i></div><div class="tx" id="m"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget,$=function(i){return document.getElementById(i)},busy=0,S;
+var L="ابتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
+function draw(){
+try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{m:"",k:0};
+var d=0,g=$("g");g.innerHTML="";
+L.forEach(function(x,i){var s=S.m.charAt(i)||"N",b=document.createElement("button");
+if(s=="D")d++;b.className="c "+s;b.textContent=x;b.style.animationDelay=i*25+"ms";
+b.onclick=function(){if(s=="N"||busy)return;busy=1;$("m").textContent="Открываю урок в чате…";
+T.request("l:"+i).then(function(){},function(){}).then(function(){busy=0})};g.appendChild(b)});
+$("n").textContent=d+" из 28 · 🔥 "+S.k;
+setTimeout(function(){$("p").style.width=Math.round(d*100/28)+"%"},50);
+$("m").textContent=d==28?"Все буквы пройдены!":"Нажми на пройденную букву, чтобы повторить урок";
+}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

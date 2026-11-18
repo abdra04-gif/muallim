@@ -1,0 +1,222 @@
+<title>Муаллим 2.0: сравнение</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Раскладка: вывод → два варианта → разбор «берём / меняем» → сверка с требованиями → итог v2 в чате → решения → план */
+:root{
+  --bg:#FFF8EA; --panel:#FFFFFF; --fg:#17231B; --muted:#6F756D; --line:#E9DCC4; --chat:#E9EEDD;
+  --g:#176B3A; --gd:#124B2D; --gs:#E5F0D8; --au:#B8862B; --sec:#F6EFDF; --out:#DDF0C8;
+  --ok:#176B3A; --warn:#A86A12; --bad:#B3402E;
+  --body:system-ui,-apple-system,'Segoe UI',sans-serif; --ar:'Geeza Pro','Noto Naskh Arabic','Traditional Arabic',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171A15; --panel:#22271F; --fg:#EEF0E8; --muted:#A7AE9F; --line:#3A4234; --chat:#1C2219;
+  --g:#6FBF86; --gd:#9BD3A8; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --out:#2E4A2A;
+  --ok:#7CC58B; --warn:#E0A94A; --bad:#E28572; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171A15; --panel:#22271F; --fg:#EEF0E8; --muted:#A7AE9F; --line:#3A4234; --chat:#1C2219;
+  --g:#6FBF86; --gd:#9BD3A8; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --out:#2E4A2A;
+  --ok:#7CC58B; --warn:#E0A94A; --bad:#E28572; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);padding-block:32px 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1200px;margin:0 auto}
+h1{font-size:clamp(28px,4.4vw,42px);line-height:1.1;margin:0 0 10px;color:var(--gd);text-wrap:balance}
+h2{font-size:23px;margin:52px 0 8px;padding-top:22px;border-top:1px solid var(--line);color:var(--gd);text-wrap:balance}
+h3{font-size:17px;margin:22px 0 6px}
+p,li{max-width:76ch}.lead{color:var(--muted);margin:0;font-size:16px}
+.note{background:var(--sec);border-left:3px solid var(--au);padding:10px 14px;border-radius:0 10px 10px 0;max-width:80ch;margin:16px 0;font-size:14px}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px}
+.verdict div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.verdict b{display:block;color:var(--g);margin-bottom:4px}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14px;min-width:760px;width:100%}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--sec)}td.s{white-space:nowrap;font-weight:600}
+.y{color:var(--ok)}.m{color:var(--warn)}.n{color:var(--bad)}
+code{background:var(--sec);padding:1px 5px;border-radius:4px;font-size:.9em}
+.ar{font-family:var(--ar);direction:rtl;unicode-bidi:isolate}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.two ul{margin:6px 0;padding-left:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;min-width:0}
+.card h3{margin-top:4px}
+.concept{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:14px}
+.concept img{display:block;width:100%;height:auto;border-radius:8px}
+.concept figcaption{color:var(--muted);font-size:13px;margin-top:6px}
+.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px;margin-top:18px}
+figure{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cap b{display:block}.cap span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.phone{background:var(--chat);border:1px solid var(--line);border-radius:26px;overflow:hidden;display:flex;flex-direction:column}
+.top{background:var(--panel);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.ava{width:34px;height:34px;border-radius:17px;background:var(--g);color:#fff;display:grid;place-items:center;font-weight:700}
+.nm{font-weight:700;font-size:14px;line-height:1.2}.sb{font-size:12px;color:var(--muted)}
+.chat{padding:12px 10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.msg{background:var(--panel);border-radius:14px;overflow:hidden;width:94%;align-self:flex-start}
+.msg.me{background:var(--out);align-self:flex-end;width:auto}
+.txt{padding:8px 12px;font-size:13.5px;overflow-wrap:anywhere}.dim{color:var(--muted)}
+.vid{position:relative;aspect-ratio:16/9;background:#26302A;display:grid;place-items:center;color:#fff}
+.vid .pl{width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,.92);color:#26302A;display:grid;place-items:center;padding-left:3px}
+.vid .du{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);padding:0 7px;border-radius:99px;font-size:12px}
+.vid .su{position:absolute;bottom:30px;left:8px;right:8px;text-align:center;font-size:11px}
+.vid .su span{background:rgba(0,0,0,.55);padding:1px 6px;border-radius:4px}
+.voice{display:flex;align-items:center;gap:8px;padding:8px 12px}
+.voice .p{width:30px;height:30px;border-radius:15px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:12px}
+.voice .w{display:flex;gap:2px;align-items:center;height:22px}.voice .w i{display:block;width:3px;border-radius:2px;background:var(--g)}
+.voice small{color:var(--muted);font-size:12px}
+.wb{--tg-theme-bg-color:var(--panel);--tg-theme-text-color:var(--fg);--tg-theme-hint-color:var(--muted);
+  --tg-theme-button-color:var(--g);--tg-theme-button-text-color:#fff;--tg-theme-secondary-bg-color:var(--sec);
+  --tg-theme-section-separator-color:var(--line)}
+.log{font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-height:2.8em;color:var(--muted);overflow-wrap:anywhere}
+.q{display:grid;gap:12px;margin-top:12px}
+.q div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.q b{color:var(--gd)}.q em{font-style:normal;color:var(--g);font-weight:600}
+ol.plan li{margin:6px 0}
+.v1{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:12px}
+.v1 .msg{width:100%}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+<h1>Муаллим 2.0: что берём из концепта ChatGPT и из наших прототипов</h1>
+<p class="lead">Разбор концепта из восьми экранов и технического задания от ChatGPT, сравнение с нашими прототипами виджетов (v1) и итоговый вариант v2, собранный из лучшего в обоих. Всё сверено с замечаниями профессоров, ТЗ и ограничениями виджетов Telegram.</p>
+<div class="verdict">
+<div><b>Концепт ChatGPT</b>Хороший визуальный стиль и понятная структура, но это экраны мобильного приложения, а не Telegram. Картинки похожи на сгенерированные, слова урока не из букв урока, звук и микрофон нарисованы там, где Telegram их не даёт.</div>
+<div><b>Наши прототипы v1</b>Реально работают как виджеты и укладываются в лимит, но перегружены: карусель, пульсирующий микрофон, три вкладки при четырёх шагах, список букв зашит в код, кнопка «Поделиться» не работает в продакшне.</div>
+<div><b>Итог v2</b>Стиль и структура ChatGPT, техника v1. Четыре шага, одно главное действие, звук и видео обычными сообщениями Telegram, данные с сервера, без сгенерированных картинок. Размер 1,3–2,1 КБ из 4 КБ.</div>
+</div>
+<div class="note"><b>Что это не доказывает.</b> Виджеты v2 запускаются здесь в обычном браузере с имитацией <code>TelegramWidget</code>. Проверка в песочнице Telegram, на тестовом сервере и на iOS, Android, Desktop ещё впереди. Арабские слоги примерные: учебный текст утверждает владелец.</div>
+
+<h2>1. Концепт ChatGPT</h2>
+<figure class="concept"><img src="__CONCEPT__" alt="Восемь экранов концепта ChatGPT: главная, видео, слова урока, попытка, разбор, карта букв, прогресс, поздравление"><figcaption>Концепт ChatGPT (<code>docs/design/muallim-2.0-eight-screens.png</code>). Это ориентир по стилю, не источник учебного текста.</figcaption></figure>
+<div class="two">
+<div class="card"><h3 class="y">Берём</h3><ul>
+<li>Палитру: кремовый фон, тёмно-зелёный основной, золото как акцент. Она близка к нынешним макетам проекта.</li>
+<li>Главную: этап, «n из 28», <b>одна</b> кнопка «Продолжить урок» и две второстепенные «Карта букв», «Прогресс».</li>
+<li>Урок из <b>четырёх</b> шагов с полоской «шаг n из 4» в шапке.</li>
+<li>«Видео просмотрено» как явное действие после видео.</li>
+<li>«Прослушать целиком» и «Как отправить голосовое».</li>
+<li>Разбор «Попытка принята!» с ✓ / ! у каждого слова и выбором «Повторить» или «Следующий урок».</li>
+<li>Карту букв со статусами и прогресс кольцом.</li>
+</ul></div>
+<div class="card"><h3 class="n">Меняем</h3><ul>
+<li><b>Картинки</b> верблюда, дома, дерева, книги, фото учителя и Корана выглядят сгенерированными. Профессор просил без AI-картинок, и в 4 КБ они всё равно не помещаются. Оставляем только арабский текст.</li>
+<li><b>Слова</b> <span class="ar">جَمَلٌ بَيْتٌ شَجَرَةٌ كِتَابٌ</span> содержат буквы не из урока 1 и нарушают порядок книги. Слова урока берём из программы на сервере.</li>
+<li><b>🔊 в карточке</b>: в виджете нет звука. Нажатие отправляет запрос боту, и он присылает голосовое учителя.</li>
+<li><b>Видео внутри экрана</b>: видео идёт обычным сообщением Telegram над виджетом.</li>
+<li><b>Нарисованный микрофон</b>: голосовое записывается штатным микрофоном Telegram. Вместо рисунка даём короткую подсказку.</li>
+<li><b>«Достижение: Первые шаги»</b>: профессора об этом не просили, и само ТЗ запрещает выдуманные достижения. Убираем.</li>
+<li><b>Рамка приложения</b> (стрелка «назад», статус-бар, «Урок 1 из 3»): в чате её нет, пишем «Урок 1 · шаг 2 из 4».</li>
+<li><b>Силуэты мечетей и растения</b>: тяжёлые для 4 КБ и спорят с огласовками. Оставляем одну маленькую восьмиконечную звезду.</li>
+</ul></div>
+</div>
+
+<h2>2. Наши прототипы v1</h2>
+<p class="lead">Живые виджеты прошлой версии, их можно нажимать.</p>
+<div class="v1">
+__V1__
+</div>
+<div class="two" style="margin-top:16px">
+<div class="card"><h3 class="y">Берём</h3><ul>
+<li>Всё управление внутри виджета, без кнопок под сообщением.</li>
+<li>Нажатие на слог → запрос <code>p:N</code> → бот присылает голосовое.</li>
+<li>Состояние пишет бот, виджет перерисовывается без нового сообщения.</li>
+<li>Карту и прогресс — в одном виджете с двумя вкладками, чтобы было меньше сообщений.</li>
+<li>Конфетти на canvas только на большой вехе.</li>
+<li>Измерение размера тем же способом, что на сервере.</li>
+</ul></div>
+<div class="card"><h3 class="n">Меняем</h3><ul>
+<li><b>Пульсирующий микрофон</b> выглядит как запись, а виджет не пишет звук. Заменяем подсказкой.</li>
+<li><b>Три вкладки при кольце из четырёх шагов</b>: два несовместимых счётчика. Делаем одну модель из 4 шагов.</li>
+<li><b>Карусель букв</b> — лишний жест и лишняя нагрузка. Показываем слова сеткой.</li>
+<li><b>Список 28 букв зашит в коде карты</b>. Теперь буквы и порядок приходят с сервера.</li>
+<li><b>Падение без <code>TelegramWidget</code></b>: добавлена заглушка.</li>
+<li><b>«Поделиться»</b>: в продакшне виджет нельзя переслать. Убираем.</li>
+<li><b>Отдельная карточка серии</b>: серия теперь на главной и в уроке, без давления.</li>
+</ul></div>
+</div>
+
+<h2>3. Сверка с требованиями</h2>
+<p class="lead">✅ выполнено · ⚠️ частично · ❌ нарушено. Источник — кто требует.</p>
+<div class="tw"><table>
+<tr><th>Требование</th><th>Источник</th><th>Концепт ChatGPT</th><th>Наши v1</th><th>Итог v2</th></tr>
+<tr><td>Видео ≤ 5 мин на 1–3 буквы, живой преподаватель</td><td>профессора</td><td class="m">⚠️ видео внутри экрана, учитель на картинке сгенерирован</td><td class="m">⚠️ видео в потоке не показано</td><td class="y">✅ обычное видео над виджетом + «Видео просмотрено»</td></tr>
+<tr><td>Картинка со словами урока и аудио</td><td>профессора</td><td class="m">⚠️ 🔊 внутри карточки, звука в виджете нет</td><td class="y">✅ слог → голосовое от бота</td><td class="y">✅ слово → голосовое учителя, «Всё целиком»</td></tr>
+<tr><td>Слова из букв урока, порядок книги</td><td>профессора, ТЗ</td><td class="n">❌ <span class="ar">جَمَلٌ بَيْتٌ شَجَرَةٌ كِتَابٌ</span></td><td class="y">✅ слоги букв урока</td><td class="y">✅ слова приходят из программы</td></tr>
+<tr><td>Голосовое штатным Telegram, без имитации микрофона</td><td>ТЗ</td><td class="m">⚠️ нарисованный микрофон</td><td class="n">❌ пульсирующий микрофон</td><td class="y">✅ подсказка «Как отправить голосовое»</td></tr>
+<tr><td>Разбор текстом или картинкой, мягко</td><td>профессора</td><td class="y">✅ «Попытка принята!»</td><td class="y">✅ рамки</td><td class="y">✅ ✓ / ! только из ответа бэкенда, замечания в подписи</td></tr>
+<tr><td>Без кириллической транслитерации</td><td>профессора</td><td class="y">✅</td><td class="y">✅</td><td class="y">✅</td></tr>
+<tr><td>Без AI-голоса, AI-картинок и AI-видео</td><td>профессора</td><td class="n">❌ иллюстрации, фото учителя, Коран</td><td class="y">✅</td><td class="y">✅ только текст и звезда-орнамент</td></tr>
+<tr><td>Лёгкий путь, ошибки не блокируют</td><td>профессора</td><td class="y">✅ «Следующий урок»</td><td class="y">✅</td><td class="m">⚠️ ✅ в интерфейсе, правило зачёта решает владелец (M-01, M-12)</td></tr>
+<tr><td>Прогресс в уроке и общий</td><td>профессора</td><td class="y">✅ 1/4 и 3/28</td><td class="m">⚠️ кольцо из 4 при 3 вкладках</td><td class="y">✅ «шаг n из 4» + «n из 28» с сервера</td></tr>
+<tr><td>Поздравление и серия</td><td>профессора</td><td class="m">⚠️ серия только на экране прогресса</td><td class="y">✅</td><td class="y">✅ на главной и в уроке, без упрёков</td></tr>
+<tr><td>Большая веха 28 → Этап II</td><td>профессора</td><td class="y">✅</td><td class="m">⚠️ «Поделиться» не работает в продакшне</td><td class="y">✅ кнопка Этапа II только если он открыт</td></tr>
+<tr><td>Артикуляция: статичная картинка и текст, живое видео — по желанию</td><td>профессора</td><td class="n">❌ нет</td><td class="n">❌ нет</td><td class="m">⚠️ ещё не нарисовано, остаётся «Углублённо»</td></tr>
+<tr><td>Без лишней игровой механики</td><td>ТЗ</td><td class="m">⚠️ «Достижение»</td><td class="m">⚠️ много анимаций</td><td class="y">✅ конфетти только на вехе, учтено «уменьшить движение»</td></tr>
+<tr><td>Реально работает как виджет Telegram</td><td>Telegram</td><td class="n">❌ экраны приложения, картинки не помещаются</td><td class="y">✅</td><td class="y">✅ 1,3–2,1 КБ из 4 КБ</td></tr>
+<tr><td>Буквы и порядок с сервера, не зашиты</td><td>ТЗ</td><td>—</td><td class="n">❌ зашиты в карте</td><td class="y">✅</td></tr>
+<tr><td>Работает без <code>TelegramWidget</code></td><td>ТЗ</td><td>—</td><td class="n">❌ падает</td><td class="y">✅ заглушка</td></tr>
+<tr><td>Светлая и тёмная тема Telegram</td><td>ТЗ</td><td class="m">⚠️ только светлая</td><td class="y">✅</td><td class="y">✅ тема Telegram + фирменный зелёный</td></tr>
+<tr><td>Одно главное действие на экран</td><td>ТЗ</td><td class="y">✅</td><td class="m">⚠️ вкладки и карусель</td><td class="y">✅</td></tr>
+<tr><td>Единая модель шагов</td><td>ТЗ</td><td class="y">✅ 4</td><td class="n">❌ 3 вкладки и 4 шага</td><td class="m">⚠️ 4, ждёт утверждения</td></tr>
+<tr><td>Старые клиенты видят текст</td><td>Telegram</td><td>—</td><td class="y">✅ подпись</td><td class="y">✅ подпись</td></tr>
+</table></div>
+
+<h2>4. Итог v2: как это выглядит в чате</h2>
+<p class="lead">Один виджет на урок проходит четыре шага: бот правит его состояние, а нового сообщения не нужно. Видео, голосовое учителя и голосовое ученика — обычные сообщения Telegram. Нажимайте кнопки в виджетах: журнал под экраном показывает, какой запрос получил бот.</p>
+<div class="row">
+__V2__
+</div>
+
+<h2>5. Решения владельца (до кода)</h2>
+<div class="q">
+<div><b>4 или 5 шагов?</b> В <code>spec-for-chatgpt.md</code> написано «пять шагов», в макетах «шаг n из 4», в v1 три вкладки. Это моя несогласованность, ChatGPT справедливо её заметил.<br><em>Рекомендую 4:</em> Видео → Слова → Попытка → Разбор. Прогресс и поздравление — итог шага 4, а не отдельный шаг. Вариант с 5 шагами даёт отдельный экран итога, но удлиняет путь.</div>
+<div><b>Что значит «28»?</b> (а) 28 букв алфавита; (б) 28 пунктов программы; (в) 28 букв с огласовками как один пункт на букву. В программе бота 28 уроков букв (L004–L030 + алиф с хамзой, L003).<br><em>Нужен ответ профессора</em>, иначе «n из 28» показывать нельзя.</div>
+<div><b>Когда урок засчитан?</b> Сейчас M-12: «урок пройден, когда засчитаны все строки», но «не получается — можно дальше». Профессор просит «прочитать все слова один раз».<br>Варианты: (а) засчитан после любой голосовой попытки по всем словам; (б) как сейчас, по порогу M-01 (≥ 80); (в) засчитан по попытке, а порог M-01 только для звёздочки «уверенно». <em>Рекомендую (в)</em>: не блокирует ученика и сохраняет данные для исследования.</div>
+<div><b>Как реализовать <code>sendWidget</code> без поддержки в aiogram 3.31?</b> (а) свой метод <code>TelegramMethod</code> в адаптере; (б) сырой HTTP-вызов в адаптере; (в) ждать релиз aiogram (PR #2004). <em>Рекомендую (а)</em> за портом: меньше всего кода, тип проверяет mypy, а после релиза aiogram его легко заменить.</div>
+<div><b>Звук по слову или целиком?</b> Каждое нажатие — отдельное голосовое (нужны записи по словам) или одна запись урока. Зависит от того, какие записи учителя уже есть.</div>
+</div>
+
+<h2>6. Что сделать</h2>
+<ol class="plan">
+<li><b>Фаза 0 — аудит</b> (без изменения поведения): <code>docs/design/muallim-2.0-audit.md</code>. Что уже есть в коде (обработчики, прогресс, серия, оценка), чего нет, риски, вопросы выше. Заново проверить документацию Telegram с датой и ссылками.</li>
+<li><b>Фаза 1 — контракты</b>: путь «сообщение → действие → сценарий → ответ», JSON-схемы <code>chat_data</code> с версией <code>v</code>, защита от чужого пользователя, повторов и гонок, ADR.</li>
+<li><b>Фаза 2 — один урок целиком</b> по TDD: видео, виджет урока, голосовое учителя по нажатию, голосовое ученика, существующая оценка, разбор, повтор или дальше, восстановление после перезапуска.</li>
+<li><b>Фаза 3 — карта и прогресс</b> на существующих сценариях, веха после утверждения правила.</li>
+<li><b>Фаза 4 — проверка</b>: валидатор <code>widget-sandbox</code>, тестовый сервер, iOS, Android, Desktop, Web, тёмная тема, старые клиенты, таймауты и лимиты.</li>
+</ol>
+<p>Исправить в документах: «пять шагов» в <code>spec-for-chatgpt.md</code> (после решения), прототипы v1 оставить как историю, концепт ChatGPT хранить только как ориентир по стилю.</p>
+
+<h2>7. Размер виджетов (измерено)</h2>
+<p>Лимит Telegram: 4096 байт после zlib уровня 9 и 32 768 байт исходного HTML.</p>
+<div class="tw"><table><tr><th>Виджет</th><th>HTML, байт</th><th>Сжатый, байт</th><th>Запас до 4096</th></tr>
+__SIZES__
+</table></div>
+</div>
+<script>
+/* Имитация TelegramWidget в обычном браузере; настоящие виджеты запускает QuickJS Telegram. */
+var WIDGETS = __WIDGETS__;
+function mount(host) {
+  var name = host.dataset.w, state = JSON.parse(host.dataset.state);
+  var fig = host.closest("figure"), log = fig ? fig.querySelector(".log") : null;
+  var root = host.attachShadow({mode: "open"});
+  var tpl = document.createElement("template");
+  tpl.innerHTML = WIDGETS[name];
+  var scripts = Array.prototype.slice.call(tpl.content.querySelectorAll("script"));
+  var code = scripts.map(function (s) { return s.textContent; }).join("\n");
+  scripts.forEach(function (s) { s.remove(); });
+  root.appendChild(tpl.content);
+  var T = {
+    chatData: JSON.stringify(state), isPreview: false,
+    onEvent: function () {},
+    request: function (d) {
+      if (log) { log.innerHTML = "→ бот получил запрос <b>" + d + "</b>"; }
+      return new Promise(function (ok) { setTimeout(function () { ok({result: null}); }, 500); });
+    }
+  };
+  var doc = {
+    getElementById: function (id) { return root.getElementById(id); },
+    createElement: function (t) { return document.createElement(t); }, createTextNode: function (t) { return document.createTextNode(t); }
+  };
+  try { new Function("window", "document", "matchMedia", code)({TelegramWidget: T}, doc, window.matchMedia.bind(window)); }
+  catch (e) { if (log) { log.textContent = "ошибка: " + e.message; } }
+}
+document.querySelectorAll(".wb").forEach(mount);
+</script>

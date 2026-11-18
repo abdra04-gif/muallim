@@ -246,7 +246,7 @@ Diacritics:
 Sound inventory:
 
 - **primary:** the Quran Phonetic Script already used by the bot and by the Muaalem model and its relatives (Phase 1);
-- **published mapping:** a table from each symbol to IPA and, where one exists, to the 68-symbol set of the IQRA benchmark, in `docs/phoneme-inventory.md`. This lets other groups score models that use a different inventory;
+- **published mapping:** a table from each symbol to IPA and, where one exists, to the 68-symbol set of the IQRA benchmark, in the dataset's own `phoneme-inventory.md` (planned, see the tree above). This lets other groups score models that use a different inventory;
 - sounds outside Arabic (a Russian substitute) need a symbol. Proposal: one reserved symbol for "non-Arabic sound" plus a free-text note; a finer inventory can be added after the first labelled batch shows which substitutes actually occur.
 
 Time alignment: not annotated by hand. If automatic alignments are added later, they go into a separate field marked as automatic.

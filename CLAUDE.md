@@ -41,6 +41,7 @@ Telegram-бот — тренажёр чтения по учебнику «Аль
 | `make report` · `make verify` · `make errors a="--letter ص"` | отчёты, сверка БД и файлов записей, каталог ошибок (`docs/data/browsing.md`) |
 | `scripts/phase [tests\|impl\|off]` | TDD-фаза; в `impl` хук запрещает править `tests/` |
 | `make trace` | требования ↔ тесты сейчас, отпечаток версии (`docs/requirements/verification-status.md`) |
+| `make site` | сайт-описание и демо для профессоров (RU/EN) из `docs/site/`, результат — в папке `build` рядом (не коммитить: там страницы скана книги) |
 | `make hygiene` | объявленные зависимости (deptry) и безопасность CI (zizmor), как в CI (ADR-0042) |
 | `make model-check` | не обновилась ли модель Muaalem на Hugging Face (в GitHub — раз в неделю, письмо; TD-FN-121) |
 | `make logs` (`n=200`) | последние строки лога бота `logs/bot.log` (ADR-0048) |

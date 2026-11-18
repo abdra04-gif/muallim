@@ -1,0 +1,28 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
+h3{margin:0 0 2px;font-size:16px}.s{font-size:12px;color:var(--tg-theme-hint-color);margin-bottom:8px}
+.e{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;padding:9px 10px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);margin-bottom:5px;text-align:left;width:100%}
+.e i{font-style:normal;grid-row:span 2;font-size:18px;align-self:center}.e b{font-size:13.5px}.e small{font-size:11.5px;color:var(--tg-theme-hint-color)}
+.e span{font-size:12px;color:var(--tg-theme-hint-color)}.e u{text-decoration:none;font:17px system-ui,serif;direction:rtl;color:var(--au);grid-row:span 2;align-self:center}
+.f{display:flex;gap:6px;margin-top:8px}.f button{flex:1;padding:10px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-weight:700}
+</style>
+<div class="w"><h3 id="h"></h3><div class="s" id="s"></div><div id="l"></div><div class="f"><button id="b"></button><button id="hm"></button></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I;
+var R={ru:["📜 История занятий","Попыток: # · ошибок найдено: # · исправлено: #","Урок #","попыток: # · ошибок: # · исправлено: #","просмотрена без чтения","‹ Повторение","🏠"],
+en:["📜 Study history","Attempts: # · errors found: # · fixed: #","Lesson #","attempts: # · errors: # · fixed: #","viewed without reading","‹ Review","🏠"]};
+var IC={D:"✅",V:"👁",P:"🟡"};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{e:[]};I=R[S.lg]||R.ru;var a=0,er=0,fx=0;
+var l=$("l");l.innerHTML="";S.e.forEach(function(x){a+=x[3];er+=x[4];fx+=x[5];var b=el("button","e");b.appendChild(el("i","",IC[x[2]]));
+var t=el("b","",f(I[2],x[0],x[1]));b.appendChild(t);b.appendChild(el("u","",x[7]||""));
+var d=el("span","",x[2]=="V"?I[4]:f(I[3],x[3],x[4],x[5]));b.appendChild(d);var dt=el("small","",x[6]);t.appendChild(document.createTextNode(" "));t.appendChild(dt);
+b.onclick=function(){T.request("o:"+x[0]).then(function(){},function(){})};l.appendChild(b)});
+$("h").textContent=I[0];$("s").textContent=f(I[1],a,er,fx);$("b").textContent=I[5];$("hm").textContent=I[6]}
+$("b").onclick=function(){T.request("prog").then(function(){},function(){})};$("hm").onclick=function(){T.request("home").then(function(){},function(){})};
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

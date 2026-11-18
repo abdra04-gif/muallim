@@ -1,0 +1,26 @@
+<style>
+.w{padding:14px 14px max(14px,env(safe-area-inset-bottom));font-family:system-ui,serif;color:var(--tg-theme-text-color);text-align:center}
+.fl{font-size:54px;line-height:1.1;display:inline-block;animation:fl 1.6s ease-in-out infinite}
+@keyframes fl{50%{transform:scale(1.15) rotate(-4deg)}}
+.n{font-size:34px;font-weight:800}.h{color:var(--tg-theme-hint-color);font-size:13px}
+.wk{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.wk div{width:34px;font-size:11px;color:var(--tg-theme-hint-color)}
+.wk i{display:block;width:34px;height:34px;border-radius:17px;margin-bottom:3px;background:var(--tg-theme-secondary-bg-color);line-height:34px;font-style:normal;font-size:15px}
+.wk .d i{background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color)}
+.wk .t i{border:2px solid var(--tg-theme-button-color);line-height:30px}
+button{font:inherit;display:block;width:100%;padding:10px;border:0;border-radius:12px;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color);font-weight:700}
+</style>
+<div class="w"><div class="fl">🔥</div><div class="n" id="n"></div><div class="h" id="h"></div>
+<div class="wk" id="wk"></div><button id="go">Занятие на 3 минуты</button></div>
+<script>
+(function(){
+var T=window.TelegramWidget,$=function(i){return document.getElementById(i)},S;
+try{S=JSON.parse(T.chatData)}catch(e){}S=S||{k:0,d:"0000000"};
+var D=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+$("n").textContent=S.k+" дн.";
+$("h").textContent=S.d.charAt(S.t||0)=="1"?"Сегодня уже занимался. Так держать!":"Занятие сегодня сохранит серию";
+$("wk").innerHTML=D.map(function(x,i){var c=S.d.charAt(i)=="1"?"d":i==S.t?"t":"";
+return '<div class="'+c+'"><i>'+(c=="d"?"✓":"")+"</i>"+x+"</div>"}).join("");
+$("go").onclick=function(){T.request("go").then(function(){},function(){})};
+})();
+</script>

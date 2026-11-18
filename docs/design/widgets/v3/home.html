@@ -1,0 +1,43 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);--on:light-dark(#fff,#10261A);padding:14px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.95)}
+.hd{display:flex;align-items:center;gap:8px}.hd svg{width:28px;height:28px}.hd b{font:700 22px/1.1 system-ui,serif;color:var(--g);flex:1}
+.k{padding:3px 10px;border-radius:99px;background:var(--gs);font-size:13px;font-weight:700}
+.k i{font-style:normal;display:inline-block;animation:fl 1.6s ease-in-out infinite}@keyframes fl{50%{transform:scale(1.25)}}
+.st{display:flex;justify-content:space-between;margin:12px 2px 6px;font-size:13px;color:var(--tg-theme-hint-color)}.st b{color:var(--tg-theme-text-color)}
+.pp{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:12.5px;color:var(--tg-theme-hint-color);margin:4px 2px 12px}.pp b{color:var(--tg-theme-text-color)}.pp div{height:6px;border-radius:3px;background:var(--tg-theme-secondary-bg-color);overflow:hidden}.pp u{display:block;height:100%;background:var(--g);transition:width 1s}
+.g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;direction:rtl}
+.c{font:20px/1.85 system-ui,serif;border-radius:9px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color);position:relative;animation:pop .35s backwards}
+@keyframes pop{from{transform:scale(.6)}}
+.c.D{background:var(--gs);color:var(--tg-theme-text-color)}.c.D::after{content:"✓";position:absolute;top:-2px;right:2px;font:9px system-ui;color:var(--g)}
+.c.R{background:var(--gs);color:var(--tg-theme-text-color);outline:2px dashed var(--au)}.c.R::after{content:"🔁";position:absolute;top:-4px;right:0;font:8px system-ui}
+.c.C{outline:2px solid var(--g);color:var(--tg-theme-text-color);animation:pop .35s backwards,cu 1.6s .5s infinite}@keyframes cu{50%{transform:scale(1.1)}}
+.br{height:7px;margin:10px 2px 12px;border-radius:4px;background:var(--tg-theme-secondary-bg-color);overflow:hidden}.br i{display:block;width:0;height:100%;background:var(--g);transition:width 1s ease-out}
+.hi{font-size:14px;margin:8px 2px 0}
+.r{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.r button{flex:1;padding:9px 2px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-size:12.5px;font-weight:700}
+.go{display:block;width:100%;margin:10px 0 4px;padding:13px;border-radius:15px;background:var(--g);color:var(--on);font-weight:700;font-size:15px}.go small{display:block;margin-top:3px;font-size:12.5px;font-weight:500;opacity:.88}
+#m{font-size:12px;color:var(--tg-theme-hint-color);min-height:1.2em;margin-top:6px;text-align:center}
+@media (prefers-reduced-motion:reduce){.k i,.c,.c.C{animation:none}}
+.r button:last-child:nth-child(odd){grid-column:1/-1}[hidden]{display:none!important}
+</style>
+<div class="w"><div class="hd"><svg viewBox="0 0 30 30"><path fill="var(--au)" d="M15 1l4 6 7-1-1 7 6 4-6 4 1 7-7-1-4 6-4-6-7 1 1-7-6-4 6-4-1-7 7 1z"/><circle cx="15" cy="15" r="6" fill="var(--tg-theme-bg-color)"/></svg><b id="tl"></b><span class="k" id="k"></span></div>
+<div class="hi" id="hi"></div><div class="st" id="st"><span id="sn"></span><b id="n"></b></div><div class="g" id="g"></div><div class="pp" id="pp"><span id="l1"></span><div><u id="p"></u></div><b id="n2"></b><span id="l2"></span><div><u id="q"></u></div><b id="n3"></b></div>
+<button class="go" id="go"></button><div class="r"><button id="a1"></button><button id="a2"></button><button id="a3"></button><button id="a4"></button></div><div id="m"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},busy=0,S,I;
+var R={ru:["Муаллим","Этап I · все 28 букв","# из #","▶ Продолжить: урок #","Нажмите на букву — откроется её карточка","Открываю…","Не вышло, попробуйте ещё раз","дн.","🌙 Ассаляму алейкум!","📚 Уроки","🔁 Повторение","📊 Прогресс","⚙️ Настройки","Буквы","Уроки","▶ Начать","сначала — алфавит, 5 мин","🔤 Алфавит"],
+en:["Muallim","Stage I · all 28 letters","# of #","▶ Continue: lesson #","Tap a letter to open its card","Opening…","Something went wrong, please try again","days","🌙 Assalamu alaikum!","📚 Lessons","🔁 Review","📊 Progress","⚙️ Settings","Letters","Lessons","▶ Start","the alphabet first, 5 min","🔤 The alphabet"]};
+function f(s){var a=arguments,i=1;return s.replace(/#/g,function(){return a[i++]})}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.impactOccurred("light")}catch(e){}$("m").textContent=I[5];
+T.request(d).then(function(){$("m").textContent=""},function(){$("m").textContent=I[6]}).then(function(){busy=0})}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{};I=R[S.lg]||R.ru;
+$("tl").textContent=I[0];$("hi").textContent=I[8];$("a1").textContent=I[9];$("a2").textContent=I[10]+(S.du?" · "+S.du:"");$("a3").textContent=I[11];$("a4").textContent=I[12];$("sn").textContent=I[1];$("n").textContent="";
+$("k").innerHTML="";$("k").hidden=!S.k;if(S.k){$("k").innerHTML="<i>🔥</i> ";$("k").appendChild(document.createTextNode(S.k+" "+I[7]))}
+var g=$("g");g.innerHTML="";(S.L||"").split("").forEach(function(x,i){var s=(S.m||"").charAt(i)||"N",c=document.createElement("button");
+c.className="c "+s;c.textContent=x;c.style.animationDelay=i*20+"ms";c.onclick=function(){ask("l:"+i)};g.appendChild(c)});
+$("l1").textContent=I[13];$("l2").textContent=I[14];$("n2").textContent=(S.n||0)+"/28";$("n3").textContent=(S.P||0)+"/15";setTimeout(function(){$("p").style.width=Math.round((S.n||0)*100/28)+"%";$("q").style.width=Math.round((S.P||0)*100/15)+"%"},60);
+var g=$("go"),sm=document.createElement("small");g.textContent=S.nl===0?I[15]:f(I[3],S.nl);sm.textContent=S.nl===0?I[16]:(S.nt||"");if(sm.textContent)g.appendChild(sm);if(S.nl>0)sm.style.fontSize="22px";var A=!!S.a;$("st").hidden=$("g").hidden=$("m").hidden=A;$("pp").hidden=!A;$("m").textContent=I[4]}
+$("go").onclick=function(){ask("go")};$("a1").onclick=function(){ask("list")};$("a2").onclick=function(){ask("rev")};$("a3").onclick=function(){ask("prog")};$("a4").onclick=function(){ask("set")};T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

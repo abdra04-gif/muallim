@@ -1,0 +1,395 @@
+# Содержание демонстрации уроков (scripts/site/lessons.py → docs/site/build/lessons.html). Правится здесь.
+# book — дословно со страниц книги SRC-040; explain_ru/explain_en — объяснения без кириллических примеров звуков
+# (черновик агента, утверждает автор); videos — серия «Уроки таджвида» (musulmanin), минуты — полная длина;
+# review — вопросы «послушай и выбери», a — номер верного ответа (в боте хранится на сервере, не в виджете).
+# annotation — пример очереди учителя (conf — пример уверенности модели, не реальные числа): строки урока 2, flags — номера клеток с ⚠️ (пример ответа модели).
+book:
+  ء:
+    ru: «Хэмзэ» образуется в нижней части гортани.
+    en: Hamza is formed in the lower part of the throat.
+  ر:
+    ru: Образуется, когда передняя часть спинки языка касается передней части верхнего нёба.
+    en: Formed when the front of the back of the tongue touches the front of the upper palate.
+  ز:
+    ru: Образуется при приближении передней части спинки языка к передним зубам. Кончик языка при этом
+      касается передних нижних зубов.
+    en: Formed when the front of the tongue comes close to the front teeth; the tip touches the lower
+      front teeth.
+  م:
+    ru: Образуется при смыкании губ.
+    en: Formed by closing the lips.
+  ت:
+    ru: Образуется, когда передняя часть спинки языка касается основания передних верхних зубов.
+    en: Formed when the front of the tongue touches the base of the upper front teeth.
+  ن:
+    ru: Образуется, когда передняя часть спинки языка касается верхних дёсен.
+    en: Formed when the front of the tongue touches the upper gums.
+explain_en:
+  vowels: 'Fatha: a short stroke above the letter; a short open vowel, the jaw drops.
+
+    Kasra: a stroke below the letter; a short vowel with lips slightly spread.
+
+    Damma: a small wāw-shaped mark above; a short vowel with rounded lips.
+
+    Each lasts one count. Do not stretch it.'
+  ء: 'When alif carries the small hamza ء and a vowel mark, it is read as a short vowel that starts with
+    a light catch in the throat: the vocal cords close for a moment and open sharply.'
+  ر: Tip of the tongue at the ridge behind the upper teeth. One light tap, do not roll it. With fatha
+    and damma ر is heavy; with kasra it is light.
+  ز: 'Tip of the tongue at the lower front teeth; the air passes with a buzz. A voiced sound: do not let
+    it turn into س.'
+  م: Both lips closed, the sound goes through the nose. Close the lips firmly and softly.
+  ت: Tip of the tongue at the base of the upper front teeth. A light sound; do not confuse it with the
+    heavy ط.
+  ن: Tip of the tongue at the ridge behind the upper teeth; the sound goes through the nose.
+ui:
+  ru:
+    letter: 'Буква #'
+    vowels: Три огласовки
+    hamza: Элиф с хэмзэ
+    lines: Строки страницы
+    check: Проверь себя
+    checkNx: Проверь себя ›
+    checkE: Прочитайте все строки страницы вслух, справа налево, и пришлите одно голосовое.
+    read: Прочитайте страницу
+    readE: Прочитайте строки вслух и отправьте голосовое. Я послушаю и подскажу, что повторить.
+  en:
+    letter: 'The letter #'
+    vowels: Three short vowels
+    hamza: Alif with hamza
+    lines: The lines of the page
+    check: Check yourself
+    checkNx: Check yourself ›
+    checkE: Read all lines of the page aloud, right to left, and send one voice message.
+    read: Read the page
+    readE: Read the lines aloud and send a voice message. I will listen and show what to repeat.
+rule49:
+  ru: Буква ن с «сукуном» и «танвин» сливаются с идущими после них буквами ل и ر без назализации.
+  en: Nun with sukun and tanwin merge into a following ل or ر without nasalisation.
+rule50:
+- title_ru: Полный идгам · ن
+  title_en: Full idgham · ن
+  arabic:
+  - - 'مِّن '
+    - 0
+  - - رَّ
+    - 1
+  - - بِّهِمْ
+    - 0
+  ru: Признаком того, что ن с «сукуном» находится в положении полного «Идгама», является отсутствие «сукуна»
+    над ن и наличие «ташдида» над последующей буквой.
+  en: 'Sign of full idgham for ن: there is no sukun on ن, and the next letter carries a shadda.'
+- title_ru: Полный идгам · танвин
+  title_en: Full idgham · tanwin
+  arabic:
+  - - 'غَفُورًۭا '
+    - 0
+  - - رَّ
+    - 1
+  - - حِيمًۭا
+    - 0
+  ru: Признаком того, что «танвин» находится в положении полного «Идгама», является написание соответствующих
+    огласовок одна за другой и наличие «ташдида» над последующей буквой.
+  en: 'Sign of full idgham for tanwin: the two vowel marks are written one after the other, and the next
+    letter carries a shadda.'
+- title_ru: Неполный идгам
+  title_en: Partial idgham
+  arabic: ن
+  ru: Признаком того, что ن с «сукуном» находится в положении неполного «Идгама», является отсутствие
+    «сукуна» над ن и отсутствие «ташдида» над последующей буквой. Для «танвина» — огласовки одна за другой
+    и нет «ташдида» над последующей буквой.
+  en: 'Sign of partial idgham: no sukun on ن and no shadda on the next letter. For tanwin: the vowel marks
+    are written one after the other and the next letter has no shadda.'
+quiz:
+  ru:
+    question: 'Вопрос: в مِّن رَّبِّهِمْ над ر есть ташдид?'
+    options:
+    - Да
+    - Нет
+    right: 'Верно: над ن нет сукуна, над ر ташдид — полный идгам. Перед ل и ر — без назализации (с. 49).'
+    wrong: 'Посмотрите ещё раз: над ر стоит ташдид ّ.'
+  en:
+    question: 'Question: in مِّن رَّبِّهِمْ, is there a shadda on ر?'
+    options:
+    - 'Yes'
+    - 'No'
+    right: 'Right: no sukun on ن, a shadda on ر, so it is full idgham; before ل and ر without nasalisation
+      (page 49).'
+    wrong: 'Look again: there is a shadda ّ above ر.'
+# videos: from/to — минуты фрагмента этой страницы в ролике («02:15»). Пусто = ещё не отмечено учителем:
+# кнопка открывает ролик с начала. Ролики без глав, поэтому отметки ставит человек, посмотрев видео.
+# letters — буквы, которые разбирает ролик (по его названию): части урока показывают только «свой» ролик.
+videos:
+  10:
+  - id: QUINQMRkrxM
+    letters: اأ
+    title: Уроки таджвида. Урок 1. Вступление. Арабский алфавит
+    author: musulmanin · исламиндекс.ру
+    minutes: 27
+  11:
+  - id: -dzoCLH36lY
+    letters: ءرزمت
+    title: Уроки таджвида. Урок 2. Огласовки. Хамза, Ра, Зай, Мим, Та
+    author: musulmanin · исламиндекс.ру
+    minutes: 29
+  12:
+  - id: -dzoCLH36lY
+    letters: ءرزمت
+    title: Уроки таджвида. Урок 2. Огласовки. Хамза, Ра, Зай, Мим, Та
+    author: musulmanin · исламиндекс.ру
+    minutes: 29
+  - id: CNm3ucjwcI0
+    letters: نيبكلو
+    title: 'Уроки таджвида. Урок 3. Буквы: Нун, Йа, Ба, Кяф, Лям, Вав'
+    author: musulmanin · исламиндекс.ру
+    minutes: 28
+  13:
+  - id: CNm3ucjwcI0
+    letters: نيبكلو
+    title: 'Уроки таджвида. Урок 3. Буквы: Нун, Йа, Ба, Кяф, Лям, Вав'
+    author: musulmanin · исламиндекс.ру
+    minutes: 28
+  14:
+  - id: CNm3ucjwcI0
+    letters: نيبكلو
+    title: 'Уроки таджвида. Урок 3. Буквы: Нун, Йа, Ба, Кяф, Лям, Вав'
+    author: musulmanin · исламиндекс.ру
+    minutes: 28
+  15:
+  - id: CNm3ucjwcI0
+    letters: نيبكلو
+    title: 'Уроки таджвида. Урок 3. Буквы: Нун, Йа, Ба, Кяф, Лям, Вав'
+    author: musulmanin · исламиндекс.ру
+    minutes: 28
+  49:
+  - id: EMNVHmbOibA
+    title: Уроки таджвида. Урок 9. Идгам. Изхар
+    author: musulmanin · исламиндекс.ру
+    minutes: 32
+  50:
+  - id: EMNVHmbOibA
+    title: Уроки таджвида. Урок 9. Идгам. Изхар
+    author: musulmanin · исламиндекс.ру
+    minutes: 32
+explain_ru:
+  vowels: 'Фатха — косая чёрточка над буквой: короткий открытый гласный, челюсть опускается.
+
+    Кясра — чёрточка под буквой: короткий гласный, губы слегка растянуты.
+
+    Дамма — маленький знак в форме و над буквой: короткий гласный, губы округлены.
+
+    Каждая огласовка звучит один счёт — не растягивайте.'
+  ء: 'Когда над алифом или под ним стоят маленькая хамза ء и огласовка, он читается коротким гласным,
+    который начинается лёгкой смычкой в горле: голосовые связки на миг смыкаются и резко размыкаются.'
+  ر: Кончик языка у бугорка за верхними зубами. Один лёгкий удар — не раскатывайте. С фатхой и даммой
+    ر твёрдая, с кясрой — мягкая.
+  ز: Кончик языка у нижних передних зубов, воздух проходит со звонким свистом. Звук звонкий — не превращайте
+    его в س.
+  م: Обе губы сомкнуты, звук идёт через нос. Смыкайте губы плотно и мягко.
+  ت: Кончик языка у основания верхних передних зубов. Звук лёгкий, язык не прижимается всей спинкой. Не
+    путайте с твёрдым ط.
+  ن: Кончик языка у бугорка за верхними зубами, звук идёт через нос.
+review:
+- o:
+  - رَ
+  - زَ
+  - مَ
+  a: 0
+- o:
+  - نِ
+  - تِ
+  - مِ
+  a: 1
+- o:
+  - رُ
+  - مُ
+  - زُ
+  a: 2
+- o:
+  - تَ
+  - نَ
+  - مَ
+  a: 1
+- o:
+  - أُ
+  - أَ
+  - إِ
+  a: 0
+annotation:
+- lesson: L004
+  line: 1
+  page_line: 1
+  page: 11
+  flags:
+  - 3
+  bot:
+    ru: 'Бот: в слоге رِ прозвучала фатха вместо кясры'
+    en: 'Bot: in رِ a fatha was heard instead of kasra'
+  conf:
+    3:
+    - r
+    - 87
+    - 'ошибка: фатха вместо кясры'
+    - 'error: fatha instead of kasra'
+    4:
+    - y
+    - 64
+    - 'сомневается: сукун выдержан?'
+    - 'unsure: was the sukun held?'
+- lesson: L005
+  line: 1
+  page_line: 2
+  page: 11
+  flags:
+  - 6
+  - 12
+  bot:
+    ru: 'Бот: в أُ — фатха вместо даммы; в زِ — буква س вместо ز'
+    en: 'Bot: in أُ a fatha instead of damma; in زِ the letter س instead of ز'
+  conf:
+    6:
+    - r
+    - 87
+    - 'ошибка: фатха вместо даммы'
+    - 'error: fatha instead of damma'
+    12:
+    - y
+    - 62
+    - возможно, س вместо ز
+    - maybe س instead of ز
+- lesson: L006
+  line: 1
+  page_line: 4
+  page: 11
+  flags: []
+  bot:
+    ru: 'Бот: ошибок не нашёл'
+    en: 'Bot: no errors found'
+  conf:
+    9:
+    - y
+    - 58
+    - 'сомневается: огласовка неясна'
+    - 'unsure: the vowel is unclear'
+# line_crops — строки для чтения вырезаются из скана книги (curriculum/book_pages): [верх, низ] по превью
+# высотой 760; одна пара = одна строка книги, в порядке строк урока. Сверено глазами 2026-11-15.
+line_crops:
+  10:
+  - [600, 650]
+  11:
+  - [152, 195]
+  - [358, 400]
+  - [410, 453]
+  - [583, 628]
+  - [638, 683]
+  12:
+  - [165, 208]
+  - [222, 265]
+  - [282, 327]
+  - [498, 543]
+  - [560, 604]
+  - [630, 678]
+# swaid — д-р Айман Сувейд, официальный канал @Dr.AymanSwaid (проверено 2026-11-16 по oEmbed: автор канала).
+# Короткие ролики «The Articulation Point of the Letter …» (1–2,5 мин) на 24 буквы; для ق ص غ ء коротких нет —
+# взяты его уроки с того же канала (long: true). Буква ا на с. 10 — ролик о хамзе с сукуном (ссылка профессора).
+swaid:
+  ا: {id: ixTtGwrHYiM}
+  ب: {id: FjIfrIOHZys}
+  ت: {id: 6DGo0mQpoJk}
+  ث: {id: BSEVJZeOY5c}
+  ج: {id: fZPFoUW4ysU}
+  ح: {id: cO8tVnaDAVU}
+  خ: {id: WXQfq8G4Hkw}
+  د: {id: -fmdMhGGXtk}
+  ذ: {id: BSEVJZeOY5c}
+  ر: {id: kC9b8BeufOQ}
+  ز: {id: ZqLMtCVklno}
+  س: {id: 9vDpjp5VPqQ}
+  ش: {id: 3yFsTM1t4-Y}
+  ص: {id: MjvzC27428k, long: true}
+  ض: {id: U77TRmmc7W8}
+  ط: {id: hN1vjATSc7s}
+  ظ: {id: mSfDNA3UljA}
+  ع: {id: dYhYL0-nVzY}
+  غ: {id: 2BFpfzbBBVo, long: true}
+  ف: {id: jeALKDat36A}
+  ق: {id: PHnOiy3blcQ, long: true}
+  ك: {id: p4Rsy2WPcGE}
+  ل: {id: RDy-wdGrexU}
+  م: {id: TcnbC5AqJw0}
+  ن: {id: BuhvNsgFWLk}
+  ه: {id: ZhC9dhD6XTY}
+  و: {id: A2UDb0hFeMM}
+  ي: {id: YaRpc7-JsMw}
+# book_short — канал @Myallim_sani («Муаллим сани · второй учитель»): по уроку на каждую букву, 1–5 мин,
+# учитель ведёт по строкам книги и читает их (старое издание, порядок букв тот же). Проверено 2026-11-16:
+# автор канала по oEmbed, буква — по обложке (урок 3 назван «Заль», но на обложке زَ زِ زُ — это ز).
+# Качество произношения — подтверждает преподаватель. Длинная серия «Уроки таджвида» (videos) — в «Углублённо».
+book_short:
+  ا: {id: CLcEtB7t_q8, len: "1:28"}
+  ر: {id: lhVw7s6bui0, len: "0:43"}
+  ز: {id: zzcG6Zp9QnQ, len: "0:49"}
+  م: {id: u3Twc5X-NsI, len: "1:06"}
+  ت: {id: P_gCF4cRAPo, len: "1:13"}
+  ن: {id: teQf22SqGwo, len: "1:50"}
+  ي: {id: WVy4-6ntKrY, len: "1:48"}
+  ب: {id: RHkXHnZD6zM, len: "1:45"}
+  ك: {id: 57fqTDPemq8, len: ""}
+  ل: {id: 3NjodY9BfXY, len: "2:41"}
+  و: {id: 2feyjMvtbdw, len: "2:30"}
+  ه: {id: u5dI8nKH4CY, len: "2:15"}
+  ف: {id: Xpm9S5RjU5E, len: "2:25"}
+  ق: {id: e-mfoxaREcs, len: "2:24"}
+  ش: {id: jgmrSHFRlBQ, len: "2:13"}
+  س: {id: 2PvQsp6ndzo, len: "2:17"}
+  ث: {id: eEDk1gJ8MS0, len: "3:03"}
+  ص: {id: kvmdt27NsLM, len: "2:25"}
+  ط: {id: HO_yX2d6anM, len: "3:07"}
+  ج: {id: fMluodNlF9o, len: "1:56"}
+  خ: {id: C3WbUxdVCV8, len: "2:26"}
+  ح: {id: vggwW1PYpT0, len: "2:48"}
+  غ: {id: bbC-JuF9gdg, len: "1:48"}
+  ع: {id: xGoKUKko-Xc, len: "2:34"}
+  د: {id: Z4yqjRXuOl0, len: "2:07"}
+  ض: {id: sVscpxZU138, len: "2:48"}
+  ذ: {id: JY2_-PUVFVA, len: "3:21"}
+  ظ: {id: rV_wmxf4Oyk, len: "5:04"}
+# abu_yasin — Абу Ясин Руслан Маликов, официальный канал «Исламские уроки» (@Ruslan_Malikov), курс
+# «Учимся читать Коран по-арабски» по книге «Муаллим сани» (abu-yasin.com/playlist/quran-reading/).
+# Проверено 2026-11-18 по oEmbed: автор канала и название каждого ролика; длительность — со страницы ролика.
+# lesson — урок блока 1 «Буквы» (по-русски, по книге); mk — модуль «Махрадж» (откуда звук), у ا его нет.
+abu_yasin:
+  alphabet: {id: o4oRsk4BIMU, len: "5:10", t: "Урок 1. Арабский алфавит"}
+  vowels:
+  - {id: HxLbaC9shRg, len: "15:42", t: "Урок 4. Харакаты-огласовки"}
+  - {id: _XnLh099IpA, len: "7:14", t: "Урок 5. Закрепление харакатов"}
+  - {id: m6d70M_Evs4, len: "10:06", t: "Урок 6. Огласовки с буквами ر и ا"}
+  letters:
+    ا: {id: Q4PjIyBHTSw, len: "6:58"}
+    ر: {id: LjbsNdJnJlQ, len: "8:26", mk: QTln15wk-Iw, mkl: "25:48"}
+    ز: {id: bN_mxfBahEo, len: "7:54", mk: bTg-IMfr3Nw, mkl: "16:36"}
+    م: {id: GtHxfgLr6Qw, len: "11:30", mk: sYWQlD-RQYI, mkl: "13:31"}
+    ت: {id: odW0pz1eDb4, len: "13:20", mk: O3BzF6mG95E, mkl: "10:50"}
+    ن: {id: moVsbfqq5iw, len: "12:26", mk: V_BRs8IWQU4, mkl: "18:01"}
+    ي: {id: 6yQGUvS_Qbc, len: "15:14", mk: oUBZdhI_A_M, mkl: "7:24"}
+    ب: {id: ktzza5_FuIQ, len: "13:10", mk: RnGoPBv5sFE, mkl: "22:01"}
+    ك: {id: Hckut613qDo, len: "14:05", mk: dMzgXjVW12A, mkl: "14:56"}
+    ل: {id: VoB84bYm2TM, len: "16:57", mk: y6dZHrRqUo8, mkl: "18:28"}
+    و: {id: oTONa18LeQY, len: "11:47", mk: fLGsApJAnpw, mkl: "13:06"}
+    ه: {id: znJ_sMQgvY4, len: "17:21", mk: DnFtBYCludQ, mkl: "3:38"}
+    ف: {id: 8o2UZtle-vM, len: "9:00", mk: OIGd0UcMsnA, mkl: "4:29"}
+    ق: {id: XuvcrPknaiM, len: "12:40", mk: hAXBcI93HR4, mkl: "5:49"}
+    ش: {id: tLYwIV9nw7E, len: "13:16", mk: mhTNvSNdJrA, mkl: "4:24"}
+    س: {id: 5lzGpSd_kqs, len: "13:52", mk: 6UJFw51agQc, mkl: "3:17"}
+    ث: {id: 7g71yKDV4Vw, len: "16:11", mk: wv5vt9kTrE4, mkl: "3:09"}
+    ص: {id: rGF8zPyIi1k, len: "13:12", mk: QspSllfG1Ts, mkl: "3:12"}
+    ط: {id: hN3whZh9m6M, len: "15:21", mk: kae_nRHAmHU, mkl: "19:28"}
+    ج: {id: SVrZl4FJFdM, len: "12:36", mk: 5J5A8ijuwUw, mkl: "4:31"}
+    خ: {id: PhWz-YPjnd4, len: "7:09", mk: 6xc_q2eqyck, mkl: "1:20"}
+    ح: {id: 2zQlxXNxjQM, len: "10:38", mk: tW3K5skwhHw, mkl: "4:27"}
+    غ: {id: 41VgnUihPJs, len: "13:59", mk: 4_jnj7EgDAE, mkl: "10:00"}
+    ع: {id: sukS_YYlWrY, len: "13:59", mk: SfsOcu3sEeM, mkl: "12:10"}
+    د: {id: JaHb-VMs-QE, len: "14:46", mk: GyTJCl74u78, mkl: "4:30"}
+    ض: {id: RWxuPNFVKdw, len: "9:42", mk: YFjNzxuuSrI, mkl: "5:04"}
+    ذ: {id: JEW_ZlGmY4M, len: "6:43", mk: ZjS2_XDW5vs, mkl: "4:00"}
+    ظ: {id: J6NmUun0Dk8, len: "8:39", mk: iDNTNo3MRw4, mkl: "3:49"}

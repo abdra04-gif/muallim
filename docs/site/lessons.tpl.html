@@ -1,0 +1,697 @@
+<title>Muallim Lessons Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;600&family=Amiri:wght@400;700&display=swap">
+<style>
+/* Layout: hero + live Telegram simulator → lesson 2 in screens → lessons as book pages → Telegram features used →
+   home & milestone → how reading is checked → deeper → principles → decisions → next steps */
+:root{
+  --bg:#FFF8EA; --panel:#FFFFFF; --fg:#17231B; --muted:#5F665D; --line:#E9DCC4;
+  --g:#176B3A; --gd:#124B2D; --gs:#E5F0D8; --au:#B07D1E; --sec:#F6EFDF; --chat:#E8EDDC; --out:#DCF0C6;
+  --body:'Manrope',system-ui,sans-serif; --ar:'Noto Naskh Arabic','Amiri','Geeza Pro',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141812; --panel:#22281F; --fg:#EEF0E8; --muted:#A9B0A1; --line:#3A4234;
+  --g:#6FBF86; --gd:#A6D9B2; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --chat:#1A2017; --out:#2E4A2A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141812; --panel:#22281F; --fg:#EEF0E8; --muted:#A9B0A1; --line:#3A4234;
+  --g:#6FBF86; --gd:#A6D9B2; --gs:#26382A; --au:#D9A83F; --sec:#2B3127; --chat:#1A2017; --out:#2E4A2A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);padding-block:0 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1200px;margin:0 auto}
+.ar{font-family:var(--ar);direction:rtl;unicode-bidi:isolate}
+h1{font-size:clamp(32px,5vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;color:var(--gd);text-wrap:balance}
+h2{font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0 0 10px;color:var(--gd);text-wrap:balance}
+h3{font-size:18px;margin:0 0 6px}
+p{max-width:72ch;margin:0 0 12px}.lead{font-size:18px;color:var(--muted)}.dim{color:var(--muted)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--au);margin-bottom:10px}
+section{padding-block:64px 8px;border-top:1px solid var(--line)}section.hero{border-top:0}
+.hero{position:relative}.hero::before{content:"";position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:radial-gradient(ellipse at 30% 0,var(--gs),transparent 60%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 6l5 9 10-2-2 10 9 5-9 5 2 10-10-2-5 9-5-9-10 2 2-10-9-5 9-5-2-10 10 2z' fill='none' stroke='%23B07D1E' stroke-opacity='.16' stroke-width='1.2'/%3E%3C/svg%3E");background-size:auto,56px 56px;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+body{overflow-x:hidden}
+.eyebrow::before{content:"✦ ";color:var(--au)}
+h2::after{content:"";display:block;width:56px;height:3px;border-radius:2px;margin-top:10px;background:linear-gradient(90deg,var(--g),var(--au))}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:44px;align-items:start;padding-block:44px 24px}
+.flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:20px 0}
+.flow div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;font-size:13px}
+.flow b{display:block;font-size:14px;color:var(--gd)}.flow i{font-style:normal;font-size:19px;display:block}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:14.5px}
+.howto ol{margin:6px 0 0;padding-left:20px}
+.sim{position:sticky;top:16px}
+.lang{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.pill{font:600 13px var(--body);padding:7px 13px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.pill.on{background:var(--g);border-color:var(--g);color:#fff}
+.ctl{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--au);outline-offset:2px}
+/* phone */
+.phone{background:var(--chat);border:9px solid #1E241C;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 50px -24px rgba(30,40,25,.45)}
+.top{background:var(--panel);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.ava{width:36px;height:36px;border-radius:18px;background:var(--g);color:#fff;display:grid;place-items:center;font:700 18px var(--ar)}
+.nm{font-weight:800;font-size:14.5px;line-height:1.2}.sb{font-size:12px;color:var(--muted)}
+.chat{padding:12px 10px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;height:620px;scroll-behavior:smooth;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 6l5 9 10-2-2 10 9 5-9 5 2 10-10-2-5 9-5-9-10 2 2-10-9-5 9-5-2-10 10 2z' fill='none' stroke='%23B07D1E' stroke-opacity='.16' stroke-width='1.2'/%3E%3C/svg%3E");background-size:56px 56px}
+.chat>*{flex-shrink:0}
+.tag{align-self:flex-start;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--au);margin:4px 0 -3px 4px}
+.tag.me{align-self:flex-end;margin-right:4px}
+.tag{display:none}
+.msg{background:var(--panel);border-radius:16px;overflow:hidden;width:93%;align-self:flex-start;animation:msg .3s ease-out}
+@keyframes msg{from{transform:translateY(10px)}}
+.msg.me{background:var(--out);align-self:flex-end;width:auto}
+.msg.eph{border:1.5px dashed var(--g);background:var(--gs);width:auto;transition:opacity .6s}
+.msg.eph em{display:block;font-style:normal;font-size:10.5px;color:var(--g);padding:5px 12px 0}
+.msg.gone{opacity:0}
+.txt{padding:8px 12px;font-size:13.5px;line-height:1.45;overflow-wrap:anywhere}
+.voice{display:flex;align-items:center;gap:9px;padding:8px 12px}
+.voice .p{width:32px;height:32px;border-radius:16px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.voice .w{display:flex;gap:2px;align-items:center;height:22px}.voice .w i{display:block;width:3px;border-radius:2px;background:var(--g)}
+.voice small{color:var(--muted);font-size:12px}
+.draft .txt div{animation:msg .3s ease-out}
+.draft .stop{margin:0 12px 10px;font:700 12px var(--body);padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--sec);color:var(--fg)}
+.quote{margin:8px 10px 0;padding:5px 9px;border-left:3px solid var(--g);background:var(--sec);border-radius:0 8px 8px 0;font-size:12px}
+.quote b{display:block;color:var(--g);font-size:11.5px}
+.kb{display:flex;gap:5px;width:93%;align-self:flex-start}
+.kb button{flex:1;font:700 12.5px var(--body);padding:9px;border-radius:11px;border:0;background:var(--panel);color:var(--fg);opacity:.95}
+.kb button:disabled{color:var(--muted);background:var(--sec);cursor:not-allowed}
+.lp{border-left:3px solid #E62117;margin:8px 10px 0;padding:0 0 0 9px}
+.lp small{display:block;color:#E62117;font-weight:800;font-size:12px}.lp b{display:block;font-size:13px;line-height:1.35;margin:1px 0 6px}
+.lp .th{position:relative;display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;border-radius:10px;overflow:hidden}
+.lp .th img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.lp .th span{position:absolute;inset:0;display:grid;place-items:center}.lp .th span i{width:54px;height:38px;border-radius:11px;background:#E62117;color:#fff;font-style:normal;display:grid;place-items:center;font-size:18px}
+.lp .th em{position:absolute;right:7px;bottom:7px;background:rgba(0,0,0,.7);color:#fff;font-style:normal;font-size:11.5px;padding:1px 6px;border-radius:5px}
+.lp p{font-size:12px;color:var(--muted);margin:6px 0 9px}
+.player{position:fixed;inset:0;background:rgba(5,7,5,.92);z-index:30;display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.player .box{width:min(760px,100%);color:#fff}.player .sc{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000}
+.player .sc img{width:100%;height:100%;object-fit:cover;opacity:.55}.player .sc i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:56px}
+.player .bar2{height:4px;background:#333;margin-top:8px;border-radius:2px}.player .bar2 b{display:block;width:8%;height:100%;background:#E62117;border-radius:2px}
+.player p{font-size:14px;color:#ddd;margin:10px 0}.player a,.player button{font:700 14px var(--body);color:#fff;background:#E62117;border:0;border-radius:99px;padding:9px 16px;text-decoration:none;margin-right:8px;cursor:pointer}
+.player button{background:#333}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
+.bar .in{flex:1;padding:8px 12px;border-radius:99px;background:var(--sec);color:var(--muted);font-size:13px}
+.mic{width:40px;height:40px;border-radius:20px;border:0;background:none;color:var(--muted);cursor:pointer;flex:none;display:grid;place-items:center}
+.mic.live{color:var(--g);animation:ring 1.6s infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(23,107,58,.55)}80%{box-shadow:0 0 0 12px rgba(23,107,58,0)}}
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px;min-height:2.6em}
+.wb{--tg-theme-bg-color:var(--panel);--tg-theme-text-color:var(--fg);--tg-theme-hint-color:var(--muted);--tg-theme-button-color:var(--g);
+  --tg-theme-button-text-color:#fff;--tg-theme-secondary-bg-color:var(--sec);--tg-theme-section-separator-color:var(--line)}
+/* rich lesson message */
+.rich .rh{padding:10px 12px 0;font-weight:800;font-size:15px}
+.rich .rs{padding:0 12px 6px;font:700 30px var(--ar);color:var(--g)}
+.rich .pg{display:block;width:100%;height:auto;cursor:zoom-in;border-block:1px solid var(--line)}
+.rich .st{display:flex;gap:9px;padding:8px 12px 0;font-size:13.5px;align-items:flex-start}
+.rich .st b{flex:none;width:22px;height:22px;border-radius:11px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:12px}
+.yt{display:flex;gap:9px;margin:8px 12px 0;padding:6px;border-radius:12px;background:var(--sec);text-decoration:none;color:var(--fg);align-items:center}
+.yt img{width:96px;height:54px;object-fit:cover;border-radius:8px;flex:none}
+.yt span{font-size:12.5px;line-height:1.35}.yt small{display:block;color:var(--muted)}
+.yt.none{display:block;font-size:12.5px;color:var(--muted)}
+.rich details{margin:10px 12px 0;padding:8px 10px;border-radius:12px;background:var(--sec);font-size:13px}
+.rich summary{font-weight:700;cursor:pointer}
+.rbtn{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px}
+.rbtn button{flex:1 1 40%;font:700 13px var(--body);padding:10px;border-radius:11px;border:0;background:var(--sec);color:var(--fg);cursor:pointer}
+.rbtn button.main{background:var(--g);color:#fff}
+.rbtn button.sm{flex:1 1 20%;font-size:12px;padding:8px 4px}
+.rbtn.nav3{display:grid;grid-template-columns:1fr 56px 1fr}
+.rbtn button.go{background:var(--g);color:#fff}
+.chat{position:relative}
+.vt{display:flex;gap:10px;align-items:center;margin:10px 12px 0;padding:8px;border-radius:14px;border:2px solid #E62117;background:var(--panel);text-decoration:none;color:var(--fg)}
+.vt .th{position:relative;flex:none;width:112px;border-radius:9px;overflow:hidden}.vt .th img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.vt .th i{position:absolute;inset:0;margin:auto;width:38px;height:27px;border-radius:8px;background:#E62117;color:#fff;font-style:normal;display:grid;place-items:center;font-size:13px}
+.vt b{display:block;font-size:13.5px;color:#C4170F}.vt small{display:block;font-size:11.5px;line-height:1.3;color:var(--fg)}.vt em{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:2px}
+.vt.sm{margin:8px 0 0;border-width:1px}.vt.part{margin:10px 12px 0;border-width:2px}.vt.sm .th{width:80px}.vt.sm b{font-size:12.5px}
+.vt>span:last-child{flex:1;min-width:0}.gal .vt .th{width:64px}
+.media{margin:10px 12px 0}.media.in{margin:8px 0 0}
+.mh{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mg.one{grid-template-columns:1fr}
+.mc{display:flex;flex-direction:column;min-width:0;text-decoration:none;color:var(--fg);background:var(--sec);border:1px solid var(--line);border-radius:13px;overflow:hidden;transition:transform .15s}
+.mc:active{transform:scale(.97)}
+.mt{position:relative;display:block}.mt img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.mt i{position:absolute;inset:0;margin:auto;width:36px;height:25px;border-radius:7px;background:#E62117;color:#fff;font-style:normal;display:grid;place-items:center;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.mt em{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.75);color:#fff;font-style:normal;font-size:10.5px;font-weight:700;padding:0 5px;border-radius:4px}
+.mc b{display:block;font-size:12.5px;line-height:1.3;padding:6px 8px 0}.mc small{display:block;font-size:10.5px;line-height:1.3;color:var(--muted);padding:2px 8px 7px}
+.mc .ai{font-size:1.5em}
+.vc{display:flex;gap:10px;align-items:center;margin:10px 12px 0;padding:6px;border-radius:13px;background:var(--sec);border:1px solid var(--line);text-decoration:none;color:var(--fg)}
+.vc .mt{flex:none;width:118px;border-radius:9px;overflow:hidden}.vc b{display:block;font-size:14px;color:#C4170F}.vc small{display:block;font-size:12px;color:var(--muted)}
+.rdw .tabs{margin:8px 12px 0}
+.cta{margin:12px 12px 0;font-weight:800;font-size:15px;line-height:1.35;color:var(--gd)}
+.words{margin:8px 12px 0;padding:8px 6px;border-radius:14px;background:var(--sec);font:400 46px/1.75 var(--ar);text-align:center;color:var(--fg)}.words>div+div{border-top:1px dashed var(--line)}
+.words span,.fl span,.rdl span{display:inline-block;margin:0 .2em}
+.words.alpha{font-size:30px;line-height:1.8}.words.alpha span{margin:0 .12em}.phone .words{font-size:34px}.phone .words.alpha{font-size:21px}
+.rh .rl{font-size:1.15em;color:var(--g);margin-left:6px}
+.xtra{margin:4px 12px 12px;padding:9px 11px;border-radius:12px;background:var(--sec);font-size:13px}.xtra summary{font-weight:800;cursor:pointer}
+.abw{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;direction:rtl;padding:4px 12px 10px}.abw span{font:400 44px/1.55 var(--ar);text-align:center;background:var(--sec);border-radius:12px;color:var(--fg)}.phone .abw span{font-size:30px}
+.vc2{display:block;margin:6px 12px 0;padding:8px 12px;border-radius:12px;background:var(--sec);color:var(--fg);text-decoration:none;font-size:13.5px}
+.rtop{padding:14px 14px 10px;text-align:center}.rtop b{display:block;font:700 18px/1.4 var(--body)}.rtop small{display:block;margin-top:2px;color:var(--muted);font-size:13px}.rta{font:400 30px/1.3 var(--ar);color:var(--g)}
+.rmenu{display:grid;gap:8px;padding:2px 12px 6px}.rmenu button{display:grid;grid-template-columns:30px minmax(0,1fr) auto 12px;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+.rmenu .ic{font-size:22px;text-align:center}.rmenu .tx{min-width:0}.rmenu b{display:block;font:600 15px/1.3 var(--body)}.rmenu small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmenu small.ar{font:400 22px/1.45 var(--ar);color:var(--g);direction:rtl;text-align:left}.rmenu .ct{min-width:26px;padding:2px 8px;border-radius:99px;background:var(--gs);color:var(--gd);font-weight:700;font-size:13px;text-align:center}.rmenu .ct.z{background:var(--sec);color:var(--muted);font-weight:400}.rmenu i{font-style:normal;color:var(--muted);font-size:20px}
+.rnote{margin-top:8px;font-size:13px;line-height:1.45;color:var(--muted)}
+.xs{margin-top:10px}.xs>b{display:block;margin-bottom:5px}.xs .pg{border-radius:9px;border:1px solid var(--line)}
+.abg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;padding:10px 12px 6px}.abg button{font:400 26px/1.45 var(--ar);border-radius:10px;border:1px solid var(--line);background:var(--sec);color:var(--fg);cursor:pointer;padding:0}
+.abg button.ok{border-color:var(--g);color:var(--g)}.abg button.due{border-color:var(--au);color:var(--au)}
+.how{margin:8px 12px 0;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.hear{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--g);font-weight:700;font-size:13px;text-decoration:none}
+.rl2{display:grid;gap:6px;margin-top:4px}.rl2 button{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:600 13.5px var(--body);cursor:pointer}.rl2 b{font:400 22px/1.3 var(--ar);color:var(--g)}
+.wr{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;direction:rtl}.wr button{padding:2px 12px;border-radius:11px;border:1px solid var(--au);background:var(--panel);color:var(--fg);font:400 26px/1.5 var(--ar);cursor:pointer}
+.rl2 button:disabled,.wr button:disabled{opacity:.55;cursor:default}
+.vt.none{display:block;border:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0 2px}.tabs button{flex:1;min-width:52px;padding:5px 6px;border-radius:10px;border:1.5px solid var(--line);background:var(--sec);font:700 12px var(--body);color:var(--fg);cursor:pointer}
+.tabs button .ar{font-size:17px}.tabs button.ok{background:var(--gs);border-color:var(--gs);color:var(--g)}.tabs button.on{border-color:var(--g);background:var(--panel)}
+.rdh small{font-weight:600;font-size:11.5px}
+.qz{margin:2px 12px 4px;font-weight:700;font-size:14.5px;line-height:1.5}
+.hlp{font-size:13px;line-height:1.5}.hlp p{margin:0 0 7px}.hlp ol{margin:0 0 7px;padding-left:18px}.hlp li{margin-bottom:4px}
+.syl{display:inline-block;min-width:54px;padding:2px 10px;border-radius:12px;background:var(--gs);font-size:30px;line-height:1.45;text-align:center}
+.bls{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding:4px;border-radius:10px;background:#FBF4E2}
+.bl{display:block;width:100%;height:auto;border-radius:6px}
+.cmp{display:flex;gap:6px;margin-top:6px}.cmp span{flex:1;text-align:center;padding:4px;border-radius:10px;background:var(--panel)}
+.cmp small{display:block;font-size:11px;color:var(--muted)}.cmp b{font:400 40px/1.4 var(--ar)}.cmp span+span b{color:var(--au)}
+.lcs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.lc{min-width:64px;padding:4px 8px;border-radius:12px;background:var(--gs);text-align:center}
+.lc b{display:block;font:400 38px/1.4 var(--ar)}.lc small{font-size:11px;color:var(--g)}.lc.due{background:var(--sec);outline:2px dashed var(--au)}.lc.due small{color:var(--au);font-weight:700}
+.ai,.rh .ar,.rdh .ar,h4 .ar,.txt .ar,.ytc .ar{font-family:var(--ar);font-size:1.75em;line-height:1;unicode-bidi:isolate}
+.rbtn.q3 button{flex:1 1 28%}.rbtn button.ok{background:var(--gs);outline:2px solid var(--g)}.rbtn button.no{outline:2px solid var(--au)}
+.rbtn button.arb{font:400 32px/1.35 var(--ar)}
+/* voice blocks: tap = sound right away */
+.vbs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;direction:rtl;padding:2px 0}
+.vbs.l{justify-content:flex-start;direction:ltr;margin-top:6px}
+.vb{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:99px;border:0;background:var(--gs);color:var(--fg);cursor:pointer;direction:ltr;font:600 12px var(--body)}
+.vb i{width:28px;height:28px;border-radius:14px;background:var(--g);color:#fff;display:grid;place-items:center;font-style:normal;font-size:11px;flex:none}
+.vb .ar{font-size:24px;line-height:1.2}.vb small{color:var(--muted);font-size:11.5px}
+.vb.play i{animation:ring 1s}.vb.play{background:var(--out)}
+.cnt{float:right;font-weight:600;font-size:12px;color:var(--muted)}
+.cdots{display:flex;gap:4px;padding:7px 12px 0}.cdots i{flex:1;height:4px;border-radius:2px;background:var(--sec)}.cdots i.on{background:var(--g)}
+.cbody{padding:6px 12px 0}.cbody h4{margin:2px 0 4px;font-size:15px}
+.cbig{font:400 46px/1.5 var(--ar);text-align:center;color:var(--fg)}.cbig.sm{font-size:34px;line-height:1.9}.cbig mark{background:none;color:var(--au)}
+.cq{font-size:12.5px;padding:6px 9px;border-left:3px solid var(--au);background:var(--sec);border-radius:0 9px 9px 0;margin:4px 0 7px}
+.cq b{display:block;font-size:10.5px;color:var(--au);text-transform:uppercase;letter-spacing:.06em}
+.ce{font-size:13px;line-height:1.45;margin-bottom:6px;white-space:pre-line}
+.cn{font-size:11.5px;text-align:center;margin:3px 0 0}
+.cok{margin:0 12px;padding:8px 10px;border-radius:10px;background:var(--gs);font-size:13px}
+.str{font-size:12.5px;margin:6px 0 2px;padding:6px 9px;border-radius:9px;background:var(--sec)}.str b{color:var(--g);letter-spacing:2px}
+/* what to read now */
+.rd{margin:10px 12px 0;padding:9px 10px;border-radius:13px;border:1.5px solid var(--g);background:var(--panel)}
+.rdh{font-weight:800;font-size:13.5px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.pd{display:flex;gap:3px;flex:none}.pd i{width:9px;height:9px;border-radius:5px;background:var(--sec)}.pd i.on{background:var(--g)}.pd i.cur{background:var(--au)}
+.rdl{font:400 36px/1.8 var(--ar);text-align:center;background:var(--sec);border-radius:10px;padding:2px 8px;margin:6px 0}
+.rdn{font-size:12.5px;color:var(--muted);line-height:1.4}
+.ytc{display:block;margin:8px 12px 0;border-left:3px solid #E62117;padding-left:9px;text-decoration:none;color:var(--fg)}
+.ytc small{display:block;color:#E62117;font-weight:800;font-size:12px}.ytc b{display:block;font-size:12.5px;line-height:1.35;margin:1px 0 5px}
+.ytc span{position:relative;display:block;border-radius:10px;overflow:hidden}.ytc img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.ytc span i{position:absolute;inset:0;margin:auto;width:54px;height:38px;border-radius:11px;background:#E62117;color:#fff;font-style:normal;display:grid;place-items:center;font-size:18px}
+.ytc span em{position:absolute;right:7px;bottom:7px;background:rgba(0,0,0,.7);color:#fff;font-style:normal;font-size:11.5px;padding:1px 6px;border-radius:5px}
+/* feedback */
+.vd{padding:8px 12px 0;font-weight:800;font-size:14.5px}
+.fl{font:400 44px/1.75 var(--ar);text-align:center;padding:0 10px}.fl .bad{color:var(--au);text-decoration:underline wavy var(--au);text-underline-offset:6px}.fl .ok{color:var(--g)}
+.fbh{padding:6px 12px 0;font-weight:800;font-size:13px}
+.fbr{display:block;margin:6px 12px 0;padding:8px;border-radius:12px;background:var(--sec);font-size:12.5px;line-height:1.4}
+.fbr .w{font:400 32px/1.3 var(--ar)}
+.dsp{margin:8px 12px 0;padding:8px 10px;border-radius:12px;border:1.5px dashed var(--au);font-size:13px}.dsp:empty{display:none}
+.dsp .rbtn{padding:6px 0 0}
+/* page sections */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:24px;margin-top:22px}
+.gal figure{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.gal .phone{border-width:7px;border-radius:32px}.gal .chat{height:auto;min-height:420px;justify-content:flex-start;overflow:visible}
+.gal figcaption b{display:block;font-size:15.5px}.gal figcaption span{display:block;font-size:13.5px;color:var(--muted)}
+.plans{display:grid;align-items:start;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:22px;margin-top:24px}
+.plan{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.plan header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 18px 10px;background:linear-gradient(180deg,var(--sec),var(--panel))}
+.plan header span{display:inline-block;padding:2px 10px;border-radius:99px;background:var(--gs);color:var(--gd);font-size:12px;font-weight:800}
+.plan header span.rule{background:var(--sec);color:var(--au);border:1px solid var(--line)}
+.plan header h3{margin:6px 0 0;color:var(--gd);font-size:19px;line-height:1.25}
+.plan header .ltr{font:700 34px/1.2 var(--ar);color:var(--g);direction:rtl;white-space:nowrap}
+.plan .bd{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:6px 18px 4px}
+.plan .bd img{width:150px;height:auto;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;box-shadow:0 10px 24px -16px rgba(30,40,25,.5)}
+.plan ol{list-style:none;margin:0;padding:0;position:relative}
+.plan ol::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.plan li{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;padding:6px 0}
+.plan li>i{font-style:normal;width:32px;height:32px;border-radius:16px;background:var(--panel);border:2px solid var(--g);display:grid;place-items:center;font-size:15px;z-index:1}
+.plan li b{display:block;font-size:14.5px}
+.plan li span{display:block;font-size:13px;color:var(--muted);line-height:1.45}
+.plan li em{display:inline-block;margin-top:3px;font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--au)}
+.plan .lines{font:30px/1.8 var(--ar);direction:rtl;color:var(--fg);background:var(--sec);border-radius:10px;padding:4px 10px;margin-top:4px}
+.plan .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}.plan .chips u{text-decoration:none;padding:1px 9px;border-radius:99px;background:var(--gs);color:var(--gd);font-size:12.5px}
+.plan footer{padding:10px 18px 16px;display:flex;justify-content:flex-end}
+.plan footer button{font:700 13.5px var(--body);padding:10px 16px;border-radius:12px;border:0;background:var(--g);color:#fff;cursor:pointer}
+.teach{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:36px;align-items:start;margin-top:22px}
+.teach .phone{border-width:7px;border-radius:32px}.teach .chat{height:560px}
+.kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0}
+.kinds div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13.5px}
+.kinds b{display:block;color:var(--gd)}.kinds div>span{color:var(--muted);font-size:12.5px}
+@media(max-width:560px){.plan .bd{grid-template-columns:1fr}.plan .bd img{width:100%}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:20px}
+.cards div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.cards b{display:block;font-size:16px;margin-bottom:4px;color:var(--gd)}.cards div>span{font-size:14px;color:var(--muted)}
+.cards small{display:inline-block;margin-bottom:6px;padding:1px 8px;border-radius:99px;background:var(--gs);color:var(--gd);font-weight:800;font-size:11px}
+.cards .off{opacity:.75}.cards .off small{background:var(--sec);color:var(--muted)}
+.tw{overflow-x:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:var(--sec)}
+td .ar{font-size:20px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:36px;align-items:start;margin-top:22px}
+.split .phone{border-width:7px;border-radius:32px}.split .chat{height:auto;min-height:0;overflow:visible}
+.q{display:grid;gap:12px;margin-top:18px}
+.q div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 18px}
+.q b{display:block;font-size:16px;color:var(--gd);margin-bottom:4px}.q em{font-style:normal;font-weight:700;color:var(--g)}
+.q ul{margin:6px 0 0;padding-left:20px;font-size:14.5px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:18px}
+.steps div{border-top:3px solid var(--g);background:var(--panel);border-radius:0 0 14px 14px;padding:13px 15px;font-size:14.5px}
+.steps b{display:block;color:var(--gd)}
+.zoom{position:fixed;inset:0;background:rgba(10,14,9,.82);display:grid;place-items:center;z-index:20;cursor:zoom-out;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.zoom img{max-width:100%;max-height:100%;border-radius:8px}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}
+@media(max-width:960px){.hero,.split,.teach{grid-template-columns:minmax(0,1fr)}.teach>*{min-width:0}.sim{position:static;max-width:410px;margin:0 auto}.flow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.msg,.mic.live,.draft .txt div{animation:none}.chat{scroll-behavior:auto}}
+details.more{margin-top:12px}details.more summary{cursor:pointer;font-weight:700;color:var(--g)}
+html[data-pl="ru"] .le,html:not([data-pl="ru"]) .lr{display:none}
+.plang{position:fixed;z-index:20;top:calc(10px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));display:flex;padding:3px;border-radius:99px;background:var(--panel);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.plang button{font:700 13px var(--body);padding:6px 12px;border:0;border-radius:99px;background:transparent;color:var(--muted);cursor:pointer}
+html:not([data-pl="ru"]) .plang [data-pl="en"],html[data-pl="ru"] .plang [data-pl="ru"]{background:var(--g);color:#fff}
+.toc{display:flex;flex-wrap:wrap;gap:8px;padding:6px 0 4px;margin:0 0 6px}.toc a{font:600 13px var(--body);padding:7px 13px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--fg);text-decoration:none}.toc a:hover{border-color:var(--g);color:var(--g)}
+section[id]{scroll-margin-top:60px}
+.qh{margin:26px 0 10px;font:700 17px var(--body);color:var(--gd)}
+.qa{display:grid;gap:10px}.qa details{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 16px}.qa summary{cursor:pointer;font-size:15.5px}.qa details>div{margin-top:8px;line-height:1.6;color:var(--fg)}
+.qa.grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.qa.grid>div{position:relative;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:14px 16px 12px}.qa.grid>div.wide{grid-column:1/-1}.qa.grid>div>span{line-height:1.55;color:var(--muted);font-size:14px}.qa.grid>div>em{margin-top:auto;font-style:normal;font-size:12.5px;font-weight:700;color:var(--g)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}.stats div{background:var(--gs);border-radius:16px;padding:14px 16px}.stats b{display:block;font:800 32px/1.1 var(--body);color:var(--gd)}.stats div>span{font-size:13px;color:var(--fg)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.phases div{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}.phases i{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--g);color:#fff;font:700 13px var(--body);font-style:normal;margin-bottom:6px}.phases b{display:block}.phases div>span{font-size:13px;color:var(--muted)}
+.finds{counter-reset:f;list-style:none;padding:0;margin:0;display:grid;gap:10px}.finds li{counter-increment:f;position:relative;padding:12px 16px 12px 54px;border-radius:14px;background:var(--panel);border:1px solid var(--line);line-height:1.55}.finds li::before{content:counter(f);position:absolute;left:16px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--sec);color:var(--au);font:800 14px/26px var(--body);text-align:center}
+.chart{display:grid;gap:8px;margin:14px 0 6px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.bar{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 4.2em;align-items:center;gap:12px}.bar>.bl{font-size:13.5px;line-height:1.3}.bar>.bt{height:18px;border-radius:0 4px 4px 0;background:var(--sec);overflow:hidden}.bar .bt i{display:block;height:100%;width:var(--w);min-width:2px;background:var(--muted);opacity:.55;border-radius:0 4px 4px 0}.bar>b{font:700 14px var(--body);text-align:right}
+.bar.hi .bt i{background:var(--g);opacity:1}.bar.hi2 .bt i{background:var(--g);opacity:.7}.bar.hi .bl,.bar.hi2 .bl{font-weight:700}
+@media (max-width:560px){.bar{grid-template-columns:minmax(0,1fr) 3.8em}.bar .bl{grid-column:1/-1}}
+.qa a,.note a,.wrap p a{color:var(--g);font-weight:600}.pr{font:400 20px/1.3 var(--ar);white-space:nowrap}
+.note{font-size:13.5px;color:var(--muted);line-height:1.55}
+.callout{display:flex;align-items:center;gap:16px;margin:12px 0;padding:14px 18px;border-radius:16px;background:var(--gs)}.callout b{font:800 38px var(--body);color:var(--gd)}.callout>span{line-height:1.5}
+.cards.three{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:12px}.cards .good{border-color:var(--g)}.cards .bad{border-color:var(--au)}
+table .me,tr.hl td{background:var(--gs);font-weight:600}
+.fixes em.st{font-style:normal;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}.st.d{background:var(--gs);color:var(--gd)}.st.p{background:var(--sec);color:var(--au)}.st.n{background:var(--sec);color:var(--fg)}
+.ticks{padding-left:0;list-style:none;display:grid;gap:6px}.ticks li{padding-left:24px;position:relative;line-height:1.5}.ticks li::before{content:"✓";position:absolute;left:4px;color:var(--g);font-weight:800}
+.consent{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:8px}.consent b{font-size:16px}.consent p{margin:0;font-size:14px;line-height:1.55}.cbtn{display:grid;gap:6px;margin-top:6px}.cbtn>span{padding:9px 12px;border-radius:10px;background:var(--sec);text-align:center;font-weight:600;font-size:13.5px}.cbtn .pri{background:var(--g);color:#fff}.consent small{color:var(--muted)}
+.road{list-style:none;padding:0;margin:14px 0 0;position:relative;display:grid;gap:14px}.road::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:var(--line)}.road li{position:relative;padding-left:40px;display:flex;flex-direction:column;gap:2px}.road li::before{content:"";position:absolute;left:4px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--panel);border:3px solid var(--g)}.road li.now::before{background:var(--g)}.road li.far::before{border-color:var(--muted)}.road li>em{font-style:normal;font-size:12.5px;font-weight:700;color:var(--au);text-transform:uppercase;letter-spacing:.04em}.road li>b{font-size:16px}.road li>span{color:var(--muted);line-height:1.5}
+.pubs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.pubs div{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:14px 16px}.pubs small{color:var(--au);font-weight:700}.pubs div>span{font-size:14px;line-height:1.5;color:var(--fg);flex:1}.pubs a{font-size:13px;color:var(--g);font-weight:600}
+</style>
+
+<script>(function () { var l = "en"; try { l = localStorage.getItem("muallim-pl") || ((navigator.language || "").slice(0, 2) === "ru" ? "ru" : "en"); } catch (e) {} document.documentElement.setAttribute("data-pl", l === "ru" ? "ru" : "en"); })();</script>
+<div class="plang" id="plang" role="group" aria-label="Language / Язык"><button data-pl="ru">RU</button><button data-pl="en">EN</button></div>
+
+<div class="wrap">
+<section class="hero">
+  <div>
+    <div class="eyebrow">[[For approval · first version of the Telegram bot||На утверждение · первая версия Telegram-бота]]</div>
+    <h1>[[Learn to read the Quran in Arabic||Научиться читать Коран по-арабски]]</h1>
+    <p class="lead">[[From zero, lesson by lesson of <i>al-Muallim ath-Thani</i>. Each lesson asks for one thing: watch a short video, read the words aloud, send a voice message. Everything else is under “Go deeper”.||С нуля, урок за уроком по книге <i>«Муаллим сани»</i>. В каждом уроке одно дело: посмотреть короткое видео, прочитать слова вслух и отправить голосовое. Всё остальное — в разделе «Углублённо».]]</p>
+    <div class="flow">
+      <div><i>🔤</i><b>[[Alphabet||Алфавит]]</b>[[a first look, nothing to record||первое знакомство, без записи]]</div>
+      <div><i>▶️</i><b>[[Video||Видео]]</b>[[a short lesson by the book||короткий урок по книге]]</div>
+      <div><i>🎤</i><b>[[Read aloud||Чтение вслух]]</b>[[the words in large type, one voice message||крупные слова, одно голосовое]]</div>
+      <div><i>💬</i><b>[[Feedback||Разбор]]</b>[[needed vs heard, 🔊 the teacher||что нужно и что прозвучало, 🔊 учитель]]</div>
+      <div><i>🔁</i><b>[[Review||Повторение]]</b>[[letters, lessons and mistakes come back||буквы, уроки и ошибки возвращаются]]</div>
+      <div><i>📖</i><b>[[Go deeper||Углублённо]]</b>[[book page, more videos, cards: hidden||страница книги, ещё видео, карточки — скрыто]]</div>
+    </div>
+    <div class="howto"><b>[[Try it in the phone||Попробуйте в телефоне]]</b>[[, it behaves like the real bot:||, он работает как настоящий бот:]]
+      <ol><li>[[Choose the language and tap <b>Agree</b>; on the home screen tap <b>▶ Start</b> (the alphabet), then <b>▶ Start lesson 1</b>.||Выберите язык и нажмите <b>«Согласен(на)»</b>; на главном экране — <b>«▶ Начать»</b> (алфавит), затем <b>«▶ Начать урок 1»</b>.]]</li>
+      <li>[[Watch the short video, then tap the microphone next to “Message” and read the words. Tabs and ‹ › move freely: nothing is locked.||Посмотрите короткое видео, нажмите микрофон рядом с «Сообщение» и прочитайте слова. Вкладки и ‹ › работают свободно: ничего не закрыто.]]</li>
+      <li>[[Open <b>🔁 Review</b>: your letters, lessons done, words with mistakes and the alphabet; <b>⏩ +1 day</b> shows letters coming back.||Откройте <b>«🔁 Повторение»</b>: ваши буквы, пройденные уроки, слова с ошибками и алфавит; <b>«⏩ +1 день»</b> показывает, как буквы возвращаются.]]</li></ol></div>
+    <p class="dim" style="margin-top:12px;font-size:14px">[[The RU / EN switch at the top changes the whole page and the phone; the buttons above the phone change only the bot's language. Arabic lines and syllables come from the book and the bot's lesson content. Which words are marked gold is an example of a possible check result.||Переключатель RU / EN вверху меняет всю страницу и телефон; кнопки над телефоном — только язык бота. Арабские строки и слоги взяты из книги и программы бота. Какие слова помечены жёлтым — пример возможного результата проверки.]]</p>
+  </div>
+  <div class="sim">
+    <div class="lang" id="lang"><button class="pill on" data-l="ru">Русский</button><button class="pill" data-l="en">English</button></div>
+    <div class="phone">
+      <div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb" id="status">bot</div></div></div>
+      <div class="chat" id="chat"></div>
+      <div class="bar"><div class="in" id="ph">Message</div><button class="mic" id="mic" aria-label="Hold to record a voice message"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="ctl"><button class="pill" id="restart">[[↺ Restart||↺ Заново]]</button><button class="pill" id="j49">[[Page 49||Стр. 49]]</button><button class="pill" id="j50">[[Page 50||Стр. 50]]</button><button class="pill" id="jms">[[🏆 Milestone||🏆 Веха]]</button><button class="pill" id="jday">[[⏩ +1 day||⏩ +1 день]]</button></div>
+  </div>
+</section>
+
+<nav class="toc" aria-label="Contents">
+  <a href="#answers">[[Your questions||Ваши вопросы]]</a><a href="#research">[[The research||Исследование]]</a><a href="#experiment">[[Our test||Наш эксперимент]]</a><a href="#field">[[Muallim vs others||Муаллим и другие]]</a><a href="#fixes">[[Weak points → fixes||Минусы → исправления]]</a><a href="#roadmap">[[Where we go||Куда движемся]]</a><a href="#screens">[[Screens||Экраны]]</a><a href="#decisions">[[Decisions||Решения]]</a>
+</nav>
+
+<section id="answers">
+  <div class="eyebrow">[[Answers to the professors' questions||Ответы на вопросы профессоров]]</div>
+  <h2>[[Everything you asked, and what we did||Всё, что вы спросили, и что мы сделали]]</h2>
+  <p>[[Three rounds of questions: the research task, the first feedback on the plan, and the feedback on this demo. Each answer says what changed in the bot or what we found.||Три круга вопросов: исследовательское задание, первые замечания к плану и замечания к этому демо. В каждом ответе — что изменилось в боте или что мы нашли.]]</p>
+
+  <h3 class="qh">[[Round 1 · the research task||Круг 1 · исследовательское задание]]</h3>
+  <div class="qa">
+    <details open><summary><b>[[Which models can transcribe a beginner's reading?||Какие модели могут распознать чтение новичка?]]</b></summary><div>[[<b>None is proven for our learners.</b> No model, open or commercial, has published results on adults who start from zero, or on Russian- or Kazakh-speaking learners. The best-supported design is a phoneme model without a language model, checked sound by sound against the known text. On single letters free transcription is right in only 39–50 % of clips; a checker that <i>verifies</i> the expected letter reached <b>88 %</b> on speakers it never heard. Details: <a href="#experiment">our test</a>.||<b>Ни одна не доказана на наших учениках.</b> Ни у одной модели — открытой или коммерческой — нет опубликованных результатов на взрослых, начинающих с нуля, или на русско- и казахскоязычных учениках. Лучше всего обоснована схема «фонемная модель без языковой модели, проверка звук за звуком по известному тексту». На отдельных буквах свободное распознавание право лишь в 39–50 % записей; проверка, которая <i>подтверждает</i> ожидаемую букву, дала <b>88 %</b> на голосах, которых не слышала. Подробно — <a href="#experiment">наш эксперимент</a>.]]</div></details>
+    <details><summary><b>[[What is the dataset format?||Какой формат у датасета?]]</b></summary><div>[[One record per attempt: one voice message, one learner, one item of the book. The original Telegram audio, unedited, and one table <code>metadata.jsonl</code>, published on Hugging Face. Three transcriptions kept apart: what should be read · what the system heard · what a teacher heard. Split by learner, never by recording; the test learners are fixed before any training. Not published: name, Telegram account, exact dates.||Одна запись — одна попытка: одно голосовое, один ученик, один пункт книги. Оригинальный звук из Telegram без обработки и одна таблица <code>metadata.jsonl</code>, публикация на Hugging Face. Три расшифровки хранятся отдельно: что нужно было прочитать · что услышала система · что услышал учитель. Деление по ученикам, никогда по записям; тестовые ученики фиксируются до любого обучения. Не публикуются: имя, аккаунт Telegram, точные даты.]]</div></details>
+    <details><summary><b>[[How do we make public release clear to learners?||Как понятно объяснить ученику публикацию записей?]]</b></summary><div>[[One screen before the first recording. Its title and its main button both say the recordings will be <b>published</b>; it says plainly that a voice can be recognised and that copies already downloaded cannot be recalled. A second button lets a person <b>practise without recording</b>. This is not optional: Telegram's developer terms allow datasets only with “individual, explicit, active and revocable consent”. Recordings of people under 18 are never published. <a href="#consent">See the draft screen</a>.||Один экран перед первой записью. И заголовок, и главная кнопка говорят, что записи будут <b>опубликованы</b>; прямо сказано, что голос можно узнать и что уже скачанные копии нельзя вернуть. Вторая кнопка — <b>заниматься без записи</b>. Это не по желанию: правила Telegram для разработчиков разрешают датасеты только с «индивидуальным, явным, активным и отзываемым согласием». Записи людей младше 18 не публикуются никогда. <a href="#consent">Черновик экрана</a>.]]</div></details>
+  </div>
+
+  <h3 class="qh">[[Round 2 · feedback on the plan||Круг 2 · замечания к плану]]</h3>
+  <div class="qa grid">
+    <div><b>[[“Show a first version”||«Покажите первую версию»]]</b><span>[[This page: a working bot in the phone above, lessons 1–15 open, every screen live.||Эта страница: работающий бот в телефоне выше, уроки 1–15 открыты, все экраны живые.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Only letters and vowel marks first”||«Сначала только буквы и огласовки»]]</b><span>[[Stage I = 28 letters, lessons 1–15; one big milestone at 28/28, then Stage II.||Этап I = 28 букв, уроки 1–15; одна большая веха на 28/28, затем Этап II.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“No Cyrillic transliteration”||«Без транслитерации кириллицей»]]</b><span>[[Arabic script and sound only; Russian is used only to explain.||Только арабское письмо и звук; русский — только для пояснений.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“No AI-generated sound or pictures”||«Без звука и картинок от ИИ»]]</b><span>[[Only real teachers, all channels checked: book readings, Abu Yasin's Russian course, Dr. Ayman Swaid.||Только живые учителя, каналы проверены: чтение по книге, русский курс Абу Ясина, д-р Айман Сувейд.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“A short video per 1–3 letters”||«Короткое видео на 1–3 буквы»]]</b><span>[[1–3-minute book readings on the lesson screen; full 5–17-minute lessons one tap away.||Чтение по книге на 1–3 минуты прямо в уроке; полные уроки на 5–17 минут — в одно нажатие.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Read every word once; do not demand perfection”||«Прочитать каждое слово один раз, без требования идеала»]]</b><span>[[A lesson counts once read aloud, whatever the result; mistakes are shown, never blocking.||Урок засчитан, когда прочитан вслух, при любом результате; ошибки показываются, но не блокируют.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Progress, congratulations, a streak”||«Прогресс, поздравления, серия»]]</b><span>[[Letters n/28 and lessons n/15, streak, week Mo–Su, milestone card.||Буквы n/28 и уроки n/15, серия, неделя Пн–Вс, карточка вехи.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Articulation: a static picture and text; a live person as an extra”||«Артикуляция: картинка и текст; живой человек — дополнительно»]]</b><span>[[The book's own words on every letter card; makhraj videos by real teachers under “Go deeper”. Static pictures still to be drawn or approved by a teacher.||Слова книги на каждой карточке буквы; ролики «махрадж» живых учителей — в «Углублённо». Статичные картинки ещё нужно нарисовать или утвердить у преподавателя.]]</span><em>🟡 [[partly||частично]]</em></div>
+  </div>
+
+  <h3 class="qh">[[Round 3 · feedback on this demo||Круг 3 · замечания к этому демо]]</h3>
+  <div class="qa grid">
+    <div><b>[[“Get me started on the main activity”||«Сразу к главному»]]</b><span>[[Two taps (language, consent), then one button “Start”. No other screens before the first lesson.||Два нажатия (язык, согласие), затем одна кнопка «Начать». До первого урока — никаких других экранов.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Start from an alphabet overview”||«Начать с обзора алфавита»]]</b><span>[[The first lesson is the alphabet: all letters in large type with a 5-minute video; nothing to record.||Первый урок — алфавит: все буквы крупно и видео на 5 минут; записывать ничего не нужно.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Remove the questions; only consent and language”||«Убрать вопросы; только согласие и язык»]]</b><span>[[All questions removed, including name and age; the name comes from Telegram.||Все вопросы убраны, в том числе имя и возраст; имя берётся из Telegram.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div><b>[[“Page numbers differ between editions”||«Номера страниц в изданиях разные»]]</b><span>[[The learner sees lesson numbers only. Pages stay in the bot's data for the research.||Ученик видит только номера уроков. Страницы остаются в данных бота для исследования.]]</span><em>✅ [[done||сделано]]</em></div>
+    <div class="wide"><b>[[“What were the first 9 pages about?”||«О чём первые 9 страниц?»]]</b><span>[[Front matter, no reading exercises: the cover, the title and imprint (p. 2: Almetyevsk, 2010, ed. O. Turabi), an introduction (p. 5) and a preface (pp. 6–9) by the publisher and the mufti, about the author Ahmadhadi Maksudi, the course and its 16 video lessons. The book itself says the video teacher explains the sounds, and the book helps to consolidate them. The exercises start on p. 10 with the alphabet table, which is our first lesson.||Вступительная часть, упражнений для чтения нет: обложка, титул и выходные данные (с. 2: Альметьевск, 2010, ред. О. Тураби), введение (с. 5) и предисловие (с. 6–9) от издателя и муфтия — об авторе Ахмадхади Максуди, о курсе и его 16 видеоуроках. Сама книга говорит, что звуки объясняет учитель в видео, а книга помогает закрепить. Упражнения начинаются на с. 10 с таблицы алфавита — это наш первый урок.]]</span><em>ℹ️ [[answer||ответ]]</em></div>
+  </div>
+</section>
+
+<section id="research">
+  <div class="eyebrow">[[The research behind the bot||Исследование, на котором стоит бот]]</div>
+  <h2>[[Five phases, two surveys, one experiment||Пять фаз, два обзора, один эксперимент]]</h2>
+  <p>[[Before building the checker we looked at everything that exists: speech models, datasets, Arabic products and systems for other languages. Then we tested the most promising ones ourselves. Every statement below has a source in the reports.||Прежде чем строить проверку, мы изучили всё, что существует: модели речи, датасеты, арабские продукты и системы для других языков. Потом сами проверили самые перспективные. У каждого утверждения ниже есть источник в отчётах.]]</p>
+  <div class="stats">
+    <div><b>40+</b><span>[[speech models and services, in 7 families||моделей и сервисов речи, 7 семейств]]</span></div>
+    <div><b>25</b><span>[[datasets compared||датасетов сравнено]]</span></div>
+    <div><b>16</b><span>[[Arabic products and research systems||арабских продуктов и систем]]</span></div>
+    <div><b>≈20</b><span>[[systems for other languages||систем для других языков]]</span></div>
+    <div><b>130+</b><span>[[sources: papers, model cards, terms||источников: статьи, карточки моделей, правила]]</span></div>
+    <div><b>8 904</b><span>[[recordings in our own test||записей в нашем эксперименте]]</span></div>
+  </div>
+  <div class="phases">
+    <div><i>1</i><b>[[Speech models||Модели речи]]</b><span>[[What can hear a wrong vowel or letter, and on whom it was tested||Что слышит неверную огласовку или букву и на ком это проверено]]</span></div>
+    <div><i>2</i><b>[[Datasets||Датасеты]]</b><span>[[What data exists for learners' errors, and what is missing||Какие данные об ошибках учеников есть и чего не хватает]]</span></div>
+    <div><i>3</i><b>[[Experiment||Эксперимент]]</b><span>[[5 ready systems, then 4 checkers built by us||5 готовых систем, затем 4 наших варианта проверки]]</span></div>
+    <div><i>4</i><b>[[Dataset format||Формат датасета]]</b><span>[[One record per attempt, three transcription layers||Одна запись на попытку, три слоя расшифровки]]</span></div>
+    <div><i>5</i><b>[[Architecture and consent||Архитектура и согласие]]</b><span>[[How the bot checks, and how learners agree to publication||Как бот проверяет и как ученик соглашается на публикацию]]</span></div>
+  </div>
+
+  <h3 class="qh">[[Seven findings that decided the design||Семь находок, которые определили устройство]]</h3>
+  <ol class="finds">
+    <li><b>[[Nobody has tested our learners.||Наших учеников не проверял никто.]]</b> [[No published result covers adults who start from zero. The organisers of the main Arabic benchmark (IQRA 2026) call learner data “future work”.||Ни один опубликованный результат не касается взрослых, начинающих с нуля. Организаторы главного арабского бенчмарка (IQRA 2026) называют данные учеников «будущей работой».]]</li>
+    <li><b>[[The best system misses more than half of real errors.||Лучшая система пропускает больше половины настоящих ошибок.]]</b> [[Quran Lab's TajweedFormer, the only one with learner figures, catches 46 % of consonant errors and 32 % of vowel errors at a low false-alarm rate (self-reported).||Quran Lab TajweedFormer — единственная с цифрами на учениках — ловит 46 % ошибок в согласных и 32 % в гласных при малом числе ложных тревог (по данным авторов).]]</li>
+    <li><b>[[“Under 2 % errors” is measured on professional reciters.||«Меньше 2 % ошибок» — это на профессиональных чтецах.]]</b> [[On amateurs, phone audio or unseen voices the same models show 4–9 %.||На любителях, телефонном звуке и незнакомых голосах те же модели дают 4–9 %.]]</li>
+    <li><b>[[Models hear what the rule says, not what was said.||Модели слышат то, что «положено», а не то, что сказано.]]</b> [[One model reported the expected sound in 81 of 94 clips where annotators heard something else (“canonical bias”).||Одна модель выдала ожидаемый звук в 81 из 94 записей, где разметчики слышали другое («каноническое смещение»).]]</li>
+    <li><b>[[Single letters are the weakest material.||Отдельные буквы — самый трудный материал.]]</b> [[On isolated vowelled letters an off-the-shelf model reached 35–37 % (Horouf corpus). Stage I of the book is exactly this.||На отдельных буквах с огласовкой готовая модель дала 35–37 % (корпус Horouf). Этап I книги — именно это.]]</li>
+    <li><b>[[A little real data beats a lot of synthetic data.||Немного настоящих данных лучше многих синтетических.]]</b> [[At IQRA 2026, 1,333 real mispronounced utterances helped more than 55,400 synthetic ones. This is why our own recordings matter.||На IQRA 2026 1 333 настоящих ошибочных высказывания помогли больше, чем 55 400 синтетических. Поэтому так важны наши собственные записи.]]</li>
+    <li><b>[[Good systems verify, and may say “not sure”.||Хорошие системы подтверждают и могут сказать «не уверен».]]</b> [[They score each expected sound against its likely alternatives instead of transcribing freely. HAFSS did this in 2006, with four answers by confidence.||Они сравнивают каждый ожидаемый звук с его вероятными заменами, а не распознают «вслепую». Так делала HAFSS ещё в 2006 году, с четырьмя ответами по уверенности.]]</li>
+  </ol>
+</section>
+
+<section id="experiment">
+  <div class="eyebrow">[[Our own test||Наш эксперимент]]</div>
+  <h2>[[Step 1: ready-made systems fail on single letters||Шаг 1: готовые системы не справляются с отдельными буквами]]</h2>
+  <p>[[Five systems listened to the same 840 public recordings: 28 letters × 3 vowel marks × 10 students (an open Indonesian school dataset). Share of clips where both the letter and the vowel were right:||Пять систем слушали одни и те же 840 открытых записей: 28 букв × 3 огласовки × 10 учеников (открытый набор индонезийской школы). Доля записей, где верно и буква, и огласовка:]]</p>
+  <div class="chart" role="img" aria-label="Step 1 results">
+    <div class="bar"><span class="bl">[[Arabic phoneme model (Maroof)||Арабская фонемная (Maroof)]]</span><span class="bt" title="50.0 %"><i style="--w:50%"></i></span><b>50.0 %</b></div>
+    <div class="bar"><span class="bl">[[Universal phone model (XLSR-espeak)¹||Универсальная фонемная (XLSR-espeak)¹]]</span><span class="bt" title="49.6 %"><i style="--w:49.6%"></i></span><b>49.6 %</b></div>
+    <div class="bar hi"><span class="bl">[[Muaalem: <u>the bot's model today</u>||Muaalem — <u>модель бота сейчас</u>]]</span><span class="bt" title="39.4 %"><i style="--w:39.4%"></i></span><b>39.4 %</b></div>
+    <div class="bar"><span class="bl">[[Whisper trained on the Quran (Tarteel)||Whisper на Коране (Tarteel)]]</span><span class="bt" title="24.5 %"><i style="--w:24.5%"></i></span><b>24.5 %</b></div>
+    <div class="bar"><span class="bl">[[General Whisper||Обычный Whisper]]</span><span class="bt" title="0.1 %"><i style="--w:0.1%"></i></span><b>0.1 %</b></div>
+  </div>
+  <p class="note">[[¹ over 24 letters: it has no symbols for ص ض ط ظ. All runs on a MacBook Air M1; phoneme models need about 0.2 s per clip.||¹ по 24 буквам: у неё нет символов для ص ض ط ظ. Всё запускалось на MacBook Air M1; фонемным моделям нужно около 0,2 с на запись.]]</p>
+  <div class="cards three">
+    <div><b>[[The bot's model writes a long vowel||Модель бота пишет долгий гласный]]</b><span>[[In 411 of 840 clips. A beginner who reads slowly and clearly would be told “too long”.||В 411 из 840 записей. Новичку, который читает медленно и чётко, бот сказал бы «слишком долго».]]</span></div>
+    <div><b>[[Errors follow the learner's errors||Ошибки модели совпадают с ошибками учеников]]</b><span><span class="pr" dir="ltr">د → ت</span>, <span class="pr" dir="ltr">ع → ء</span>, <span class="pr" dir="ltr">ث → س</span>, <span class="pr" dir="ltr">ض → د</span>: [[the model is weakest exactly where the learner needs it.||модель слабее всего именно там, где она нужна ученику.]]</span></div>
+    <div><b>[[Text recognisers turn sounds into words||Распознаватели текста превращают звуки в слова]]</b><span>[[Whisper wrote a vowel mark in 3 of 840 clips and answered with words like «نعم».||Whisper поставил огласовку в 3 записях из 840 и отвечал словами вроде «نعم».]]</span></div>
+  </div>
+
+  <h2 style="margin-top:34px">[[Step 2: ask “was it read?”, not “what was read?”||Шаг 2: спрашивать «прочитано ли?», а не «что прочитано?»]]</h2>
+  <p>[[The bot always knows what should be read. So we built four ways of deciding on top of the strongest listening model and tested them on all 8,904 recordings; each clip was judged by a checker trained on other students only.||Бот всегда знает, что нужно прочитать. Поэтому мы построили четыре способа решения поверх лучшей «слушающей» модели и проверили их на всех 8 904 записях; каждую запись оценивала проверка, обученная только на других учениках.]]</p>
+  <div class="chart" role="img" aria-label="Step 2 results">
+    <div class="bar"><span class="bl">[[Free transcription (as today)||Свободное распознавание (как сейчас)]]</span><span class="bt" title="47.2 %"><i style="--w:47.2%"></i></span><b>47.2 %</b></div>
+    <div class="bar"><span class="bl">[[Choice among 28 letters × 3 vowels||Выбор из 28 букв × 3 огласовки]]</span><span class="bt" title="55.3 %"><i style="--w:55.3%"></i></span><b>55.3 %</b></div>
+    <div class="bar"><span class="bl">[[Comparison with other students' average||Сравнение со средней записью других]]</span><span class="bt" title="69.6 %"><i style="--w:69.6%"></i></span><b>69.6 %</b></div>
+    <div class="bar hi"><span class="bl">[[<u>Trained classifier over the 84 answers</u>||<u>Обученный классификатор на 84 ответа</u>]]</span><span class="bt" title="88.0 %"><i style="--w:88%"></i></span><b>88.0 %</b></div>
+    <div class="bar hi2"><span class="bl">[[…the same, answering only when sure (3 of 4 clips)||…он же, отвечает только когда уверен (3 из 4 записей)]]</span><span class="bt" title="95.8 %"><i style="--w:95.8%"></i></span><b>95.8 %</b></div>
+  </div>
+  <div class="callout"><b>+41</b><span>[[points from changing the question alone. Correct readings accepted: 90.5 % instead of 47.2 %. The weak spots stay the same: ظ and the pair ث / س.||пункт только от смены вопроса. Верное чтение принимается в 90,5 % случаев вместо 47,2 %. Слабые места те же: ظ и пара ث / س.]]</span></div>
+  <p class="note">[[<b>What this does not show.</b> The labels say what each student was <i>asked</i> to read, not what a teacher heard; substitutions were simulated; the students are not ours. The classifier must be retrained and checked on our learners' recordings before the bot uses it.||<b>Чего это не показывает.</b> Метки говорят, что ученика <i>попросили</i> прочитать, а не что услышал учитель; замены смоделированы; ученики не наши. Прежде чем бот начнёт им пользоваться, классификатор нужно переобучить и проверить на записях наших учеников.]]</p>
+</section>
+
+<section id="field">
+  <div class="eyebrow">[[Muallim among the others||Муаллим среди других]]</div>
+  <h2>[[Four ways to judge speech, and where we stand||Четыре способа оценивать речь — и где мы]]</h2>
+  <div class="tw"><table>
+    <tr><th>[[Way||Способ]]</th><th>[[Examples||Примеры]]</th><th>[[Sees a wrong vowel||Видит неверную огласовку]]</th><th>[[Works on one letter||Работает на одной букве]]</th><th>[[Accuracy on learners||Точность на учениках]]</th></tr>
+    <tr><td>[[Recognise words, compare with the text||Распознать слова, сравнить с текстом]]</td><td>Tarteel, Duolingo, Google Read Along</td><td>✗</td><td>✗</td><td>[[not published||не опубликована]]</td></tr>
+    <tr><td>[[Write down sounds, compare||Записать звуки, сравнить]]</td><td>[[Muaalem, IQRA systems, <b>Muallim today</b>||Muaalem, системы IQRA, <b>Муаллим сейчас</b>]]</td><td>✓</td><td>[[weak (35–50 %)||слабо (35–50 %)]]</td><td>[[staged errors only||только постановочные ошибки]]</td></tr>
+    <tr class="hl"><td>[[Verify each expected sound||Подтверждать каждый ожидаемый звук]]</td><td>[[HAFSS, Quran Lab, children's letter-sound tools||HAFSS, Quran Lab, детские тренажёры звуков букв]]</td><td>✓</td><td>[[by design||изначально]]</td><td>[[the only real figures||единственные настоящие цифры]]</td></tr>
+    <tr><td>[[A general voice model talks||Общая голосовая модель разговаривает]]</td><td>QuranCast</td><td>?</td><td>?</td><td>[[none||нет]]</td></tr>
+  </table></div>
+  <p class="note">[[The third way is where Muallim's Stage I is moving: it is the only one with published numbers on real learners, and the one our step 2 tested.||Третий способ — то, куда движется Этап I Муаллима: только у него есть опубликованные цифры на настоящих учениках, и именно его проверил наш шаг 2.]]</p>
+  <div class="tw"><table class="cmp2">
+    <tr><th></th><th>Tarteel</th><th>Quran Lab</th><th>[[ELSA and similar||ELSA и похожие]]</th><th>[[Children's tools||Детские тренажёры]]</th><th class="me">[[Muallim||Муаллим]]</th></tr>
+    <tr><td>[[Judges sounds, not words||Оценивает звуки, а не слова]]</td><td>✗</td><td>✓</td><td>✓</td><td>[[some||часть]]</td><td class="me">✓</td></tr>
+    <tr><td>[[Sees vowel-mark errors||Видит ошибки в огласовках]]</td><td>✗</td><td>✓</td><td>—</td><td>✗</td><td class="me">✓</td></tr>
+    <tr><td>[[Starts from single letters||Начинает с отдельных букв]]</td><td>✗</td><td>✗</td><td>✗</td><td>[[some||часть]]</td><td class="me">✓</td></tr>
+    <tr><td>[[Adult beginners from zero||Взрослые новички с нуля]]</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td><td class="me">✓</td></tr>
+    <tr><td>[[Teacher checks the labels||Учитель проверяет разметку]]</td><td>✗</td><td>[[private||закрыто]]</td><td>✗</td><td>✗</td><td class="me">✓</td></tr>
+    <tr><td>[[Says “not sure”||Говорит «не уверен»]]</td><td>✗</td><td>[[left to the app||на усмотрение приложения]]</td><td>✗</td><td>[[some||часть]]</td><td class="me">[[planned||в плане]]</td></tr>
+    <tr><td>[[Tested on learners||Проверено на учениках]]</td><td>[[not published||не опубликовано]]</td><td>[[private sets||закрытые наборы]]</td><td>[[not published||не опубликовано]]</td><td>[[children||дети]]</td><td class="me">[[next step||следующий шаг]]</td></tr>
+    <tr><td>[[Open licence||Открытая лицензия]]</td><td>✗</td><td>[[no paid use||без платного использования]]</td><td>✗</td><td>✗</td><td class="me">✓</td></tr>
+  </table></div>
+  <div class="cards three">
+    <div class="good"><b>[[Where we are stronger||Где мы сильнее]]</b><span>[[We start where beginners start, we see vowel errors, teachers verify the labels, every decision is stored with its model output, and we can publish an evaluation others can repeat. No vendor does the last.||Мы начинаем там, где начинают новички, видим ошибки в огласовках, учителя проверяют разметку, каждое решение хранится вместе с выводом модели, и мы можем опубликовать проверку, которую другие повторят. Ни один производитель этого не делает.]]</span></div>
+    <div class="bad"><b>[[Where we are weaker||Где мы слабее]]</b><span>[[The bot's model never heard a learner; on single letters it is right in 39 % of clips; it reports a long vowel in half of them; it always gives a verdict; nothing is tested on our learners yet; the present consent does not allow publication.||Модель бота ни разу не слышала ученика; на отдельных буквах она права в 39 % записей; в половине пишет долгий гласный; всегда выносит вердикт; на наших учениках ничего ещё не проверено; нынешнее согласие не разрешает публикацию.]]</span></div>
+    <div><b>[[Weak points of the others||Слабые места других]]</b><span>[[Accuracy claimed but never shown; word recognition sold as pronunciation checking; numbers measured on professional reciters; consent for collected voices not described.||Точность заявлена, но не показана; распознавание слов выдаётся за проверку произношения; цифры получены на профессиональных чтецах; согласие на сбор голосов не описано.]]</span></div>
+  </div>
+</section>
+
+<section id="fixes">
+  <div class="eyebrow">[[What we found wrong, and how we fix it||Какие минусы нашли и как исправляем]]</div>
+  <h2>[[Weak points → fixes, in order||Минусы → исправления, по порядку]]</h2>
+  <div class="tw"><table class="fixes">
+    <tr><th>#</th><th>[[Weak point||Минус]]</th><th>[[Evidence||Основание]]</th><th>[[Fix||Исправление]]</th><th>[[Status||Статус]]</th></tr>
+    <tr><td>1</td><td>[[The consent does not allow publishing recordings||Согласие не разрешает публиковать записи]]</td><td>[[Telegram developer terms||Правила Telegram для разработчиков]]</td><td>[[Consent screen: “Continue = publication” + “Practise without recording”; 18+ only||Экран согласия: «Продолжить = публикация» + «Заниматься без записи»; только 18+]]</td><td><em class="st d">[[draft ready||черновик готов]]</em></td></tr>
+    <tr><td>2</td><td>[[A held short vowel is reported as “too long”||Протянутую краткую огласовку называют «слишком долгой»]]</td><td>[[411 of 840 clips||411 из 840 записей]]</td><td>[[On single letters, do not judge length||На отдельных буквах не оценивать длину]]</td><td><em class="st p">[[planned||в плане]]</em></td></tr>
+    <tr><td>3</td><td>[[The bot always gives a verdict||Бот всегда выносит вердикт]]</td><td>[[HAFSS; 95.8 % when answering 3 of 4||HAFSS; 95,8 % при ответе на 3 из 4]]</td><td>[[“Not sure → read it once more”||«Не уверен → прочитайте ещё раз»]]</td><td><em class="st d">[[in the demo||в демо]]</em></td></tr>
+    <tr><td>4</td><td>[[Too many chances for a false alarm||Слишком много поводов для ложной тревоги]]</td><td>[[HAFSS judged only vowels for beginners||HAFSS у новичков оценивала только гласные]]</td><td>[[Judge only what the lesson teaches||Оценивать только то, чему учит урок]]</td><td><em class="st p">[[planned||в плане]]</em></td></tr>
+    <tr><td>5</td><td>[[Free transcription fails on single letters||Свободное распознавание не справляется с буквами]]</td><td>[[47.2 % vs 88.0 %||47,2 % против 88,0 %]]</td><td>[[Stage I: verify the expected letter (84-answer classifier), retrained on our recordings||Этап I: подтверждать ожидаемую букву (классификатор на 84 ответа), переобученный на наших записях]]</td><td><em class="st d">[[prototype tested||прототип проверен]]</em></td></tr>
+    <tr><td>6</td><td>[[One signal only, nothing catches the model's mistakes||Один сигнал, ошибки модели никто не ловит]]</td><td>[[Phase 5||Фаза 5]]</td><td>[[A second checker runs silently on every attempt||Вторая проверка тихо работает на каждой попытке]]</td><td><em class="st p">[[planned||в плане]]</em></td></tr>
+    <tr><td>7</td><td>[[The model is weakest on confusable letters||Модель слабее всего на похожих буквах]]</td><td>[[ظ, ث/س, emphatic letters||ظ, ث/س, твёрдые буквы]]</td><td>[[Send these recordings to teachers first||Отдавать эти записи учителям в первую очередь]]</td><td><em class="st p">[[planned||в плане]]</em></td></tr>
+    <tr><td>8</td><td>[[No accuracy figure on our learners||Нет цифр точности на наших учениках]]</td><td>[[every number is on other people's voices||все цифры — на чужих голосах]]</td><td>[[First recordings labelled “blind” by two teachers; test learners frozen before training||Первые записи размечают два учителя «вслепую»; тестовые ученики фиксируются до обучения]]</td><td><em class="st n">[[next step||следующий шаг]]</em></td></tr>
+  </table></div>
+</section>
+
+<section id="consent">
+  <div class="eyebrow">[[Data and consent||Данные и согласие]]</div>
+  <h2>[[A dataset that does not exist yet, built honestly||Датасет, которого ещё нет, — собранный честно]]</h2>
+  <div class="split">
+    <div>
+      <p>[[<b>No open dataset</b> combines adult beginners from zero, single letters and syllables with vowel marks, real errors and sound-level labels. RetaSy has recordings from Russia, Kazakhstan and Uzbekistan but one label per recording; L2-KSU has learners but full sentences and a no-derivatives licence; IQRA's test errors are staged by native speakers.||<b>Ни один открытый датасет</b> не сочетает взрослых новичков с нуля, отдельные буквы и слоги с огласовками, настоящие ошибки и разметку по звукам. В RetaSy есть записи из России, Казахстана и Узбекистана, но одна метка на запись; в L2-KSU есть ученики, но целые предложения и лицензия без производных работ; ошибки в тесте IQRA разыграны носителями языка.]]</p>
+      <p>[[<b>Our contribution:</b> the first open dataset that follows the same beginners through a graded textbook, from letters to words, with teacher-verified labels and the deployed system's own answer stored beside each recording.||<b>Наш вклад:</b> первый открытый датасет, который ведёт одних и тех же новичков по книге — от букв к словам — с разметкой, проверенной учителями, и с ответом работающей системы рядом с каждой записью.]]</p>
+      <ul class="ticks">
+        <li>[[Three states per learner: not answered · practice only (nothing stored) · public release||Три состояния у ученика: не ответил · только практика (ничего не хранится) · публикация]]</li>
+        <li>[[No audio is written before consent; changed text asks again||До согласия звук не записывается; новый текст спрашивает заново]]</li>
+        <li>[[Withdrawal deletes audio and labels; the next release omits the speaker||Отзыв удаляет звук и разметку; следующая версия выходит без этого ученика]]</li>
+        <li>[[Gated access: no identifying speakers, no voice cloning||Доступ по условиям: нельзя узнавать людей и клонировать голос]]</li>
+      </ul>
+    </div>
+    <div class="consent">
+      <b>🎙 [[Your recordings will become part of an open dataset||Ваши записи станут частью открытого датасета]]</b>
+      <p>[[If you press “Continue”, your voice messages are saved and <b>published on the internet</b>. Published with them: what you read, the errors found, your age group, gender and first language. <b>Not published:</b> your name, Telegram account, phone number.||Если нажмёте «Продолжить», ваши голосовые сохранятся и будут <b>опубликованы в интернете</b>. Вместе с ними: что вы читали, найденные ошибки, возрастная группа, пол и родной язык. <b>Не публикуются:</b> имя, аккаунт Telegram, телефон.]]</p>
+      <p>[[Your voice is you: someone who knows you may recognise it. You can withdraw at any time (/privacy). Copies already downloaded cannot be taken back. Only recordings of people aged 18+ are published.||Ваш голос — это вы: знакомые могут его узнать. Отказаться можно в любой момент (/privacy). Уже скачанные копии вернуть нельзя. Публикуются только записи людей старше 18 лет.]]</p>
+      <div class="cbtn"><span class="pri">✅ [[Continue — I agree to publication||Продолжить — согласен(на) на публикацию]]</span><span>[[Practise without recording||Заниматься без записи]]</span><span>[[More details||Подробнее]]</span></div>
+      <small>[[Draft · needs approval and the university's ethics review||Черновик · нужно утверждение и этическая комиссия университета]]</small>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="eyebrow">[[Where we are going||Куда мы движемся]]</div>
+  <h2>[[From this demo to an open dataset||От этого демо до открытого датасета]]</h2>
+  <ol class="road">
+    <li class="now"><em>[[Now · Nov 2026||Сейчас · ноябрь 2026]]</em><b>[[First version for approval||Первая версия на утверждение]]</b><span>[[This demo; your answers on the open decisions below.||Это демо; ваши ответы на открытые решения ниже.]]</span></li>
+    <li><em>[[Dec 2026||Декабрь 2026]]</em><b>[[Lessons 1–3 in the real bot + consent screen||Уроки 1–3 в настоящем боте + экран согласия]]</b><span>[[Teacher recordings for syllables and lines; chapters 1–2 of the thesis.||Записи преподавателя для слогов и строк; главы 1–2 диссертации.]]</span></li>
+    <li><em>[[Dec 2026 – Jan 2027||Декабрь 2026 – январь 2027]]</em><b>[[Pilot: 20–40 learners, 4–6 weeks||Пилот: 20–40 учеников, 4–6 недель]]</b><span>[[Consent, recordings, complaints “the bot was wrong”, first expert feedback round.||Согласие, записи, жалобы «бот ошибся», первый круг экспертных отзывов.]]</span></li>
+    <li><em>[[Feb – Mar 2027||Февраль – март 2027]]</em><b>[[Teachers label, the checker learns||Учителя размечают, проверка учится]]</b><span>[[Two teachers label blind; test learners frozen; the Stage I verifier retrained on our learners and compared with the bot's model, with confidence intervals.||Два учителя размечают «вслепую»; тестовые ученики заморожены; проверка Этапа I переобучается на наших учениках и сравнивается с моделью бота, с доверительными интервалами.]]</span></li>
+    <li><em>[[Apr – Jun 2027||Апрель – июнь 2027]]</em><b>[[Results, dataset, defence||Результаты, датасет, защита]]</b><span>[[Results frozen mid-April; dataset v1 and a paper (Interspeech / SLaTE) if ethics and consent allow; master's defence in June 2027.||Результаты замораживаются в середине апреля; датасет v1 и статья (Interspeech / SLaTE), если позволят этика и согласия; защита магистерской в июне 2027.]]</span></li>
+    <li class="far"><em>[[Doctorate||Докторантура]]</em><b>[[The whole book, adaptive learning||Вся книга, адаптивное обучение]]</b><span>[[Tajweed rules for beginners, which attempts to give a teacher, review timed by measured learning, comparison across first languages.||Правила таджвида у новичков, какие попытки отдавать учителю, повторение по измеренному усвоению, сравнение по родным языкам.]]</span></li>
+  </ol>
+</section>
+
+<section id="sources">
+  <div class="eyebrow">[[Key publications||Ключевые публикации]]</div>
+  <h2>[[What we read, and what each gave us||Что мы прочитали и что это нам дало]]</h2>
+  <div class="pubs">
+    <div><b>[[IQRA 2026 Interspeech Challenge||IQRA 2026 Interspeech Challenge]]</b><small>arXiv:2603.29087</small><span>[[The main Arabic benchmark: sound-level models without a language model win; real error data helps more than synthetic.||Главный арабский бенчмарк: побеждают фонемные модели без языковой модели; настоящие ошибки полезнее синтетических.]]</span><a href="https://arxiv.org/abs/2603.29087" target="_blank" rel="noopener">arxiv.org</a></div>
+    <div><b>Abdelfattah et al. · Muaalem</b><small>arXiv:2509.00094</small><span>[[The bot's present model (MIT licence). Trained on professional reciters, so we tested it on beginners' material.||Нынешняя модель бота (лицензия MIT). Обучена на профессиональных чтецах — поэтому мы проверили её на материале новичков.]]</span><a href="https://huggingface.co/obadx/muaalem-model-v3_2" target="_blank" rel="noopener">huggingface.co</a></div>
+    <div><b>Zaatiti et al. · Horouf</b><small>arXiv:2508.19587</small><span>[[Isolated vowelled letters: off-the-shelf 35–37 %, a classifier ≈65 %. The idea behind our step 2.||Отдельные буквы с огласовкой: готовая модель 35–37 %, классификатор ≈65 %. Идея нашего шага 2.]]</span><a href="https://arxiv.org/abs/2508.19587" target="_blank" rel="noopener">arxiv.org</a></div>
+    <div><b>Abdou et al. · HAFSS</b><small>Interspeech 2006</small><span>[[The first Quran pronunciation tutor: verifies expected sounds, has “not sure”, judges only vowels for beginners.||Первый тренажёр произношения Корана: подтверждает ожидаемые звуки, умеет «не уверен», у новичков оценивает только гласные.]]</span><a href="https://www.cs.toronto.edu/~asamir/papers/is06.pdf" target="_blank" rel="noopener">cs.toronto.edu</a></div>
+    <div><b>Black, Kazemzadeh, Tepperman, Narayanan</b><small>ACM TSLP 7(4), 2011</small><span>[[Verifying children's letter sounds: 85 % agreement with raters against 95 % between two humans. We will report the same ceiling.||Проверка звуков букв у детей: 85 % согласия с экспертами против 95 % между двумя людьми. Мы покажем такой же «потолок».]]</span><a href="https://researchonline.stthomas.edu/esploro/outputs/journalArticle/Automatically-assessing-the-ABCs-Verification-of/991015166250703691" target="_blank" rel="noopener">researchonline</a></div>
+    <div><b>Al-Kharusi et al.</b><small>arXiv:2510.12858</small><span>[[A critical review of Quran recitation evaluation: no product publishes accuracy on learners.||Критический обзор оценки чтения Корана: ни один продукт не публикует точность на учениках.]]</span><a href="https://arxiv.org/abs/2510.12858" target="_blank" rel="noopener">arxiv.org</a></div>
+    <div><b>Salameh et al. · RetaSy</b><small>arXiv:2405.02675</small><span>[[≈7,000 recordings of non-Arab readers, including Russia, Kazakhstan, Uzbekistan: our learners' first languages occur, but one label per recording.||≈7 000 записей неарабов, в том числе из России, Казахстана, Узбекистана: родные языки наших учеников встречаются, но одна метка на запись.]]</span><a href="https://arxiv.org/abs/2405.02675" target="_blank" rel="noopener">arxiv.org</a></div>
+    <div><b>Alrashoudi et al. · L2-KSU</b><small>Discover Computing, 2025</small><span>[[Non-native Arabic learners with sound errors; an external test for consonant errors.||Неносители арабского с ошибками в звуках; внешний тест для ошибок в согласных.]]</span><a href="https://link.springer.com/10.1007/s10791-024-09489-8" target="_blank" rel="noopener">springer.com</a></div>
+    <div><b>Amrate, Tsai</b><small>ReCALL 37(1), 2025</small><span>[[Systematic review of 30 studies: such systems “still struggle” to evaluate learner speech; the teaching effect is better supported than the scoring accuracy.||Систематический обзор 30 исследований: такие системы «всё ещё с трудом» оценивают речь учеников; польза для обучения подтверждена лучше, чем точность оценки.]]</span><a href="https://doi.org/10.1017/S0958344024000181" target="_blank" rel="noopener">doi.org</a></div>
+  </div>
+  <p class="note">[[The full reports (phases 1–5, the Arabic and world surveys, 130+ sources) are in the project repository and can be sent on request.||Полные отчёты (фазы 1–5, обзоры арабских и мировых решений, 130+ источников) лежат в репозитории проекта, можем прислать по запросу.]]</p>
+</section>
+
+<section id="screens">
+  <div class="eyebrow">[[Lesson 2, screen by screen||Урок 2, экран за экраном]]</div>
+  <h2>[[Lesson 2: the letters||Урок 2: буквы]] <span class="ar">ر ز م</span></h2>
+  <p>[[The same lesson as in the phone above, laid out side by side. Every element is either a Telegram message or one of the new interactive messages.||Тот же урок, что в телефоне выше, — экраны рядом. Каждый элемент — обычное сообщение Telegram или одно из новых интерактивных сообщений.]]</p>
+  <div class="gal" id="gal"></div>
+</section>
+
+<section>
+  <div class="eyebrow">[[Lessons 1–3, and two later pages||Уроки 1–3 и две страницы дальше]]</div>
+  <h2>[[Lesson plans: what the learner gets in each lesson||Планы уроков: что получает ученик в каждом уроке]]</h2>
+  <p>[[A plan for review, lesson by lesson: what arrives, in which order, and which Telegram message carries it. Press <b>▶ Open in the phone</b> to try the same lesson above.||План для проверки, урок за уроком: что приходит, в каком порядке и каким сообщением Telegram. Нажмите <b>«▶ Открыть в телефоне»</b>, чтобы попробовать этот урок выше.]]</p>
+  <div class="plans" id="lessonCards"></div>
+</section>
+
+<section>
+  <div class="eyebrow">[[Telegram's newest features, used on purpose||Новые возможности Telegram — там, где они помогают]]</div>
+  <h2>[[What the 2026 updates give the learner||Что обновления 2026 года дают ученику]]</h2>
+  <p>[[Telegram added rich messages, buttons inside them, interactive HTML messages, private short-lived replies and live-written drafts during 2026. Muallim uses each one where it makes learning simpler.||В 2026 году Telegram добавил расширенные сообщения, кнопки внутри них, интерактивные HTML-сообщения, личные временные ответы и черновики, которые пишутся на глазах. Муаллим использует каждое там, где оно упрощает учёбу.]]</p>
+  <div class="cards">
+    <div><small>[[Rich messages · 10.1||Расширенные сообщения · 10.1]]</small><b>[[The lesson in one message||Урок в одном сообщении]]</b><span>[[Video, the words to read and “Go deeper” in a single tidy message instead of five separate ones.||Видео, слова для чтения и «Углублённо» — в одном аккуратном сообщении вместо пяти отдельных.]]</span></div>
+    <div><small>[[Buttons in rich messages · 10.3||Кнопки в расширенных сообщениях · 10.3]]</small><b>[[The way around, always open||Навигация всегда под рукой]]</b><span>[[Every lesson has ‹ previous, 🏠 and next ›; tabs switch between the parts of a lesson.||В каждом уроке есть ‹ назад, 🏠 и вперёд ›; вкладки переключают части урока.]]</span></div>
+    <div><small>[[Real voices only||Только живые голоса]]</small><b>[[No synthetic or unchecked sound||Без синтезированного и непроверенного звука]]</b><span>[[The demo plays no audio of its own. The learner hears real teachers in video lessons. Reference recordings will be the teacher's own, recorded per line; when they exist, they go into the message as voice blocks (10.1–10.2) that play in place.||Демо не проигрывает своего звука. Ученик слышит настоящих учителей в видеоуроках. Эталонные записи будут голосом преподавателя, построчно; когда они появятся, они встанут в сообщение голосовыми блоками (10.1–10.2), которые играют прямо в нём.]]</span></div>
+    <div><small>[[Live drafts with “stop” · 10.1–10.3||Живые черновики с «стоп» · 10.1–10.3]]</small><b>[[Feedback written live||Разбор пишется на глазах]]</b><span>[[While the reading is checked the learner sees the progress, and can stop it to read again.||Пока чтение проверяется, ученик видит ход проверки и может остановить её, чтобы прочитать заново.]]</span></div>
+    <div><small>[[Quoting rich messages · 10.4||Цитаты расширенных сообщений · 10.4]]</small><b>[[Feedback points to the lesson||Разбор ссылается на урок]]</b><span>[[The feedback quotes the lesson it refers to, even many messages later.||Разбор цитирует урок, к которому относится, даже если с тех пор прошло много сообщений.]]</span></div>
+    <div><small>[[Interactive messages · 10.4||Интерактивные сообщения · 10.4]]</small><b>[[Settings in one message||Настройки в одном сообщении]]</b><span>[[Language, reminder time, isti'adha at the start of the day, larger letters: switches that change in place.||Язык, время напоминания, истиаза в начале дня, крупные буквы — переключатели, которые меняются на месте.]]</span></div>
+  </div>
+  <details class="more"><summary>[[7 more||Ещё 7]]</summary>
+  <div class="cards">
+    <div><small>[[Editing rich messages · 10.1||Правка расширенных сообщений · 10.1]]</small><b>[[Cards that change in place||Карточки меняются на месте]]</b><span>[[All letter cards of a lesson live in one message; “Next ›” edits it, so the chat stays short and calm.||Все карточки букв урока живут в одном сообщении; «Далее ›» меняет его, и чат остаётся коротким и спокойным.]]</span></div>
+    <div><small>[[Scan crops||Вырезки из скана]]</small><b>[[Read the book itself||Читать саму книгу]]</b><span>[[The lines to read can be cut from the scanned page, not retyped, so the learner reads exactly what the book prints.||Строки для чтения можно вырезать из скана страницы, а не перепечатывать — ученик читает ровно то, что напечатано в книге.]]</span></div>
+    <div><small>[[Interactive messages · 10.4||Интерактивные сообщения · 10.4]]</small><b>[[Progress anyone can read||Понятный прогресс]]</b><span>[[Letters and lessons, the streak, and this week as Mo–Su with ✓.||Буквы и уроки, серия дней и эта неделя Пн–Вс с ✓.]]</span></div>
+    <div><small>[[Shared widgets · 10.4||Общие виджеты · 10.4]]</small><b>[[One card design for every lesson||Один дизайн карточки для всех уроков]]</b><span>[[The study card is one shared design; only each lesson's content changes. Improving it once improves it everywhere.||Карточка — один общий дизайн, меняется только содержание урока. Улучшили раз — улучшилось везде.]]</span></div>
+    <div><small>[[Interactive messages · 10.4||Интерактивные сообщения · 10.4]]</small><b>[[Teacher annotation in one message||Разметка учителя в одном сообщении]]</b><span>[[The model pre-marks syllables; the teacher confirms with one tap or corrects by sound and rule. The message updates in place for the whole queue.||Модель заранее отмечает слоги; учитель подтверждает одним нажатием или исправляет по звуку и правилу. Сообщение обновляется на месте для всей очереди.]]</span></div>
+    <div><small>[[Rich messages · edited in place||Расширенные сообщения · правка на месте]]</small><b>[[Review as a short game||Повторение как короткая игра]]</b><span>[[Six questions of three kinds, a combo counter, and at the end when each letter comes back.||Шесть вопросов трёх видов, счётчик серии и в конце — когда вернётся каждая буква.]]</span></div>
+    <div class="off"><small>[[Not used · TON wallet||Не используем · кошелёк TON]]</small><b>[[No payments||Без платежей]]</b><span>[[The course is free; the wallet features of 10.4 are left out on purpose.||Курс бесплатный; возможности кошелька из 10.4 сознательно не используются.]]</span></div>
+  </div></details>
+</section>
+
+<section>
+  <div class="eyebrow">[[The main screen||Главный экран]]</div>
+  <h2>[[One big milestone: all 28 letters||Одна большая веха: все 28 букв]]</h2>
+  <div class="split">
+    <div>
+      <p>[[The home message has two states. A newcomer sees the 28 letters and one big button, <b>▶ Start</b>, which opens the alphabet. Once the alphabet is seen, the letter table moves into 🔁 Review and the home screen shows two progress bars, <b>Letters n/28</b> and <b>Lessons n/15</b>, and one button that continues where the learner stopped.||У главного сообщения два состояния. Новичок видит 28 букв и одну большую кнопку <b>«▶ Начать»</b> — она открывает алфавит. Когда алфавит просмотрен, таблица букв уходит в «🔁 Повторение», а на главном экране две полосы прогресса — <b>Буквы n/28</b> и <b>Уроки n/15</b> — и одна кнопка, которая продолжает с того места, где ученик остановился.]]</p>
+      <p>[[Nothing is locked. Every lesson is open in 📚 Lessons, and Stage II can be started at any time. A lesson counts once it has been read aloud, whatever the result; reading can also be skipped and done later.||Ничего не закрыто. Любой урок открыт в «📚 Уроки», Этап II можно начать в любой момент. Урок засчитывается, когда его прочитали вслух, каким бы ни был результат; чтение можно и отложить.]]</p>
+    </div>
+    <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">Muallim</div><div class="sb">bot</div></div></div><div class="chat" id="homeShot"></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">[[Progress, history, review||Прогресс, история, повторение]]</div>
+  <h2>[[Built on what the learner actually read||Строится на том, что ученик действительно прочитал]]</h2>
+  <div class="cards">
+    <div><b>[[Two progress numbers||Два числа прогресса]]</b><span>[[Letters (28) and lessons of Stage I (15) are counted separately, so neither hides the other. A lesson that was only viewed is marked 👁, not ✅. Before the first lesson the screen shows a clearly marked example.||Буквы (28) и уроки Этапа I (15) считаются отдельно, чтобы одно не скрывало другое. Урок, который только открыли, помечен 👁, а не ✅. До первого урока экран показывает явно помеченный пример.]]</span></div>
+    <div><b>[[Study history||История занятий]]</b><span>[[For every lesson: when it was read, how many attempts, how many errors were found and how many were fixed on a later attempt. The same record serves the research.||По каждому уроку: когда прочитан, сколько попыток, сколько ошибок найдено и сколько исправлено в следующих попытках. Эта же запись служит исследованию.]]</span></div>
+    <div><b>[[Review that remembers||Повторение, которое помнит]]</b><span>[[🔁 Review shows one clear action on top (what to review today) and four sections one tap away: my letters, lessons done, words with mistakes, the alphabet. Every letter read aloud comes back after 1, 3, 7, 14 and 30 days; a mistake brings it back the next day. Empty sections show a marked example.||«🔁 Повторение» показывает сверху одно понятное действие (что повторить сегодня) и четыре раздела в одно нажатие: мои буквы, пройденные уроки, слова с ошибками, алфавит. Каждая прочитанная буква возвращается через 1, 3, 7, 14 и 30 дней; ошибка возвращает её на следующий день. Пустые разделы показывают помеченный пример.]]</span></div>
+    <div><b>[[Clear feedback||Понятный разбор]]</b><span>[[The part is shown again with every word green or gold. Each gold word gets one plain sentence, such as “Here it is زِ: ز with kasra (a stroke below the letter). You read زَ, with fatha.”, the needed syllable next to the heard one, and 🔊 the teacher's lesson for that letter. No phoneme codes.||Часть показывается снова, каждое слово зелёное или жёлтое. К каждому жёлтому — одно простое предложение, например «Здесь زِ: ز с кясрой (черта под буквой). Вы прочитали زَ, с фатхой.», нужный слог рядом с услышанным и 🔊 урок учителя по этой букве. Никаких кодов фонем.]]</span></div>
+    <div><b>[[Gentle reminders||Мягкие напоминания]]</b><span>[[The learner chooses the time or turns them off. The text only invites: “Lesson 4 is waiting for you, five minutes are enough.” Never a word about a lost streak.||Ученик сам выбирает время или выключает их. Текст только приглашает: «Урок 4 ждёт вас, хватит пяти минут». Ни слова о потерянной серии.]]</span></div>
+    <div><b>[[Honest demo||Честное демо]]</b><span>[[All lessons already exist in the bot's programme. In this demo the alphabet, lessons 1–15 (all 28 letters) and pages 49–50 open; feedback with errors is shown on lessons 1–3.||Все уроки уже есть в программе бота. В демо открываются алфавит, уроки 1–15 (все 28 букв) и страницы 49–50; разбор с ошибками показан на уроках 1–3.]]</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">[[Questions you may ask||Вопросы, которые могут возникнуть]]</div>
+  <h2>[[About the book, the videos and the vowels||О книге, видео и огласовках]]</h2>
+  <div class="cards">
+    <div><b>[[Is there a transcription?||Есть ли транскрипция?]]</b><span>[[No, as the professor asked: no Cyrillic transliteration, only Arabic script and sound. Help with reading comes from the video teachers and, later, the teacher's own recording of each line. The lines of lessons 1–3 were checked against the scan.||Нет, как просил профессор: никакой кириллической транслитерации, только арабское письмо и звук. Помогают читать учителя в видео, а позже — запись преподавателя для каждой строки. Строки уроков 1–3 сверены со сканом.]]</span></div>
+    <div><b>[[Why is a lesson read in parts?||Почему урок читается частями?]]</b><span>[[A lesson holds the lines of two or three letters. Reading it all at once is long for a beginner and the feedback gets crowded, so each letter's lines are one part, with its own tab. The lesson counts as read once every part has been read once.||В уроке строки двух-трёх букв. Читать всё сразу новичку долго, и разбор получается перегруженным, поэтому строки каждой буквы — отдельная часть со своей вкладкой. Урок засчитывается, когда каждая часть прочитана один раз.]]</span></div>
+    <div><b>[[Where are fatha, kasra and damma explained?||Где объясняются фатха, кясра и дамма?]]</b><span>[[Not in the book's text: lesson 1 only shows <span class="ar">أَ إِ أُ</span>; the book leaves the explanation to the teacher. In the demo the vowels are explained in the video lessons (Abu Yasin's lessons 4–6 on vowel marks are under “Go deeper” in lessons 1–2). The short explanation on our first card is written by us and needs a teacher's review.||Не в тексте книги: урок 1 показывает только <span class="ar">أَ إِ أُ</span>, объяснение книга оставляет учителю. В демо огласовки объясняются в видеоуроках (уроки 4–6 Абу Ясина об огласовках — в «Углублённо» уроков 1–2). Короткое объяснение на нашей первой карточке написано нами, его должен проверить преподаватель.]]</span></div>
+    <div><b>[[Whose videos are these?||Чьи это видео?]]</b><span>[[Real teachers only, all on YouTube and checked by channel: short lessons that read the lines of the book (channel “Муаллим сани”), a full Russian course by the same book by Abu Yasin Ruslan Malikov (a lesson and a “where the sound comes from” video for every letter), and Dr. Ayman Swaid on how each letter is pronounced. Their quality is to be confirmed by a teacher.||Только живые учителя, все на YouTube, каналы проверены: короткие уроки, где читают строки книги (канал «Муаллим сани»), полный русский курс по этой же книге Абу Ясина Руслана Маликова (урок и ролик «откуда звук» на каждую букву) и д-р Айман Сувейд о произношении каждой буквы. Качество подтверждает преподаватель.]]</span></div>
+    <div><b>[[Why no page numbers?||Почему нет номеров страниц?]]</b><span>[[Editions of the book are paginated differently, so the learner sees lesson numbers only. Page numbers stay in this review page and in the bot's data.||В разных изданиях книги разная нумерация, поэтому ученик видит только номера уроков. Номера страниц остаются на этой странице для проверки и в данных бота.]]</span></div>
+    <div><b>[[First contact||Первое знакомство]]</b><span>[[Two taps: the language, then “I agree” to keeping the recordings (/privacy). Then the home screen with one big button: “Start” (the alphabet) for a newcomer, “Continue: lesson N” for someone who comes back. No questions: whoever comes is a beginner, the first recording shows the real level, and the name comes from Telegram.||Два нажатия: язык, затем «Согласен(на)» на хранение записей (/privacy). Дальше главный экран с одной большой кнопкой: «Начать» (алфавит) для новичка, «Продолжить: урок N» для вернувшегося. Никаких вопросов: кто пришёл — тот новичок, первая запись покажет настоящий уровень, а имя берётся из Telegram.]]</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">[[For the teacher||Для преподавателя]]</div>
+  <h2>[[Annotation: the model marks, the teacher confirms||Разметка: модель отмечает, учитель подтверждает]]</h2>
+  <div class="teach">
+    <div>
+      <p>[[Every voice message can become research data. The teacher opens the queue in the same bot: one recording at a time, the line split into syllables, each syllable coloured by how sure the model is.||Каждое голосовое может стать данными исследования. Учитель открывает очередь в том же боте: по одной записи, строка разбита на слоги, каждый слог окрашен по уверенности модели.]]</p>
+      <div class="kinds" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+        <div><b>[[Listen properly||Слушать удобно]]</b><span>[[Telegram's own voice player: play/pause, seek on the waveform, speed. Plus 🔁 this line only, 🐢 the line slowed to 0.75×, and a tap on any syllable plays just that syllable.||Обычный плеер голосовых Telegram: пауза, перемотка по волне, скорость. Плюс 🔁 только эта строка, 🐢 строка на скорости 0,75×, а нажатие на слог проигрывает только его.]]</span></div>
+        <div><b>[[See where the model is unsure||Видно, где модель не уверена]]</b><span>[[Green: sure it is right. Yellow: unsure. Red: likely error. Tap a syllable to see the model's verdict and confidence (“87% · fatha instead of kasra”). A high number is a hint, never a verdict.||Зелёный — уверена, что верно. Жёлтый — не уверена. Красный — вероятная ошибка. Нажмите на слог — увидите вывод модели и уверенность («87% · фатха вместо кясры»). Высокое число — подсказка, а не приговор.]]</span></div>
+        <div><b>[[Mark what was heard||Отметить, что прозвучало]]</b><span>[[Tap a syllable, then tap the form that was heard among the five forms of that letter (زَ زِ زُ زْ زّ). The rule is derived. Another letter, missing, extra and length are one tap; five rarer kinds under “More…”.||Нажмите на слог, затем на прозвучавшую форму среди пяти форм этой буквы (زَ زِ زُ زْ زّ). Правило определяется само. Другая буква, пропуск, лишний звук и длина — одно нажатие; пять редких видов — в «Ещё…».]]</span></div>
+        <div><b>[[Errors the model missed||Ошибки, которые модель пропустила]]</b><span>[[Any syllable can be marked, also a green one. Each mark keeps its source: 🤖 found by the model, 👤 added by the teacher. A red syllable left unmarked counts as a false alarm.||Отметить можно любой слог, и зелёный тоже. У каждой отметки виден источник: 🤖 нашла модель, 👤 добавил учитель. Красный слог без отметки считается ложной тревогой.]]</span></div>
+        <div><b>[[🟡 Can't tell||🟡 Не определить]]</b><span>[[Poor audio, too quiet, ambiguous, or needs a second teacher: the recording goes to a second review instead of a forced decision.||Плохой звук, слишком тихо, неоднозначно или нужен второй учитель — запись уходит на вторую проверку, а не на вынужденное решение.]]</span></div>
+        <div><b>[[Undo and come back||Отмена и возврат]]</b><span>[[↩️ undoes the last action, ‹ returns to the previous recording to edit it; work is saved after every tap.||↩️ отменяет последнее действие, ‹ возвращает к предыдущей записи для правки; работа сохраняется после каждого нажатия.]]</span></div>
+        <div><b>[[🚩 Learner disputes first||🚩 Сначала оспоренные учеником]]</b><span>[[When a learner taps “The bot was wrong” and says which word, that recording comes first in the queue, marked 🚩.||Когда ученик нажимает «Бот ошибся» и указывает слово, эта запись идёт в очереди первой, с пометкой 🚩.]]</span></div>
+        <div><b>[[💬 Comment||💬 Комментарий]]</b><span>[[An optional note as a reply to the bot's message, for example “reads the right letter but stretches the vowel”.||Необязательная заметка ответом на сообщение бота, например «букву читает верно, но растягивает огласовку».]]</span></div>
+      </div>
+      <div class="tw"><table>
+        <tr><th>[[Category||Категория]]</th><th>[[What the teacher checks||Что проверяет учитель]]</th><th>[[How it is marked||Как отмечается]]</th></tr>
+        <tr><td>[[Vowel||Огласовка]]</td><td>[[fatha, kasra, damma read wrongly||фатха, кясра, дамма прочитаны неверно]]</td><td>[[tap the heard form||нажать услышанную форму]]</td></tr>
+        <tr><td>[[Sukun||Сукун]]</td><td>[[a vowel where the letter should stop||гласный там, где буква должна остановиться]]</td><td>[[tap the heard form||нажать услышанную форму]]</td></tr>
+        <tr><td>[[Shadda||Шадда]]</td><td>[[doubling missed or added||удвоение пропущено или лишнее]]</td><td>[[tap the heard form||нажать услышанную форму]]</td></tr>
+        <tr><td>[[Letter||Буква]]</td><td>[[one letter for another||одна буква вместо другой]]</td><td>[[“Another letter” → the letters most often confused||«Другая буква» → чаще всего путаемые буквы]]</td></tr>
+        <tr><td>[[Missing · Extra · Length||Пропуск · Лишнее · Длина]]</td><td>[[a sound left out or added; madd too short or long||звук пропущен или добавлен; мадд слишком короткий или длинный]]</td><td>[[one tap||одно нажатие]]</td></tr>
+        <tr><td>[[Heaviness · Ghunna · Qalqala · Hesitation · Wrong stop||Твёрдость · Гунна · Калькаля · Запинка · Неверная остановка]]</td><td>[[tajwid and fluency||таджвид и беглость]]</td><td>[[“More…”||«Ещё…»]]</td></tr>
+      </table></div>
+      <p class="dim" style="font-size:14px;margin-top:10px">[[Extends the scheme already in the bot (annotation by syllables, “the bot is right”, the same kinds). The confidence numbers in this demo are illustrations, not real model output. Telegram widgets cannot take typed text, so the comment comes as a normal reply.||Расширяет схему, которая уже есть в боте (разметка по слогам, «бот прав», те же виды). Числа уверенности в демо — иллюстрация, а не настоящий вывод модели. Виджеты Telegram не принимают набранный текст, поэтому комментарий приходит обычным ответом.]]</p>
+    </div>
+    <div class="phone"><div class="top"><div class="ava">م</div><div><div class="nm">[[Muallim · teacher||Муаллим · учитель]]</div><div class="sb">[[annotation queue||очередь разметки]]</div></div></div><div class="chat" id="teachChat"></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">[[How reading is checked||Как проверяется чтение]]</div>
+  <h2>[[Which sound, and which rule||Какой звук и какое правило]]</h2>
+  <p>[[The voice message is converted to a clean recording, the Quran Muaalem model recognises the sounds (phonemes), and the result is compared with what the lesson requires. Each difference is classified by the sound and by the reading rule it touches.||Голосовое превращается в чистую запись, модель Quran Muaalem распознаёт звуки (фонемы), и результат сравнивается с тем, что требует урок. Каждое расхождение относится к звуку и к правилу чтения, которое оно затрагивает.]]</p>
+  <div class="tw"><table>
+    <tr><th>[[Rule in the lesson||Правило в уроке]]</th><th>[[What the check notices||Что замечает проверка]]</th><th>[[What the learner reads||Что читает ученик]]</th></tr>
+    <tr><td>[[Fatha, kasra, damma||Фатха, кясра, дамма]] <span class="ar">ـَ ـِ ـُ</span></td><td>[[one short vowel read as another, or left out||один краткий гласный вместо другого или пропущен]]</td><td>[[“The vowel on ز: kasra is needed, fatha was heard.” 🔊||«Огласовка на ز: нужна кясра, прозвучала фатха». 🔊]]</td></tr>
+    <tr><td>[[Sukun||Сукун]] <span class="ar">ـْ</span></td><td>[[an extra vowel where the letter should stop||лишний гласный там, где буква должна остановиться]]</td><td>[[“ر should stop here, without a vowel.” 🔊||«Здесь ر без гласного — остановитесь на ней». 🔊]]</td></tr>
+    <tr><td>[[Shadda||Шадда]] <span class="ar">ـّ</span></td><td>[[a doubled consonant read single||удвоенный согласный прочитан одинарным]]</td><td>[[“Hold the doubled ر a little longer.” 🔊||«Задержите удвоенную ر чуть дольше». 🔊]]</td></tr>
+    <tr><td>[[Long vowels (madd)||Долгие гласные (мадд)]]</td><td>[[a long vowel cut short, or a short one stretched||долгий гласный укорочен или краткий растянут]]</td><td>[[“Stretch this vowel to two counts.” 🔊||«Растяните этот гласный на два счёта». 🔊]]</td></tr>
+    <tr><td>[[The letter itself||Сама буква]]</td><td>[[one consonant read as another, a sound skipped or added||один согласный вместо другого, звук пропущен или добавлен]]</td><td>[[“ز is needed here; it sounded like س.” 🔊||«Здесь нужна ز; прозвучало похоже на س». 🔊]]</td></tr>
+  </table></div>
+  <p style="margin-top:14px">[[The learner sees the words read well first, then the few to listen to again. Perfecting the articulation points takes years and a real teacher; the bot points the way.||Ученик сначала видит слова, прочитанные хорошо, потом — немногие, которые стоит послушать ещё раз. Отточить места образования звуков — дело лет и живого учителя; бот показывает направление.]]</p>
+</section>
+
+<section>
+  <div class="eyebrow">[[For those who want to go deeper||Для тех, кто хочет глубже]]</div>
+  <h2>[[Optional, behind “Go deeper”||По желанию — в «Углублённо»]]</h2>
+  <div class="cards">
+    <div><b>[[Where the sound is produced||Где рождается звук]]</b><span>[[The book's own words, shown on every letter card, for example for <span class="ar">م</span>: “formed by closing the lips”, and Abu Yasin's “makhraj” video for each letter.||Слова самой книги на каждой карточке буквы, например для <span class="ar">م</span>: «образуется смыканием губ», и ролик Абу Ясина «махрадж» для каждой буквы.]]</span></div>
+    <div><b>[[A real person pronouncing it||Живой человек произносит]]</b><span>[[Short videos of real teachers, such as Dr. Ayman Swaid on <span class="ar">فَأْوُوا</span> (hamza with sukun, lesson 1) and on <span class="ar">و</span>, and full Russian lessons by Abu Yasin.||Короткие видео живых учителей, например д-р Айман Сувейд о <span class="ar">فَأْوُوا</span> (хамза с сукуном, урок 1) и о <span class="ar">و</span>, и полные уроки Абу Ясина по-русски.]]</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">[[Principles||Принципы]]</div>
+  <h2>[[What the design commits to||Чему следует дизайн]]</h2>
+  <div class="cards">
+    <div><b>[[Simple||Просто]]</b><span>[[One lesson at a time, one voice message, one tap to go on. Learning cards are there for whoever wants them.||Один урок за раз, одно голосовое, одно нажатие, чтобы идти дальше. Карточки — для тех, кто хочет.]]</span></div>
+    <div><b>[[Everything open||Всё открыто]]</b><span>[[Every lesson, part and stage is available at any time, whether or not the previous ones were read.||Любой урок, часть и этап доступны в любое время, прочитаны предыдущие или нет.]]</span></div>
+    <div><b>[[Arabic script and sound||Арабское письмо и звук]]</b><span>[[Every sound is heard from a teacher; the bot adds no Cyrillic transliteration.||Каждый звук слышен от учителя; бот не добавляет кириллической транслитерации.]]</span></div>
+    <div><b>[[Real people||Живые люди]]</b><span>[[Videos and recordings by real teachers; no synthetic voices or generated images.||Видео и записи живых учителей; без синтезированных голосов и сгенерированных картинок.]]</span></div>
+    <div><b>[[Book order||Порядок книги]]</b><span>[[Exactly the lessons of <i>al-Muallim ath-Thani</i>, in order, including rule pages.||Ровно уроки <i>«Муаллим сани»</i>, по порядку, включая страницы с правилами.]]</span></div>
+    <div><b>[[Light path||Лёгкий путь]]</b><span>[[Read every lesson once; feedback is given, perfection is not demanded.||Прочитать каждый урок один раз; разбор даётся, идеала не требуем.]]</span></div>
+    <div><b>[[Encouragement||Поддержка]]</b><span>[[Progress, congratulations and a streak that motivates without punishing.||Прогресс, поздравления и серия дней, которая мотивирует, но не наказывает.]]</span></div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="eyebrow">[[For your approval||На ваше утверждение]]</div>
+  <h2>[[Decisions we need from you||Какие решения нужны от вас]]</h2>
+  <div class="q">
+    <div><b>[[Already decided||Уже решено]]</b><ul>
+      <li>[[The course starts with an alphabet overview; then one lesson per section of the book.||Курс начинается с обзора алфавита; дальше — урок на каждый раздел книги.]]</li>
+      <li>[[The learner moves on after reading the lesson aloud once, whatever the score. Reading can also be skipped.||Ученик идёт дальше, прочитав урок вслух один раз, каким бы ни был результат. Чтение можно и пропустить.]]</li>
+      <li>[[Everything is open at all times: all parts, all lessons, review, Stage II. Nothing is locked.||Всё открыто всегда: все части, все уроки, повторение, Этап II. Ничего не закрыто.]]</li>
+      <li>[[No transliteration in Cyrillic letters, no synthetic voices or generated images or videos.||Без транслитерации кириллицей, без синтезированных голосов и сгенерированных картинок и видео.]]</li>
+      <li>[[No questions at the start: only the language and consent to data use.||Никаких вопросов в начале: только язык и согласие на использование данных.]]</li>
+      <li>[[Annotation of recordings: a teacher marks them in Telegram, syllable by syllable, choosing the kind of error.||Разметка записей: учитель отмечает их в Telegram, слог за слогом, выбирая вид ошибки.]]</li>
+    </ul></div>
+    <div><b>[[1. Stage I = the 28 letters||1. Этап I = 28 букв]]</b>[[Lessons 1–15 introduce all 28 letters with their vowel marks. A letter counts as covered once its lesson has been read aloud once. <em>Please confirm.</em>||Уроки 1–15 вводят все 28 букв с огласовками. Буква считается пройденной, когда её урок прочитан вслух один раз. <em>Подтвердите, пожалуйста.</em>]]</div>
+    <div><b>[[2. Video lessons||2. Видеоуроки]]</b>[[The demo links real teachers' videos (short book readings, Abu Yasin's Russian course, Dr. Ayman Swaid). Are they suitable, or do we record our own short videos (≤ 5 min) in Arabic with subtitles? Who?||Демо ведёт на видео живых учителей (короткие чтения по книге, русский курс Абу Ясина, д-р Айман Сувейд). Подходят ли они или записываем свои короткие видео (≤ 5 мин) на арабском с субтитрами? Кто?]]</div>
+    <div><b>[[3. Teacher recordings||3. Записи преподавателя]]</b>[[Every syllable, word and line needs a real teacher's recording. Who records, and may the recordings be used in the research and a future dataset?||Каждому слогу, слову и строке нужна запись живого преподавателя. Кто записывает и можно ли использовать записи в исследовании и будущем датасете?]]</div>
+    <div><b>[[4. Annotation||4. Разметка]]</b>[[Is “tap what was heard” (the five forms of the letter) convenient? Annotate every recording or a sample (for example every fifth)? The 🟡 “Can't tell” works per recording and sends it to a second teacher. <em>Keep it?</em>||Удобно ли «нажать то, что прозвучало» (пять форм буквы)? Размечать каждую запись или выборку (например, каждую пятую)? 🟡 «Не определить» работает на всю запись и отправляет её второму учителю. <em>Оставляем?</em>]]</div>
+    <div><b>[[5. Explanations||5. Объяснения]]</b>[[The book does not define the vowels in text; it leaves them to the teacher. Please review our short explanations on the cards and in the feedback; they are written without Cyrillic sound examples.||Книга не объясняет огласовки текстом, а оставляет это учителю. Проверьте, пожалуйста, наши короткие объяснения на карточках и в разборе; они написаны без кириллических примеров звуков.]]</div>
+    <div><b>[[6. The alphabet||6. Алфавит]]</b>[[The book's alphabet table also includes hamza <span class="ar">ء</span>, so it shows 29 signs while the text says 28 letters. Keep it as printed?||В таблице алфавита книги есть и хамза <span class="ar">ء</span>, поэтому знаков 29, а в тексте сказано «28 букв». Оставить как в книге?]]</div>
+  </div>
+</section>
+
+<section>
+  <footer>[[Muallim · reading trainer for <i>al-Muallim ath-Thani</i>. Book pages are shown for review only. The interactive messages on this page run the same code the bot will send.||Муаллим · тренажёр чтения по книге <i>«Муаллим сани»</i>. Страницы книги показаны только для проверки. Интерактивные сообщения на этой странице работают на том же коде, который будет отправлять бот.]]</footer>
+</section>
+</div>
+
+__SCRIPT__

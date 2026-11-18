@@ -1,0 +1,35 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--on:light-dark(#fff,#10261A);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit;transition:transform .15s}button:active{transform:scale(.96)}
+h3{margin:0 0 4px;font-size:16px}
+.s{padding:9px 0;border-bottom:1px solid var(--tg-theme-section-separator-color)}.s:last-of-type{border:0}
+.s b{display:block;font-size:13.5px;margin-bottom:6px}.s small{display:block;font-size:11.5px;color:var(--tg-theme-hint-color);margin-top:4px}
+.seg{display:flex;gap:4px;padding:3px;border-radius:11px;background:var(--tg-theme-secondary-bg-color)}
+.seg button{flex:1;padding:7px 2px;border-radius:9px;font-size:12.5px;background:none;color:var(--tg-theme-hint-color)}
+.seg .on{background:var(--g);color:var(--on);font-weight:700}
+.tg{display:flex;justify-content:space-between;align-items:center;width:100%;padding:3px 0;background:none;text-align:left;font-size:13.5px}
+.tg i{width:40px;height:23px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);position:relative;flex:none}
+.tg i::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:9px;background:var(--tg-theme-hint-color);transition:transform .2s}
+.tg.on i{background:var(--g)}.tg.on i::after{transform:translateX(17px);background:var(--on)}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.f button{padding:10px 4px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-size:12.5px;font-weight:700}
+</style>
+<div class="w"><h3 id="h"></h3><div id="b"></div><div class="f" id="f"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I,busy=0;
+var R={ru:["⚙️ Настройки","🌐 Язык бота и объяснений","Қазақша — черновик, на проверке","🔔 Напоминание о занятии","Выкл","🌙 Истиаза и басмала в начале дня","🔎 Крупные буквы","❓ Как заниматься","📋 Шпаргалка букв","🏠 На главную"],
+en:["⚙️ Settings","🌐 Language of the bot and explanations","Қазақша: draft, under review","🔔 Study reminder","Off","🌙 Isti'adha and basmala to start the day","🔎 Larger letters","❓ How to study","📋 Letter sheet","🏠 Home"]};
+var LG=[["ru","Русский"],["kk","Қазақша"],["en","English"]],RM=["off","08:00","13:00","19:00","21:00"];
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function ask(d){if(busy)return;busy=1;try{T.HapticFeedback.selectionChanged()}catch(e){}T.request(d).then(function(){},function(){}).then(function(){busy=0})}
+function sec(title,note){var s=el("div","s");if(title)s.appendChild(el("b","",title));$("b").appendChild(s);if(note)s.appendChild(el("small","",note));return s}
+function seg(s,items,cur,pre){var g=el("div","seg");items.forEach(function(x){var b=el("button",x[0]==cur?"on":"",x[1]);b.onclick=function(){ask(pre+x[0])};g.appendChild(b)});s.insertBefore(g,s.children[1]||null)}
+function tog(s,label,on,d){var b=el("button","tg"+(on?" on":""));b.appendChild(el("span","",label));b.appendChild(el("i"));b.onclick=function(){ask(d)};s.insertBefore(b,s.children[0]);}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{};I=R[S.lg]||R.ru;$("h").textContent=I[0];$("b").innerHTML="";
+seg(sec(I[1],S.ui=="kk"?I[2]:""),LG,S.ui||S.lg,"ui:");
+seg(sec(I[3]),RM.map(function(x){return [x,x=="off"?I[4]:x]}),S.rem||"off","rem:");
+tog(sec(""),I[5],S.op,"op");tog(sec(""),I[6],S.big,"big");
+var f=$("f");f.innerHTML="";[[I[7],"help"],[I[9],"home"]].forEach(function(x){var b=el("button","",x[0]);b.onclick=function(){ask(x[1])};f.appendChild(b)})}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>

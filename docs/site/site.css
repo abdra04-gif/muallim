@@ -1,0 +1,19 @@
+:root{--bg:#F3EFE3;--panel:#FFF;--fg:#221E1C;--muted:#5E5850;--line:#D9CFB4;--btn:#5B6B4E;--gold:#A9862E;--ok:#DDE8D0;--acc:#EFE6C8;
+--display:'Noto Serif',Georgia,serif;--body:'Noto Sans','Noto Naskh Arabic',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1B1A17;--panel:#2A2824;--fg:#F1ECE0;--muted:#B9B2A3;--line:#4A453B;--btn:#6F8160;--gold:#D4B05A;--ok:#33402B;--acc:#3A3626;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1B1A17;--panel:#2A2824;--fg:#F1ECE0;--muted:#B9B2A3;--line:#4A453B;--btn:#6F8160;--gold:#D4B05A;--ok:#33402B;--acc:#3A3626;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--body)}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1200px;margin:0 auto}
+nav{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;border-right:1px solid var(--line);font-size:14px}
+nav a{display:block;color:var(--muted);text-decoration:none;padding:4px 0}nav a:hover{color:var(--fg)}nav b{display:block;margin-bottom:12px;font-family:var(--display)}
+main{padding-block:32px 80px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+h1{font-family:var(--display);font-size:clamp(26px,4vw,38px);margin:0 0 8px}h2{font-family:var(--display);margin:40px 0 8px;border-top:1px solid var(--line);padding-top:24px}
+h3{margin:24px 0 4px}p,li{max-width:75ch}a{color:var(--gold)}code{background:var(--acc);padding:1px 5px;border-radius:4px;font-size:.9em}
+blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--gold);background:var(--acc);border-radius:0 8px 8px 0}
+.tw{overflow-x:auto;margin:12px 0}table{border-collapse:collapse;font-size:14px;min-width:560px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}th{background:var(--acc)}
+.fig{margin:20px 0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.fig svg{width:100%;height:auto;display:block}.fig figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+svg .box,svg .ph{fill:var(--panel);stroke:var(--line);stroke-width:1.5}svg .acc{fill:var(--acc)}svg .ok{fill:var(--ok)}svg .gold{fill:var(--acc);stroke:var(--gold);stroke-width:2.5}
+svg .t{fill:var(--fg);font:600 15px var(--body)}svg .s{fill:var(--muted);font:13px var(--body)}svg .big,svg .ar-l{fill:var(--fg);font:36px 'Noto Naskh Arabic',var(--body)}
+svg .ar-l{font-size:30px}svg .ar{stroke:var(--muted);stroke-width:2}svg .ahp{fill:var(--muted)}svg .img{fill:var(--acc)}svg .btn{fill:var(--btn)}svg .bt{fill:#fff;font:600 12px var(--body)}
+svg .cell{fill:var(--panel);stroke:var(--line)}svg .cell.ok{fill:var(--ok);stroke:var(--btn)}svg .cell.cur{stroke:var(--gold);stroke-width:3}svg .bar{fill:var(--line)}svg .barf{fill:var(--btn)}
+@media(max-width:760px){.layout{display:block}nav{position:static;height:auto;border:0;border-bottom:1px solid var(--line)}main{padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px))}}

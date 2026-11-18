@@ -1,0 +1,49 @@
+<style>
+.w{--g:light-dark(#176B3A,#6FBF86);--gs:light-dark(#E5F0D8,#26382A);--au:light-dark(#B07D1E,#D9A83F);padding:12px 12px max(12px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;color:var(--tg-theme-text-color)}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
+.tb{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--tg-theme-secondary-bg-color)}
+.tb button{flex:1;padding:8px 0;border-radius:9px;font-size:13px;color:var(--tg-theme-hint-color);background:none}
+.tb .on{background:var(--tg-theme-bg-color);color:var(--tg-theme-text-color);font-weight:700}
+.b{animation:in .3s ease-out}@keyframes in{from{transform:translateX(14px)}}
+.g{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;direction:rtl;margin:12px 0 8px}
+.c{font:22px/1.95 system-ui,serif;border-radius:10px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color);position:relative;animation:pop .35s backwards;transition:transform .15s}
+.c:active{transform:scale(.9)}@keyframes pop{from{transform:scale(.6)}}
+.c.D{background:var(--gs);color:var(--tg-theme-text-color)}
+.c.D::after{content:"✓";position:absolute;top:-2px;right:2px;font:10px system-ui;color:var(--g)}
+.c.C{outline:2px solid var(--g);color:var(--tg-theme-text-color);animation:pop .35s backwards,cu 1.6s .5s infinite}@keyframes cu{50%{transform:scale(1.1)}}
+.ms{display:flex;align-items:center;gap:10px;margin-top:6px;padding:10px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-size:13px}
+.ms svg{width:26px;height:26px;flex:none}.ms div{flex:1}
+.br{height:6px;margin-top:5px;border-radius:3px;background:var(--tg-theme-bg-color);overflow:hidden}.br i{display:block;height:100%;background:var(--au)}
+.rg{display:block;margin:12px auto 6px;width:136px;height:136px}.rg circle{fill:none;stroke-width:11}
+.rg .f{transition:stroke-dashoffset 1s ease-out}.rg text{font:700 25px system-ui;fill:var(--tg-theme-text-color)}
+.row{display:flex;justify-content:space-between;padding:10px 11px;margin-top:6px;border-radius:12px;background:var(--tg-theme-secondary-bg-color);font-size:14px}
+.t{font-size:12px;color:var(--tg-theme-hint-color);text-align:center;min-height:1.2em;margin-top:6px}
+@media (prefers-reduced-motion:reduce){.b,.c,.c.C{animation:none}}
+</style>
+<div class="w"><div class="tb" id="tb"><button data-t="1"></button><button data-t="2"></button></div><div id="b"></div><div class="t" id="m"></div></div>
+<script>
+(function(){
+var T=window.TelegramWidget||{onEvent:function(){},request:function(){return Promise.reject({code:"OFF"})}},$=function(i){return document.getElementById(i)},S,I,tab=0,busy=0;
+var R={ru:["Карта букв","Прогресс","Нажмите на пройденную букву, чтобы повторить урок","Веха Этапа I: все буквы","Уроки пройдены","Серия занятий","# дн.","Открываю урок…","Не вышло, попробуйте ещё раз"],
+en:["Letter map","Progress","Tap a completed letter to repeat its lesson","Stage I milestone: all letters","Lessons completed","Study streak","# days","Opening the lesson…","Something went wrong, please try again"]};
+var ST='<svg viewBox="0 0 30 30"><path fill="var(--au)" d="M15 1l4 6 7-1-1 7 6 4-6 4 1 7-7-1-4 6-4-6-7 1 1-7-6-4 6-4-1-7 7 1z"/></svg>';
+function f(s,x){return s.replace("#",x)}
+function ms(b){var d=document.createElement("div");d.className="ms";d.innerHTML=ST+"<div><span></span><div class='br'><i></i></div></div><b></b>";
+d.querySelector("span").textContent=I[3];d.querySelector("i").style.width=(S.t?Math.round(S.n*100/S.t):0)+"%";d.lastChild.textContent=(S.n||0)+" / "+(S.t||0);b.appendChild(d)}
+function map(b){var g=document.createElement("div");g.className="g";
+(S.L||"").split("").forEach(function(x,i){var s=(S.m||"").charAt(i)||"N",c=document.createElement("button");c.className="c "+s;c.textContent=x;c.style.animationDelay=i*22+"ms";
+c.onclick=function(){if(s=="N"||busy)return;busy=1;try{T.HapticFeedback.selectionChanged()}catch(e){}$("m").textContent=I[7];
+T.request("l:"+i).then(function(){$("m").textContent=""},function(){$("m").textContent=I[8]}).then(function(){busy=0})};g.appendChild(c)});
+b.appendChild(g);ms(b);$("m").textContent=I[2]}
+function prog(b){var q=S.t?S.n/S.t:0,L=327;
+b.innerHTML='<svg class="rg" viewBox="0 0 136 136"><circle cx="68" cy="68" r="52" stroke="var(--tg-theme-secondary-bg-color)"/><circle class="f" id="f" cx="68" cy="68" r="52" stroke="var(--g)" stroke-linecap="round" stroke-dasharray="'+L+'" stroke-dashoffset="'+L+'" transform="rotate(-90 68 68)"/><text x="68" y="77" text-anchor="middle"></text></svg><div class="row"><span>📖 </span><b></b></div><div class="row"><span>🔥 </span><b></b></div>';
+b.querySelector("text").textContent=(S.n||0)+" / "+(S.t||0);var r=b.querySelectorAll(".row");
+r[0].firstChild.textContent+=I[4];r[0].lastChild.textContent=(S.u||0)+" / "+(S.U||0);r[1].firstChild.textContent+=I[5];r[1].lastChild.textContent=f(I[6],S.k||0);
+setTimeout(function(){$("f").style.strokeDashoffset=L*(1-q)},60);$("m").textContent=""}
+function draw(){try{S=JSON.parse(T.chatData)}catch(e){S=null}S=S||{};I=R[S.lg]||R.ru;var t=tab||S.tab||1;
+var o=$("b"),b=document.createElement("div");b.id="b";b.className="b";o.parentNode.replaceChild(b,o);
+$("tb").querySelectorAll("button").forEach(function(x){x.textContent=I[x.dataset.t-1];x.className=x.dataset.t==t?"on":"";x.onclick=function(){tab=+x.dataset.t;draw()}});
+if(t==1)map(b);else prog(b)}
+T.onEvent("chatDataChanged",draw);draw();
+})();
+</script>
