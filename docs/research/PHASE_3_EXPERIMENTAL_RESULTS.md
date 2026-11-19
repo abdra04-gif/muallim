@@ -518,11 +518,37 @@ MostafaMaroof has no sukun symbol: a letter with sukun is a consonant with no vo
 | sukun letter dropped (inside) | 97.3 % (960) | 0.3 % |
 | vowel a added, qalqala letter (ق ط ب ج د) at the end | **89.5 %** (19) | 0.0 % |
 
-Reading: plain sukun is safe to check strictly. The one weak spot is a qalqala letter at the stop — its correct light echo can sound like a fatha; the sample is small (19), so there the bot should only hint. Not measured: what the book's sukun lessons 49–51 actually teach — two neighbouring letters that merge (idgham: قَد تَّبَيَّنَ, the first letter is not read) or stay clear (قَدْ تَبَيَّنَ) — and the article with sun / moon letters (lesson 53). These need the book-text → phoneme converter and recordings of the lesson lines; to be measured before those lessons use the new check. Caveat: readers are not beginners; only false alarms are measured.
+Reading: plain sukun is safe to check strictly. The one weak spot is a qalqala letter at the stop — its correct light echo can sound like a fatha; the sample is small (19), so there the bot should only hint. Not measured: what the book's sukun lessons 49–51 actually teach — two neighbouring letters that merge (idgham: قَد تَّبَيَّنَ, the first letter is not read) or stay clear (قَدْ تَبَيَّنَ) — and the article with sun / moon letters (lesson 53). The converter now exists (§11.8i); they need recordings of the lesson lines; to be measured before those lessons use the new check. Caveat: readers are not beginners; only false alarms are measured.
+
+### 11.8i Book text → MostafaMaroof sounds (the converter) and a first check on a teacher's voice
+
+**Converter** (`to_maroof.py`): the bot's own phonetiser (quran_transcript, `_references` — reading by Hafs, with and without a stop) and a symbol table into MostafaMaroof's alphabet. Not the phonetiser the model was trained with (Nawar Halabi's, used by IqraEval): its transcriptions follow the spelling, not the reading the book teaches — on 663 whole ayahs they differ from ours in 6.3 % of sounds, and the differences are Quran reading rules: a long vowel shortened before a sukun across words (فِى ٱلْأَرْضِ), the pronoun's long vowel (إِنَّهُۥ), the long a of ٱللَّهِ, tanwin and merges of nun / mim. MostafaMaroof, trained on those transcriptions, prefers them (`convention_check.py`: of 378 differing places it accepts our reading in 17.7 %) — the reason to fine-tune it on book-style readings later, and a risk for lessons 42+ (tanwin, merges). Lessons 1–41 hardly have these rules: of the 288 cards checked by voice (plus 4 alphabet cards) none has tanwin or the pronoun's long vowel; all convert; the four alphabet cards (L002-02…05, «look at the letters and their names») are not checked by voice — the book teaches sounds, not names. Heavy vowels (A I U after emphatic letters) are not guessed: their probability is added to the plain vowel when scoring (`prepare`). A card of separate syllables is read with every vowel (no stop).
+
+**Teacher's voice** (`library_check.py` → `results/library_check.json`): the bot's 28 library recordings of three syllables (رَ رِ رُ, …) by ar-Rai (SRC-144), the content of lessons 3–30, through the whole chain — card text → converter → card variants with the «another syllable» rival → answer (thresholds of ADR-0087).
+
+| Setting | Own card: passed / again / error | Look-alike card (should be error) | Unrelated card (should be error) |
+|---|---|---|---|
+| every vowel judged (a held vowel counted as an error) | 1 / 5 / 22 | 14 of 16 error | 27 of 28 error |
+| last syllable: a stop allowed and its vowel judged softly; a held vowel = short | 16 / 10 / 2 | 14 of 16 error, 1 passed | 26 of 28 error |
+
+Reading: the teacher reads fast and the last vowel of the three fades — the model hears «b a b i b». To see whether a rule for the last syllable still catches errors, each recording is also checked against cards with its **last vowel** (56 trials) or **middle vowel** (56) replaced — as if the learner had read that vowel wrong:
+
+| Rule for the last syllable | Correct reading: passed / again / error | Last vowel wrong: passed / again / error | Middle vowel wrong: passed / again / error |
+|---|---|---|---|
+| strict — like every syllable (here and below a held vowel = short) | 2 / 9 / 17 | 0 / 14 / 42 | 0 / 10 / 46 |
+| soft — a stop allowed, another vowel an error only below −4 | 16 / 10 / 2 | **28** / 21 / 7 | 0 / 24 / 32 |
+| **clear** — the vowel heard must be the right one; a vowel hardly heard → «say it again» | 2 / 24 / 2 | **0** / 46 / 10 | 0 / 24 / 32 |
+
+The soft rule lets half of the wrong last vowels through: once a stop counts as correct, a faded vowel of any kind passes. The clear rule never passes a wrong last vowel and scolds the correct reading only twice (ث heard as س — the known weak pair — and و); a vowel the model cannot hear is asked again. The model cannot judge a vowel that is hardly pronounced — the learner has to say it clearly (a held vowel is allowed on lessons 3–30, ADR-0086). Caveats: one reader, a fast style, trimmed files; learners read slower (on the 840 learner syllables «no vowel» was rarely the rival, §11.8a). `results/library_check.json` holds the clear rule; the strict and soft rows are runs of the same script with `--last strict` / `--last soft --last-error=-4`. Which rule the bot uses is the author's decision.
 
 ### 11.9 How to repeat
 
 ```sh
+# Book text → MostafaMaroof sounds, checks on whole ayahs and lessons 1–41 (§11.8i):
+python docs/research/phase3/to_maroof.py WAV_DIR results/to_maroof_summary.json --cache LOGPROBS.npz --cards results/cards_1_41_maroof.tsv
+python docs/research/phase3/convention_check.py WAV_DIR LOGPROBS.npz results/convention_summary.json
+python docs/research/phase3/library_check.py results/library_check.json --last clear
+
 # 1. Model features for every clip (one pass, resumable):
 .venv/bin/python -I docs/research/phase3/features.py DATA FEATURES
 # 2. Build and compare the four candidates; writes results/candidates.json

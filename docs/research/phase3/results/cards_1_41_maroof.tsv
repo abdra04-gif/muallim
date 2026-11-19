@@ -1,0 +1,289 @@
+id	text	wasl	waqf
+L001-02	أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ	< a E uu * u b i ll aa h i m i n a $$ a y T aa n i rr a j ii m i	< a E uu * u b i ll aa h i m i n a $$ a y T aa n i rr a j ii m
+L001-03	بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ	b i s m i ll aa h i rr a H m aa n i rr a H ii m i	b i s m i ll aa h i rr a H m aa n i rr a H ii m
+L003-04	أَ	< a	< a
+L003-06	إِ	< i	< i
+L003-08	أُ	< u	< u
+L003-10	أَ إِ أُ	< a < i < u	< a < i < u
+L003-11	أَ إِ أُ إِأْ أُأْ أَإِ أَأَ	< a < i < u < i << u << a < i < a < a	< a < i < u < i << u << a < i < a <
+L004-02	رَ	r a	r a
+L004-03	رِ	r i	r i
+L004-04	رُ	r u	r u
+L004-05	رَ رِ رُ	r a r i r u	r a r i r u
+L004-06	رَرْ رِرْ رُرْ أَرْ إِرْ أُرْ	r a rr i rr u r < a r < i r < u r	r a rr i rr u r < a r < i r < u r
+L005-02	زَ	z a	z a
+L005-03	زِ	z i	z i
+L005-04	زُ	z u	z u
+L005-05	زَ زِ زُ	z a z i z u	z a z i z u
+L005-06	أَزْ إِزْ أُزْ زَرْ زِرْ زُرْ	< a z < i z < u zz a r z i r z u r	< a z < i z < u zz a r z i r z u r
+L005-07	رَزْ رِزْ رُزْ أَزْرُ إِزْرُ أُزْرُ أُرْزُ	r a z r i z r u z < a z r u < i z r u < u z r u < u r z u	r a z r i z r u z < a z r u < i z r u < u z r u < u r z
+L006-02	مَ	m a	m a
+L006-03	مِ	m i	m i
+L006-04	مُ	m u	m u
+L006-05	مَ مِ مُ	m a m i m u	m a m i m u
+L006-06	أَمْ إِمْ أُمْ مُرْ مُزْ رُمْ أَمَرَ أُمِرَ أَمْرُ	< a m < i m < u mm u r m u z r u m < a m a r a < u m i r a < a m r u	< a m < i m < u mm u r m u z r u m < a m a r a < u m i r a < a m r
+L006-07	إِمْرُ رَمْزُ اِرْمِ مَرْمَرُ رَمْرَمُ زَمْزَمُ	< i m r u r a m z u < i r m i m a r m a r u r a m r a m u z a m z a m u	< i m r u r a m z u < i r m i m a r m a r u r a m r a m u z a m z a m
+L007-02	تَ	t a	t a
+L007-03	تِ	t i	t i
+L007-04	تُ	t u	t u
+L007-05	تَ تِ تُ	t a t i t u	t a t i t u
+L007-06	مُتْ أَمِتْ تَمْرُ زُرْتَ زُرْتِ	m u t < a m i tt a m r u z u r t a z u r t i	m u t < a m i tt a m r u z u r t a z u r t
+L007-07	مَرَرْتُ مَرَرْتِ أُمِرْتُ أَمَرْتِ أَمَرَتْ	m a r a r t u m a r a r t i < u m i r t u < a m a r t i < a m a r a t	m a r a r t u m a r a r t i < u m i r t u < a m a r t i < a m a r a t
+L007-08	أَمَرْتُمْ أُمِرْتُمْ مَرَرْتُمْ مُرِرْتُمْ	< a m a r t u m < u m i r t u mm a r a r t u mm u r i r t u m	< a m a r t u m < u m i r t u mm a r a r t u mm u r i r t u m
+L008-02	نَ	n a	n a
+L008-03	نِ	n i	n i
+L008-04	نُ	n u	n u
+L008-05	نَ نِ نُ	n a n i n u	n a n i n u
+L008-06	أَنْ إِنْ زِنْ مَنْ مِنْ لَنْ أَنْتَ	< a n < i n z i n m a n m i n l a n < a n t a	< a n < i n z i n m a n m i n l a n < a n t
+L008-07	نِمْتَ أَنْتُمْ نِمْتُمْ نَزِرُ نَزِنُ أَمَرْنَ	n i m t a < a n t u m n i m t u m n a z i r u n a z i n u < a m a r n a	n i m t a < a n t u m n i m t u m n a z i r u n a z i n u < a m a r n
+L008-08	أُمِرْنَ مَرَرْنَ مُرِرْنَ أَمْرَرْنَ	< u m i r n a m a r a r n a m u r i r n a < a m r a r n a	< u m i r n a m a r a r n a m u r i r n a < a m r a r n
+L009-02	يَ	y a	y a
+L009-03	يِ	y i	y i
+L009-04	يُ	y u	y u
+L009-05	يَ يِ يُ	y a y i y u	y a y i y u
+L009-06	أَيْ أَيْمُ زَيْتُ مَيْتُ زَيْنُ رَأْيُ رَمْيُ	< a y < a y m u z a y t u m a y t u z a y n u r a < y u r a m y u	< a y < a y m u z a y t u m a y t u z a y n u r a < y u r a m y
+L009-07	يَمَنُ مَرْيَمُ مَيْزُ مَيْمَنُ أَيْمَنُ	y a m a n u m a r y a m u m a y z u m a y m a n u < a y m a n u	y a m a n u m a r y a m u m a y z u m a y m a n u < a y m a n
+L009-08	أَمْرَيْنِ زَيْتَيْنِ أَيْمَيْنِ مَيْتَيْنِ	< a m r a y n i z a y t a y n i < a y m a y n i m a y t a y n i	< a m r a y n i z a y t a y n i < a y m a y n i m a y t a y n
+L010-02	بَ	b a	b a
+L010-03	بِ	b i	b i
+L010-04	بُ	b u	b u
+L010-05	بَ بِ بُ	b a b i b u	b a b i b u
+L010-06	أَبُ اِبْنُ بِنْتُ بَيْتُ بَيْنَ	< a b u < i b n u b i n t u b a y t u b a y n a	< a b u < i b n u b i n t u b a y t u b a y n
+L010-07	أَبْرَمَ رَيْبُ زَيْنَبُ بَرْبَرُ مِنْبَرُ	< a b r a m a r a y b u z a y n a b u b a r b a r u m i n b a r u	< a b r a m a r a y b u z a y n a b u b a r b a r u m i n b a r
+L010-08	بِأَمْرَيْنِ بِبَيْتَيْنِ مِنْبَرَيْنِ زَيْنَبَيْنِ	b i < a m r a y n i b i b a y t a y n i m i n b a r a y n i z a y n a b a y n i	b i < a m r a y n i b i b a y t a y n i m i n b a r a y n i z a y n a b a y n
+L011-02	كَ	k a	k a
+L011-03	كِ	k i	k i
+L011-04	كُ	k u	k u
+L011-05	كَ كِ كُ	k a k i k u	k a k i k u
+L011-06	كَمْ كُمْ كُنْ كَيْ	k a m k u m k u n k a y	k a m k u m k u n k a y
+L011-07	بَكْرُ مَكْرُ كَرْمُ كَنْزُ تَرْكُ	b a k r u m a k r u k a r m u k a n z u t a r k u	b a k r u m a k r u k a r m u k a n z u t a r k
+L011-08	كَتَبَ يَكْتُبُ تَرَكَ يَتْرُكُ كَتَبْتُمْ	k a t a b a y a k t u b u t a r a k a y a t r u k u k a t a b t u m	k a t a b a y a k t u b u t a r a k a y a t r u k u k a t a b t u m
+L011-09	أَمَرَكَ أَمَرَتْكَ كُنْتُ مُمْكِنُ	< a m a r a k a < a m a r a t k a k u n t u m u m k i n u	< a m a r a k a < a m a r a t k a k u n t u m u m k i n
+L012-02	لَ	l a	l a
+L012-03	لِ	l i	l i
+L012-04	لُ	l u	l u
+L012-05	لَ لِ لُ	l a l i l u	l a l i l u
+L012-06	اَلْ بَلْ لَمْ لَنْ لِنْ كِلْ نَزَلَ لَزِمَ كَمُلَ	< a l b a ll a m l a n l i n k i l n a z a l a l a z i m a k a m u l a	< a l b a ll a m l a n l i n k i l n a z a l a l a z i m a k a m u l
+L012-07	أَنْزَلَ أَلْزَمَ أَكْمَلَ أَكَلَتْ أَكَلْنَ أَكَلْتَ	< a n z a l a < a l z a m a < a k m a l a < a k a l a t < a k a l n a < a k a l t a	< a n z a l a < a l z a m a < a k m a l a < a k a l a t < a k a l n a < a k a l t
+L012-08	أَكَلْتِ أَكَلْتُ أَكَلْتُمْ بُلْبُلُ يَلَمْلَمُ	< a k a l t i < a k a l t u < a k a l t u m b u l b u l u y a l a m l a m u	< a k a l t i < a k a l t u < a k a l t u m b u l b u l u y a l a m l a m
+L012-09	تَزَلْزَلَ يَتَزَلْزَلُ مُتَزَلْزِلُ	t a z a l z a l a y a t a z a l z a l u m u t a z a l z i l u	t a z a l z a l a y a t a z a l z a l u m u t a z a l z i l
+L013-02	وَ	w a	w a
+L013-03	وِ	w i	w i
+L013-04	وُ	w u	w u
+L013-05	وَ وِ وُ	w a w i w u	w a w i w u
+L013-06	أَوْ رَوْ نَوْ لَوْ	< a w r a w n a w l a w	< a w r a w n a w l a w
+L013-07	وَرَمْ وَتَرْ وَمَنْ وَلَنْ وَلَمْ وَكَمْ	w a r a m w a t a r w a m a n w a l a n w a l a m w a k a m	w a r a m w a t a r w a m a n w a l a n w a l a m w a k a m
+L013-08	أَوْلُ رَوْمُ يَوْمُ كَوْنُ وَيْلُ وَزْنُ	< a w l u r a w m u y a w m u k a w n u w a y l u w a z n u	< a w l u r a w m u y a w m u k a w n u w a y l u w a z n
+L013-09	كَوْكَبُ مَوْكِبُ أَوْلَمْتُمْ أَوْتَرْتُمْ	k a w k a b u m a w k i b u < a w l a m t u m < a w t a r t u m	k a w k a b u m a w k i b u < a w l a m t u m < a w t a r t u m
+L014-02	هَ	h a	h a
+L014-03	هِ	h i	h i
+L014-04	هُ	h u	h u
+L014-05	هَ هِ هُ	h a h i h u	h a h i h u
+L014-06	هَبْ هَمْ هَلْ هُوَ هِيَ هُمْ زَهْوُ	h a b h a m h a l h u w a h i y a h u m z a h w u	h a b h a m h a l h u w a h i y a h u m z a h w
+L014-07	أَهَمْ وَهَبْ لَهَبْ وَهُمْ لَهُمْ بِهِمْ	< a h a m w a h a b l a h a b w a h u m l a h u m b i h i m	< a h a m w a h a b l a h a b w a h u m l a h u m b i h i m
+L014-08	مِنْهُ مِنْهُمْ إِلَيْهِ إِلَيْهِمْ أَمْهِلْهُمْ	m i n h u m i n h u m < i l a y h i < i l a y h i m < a m h i l h u m	m i n h u m i n h u m < i l a y h i < i l a y h i m < a m h i l h u m
+L015-02	فَ	f a	f a
+L015-03	فِ	f i	f i
+L015-04	فُ	f u	f u
+L015-05	فَ فِ فُ	f a f i f u	f a f i f u
+L015-06	فَمْ فَنْ كَفْ فَلَكُ كَفَنُ نَفَرُ	f a m f a n k a ff a l a k u k a f a n u n a f a r u	f a m f a n k a ff a l a k u k a f a n u n a f a r
+L015-07	فَوْرُ فَوْزُ فَهْمُ فِكْرُ زِفْرُ كِفْلُ	f a w r u f a w z u f a h m u f i k r u z i f r u k i f l u	f a w r u f a w z u f a h m u f i k r u z i f r u k i f l
+L015-08	فُلْفُلُ نَوْفَرُ نَوْفَلُ فَهِمَ يَفْهَمُ	f u l f u l u n a w f a r u n a w f a l u f a h i m a y a f h a m u	f u l f u l u n a w f a r u n a w f a l u f a h i m a y a f h a m
+L015-09	اِفْتَتَنَ يَفْتَتِنُ اِفْتَكَرَ يَفْتَكِرُ	< i f t a t a n a y a f t a t i n u < i f t a k a r a y a f t a k i r u	< i f t a t a n a y a f t a t i n u < i f t a k a r a y a f t a k i r
+L016-02	قَ	q a	q a
+L016-03	قِ	q i	q i
+L016-04	قُ	q u	q u
+L016-05	قَ قِ قُ	q a q i q u	q a q i q u
+L016-06	زُقْ قِنْ قُلْ قُمْ قِفْ قِهْ قَلْبُ	z u qq i n q u l q u m q i f q i h q a l b u	z u qq i n q u l q u m q i f q i h q a l b
+L016-07	قَبْلُ فَوْقُ قَلَمُ قَمَرُ لَقَبُ قُمْقُمُ	q a b l u f a w q u q a l a m u q a m a r u l a q a b u q u m q u m u	q a b l u f a w q u q a l a m u q a m a r u l a q a b u q u m q u m
+L016-08	اِقْتَرَبَ يَقْتَرِبُ اِنْقَلَبَ يَنْقَلِبُ	< i q t a r a b a y a q t a r i b u < i n q a l a b a y a n q a l i b u	< i q t a r a b a y a q t a r i b u < i n q a l a b a y a n q a l i b
+L016-09	كُلْ قُلْ فَرْكُ فَرْقُ فَلَكُ فَلَقُ	k u l q u l f a r k u f a r q u f a l a k u f a l a q u	k u l q u l f a r k u f a r q u f a l a k u f a l a q
+L017-02	شَ	$ a	$ a
+L017-03	شِ	$ i	$ i
+L017-04	شُ	$ u	$ u
+L017-05	شَ شِ شُ	$ a $ i $ u	$ a $ i $ u
+L017-06	رَشْ بُشْ شَرْ شَقْ شَمْ شَكْ بِشْرُ	r a $ b u $$ a r $ a q $ a m $ a k b i $ r u	r a $ b u $$ a r $ a q $ a m $ a k b i $ r
+L017-07	شِرْبُ شَهْرُ نَشْرُ شُكْرُ شُرْبُ مَشْرَبُ	$ i r b u $ a h r u n a $ r u $ u k r u $ u r b u m a $ r a b u	$ i r b u $ a h r u n a $ r u $ u k r u $ u r b u m a $ r a b
+L017-08	مَشْرِبُ مَشْرِقُ مُشْتَهِرُ مُشْتَرَكُ	m a $ r i b u m a $ r i q u m u $ t a h i r u m u $ t a r a k u	m a $ r i b u m a $ r i q u m u $ t a h i r u m u $ t a r a k
+L017-09	اِشْتَهَرَ يَشْتَهِرُ اِبْرَنْشَقَ يَبْرَنْشِقُ	< i $ t a h a r a y a $ t a h i r u < i b r a n $ a q a y a b r a n $ i q u	< i $ t a h a r a y a $ t a h i r u < i b r a n $ a q a y a b r a n $ i q
+L018-02	سَ	s a	s a
+L018-03	سِ	s i	s i
+L018-04	سُ	s u	s u
+L018-05	سَ سِ سُ	s a s i s u	s a s i s u
+L018-06	بَسْ سَمْ سِرْ سِنْ سِلْ سَفَرُ سَقَرُ	b a ss a m s i r s i n s i l s a f a r u s a q a r u	b a ss a m s i r s i n s i l s a f a r u s a q a r
+L018-07	سَبَقُ سَلَفُ سَمَكُ فَرَسُ مَسْلَكُ	s a b a q u s a l a f u s a m a k u f a r a s u m a s l a k u	s a b a q u s a l a f u s a m a k u f a r a s u m a s l a k
+L018-08	مَسْكَنُ مُسْلِمُ مُسْرِفُ سِمْسِمُ	m a s k a n u m u s l i m u m u s r i f u s i m s i m u	m a s k a n u m u s l i m u m u s r i f u s i m s i m
+L018-09	أَسْلَمَ يُسْلِمُ اِسْتَيْسَرَ يَسْتَيْسِرُ	< a s l a m a y u s l i m u < i s t a y s a r a y a s t a y s i r u	< a s l a m a y u s l i m u < i s t a y s a r a y a s t a y s i r
+L019-02	ثَ	^ a	^ a
+L019-03	ثِ	^ i	^ i
+L019-04	ثُ	^ u	^ u
+L019-05	ثَ ثِ ثُ	^ a ^ i ^ u	^ a ^ i ^ u
+L019-06	بَثْ ثِبْ ثَمْ ثِنْيُ ثَمَرُ ثَمَنُ	b a ^^ i b ^ a m ^ i n y u ^ a m a r u ^ a m a n u	b a ^^ i b ^ a m ^ i n y u ^ a m a r u ^ a m a n
+L019-07	ثَوْرُ ثَوْبُ ثَوَبَ مِثْلُ مُثْلُ مَثَلُ	^ a w r u ^ a w b u ^ a w a b a m i ^ l u m u ^ l u m a ^ a l u	^ a w r u ^ a w b u ^ a w a b a m i ^ l u m u ^ l u m a ^ a l
+L019-08	كَوْثَرُ أَكْثَرَ يُكْثِرُ أَثْبَتَ يُثْبِتُ	k a w ^ a r u < a k ^ a r a y u k ^ i r u < a ^ b a t a y u ^ b i t u	k a w ^ a r u < a k ^ a r a y u k ^ i r u < a ^ b a t a y u ^ b i t
+L019-09	اِسْتَكْثَرَ يَسْتَكْثِرُ اِسْتَثْقَلَ يَسْتَثْقِلُ	< i s t a k ^ a r a y a s t a k ^ i r u < i s t a ^ q a l a y a s t a ^ q i l u	< i s t a k ^ a r a y a s t a k ^ i r u < i s t a ^ q a l a y a s t a ^ q i l
+L019-10	سَلْسُ ثَلْثُ سَمَرُ ثَمَرُ سَبْتُ ثَبْتُ	s a l s u ^ a l ^ u s a m a r u ^ a m a r u s a b t u ^ a b t u	s a l s u ^ a l ^ u s a m a r u ^ a m a r u s a b t u ^ a b t
+L020-02	صَ	S a	S a
+L020-03	صِ	S i	S i
+L020-04	صُ	S u	S u
+L020-05	صَ صِ صُ	S a S i S u	S a S i S u
+L020-06	صُمْ صِفْ فَصْ صَرَفَ صَبَرَ بَصَرَ	S u m S i ff a SS a r a f a S a b a r a b a S a r a	S u m S i ff a SS a r a f a S a b a r a b a S a r
+L020-07	قَصَبَ نَصَرَ يَنْصُرُ اِسْتَبْصَرَ يَسْتَبْصِرُ	q a S a b a n a S a r a y a n S u r u < i s t a b S a r a y a s t a b S i r u	q a S a b a n a S a r a y a n S u r u < i s t a b S a r a y a s t a b S i r
+L020-08	سَفَرُ صَفَرُ سَيْفُ صَيْفُ اِنْتَسَبَ اِنْتَصَبَ	s a f a r u S a f a r u s a y f u S a y f u < i n t a s a b a < i n t a S a b a	s a f a r u S a f a r u s a y f u S a y f u < i n t a s a b a < i n t a S a b
+L021-02	طَ	T a	T a
+L021-03	طِ	T i	T i
+L021-04	طُ	T u	T u
+L021-05	طَ طِ طُ	T a T i T u	T a T i T u
+L021-06	طَلْ طَيْ شَطْ بَطْ قَطْ فَقَطْ وَطَنُ	T a l T a y $ a T b a T q a T f a q a T w a T a n u	T a l T a y $ a T b a T q a T f a q a T w a T a n
+L021-07	طَلَبُ طَرَفُ طُهْرُ طِفْلُ مَطَرُ	T a l a b u T a r a f u T u h r u T i f l u m a T a r u	T a l a b u T a r a f u T u h r u T i f l u m a T a r
+L021-08	مَطْلَبُ مَسْقَطُ مَوْطِنُ مَرْبِطُ	m a T l a b u m a s q a T u m a w T i n u m a r b i T u	m a T l a b u m a s q a T u m a w T i n u m a r b i T
+L021-09	اِصْطَبَرَ يَصْطَبِرُ اِسْتَوْطَنَ يَسْتَوْطِنُ	< i S T a b a r a y a S T a b i r u < i s t a w T a n a y a s t a w T i n u	< i S T a b a r a y a S T a b i r u < i s t a w T a n a y a s t a w T i n
+L021-10	تَرَفُ طَرَفُ مُسْتَتِرُ مُسْتَطِرُ سَبْتُ سَبْطُ	t a r a f u T a r a f u m u s t a t i r u m u s t a T i r u s a b t u s a b T u	t a r a f u T a r a f u m u s t a t i r u m u s t a T i r u s a b t u s a b T
+L022-02	جَ	j a	j a
+L022-03	جِ	j i	j i
+L022-04	جُ	j u	j u
+L022-05	جَ جِ جُ	j a j i j u	j a j i j u
+L022-06	جَمْ جَرْ جِنْ جُبْ جُلْ جَبَلُ	j a m j a r j i n j u b j u l j a b a l u	j a m j a r j i n j u b j u l j a b a l
+L022-07	جَمَلُ أَجْرُ فَجْرُ جَوْهَرُ جَوْرَبُ	j a m a l u < a j r u f a j r u j a w h a r u j a w r a b u	j a m a l u < a j r u f a j r u j a w h a r u j a w r a b
+L022-08	تَجَوْرَبَ يَتَجَوْرَبُ اِسْتَجْلَبَ يَسْتَجْلِبُ	t a j a w r a b a y a t a j a w r a b u < i s t a j l a b a y a s t a j l i b u	t a j a w r a b a y a t a j a w r a b u < i s t a j l a b a y a s t a j l i b
+L023-02	خَ	x a	x a
+L023-03	خِ	x i	x i
+L023-04	خُ	x u	x u
+L023-05	خَ خِ خُ	x a x i x u	x a x i x u
+L023-06	خَبْ خَلْ خَرَجَ خَبَرَ خَشَبُ خَلَفُ	x a b x a l x a r a j a x a b a r a x a $ a b u x a l a f u	x a b x a l x a r a j a x a b a r a x a $ a b u x a l a f
+L023-07	خَيْرُ خَتْمُ خَمْرُ خَوْفُ مَخْرَجُ مُخْبِرُ	x a y r u x a t m u x a m r u x a w f u m a x r a j u m u x b i r u	x a y r u x a t m u x a m r u x a w f u m a x r a j u m u x b i r
+L023-08	أَخْرَجَ يُخْرِجُ أَخْبَرَ يُخْبِرُ	< a x r a j a y u x r i j u < a x b a r a y u x b i r u	< a x r a j a y u x r i j u < a x b a r a y u x b i r
+L023-09	اِسْتَخْبَرَ يَسْتَخْبِرُ اِسْتَخْرَجَ يَسْتَخْرِجُ	< i s t a x b a r a y a s t a x b i r u < i s t a x r a j a y a s t a x r i j u	< i s t a x b a r a y a s t a x b i r u < i s t a x r a j a y a s t a x r i j
+L024-02	حَ	H a	H a
+L024-03	حِ	H i	H i
+L024-04	حُ	H u	H u
+L024-05	حَ حِ حُ	H a H i H u	H a H i H u
+L024-06	حَيْ حِلْ حَجْ حَسَنُ حَسَبُ حَسَدُ	H a y H i l H a j H a s a n u H a s a b u H a s a d u	H a y H i l H a j H a s a n u H a s a b u H a s a d
+L024-07	مُحْسِنُ مَحْشَرُ مِنْحَرُ مَحْفَلُ أَحْسَنَ	m u H s i n u m a H $ a r u m i n H a r u m a H f a l u < a H s a n a	m u H s i n u m a H $ a r u m i n H a r u m a H f a l u < a H s a n
+L024-08	اِمْتَحَنَ يَمْتَحِنُ اِحْتَمَلَ يَحْتَمِلُ	< i m t a H a n a y a m t a H i n u < i H t a m a l a y a H t a m i l u	< i m t a H a n a y a m t a H i n u < i H t a m a l a y a H t a m i l
+L024-09	اِسْتَحْسَنَ يَسْتَحْسِنُ اِحْرَنْجَمَ يَحْرَنْجِمُ	< i s t a H s a n a y a s t a H s i n u < i H r a n j a m a y a H r a n j i m u	< i s t a H s a n a y a s t a H s i n u < i H r a n j a m a y a H r a n j i m
+L024-10	خَلْقُ حَلْقُ خَتْمُ حَتْمُ أَرْخَمُ أَرْحَمُ	x a l q u H a l q u x a t m u H a t m u < a r x a m u < a r H a m u	x a l q u H a l q u x a t m u H a t m u < a r x a m u < a r H a m
+L025-02	غَ	g a	g a
+L025-03	غِ	g i	g i
+L025-04	غُ	g u	g u
+L025-05	غَ غِ غُ	g a g i g u	g a g i g u
+L025-06	غَمْ غِبْ غِلْ غَيْرُ بَغْلُ فَرْغُ	g a m g i b g i l g a y r u b a g l u f a r g u	g a m g i b g i l g a y r u b a g l u f a r g
+L025-07	غَبْغَبُ مَبْلَغُ مَغْرِبُ اِغْلِبْ اِغْفِرْ	g a b g a b u m a b l a g u m a g r i b u < i g l i b < i g f i r	g a b g a b u m a b l a g u m a g r i b u < i g l i b < i g f i r
+L025-08	اِشْتَغَلَ يَشْتَغِلُ اِسْتَغْفَرَ يَسْتَغْفِرُ	< i $ t a g a l a y a $ t a g i l u < i s t a g f a r a y a s t a g f i r u	< i $ t a g a l a y a $ t a g i l u < i s t a g f a r a y a s t a g f i r
+L026-02	عَ	E a	E a
+L026-03	عِ	E i	E i
+L026-04	عُ	E u	E u
+L026-05	عَ عِ عُ	E a E i E u	E a E i E u
+L026-06	بِعْ عَنْ عَمْ سَعْ مَعَ عَرَبُ عَجَمُ	b i EE a n E a m s a E m a E a E a r a b u E a j a m u	b i EE a n E a m s a E m a E a E a r a b u E a j a m
+L026-07	عَجَبُ عَمَلُ عِلْمُ عُمْرُ جَمْعُ	E a j a b u E a m a l u E i l m u E u m r u j a m E u	E a j a b u E a m a l u E i l m u E u m r u j a m E
+L026-08	جَعَلَ عَسْكَرُ عَيْلَمُ جَعْفَرُ عَنْبَرُ	j a E a l a E a s k a r u E a y l a m u j a E f a r u E a n b a r u	j a E a l a E a s k a r u E a y l a m u j a E f a r u E a n b a r
+L026-09	غَيْنُ عَيْنُ بَغْلُ بَعْلُ بَلْغُ بَلْعُ	g a y n u E a y n u b a g l u b a E l u b a l g u b a l E u	g a y n u E a y n u b a g l u b a E l u b a l g u b a l E
+L027-02	دَ	d a	d a
+L027-03	دِ	d i	d i
+L027-04	دُ	d u	d u
+L027-05	دَ دِ دُ	d a d i d u	d a d i d u
+L027-06	دُمْ دُبْ دُفْ رُدْ زِدْ قَدْ دَرَسَ	d u m d u b d u f r u d z i d q a dd a r a s a	d u m d u b d u f r u d z i d q a dd a r a s
+L027-07	دَفْعُ دَبْغُ دَلْكُ دَهْرُ دُهْنُ	d a f E u d a b g u d a l k u d a h r u d u h n u	d a f E u d a b g u d a l k u d a h r u d u h n
+L027-08	دُلْدُلُ فُدْفُدُ هُدْهُدُ اُشْدُدْ	d u l d u l u f u d f u d u h u d h u d u < u $ d u d	d u l d u l u f u d f u d u h u d h u d u < u $ d u d
+L027-09	اِعْتَدَلَ يَعْتَدِلُ اِسْتَرْشَدَ يَسْتَرْشِدُ	< i E t a d a l a y a E t a d i l u < i s t a r $ a d a y a s t a r $ i d u	< i E t a d a l a y a E t a d i l u < i s t a r $ a d a y a s t a r $ i d
+L028-02	ضَ	D a	D a
+L028-03	ضِ	D i	D i
+L028-04	ضُ	D u	D u
+L028-05	ضَ ضِ ضُ	D a D i D u	D a D i D u
+L028-06	ضَيْفُ عَضْلُ ضَهْلُ ضَبْطُ	D a y f u E a D l u D a h l u D a b T u	D a y f u E a D l u D a h l u D a b T
+L028-07	ضَعْفُ عَرْضُ مَضْرِبُ مِضْرَبُ	D a E f u E a r D u m a D r i b u m i D r a b u	D a E f u E a r D u m a D r i b u m i D r a b
+L028-08	اِضْرِبْ تَضْرِبُ أَضْرِبُ نَضْرِبُ	< i D r i b t a D r i b u < a D r i b u n a D r i b u	< i D r i b t a D r i b u < a D r i b u n a D r i b
+L028-09	اِضْطَرَبَ يَضْطَرِبُ اِسْتَضْعَفَ يَسْتَضْعِفُ	< i D T a r a b a y a D T a r i b u < i s t a D E a f a y a s t a D E i f u	< i D T a r a b a y a D T a r i b u < i s t a D E a f a y a s t a D E i f
+L028-10	دَرْسُ ضَرْسُ وَدْعُ وَضْعُ بَعْدُ بَعْضُ	d a r s u D a r s u w a d E u w a D E u b a E d u b a E D u	d a r s u D a r s u w a d E u w a D E u b a E d u b a E D
+L029-02	ذَ	* a	* a
+L029-03	ذِ	* i	* i
+L029-04	ذُ	* u	* u
+L029-05	ذَ ذِ ذُ	* a * i * u	* a * i * u
+L029-06	إِذْ مُذْ خُذْ عُذْ ذُبْ ذُقْ ذَرْ مُنْذُ	< i * m u * x u * E u ** u b * u q * a r m u n * u	< i * m u * x u * E u ** u b * u q * a r m u n *
+L029-07	إِذْنُ بَذْلُ ذِكْرُ ذِهْنُ ذَهَبَ مَذْهَبُ	< i * n u b a * l u * i k r u * i h n u * a h a b a m a * h a b u	< i * n u b a * l u * i k r u * i h n u * a h a b a m a * h a b
+L029-08	ذَهَلَ يَذْهَلُ بَذَلَ يَبْذُلُ أَذْهَبَ يُذْهِبُ	* a h a l a y a * h a l u b a * a l a y a b * u l u < a * h a b a y u * h i b u	* a h a l a y a * h a l u b a * a l a y a b * u l u < a * h a b a y u * h i b
+L029-09	أَقْزَعَ أَقْذَعَ بَزْلُ بَذْلُ زَرَعَ ذَرَعَ	< a q z a E a < a q * a E a b a z l u b a * l u z a r a E a * a r a E a	< a q z a E a < a q * a E a b a z l u b a * l u z a r a E a * a r a E
+L030-02	ظَ	Z a	Z a
+L030-03	ظِ	Z i	Z i
+L030-04	ظُ	Z u	Z u
+L030-05	ظَ ظِ ظُ	Z a Z i Z u	Z a Z i Z u
+L030-06	ظَنْ ظِلْ فَظْ حَظْ عَظْ لَظْ ظَفَرَ	Z a n Z i l f a Z H a Z E a Z l a ZZ a f a r a	Z a n Z i l f a Z H a Z E a Z l a ZZ a f a r
+L030-07	نَظَرَ حَظَرَ ظَلَفُ عِظَمُ نَظْمُ	n a Z a r a H a Z a r a Z a l a f u E i Z a m u n a Z m u	n a Z a r a H a Z a r a Z a l a f u E i Z a m u n a Z m
+L030-08	ظَلْفُ ظِلْفُ حِظْلُ ظُلْمُ ظُهْرُ أَظْهَرَ أَظْفَرَ	Z a l f u Z i l f u H i Z l u Z u l m u Z u h r u < a Z h a r a < a Z f a r a	Z a l f u Z i l f u H i Z l u Z u l m u Z u h r u < a Z h a r a < a Z f a r
+L030-09	أَظْهَرُ أَظْفَرُ مَظْهَرُ مَنْظَرُ مُظْهِرُ مُظْلِمُ	< a Z h a r u < a Z f a r u m a Z h a r u m a n Z a r u m u Z h i r u m u Z l i m u	< a Z h a r u < a Z f a r u m a Z h a r u m a n Z a r u m u Z h i r u m u Z l i m
+L030-10	ظَهَرَ يَظْهَرُ نَظَرَ يَنْظُرُ ظَلَمَ يَظْلِمُ	Z a h a r a y a Z h a r u n a Z a r a y a n Z u r u Z a l a m a y a Z l i m u	Z a h a r a y a Z h a r u n a Z a r a y a n Z u r u Z a l a m a y a Z l i m
+L030-11	اِنْتَظَمَ يَنْتَظِمُ اِسْتَعْظَمَ يَسْتَعْظِمُ	< i n t a Z a m a y a n t a Z i m u < i s t a E Z a m a y a s t a E Z i m u	< i n t a Z a m a y a n t a Z i m u < i s t a E Z a m a y a s t a E Z i m
+L031-02	ءَا إِي أُو	< aa < ii < uu	< aa < ii < uu
+L031-03	بَا بِي بُو تَا تِي تُو ثَا ثِي ثُو	b aa b ii b uu t aa t ii t uu ^ aa ^ ii ^ uu	b aa b ii b uu t aa t ii t uu ^ aa ^ ii ^ uu
+L031-04	جَا جِي جُو حَا حِي حُو خَا خِي خُو	j aa j ii j uu H aa H ii H uu x aa x ii x uu	j aa j ii j uu H aa H ii H uu x aa x ii x uu
+L031-05	دَا دِي دُو ذَا ذِي ذُو رَا رِي رُو	d aa d ii d uu * aa * ii * uu r aa r ii r uu	d aa d ii d uu * aa * ii * uu r aa r ii r uu
+L031-06	زَا زِي زُو سَا سِي سُو شَا شِي شُو	z aa z ii z uu s aa s ii s uu $ aa $ ii $ uu	z aa z ii z uu s aa s ii s uu $ aa $ ii $ uu
+L031-07	صَا صِي صُو ضَا ضِي ضُو طَا طِي طُو	S aa S ii S uu D aa D ii D uu T aa T ii T uu	S aa S ii S uu D aa D ii D uu T aa T ii T uu
+L031-08	ظَا ظِي ظُو عَا عِي عُو غَا غِي غُو	Z aa Z ii Z uu E aa E ii E uu g aa g ii g uu	Z aa Z ii Z uu E aa E ii E uu g aa g ii g uu
+L032-01	فَا فِي فُو قَا قِي قُو كَا كِي كُو	f aa f ii f uu q aa q ii q uu k aa k ii k uu	f aa f ii f uu q aa q ii q uu k aa k ii k uu
+L032-02	لَا لِي لُو مَا مِي مُو نَا نِي نُو	l aa l ii l uu m aa m ii m uu n aa n ii n uu	l aa l ii l uu m aa m ii m uu n aa n ii n uu
+L032-03	وَا وِي وُو هَا هِي هُو يَا يِي يُو	w aa w ii w uu h aa h ii h uu y aa y ii y uu	w aa w ii w uu h aa h ii h uu y aa y ii y uu
+L032-04	بُو يِي بَا يُو بِي يَا تُو هِي تَا	b uu y ii b aa y uu b ii y aa t uu h ii t aa	b uu y ii b aa y uu b ii y aa t uu h ii t aa
+L032-05	هُو تِي هَا ثُو وِي ثَا وُو تِي وَا	h uu t ii h aa ^ uu w ii ^ aa w uu t ii w aa	h uu t ii h aa ^ uu w ii ^ aa w uu t ii w aa
+L032-06	جُو نِي جَا نُو جِي نَا حُو مِي حَا	j uu n ii j aa n uu j ii n aa H uu m ii H aa	j uu n ii j aa n uu j ii n aa H uu m ii H aa
+L032-07	مُو حِي مَا خُو لِي خَا لُو خِي لَا	m uu H ii m aa x uu l ii x aa l uu x ii l aa	m uu H ii m aa x uu l ii x aa l uu x ii l aa
+L033-01	دُو كِي دَا كُو دِي كَا ذُو قِي ذَا	d uu k ii d aa k uu d ii k aa * uu q ii * aa	d uu k ii d aa k uu d ii k aa * uu q ii * aa
+L033-02	قُو ذِي قَا رُو فِي رَا فُو رِي فَا	q uu * ii q aa r uu f ii r aa f uu r ii f aa	q uu * ii q aa r uu f ii r aa f uu r ii f aa
+L033-03	زُو غِي زَا غُو زِي غَا سُو عِي سَا	z uu g ii z aa g uu z ii g aa s uu E ii s aa	z uu g ii z aa g uu z ii g aa s uu E ii s aa
+L033-04	عُو سِي عَا شُو ظِي شَا ظُو شِي ظَا	E uu s ii E aa $ uu Z ii $ aa Z uu $ ii Z aa	E uu s ii E aa $ uu Z ii $ aa Z uu $ ii Z aa
+L033-05	صُو طِي صَا طُو صِي طَا ضُو إِي ضَا	S uu T ii S aa T uu S ii T aa D uu < ii D aa	S uu T ii S aa T uu S ii T aa D uu < ii D aa
+L034-02	مَالُ حَالُ نَارُ جَاهُ شَامُ سَامُ بَارِي	m aa l u H aa l u n aa r u j aa h u $ aa m u s aa m u b aa r ii	m aa l u H aa l u n aa r u j aa h u $ aa m u s aa m u b aa r ii
+L034-03	عَالِي رَاضِي قَاضِي هَادِي حَالِي كَلَامُ	E aa l ii r aa D ii q aa D ii h aa d ii H aa l ii k a l aa m u	E aa l ii r aa D ii q aa D ii h aa d ii H aa l ii k a l aa m
+L034-04	سَلَامُ حَلَالُ حَرَامُ جَلَالُ جَمَالُ كَمَالُ	s a l aa m u H a l aa l u H a r aa m u j a l aa l u j a m aa l u k a m aa l u	s a l aa m u H a l aa l u H a r aa m u j a l aa l u j a m aa l u k a m aa l
+L034-05	إِمَامُ حِسَابُ نِظَامُ غُرَابُ غُلَامُ غُبَارُ	< i m aa m u H i s aa b u n i Z aa m u g u r aa b u g u l aa m u g u b aa r u	< i m aa m u H i s aa b u n i Z aa m u g u r aa b u g u l aa m u g u b aa r
+L034-06	تُرَابُ أَمْوَالُ أَعْمَالُ أَعْلَامُ أَمْوَاتُ	t u r aa b u < a m w aa l u < a E m aa l u < a E l aa m u < a m w aa t u	t u r aa b u < a m w aa l u < a E m aa l u < a E l aa m u < a m w aa t
+L034-07	أَمْرَاضُ قَوَاعِدُ عَوَامِلُ شَوَاهِدُ جَوَاهِرُ	< a m r aa D u q a w aa E i d u E a w aa m i l u $ a w aa h i d u j a w aa h i r u	< a m r aa D u q a w aa E i d u E a w aa m i l u $ a w aa h i d u j a w aa h i r
+L034-08	كَوَاكِبُ مَكَاتِبُ إِكْرَامُ إِعْلَامُ إِخْلَاصُ	k a w aa k i b u m a k aa t i b u < i k r aa m u < i E l aa m u < i x l aa S u	k a w aa k i b u m a k aa t i b u < i k r aa m u < i E l aa m u < i x l aa S
+L034-09	إِظْهَارُ إِصْلَاحُ إِفْسَادُ عَالِمُ صَابِرُ مَاهِرُ	< i Z h aa r u < i S l aa H u < i f s aa d u E aa l i m u S aa b i r u m aa h i r u	< i Z h aa r u < i S l aa H u < i f s aa d u E aa l i m u S aa b i r u m aa h i r
+L035-01	طَالِبُ فَاتِحُ صَالِحُ قَامَا طَافَا تَابَا	T aa l i b u f aa t i H u S aa l i H u q aa m aa T aa f aa t aa b aa	T aa l i b u f aa t i H u S aa l i H u q aa m aa T aa f aa t aa b aa
+L035-02	قُولِي طُوفِي تُوبِي يُقَالُ يُطَافُ يُتَابُ	q uu l ii T uu f ii t uu b ii y u q aa l u y u T aa f u y u t aa b u	q uu l ii T uu f ii t uu b ii y u q aa l u y u T aa f u y u t aa b
+L035-03	يَقُولُ تَقُومُ يَطُوفُ يَتُوبَانِ يَقُولُونَ	y a q uu l u t a q uu m u y a T uu f u y a t uu b aa n i y a q uu l uu n a	y a q uu l u t a q uu m u y a T uu f u y a t uu b aa n i y a q uu l uu n
+L035-04	تَقُومُونَ يَطُوفُونَ تَقُولُونَ يَنْصُرُونَ	t a q uu m uu n a y a T uu f uu n a t a q uu l uu n a y a n S u r uu n a	t a q uu m uu n a y a T uu f uu n a t a q uu l uu n a y a n S u r uu n
+L035-05	تَدْخُلُونَ يَعْلَمُونَ تَعْلَمُونَ يَشْهَدُونَ	t a d x u l uu n a y a E l a m uu n a t a E l a m uu n a y a $ h a d uu n a	t a d x u l uu n a y a E l a m uu n a t a E l a m uu n a y a $ h a d uu n
+L035-06	تَضْرِبُونَ تَرْجِعُونَ تَجْلِسُونَ يُكْرِمُونَ	t a D r i b uu n a t a r j i E uu n a t a j l i s uu n a y u k r i m uu n a	t a D r i b uu n a t a r j i E uu n a t a j l i s uu n a y u k r i m uu n
+L035-07	تُسْلِمُونَ يُخْلِصُونَ تُكْرِمُونَ يُنْصَرُونَ	t u s l i m uu n a y u x l i S uu n a t u k r i m uu n a y u n S a r uu n a	t u s l i m uu n a y u x l i S uu n a t u k r i m uu n a y u n S a r uu n
+L035-08	تُضْرَبُونَ يَجْتَمِعُونَ تَكْتَسِبُونَ يَحْتَسِبُونَ	t u D r a b uu n a y a j t a m i E uu n a t a k t a s i b uu n a y a H t a s i b uu n a	t u D r a b uu n a y a j t a m i E uu n a t a k t a s i b uu n a y a H t a s i b uu n
+L036-01	تَسْتَشْهِدُونَ يَسْتَخْرِجُونَ اُشْكُرَا اُنْصُرَا	t a s t a $ h i d uu n a y a s t a x r i j uu n a < u $ k u r aa < u n S u r aa	t a s t a $ h i d uu n a y a s t a x r i j uu n a < u $ k u r aa < u n S u r aa
+L036-02	اِعْلَمَا اُشْكُرِي اُنْصُرِي اِعْلَمِي مُكْرِمَانِ	< i E l a m aa < u $ k u r ii < u n S u r ii < i E l a m ii m u k r i m aa n i	< i E l a m aa < u $ k u r ii < u n S u r ii < i E l a m ii m u k r i m aa n
+L036-03	مُسْلِمَانِ مُخْلِصَانِ مُنْفِقَانِ مُكْرِمُونَ	m u s l i m aa n i m u x l i S aa n i m u n f i q aa n i m u k r i m uu n a	m u s l i m aa n i m u x l i S aa n i m u n f i q aa n i m u k r i m uu n
+L036-04	مُسْلِمُونَ مُخْلِصُونَ مُنْفِقُونَ مُسْلِمَاتُ	m u s l i m uu n a m u x l i S uu n a m u n f i q uu n a m u s l i m aa t u	m u s l i m uu n a m u x l i S uu n a m u n f i q uu n a m u s l i m aa t
+L036-05	مُخْلِصَاتُ مَنْصُورُونَ مَطْلُوبُونَ مِيلُ نِيلُ	m u x l i S aa t u m a n S uu r uu n a m a T l uu b uu n a m ii l u n ii l u	m u x l i S aa t u m a n S uu r uu n a m a T l uu b uu n a m ii l u n ii l
+L036-06	فِيلُ حِينُ سِينُ شِينُ كَرِيمُ عَلِيمُ سَمِيعُ	f ii l u H ii n u s ii n u $ ii n u k a r ii m u E a l ii m u s a m ii E u	f ii l u H ii n u s ii n u $ ii n u k a r ii m u E a l ii m u s a m ii E
+L036-07	عَزِيزُ حَكِيمُ مِسْكِينُ مِعْطِيرُ عِفْرِيتُ	E a z ii z u H a k ii m u m i s k ii n u m i E T ii r u E i f r ii t u	E a z ii z u H a k ii m u m i s k ii n u m i E T ii r u E i f r ii t
+L036-08	إِدْرِيسُ تَعْلِيمُ تَدْرِيسُ تَبْرِيكُ تَحْسِينُ	< i d r ii s u t a E l ii m u t a d r ii s u t a b r ii k u t a H s ii n u	< i d r ii s u t a E l ii m u t a d r ii s u t a b r ii k u t a H s ii n
+L037-01	بِيعَ مِيلَ عِيشَ يَبِيعُ يَمِيلُ تَعِيشُ	b ii E a m ii l a E ii $ a y a b ii E u y a m ii l u t a E ii $ u	b ii E a m ii l a E ii $ a y a b ii E u y a m ii l u t a E ii $
+L037-02	تَبِيعِينَ تَوَارِيخُ تَرَاوِيحُ مُهْتَدِينَ	t a b ii E ii n a t a w aa r ii x u t a r aa w ii H u m u h t a d ii n a	t a b ii E ii n a t a w aa r ii x u t a r aa w ii H u m u h t a d ii n
+L037-03	مُجْرِمِينَ مُكْرِمِينَ مُسْلِمِينَ مُحْسِنِينَ	m u j r i m ii n a m u k r i m ii n a m u s l i m ii n a m u H s i n ii n a	m u j r i m ii n a m u k r i m ii n a m u s l i m ii n a m u H s i n ii n
+L037-04	مُسْتَقِيمُ مُوقِنِينَ مُرْسَلِينَ مُحْصِنِينَ	m u s t a q ii m u m uu q i n ii n a m u r s a l ii n a m u H S i n ii n a	m u s t a q ii m u m uu q i n ii n a m u r s a l ii n a m u H S i n ii n
+L037-05	مُحْصَنَاتُ غَافِلَاتُ سَمَاوَاتُ صَالِحَاتُ	m u H S a n aa t u g aa f i l aa t u s a m aa w aa t u S aa l i H aa t u	m u H S a n aa t u g aa f i l aa t u s a m aa w aa t u S aa l i H aa t
+L038-02	رَبَّ رَبِّ رَبُّ	r a bb a r a bb i r a bb u	r a bb a r a bb i r a bb
+L038-03	إِنَّ أَنَّ أَمَّ بَرَّ جَرَّ حَجَّ شَكَّ	< i nn a < a nn a < a mm a b a rr a j a rr a H a jj a $ a kk a	< i nn a < a nn a < a mm a b a rr a j a rr a H a jj a $ a kk
+L038-04	بَرُّ جَرُّ حَجُّ شَكُّ ذَمُّ حَقُّ شَرُّ	b a rr u j a rr u H a jj u $ a kk u * a mm u H a qq u $ a rr u	b a rr u j a rr u H a jj u $ a kk u * a mm u H a qq u $ a rr
+L038-05	بِرُّ سِرُّ سِنُّ عِزُّ طِلُّ حِلُّ حِسُّ	b i rr u s i rr u s i nn u E i zz u T i ll u H i ll u H i ss u	b i rr u s i rr u s i nn u E i zz u T i ll u H i ll u H i ss
+L038-06	بُرُّ دُرُّ خُفُّ كُلُّ دُبُّ زُقُّ أُمُّ	b u rr u d u rr u x u ff u k u ll u d u bb u z u qq u < u mm u	b u rr u d u rr u x u ff u k u ll u d u bb u z u qq u < u mm
+L038-07	بُرَّ ذُمَّ سُبَّ فُكَّ سُرَّ سُمَّ ثُمَّ	b u rr a * u mm a s u bb a f u kk a s u rr a s u mm a ^ u mm a	b u rr a * u mm a s u bb a f u kk a s u rr a s u mm a ^ u mm
+L038-08	بُرِّ دُرِّ خُفِّ كُلِّ دُبِّ زُقِّ ضُرِّ	b u rr i d u rr i x u ff i k u ll i d u bb i z u qq i D u rr i	b u rr i d u rr i x u ff i k u ll i d u bb i z u qq i D u rr
+L039-01	دَبَّرَ كَثَّرَ فَجَّرَ وَحَّدَ سَخَّرَ أَدَّبَ	d a bb a r a k a ^^ a r a f a jj a r a w a HH a d a s a xx a r a < a dd a b a	d a bb a r a k a ^^ a r a f a jj a r a w a HH a d a s a xx a r a < a dd a b
+L039-02	حَرَّمَ رَزَّقَ يَسَّرَ بَشَّرَ فَصَّلَ فَضَّلَ	H a rr a m a r a zz a q a y a ss a r a b a $$ a r a f a SS a l a f a DD a l a	H a rr a m a r a zz a q a y a ss a r a b a $$ a r a f a SS a l a f a DD a l
+L039-03	عَطَّرَ عَظَّمَ نَعَّمَ كَفَّنَ لَقَّبَ	E a TT a r a E a ZZ a m a n a EE a m a k a ff a n a l a qq a b a	E a TT a r a E a ZZ a m a n a EE a m a k a ff a n a l a qq a b
+L039-04	ذَكَّرَ شَمَّرَ عَلَّمَ كَمَّلَ صَنَّفَ	* a kk a r a $ a mm a r a E a ll a m a k a mm a l a S a nn a f a	* a kk a r a $ a mm a r a E a ll a m a k a mm a l a S a nn a f
+L039-05	صَوَّرَ غَيَّرَ دُبِّرَ كُثِّرَ فُجِّرَ وُحِّدَ	S a ww a r a g a yy a r a d u bb i r a k u ^^ i r a f u jj i r a w u HH i d a	S a ww a r a g a yy a r a d u bb i r a k u ^^ i r a f u jj i r a w u HH i d
+L039-06	سُخِّرَ أُدِّبَ حُرِّمَ رُزِّقَ يُسِّرَ بُشِّرَ	s u xx i r a < u dd i b a H u rr i m a r u zz i q a y u ss i r a b u $$ i r a	s u xx i r a < u dd i b a H u rr i m a r u zz i q a y u ss i r a b u $$ i r
+L039-07	فُصِّلَ فُضِّلَ عُطِّرَ عُظِّمَ نُعِّمَ كُفِّنَ لُقِّبَ	f u SS i l a f u DD i l a E u TT i r a E u ZZ i m a n u EE i m a k u ff i n a l u qq i b a	f u SS i l a f u DD i l a E u TT i r a E u ZZ i m a n u EE i m a k u ff i n a l u qq i b
+L040-01	ذُكِّرَ عُلِّمَ كُمِّلَ شُمِّرَ صُنِّفَ صُوِّرَ غُيِّرَ	* u kk i r a E u ll i m a k u mm i l a $ u mm i r a S u nn i f a S u ww i r a g u yy i r a	* u kk i r a E u ll i m a k u mm i l a $ u mm i r a S u nn i f a S u ww i r a g u yy i r
+L040-02	تَدَبُّرُ تَكَبُّرُ تَحَجُّرُ تَوَحُّدُ تَسَخُّنُ تَبَدُّلُ	t a d a bb u r u t a k a bb u r u t a H a jj u r u t a w a HH u d u t a s a xx u n u t a b a dd u l u	t a d a bb u r u t a k a bb u r u t a H a jj u r u t a w a HH u d u t a s a xx u n u t a b a dd u l
+L040-03	تَحَرُّرُ تَعَزُّزُ تَيَسُّرُ تَعَشُّقُ تَعَصُّبُ	t a H a rr u r u t a E a zz u z u t a y a ss u r u t a E a $$ u q u t a E a SS u b u	t a H a rr u r u t a E a zz u z u t a y a ss u r u t a E a $$ u q u t a E a SS u b
+L040-04	تَفَضُّلُ تَوَطُّرُ تَنَعُّمُ تَوَغُّلُ تَنَفُّسُ تَرَقُّبُ	t a f a DD u l u t a w a TT u r u t a n a EE u m u t a w a gg u l u t a n a ff u s u t a r a qq u b u	t a f a DD u l u t a w a TT u r u t a n a EE u m u t a w a gg u l u t a n a ff u s u t a r a qq u b
+L040-05	تَفَكُّرُ تَصَلُّمُ تَكَمُّلُ تَفَنُّنُ تَصَوُّرُ تَغَيُّرُ	t a f a kk u r u t a S a ll u m u t a k a mm u l u t a f a nn u n u t a S a ww u r u t a g a yy u r u	t a f a kk u r u t a S a ll u m u t a k a mm u l u t a f a nn u n u t a S a ww u r u t a g a yy u r
+L040-06	مُتَدَبِّرُ مُتَكَثِّرُ مُتَحَجِّرُ مُتَوَحِّدُ مُتَسَخِّنُ	m u t a d a bb i r u m u t a k a ^^ i r u m u t a H a jj i r u m u t a w a HH i d u m u t a s a xx i n u	m u t a d a bb i r u m u t a k a ^^ i r u m u t a H a jj i r u m u t a w a HH i d u m u t a s a xx i n
+L040-07	مُتَبَدِّلُ مُتَهَذِّبُ مُتَحَرِّرُ مُتَعَزِّزُ مُتَيَسِّرُ	m u t a b a dd i l u m u t a h a ** i b u m u t a H a rr i r u m u t a E a zz i z u m u t a y a ss i r u	m u t a b a dd i l u m u t a h a ** i b u m u t a H a rr i r u m u t a E a zz i z u m u t a y a ss i r
+L041-01	مُتَوَطِّنُ مُتَنَعِّمُ مُتَوَغِّلُ مُتَنَفِّسُ مُتَفَكِّرُ	m u t a w a TT i n u m u t a n a EE i m u m u t a w a gg i l u m u t a n a ff i s u m u t a f a kk i r u	m u t a w a TT i n u m u t a n a EE i m u m u t a w a gg i l u m u t a n a ff i s u m u t a f a kk i r
+L041-02	مُتَعَلِّمُ مُتَكَمِّلُ مُتَفَنِّنُ مُتَصَوِّرُ مُتَغَيِّرُ	m u t a E a ll i m u m u t a k a mm i l u m u t a f a nn i n u m u t a S a ww i r u m u t a g a yy i r u	m u t a E a ll i m u m u t a k a mm i l u m u t a f a nn i n u m u t a S a ww i r u m u t a g a yy i r
+L041-03	اِسْوَدَّ اِصْفَرَّ اِحْمَرَّ اِغْتَرَّ اِعْتَزَّ	< i s w a dd a < i S f a rr a < i H m a rr a < i g t a rr a < i E t a zz a	< i s w a dd a < i S f a rr a < i H m a rr a < i g t a rr a < i E t a zz
+L041-04	اِسْتَرَدَّ اِسْتَحَبَّ اِسْتَحَلَّ اِسْتَدَلَّ	< i s t a r a dd a < i s t a H a bb a < i s t a H a ll a < i s t a d a ll a	< i s t a r a dd a < i s t a H a bb a < i s t a H a ll a < i s t a d a ll
+L041-05	يَذَّكَّرُ اَلْمُزَّمِّلُ اَلْمُدَّثِّرُ عِلِّيُّونَ	y a ** a kk a r u < a l m u zz a mm i l u < a l m u dd a ^^ i r u E i ll i yy uu n a	y a ** a kk a r u < a l m u zz a mm i l u < a l m u dd a ^^ i r u E i ll i yy uu n

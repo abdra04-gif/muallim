@@ -1,0 +1,204 @@
+{
+ "places": 378,
+ "accepted_pct": 17.7,
+ "by_difference": [
+  {
+   "difference": "a → aa",
+   "count": 32,
+   "median_margin": -4.66,
+   "model_rejects_pct": 75.0
+  },
+  {
+   "difference": "aa → a",
+   "count": 29,
+   "median_margin": -2.37,
+   "model_rejects_pct": 51.7
+  },
+  {
+   "difference": "u → uu",
+   "count": 24,
+   "median_margin": -5.48,
+   "model_rejects_pct": 95.8
+  },
+  {
+   "difference": "aa w → a ww",
+   "count": 19,
+   "median_margin": -13.94,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "ii → i",
+   "count": 17,
+   "median_margin": -3.9,
+   "model_rejects_pct": 70.6
+  },
+  {
+   "difference": "aa → a n",
+   "count": 16,
+   "median_margin": -10.85,
+   "model_rejects_pct": 93.8
+  },
+  {
+   "difference": "aa → AA",
+   "count": 13,
+   "median_margin": -6.25,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "∅ → i n",
+   "count": 13,
+   "median_margin": -10.57,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "m m → mm",
+   "count": 13,
+   "median_margin": -11.7,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "a → A",
+   "count": 12,
+   "median_margin": -5.54,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "∅ → u n",
+   "count": 12,
+   "median_margin": -9.13,
+   "model_rejects_pct": 91.7
+  },
+  {
+   "difference": "n y → yy",
+   "count": 11,
+   "median_margin": -13.33,
+   "model_rejects_pct": 90.9
+  },
+  {
+   "difference": "aa l → a ll",
+   "count": 8,
+   "median_margin": -8.55,
+   "model_rejects_pct": 87.5
+  },
+  {
+   "difference": "uu → u",
+   "count": 7,
+   "median_margin": 2.12,
+   "model_rejects_pct": 0.0
+  },
+  {
+   "difference": "w → i ww",
+   "count": 7,
+   "median_margin": -13.8,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "u → U",
+   "count": 6,
+   "median_margin": -4.62,
+   "model_rejects_pct": 83.3
+  },
+  {
+   "difference": "m → i mm",
+   "count": 6,
+   "median_margin": -11.13,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "∅ → t i n",
+   "count": 5,
+   "median_margin": -8.68,
+   "model_rejects_pct": 80.0
+  },
+  {
+   "difference": "ii → II",
+   "count": 5,
+   "median_margin": -7.56,
+   "model_rejects_pct": 80.0
+  },
+  {
+   "difference": "i → ii",
+   "count": 5,
+   "median_margin": -6.51,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "ii y → i yy",
+   "count": 5,
+   "median_margin": -3.59,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "aa m → a mm",
+   "count": 5,
+   "median_margin": -11.8,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "m → u mm",
+   "count": 4,
+   "median_margin": -10.57,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "uu → U",
+   "count": 4,
+   "median_margin": -6.83,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "w → t a ww",
+   "count": 4,
+   "median_margin": -15.76,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "w → t i ww",
+   "count": 3,
+   "median_margin": -12.54,
+   "model_rejects_pct": 66.7
+  },
+  {
+   "difference": "∅ → i m",
+   "count": 3,
+   "median_margin": -8.63,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "∅ → h",
+   "count": 3,
+   "median_margin": -7.04,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "aa y → a yy",
+   "count": 3,
+   "median_margin": -12.59,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "n r → rr",
+   "count": 3,
+   "median_margin": -10.64,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "l → u ll",
+   "count": 3,
+   "median_margin": -8.18,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "n l → ll",
+   "count": 3,
+   "median_margin": -7.68,
+   "model_rejects_pct": 100.0
+  },
+  {
+   "difference": "w → t u ww",
+   "count": 3,
+   "median_margin": -9.98,
+   "model_rejects_pct": 100.0
+  }
+ ]
+}

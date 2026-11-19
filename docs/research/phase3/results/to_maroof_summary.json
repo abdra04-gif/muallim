@@ -1,0 +1,121 @@
+{
+ "agreement": {
+  "ayahs": 663,
+  "phonetiser_failed": 0,
+  "token_difference_pct": 6.32,
+  "exact_match_pct": 21.9,
+  "top_differences": [
+   [
+    "a → aa",
+    115
+   ],
+   [
+    "aa → a",
+    105
+   ],
+   [
+    "u → uu",
+    68
+   ],
+   [
+    "m m → mm",
+    61
+   ],
+   [
+    "ii → i",
+    52
+   ],
+   [
+    "aa → a n",
+    50
+   ],
+   [
+    "aa w → a ww",
+    50
+   ],
+   [
+    "∅ → i n",
+    47
+   ],
+   [
+    "i → ii",
+    42
+   ],
+   [
+    "uu → u",
+    41
+   ],
+   [
+    "∅ → u n",
+    41
+   ],
+   [
+    "n y → yy",
+    31
+   ],
+   [
+    "m → u mm",
+    28
+   ],
+   [
+    "m → i mm",
+    20
+   ],
+   [
+    "w → i ww",
+    19
+   ],
+   [
+    "ii y → i yy",
+    19
+   ],
+   [
+    "aa l → a ll",
+    16
+   ],
+   [
+    "∅ → h",
+    14
+   ],
+   [
+    "aa m → a mm",
+    13
+   ],
+   [
+    "∅ → t i n",
+    12
+   ],
+   [
+    "l → u ll",
+    12
+   ],
+   [
+    "n → m",
+    12
+   ],
+   [
+    "n l → ll",
+    12
+   ],
+   [
+    "∅ → t a n",
+    10
+   ],
+   [
+    "n r → rr",
+    9
+   ]
+  ]
+ },
+ "model_preference": {
+  "ayahs": 200,
+  "ours_preferred_pct": 5.0,
+  "median_ours_minus_dataset": -9.01,
+  "ours_behind_by_more_than_4_pct": 65.0
+ },
+ "book_lessons_1_41": {
+  "cards": 288,
+  "failed": [],
+  "symbols_not_in_model": {}
+ }
+}

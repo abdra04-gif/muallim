@@ -1,0 +1,1705 @@
+{
+ "summary": {
+  "recordings": 28,
+  "last": "clear",
+  "last_error": -4.0,
+  "own": {
+   "passed": "2 of 28",
+   "again": "24 of 28",
+   "error": "2 of 28",
+   "passed_with_hint": "0"
+  },
+  "last_vowel_wrong": {
+   "passed": "0 of 56",
+   "again": "46 of 56",
+   "error": "10 of 56",
+   "passed_with_hint": "0"
+  },
+  "middle_vowel_wrong": {
+   "passed": "0 of 56",
+   "again": "24 of 56",
+   "error": "32 of 56",
+   "passed_with_hint": "0"
+  },
+  "lookalike": {
+   "passed": "1 of 16",
+   "again": "1 of 16",
+   "error": "14 of 16",
+   "passed_with_hint": "0"
+  },
+  "unrelated": {
+   "passed": "0 of 28",
+   "again": "2 of 28",
+   "error": "26 of 28",
+   "passed_with_hint": "0"
+  }
+ },
+ "trials": {
+  "own": [
+   {
+    "said": "أَ إِ أُ",
+    "card": "< a < i < u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.31,
+    "rival": "no vowel",
+    "margin_other": -3.76
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "h a h i h u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.59,
+    "rival": "no vowel",
+    "margin_other": 0.96
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "E a E i E u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.04,
+    "rival": "no vowel",
+    "margin_other": -1.3
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "H a H i H u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 3.3,
+    "rival": "letter h",
+    "margin_other": -2.2
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "g a g i g u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.67,
+    "rival": "vowel",
+    "margin_other": 0.14
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "x a x i x u",
+    "answer": "passed",
+    "hint_last_vowel": false,
+    "margin": 3.88,
+    "rival": "vowel",
+    "margin_other": -1.03
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "q a q i q u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.47,
+    "rival": "no vowel",
+    "margin_other": 0.94
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "k a k i k u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.14,
+    "rival": "letter q",
+    "margin_other": -3.92
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "j a j i j u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 4.06,
+    "rival": "vowel",
+    "margin_other": -4.8
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "$ a $ i $ u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.53,
+    "rival": "vowel",
+    "margin_other": -5.56
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "y a y i y u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.08,
+    "rival": "no vowel",
+    "margin_other": 2.6
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "D a D i D u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.39,
+    "rival": "letter d",
+    "margin_other": -5.69
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "l a l i l u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.96,
+    "rival": "vowel",
+    "margin_other": 1.13
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "n a n i n u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.96,
+    "rival": "vowel",
+    "margin_other": -3.62
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "r a r i r u",
+    "answer": "passed",
+    "hint_last_vowel": false,
+    "margin": 2.32,
+    "rival": "no vowel",
+    "margin_other": -0.13
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "T a T i T u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -0.4,
+    "rival": "letter t",
+    "margin_other": -1.18
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "d a d i d u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.22,
+    "rival": "letter t",
+    "margin_other": -0.36
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "t a t i t u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 0.08,
+    "rival": "letter d",
+    "margin_other": -0.27
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "S a S i S u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.47,
+    "rival": "letter s",
+    "margin_other": 0.29
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "s a s i s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -1.21,
+    "rival": "letter ^",
+    "margin_other": -7.15
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "z a z i z u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.28,
+    "rival": "letter *",
+    "margin_other": -0.44
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "Z a Z i Z u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.14,
+    "rival": "letter *",
+    "margin_other": -4.99
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "* a * i * u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -1.19,
+    "rival": "letter z",
+    "margin_other": -1.35
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "^ a ^ i ^ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "letter s",
+    "margin_other": -2.65
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "f a f i f u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.23,
+    "rival": "vowel",
+    "margin_other": -0.78
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "w a w i w u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.24,
+    "rival": "no vowel",
+    "margin_other": -5.64
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "b a b i b u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.89,
+    "rival": "no vowel",
+    "margin_other": 0.24
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "m a m i m u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.57,
+    "rival": "vowel",
+    "margin_other": -0.7
+   }
+  ],
+  "last_vowel_wrong": [
+   {
+    "said": "أَ إِ أُ",
+    "card": "< a < i < a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.31,
+    "rival": "no vowel",
+    "margin_other": -5.91
+   },
+   {
+    "said": "أَ إِ أُ",
+    "card": "< a < i < i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -0.85,
+    "rival": "no vowel",
+    "margin_other": -6.75
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "h a h i h a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.58,
+    "rival": "no vowel",
+    "margin_other": -2.84
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "h a h i h i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.41,
+    "rival": "no vowel",
+    "margin_other": -4.12
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "E a E i E a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.04,
+    "rival": "no vowel",
+    "margin_other": -0.19
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "E a E i E i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.04,
+    "rival": "no vowel",
+    "margin_other": -1.57
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "H a H i H a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 3.25,
+    "rival": "letter h",
+    "margin_other": -2.2
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "H a H i H i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 3.26,
+    "rival": "no vowel",
+    "margin_other": -2.2
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "g a g i g a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.66,
+    "rival": "vowel",
+    "margin_other": 0.14
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "g a g i g i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.29,
+    "rival": "no vowel",
+    "margin_other": -1.46
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "x a x i x a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 3.88,
+    "rival": "vowel",
+    "margin_other": -1.03
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "x a x i x i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 3.88,
+    "rival": "vowel",
+    "margin_other": -1.03
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "q a q i q a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.47,
+    "rival": "no vowel",
+    "margin_other": 0.94
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "q a q i q i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.47,
+    "rival": "no vowel",
+    "margin_other": 0.94
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "k a k i k a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.14,
+    "rival": "letter q",
+    "margin_other": -3.92
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "k a k i k i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 1.14,
+    "rival": "letter q",
+    "margin_other": -3.92
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "j a j i j a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 4.06,
+    "rival": "vowel",
+    "margin_other": -4.8
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "j a j i j i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 3.6,
+    "rival": "no vowel",
+    "margin_other": -4.8
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "$ a $ i $ a",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.52,
+    "rival": "vowel",
+    "margin_other": -7.23
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "$ a $ i $ i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.94,
+    "rival": "no vowel",
+    "margin_other": -5.82
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "y a y i y a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.08,
+    "rival": "no vowel",
+    "margin_other": 2.29
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "y a y i y i",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 1.08,
+    "rival": "no vowel",
+    "margin_other": 4.61
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "D a D i D a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 0.39,
+    "rival": "letter d",
+    "margin_other": -5.69
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "D a D i D i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.39,
+    "rival": "letter d",
+    "margin_other": -5.69
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "l a l i l a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.96,
+    "rival": "vowel",
+    "margin_other": 0.52
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "l a l i l i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.96,
+    "rival": "vowel",
+    "margin_other": -0.55
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "n a n i n a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.95,
+    "rival": "vowel",
+    "margin_other": -3.62
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "n a n i n i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.95,
+    "rival": "vowel",
+    "margin_other": -3.62
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "r a r i r a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.32,
+    "rival": "no vowel",
+    "margin_other": -3.44
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "r a r i r i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.26,
+    "rival": "no vowel",
+    "margin_other": -4.61
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "T a T i T a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -0.4,
+    "rival": "letter t",
+    "margin_other": -1.18
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "T a T i T i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -0.4,
+    "rival": "letter t",
+    "margin_other": -1.18
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "d a d i d a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 1.22,
+    "rival": "letter t",
+    "margin_other": 1.34
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "d a d i d i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.22,
+    "rival": "letter t",
+    "margin_other": 0.32
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "t a t i t a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.08,
+    "rival": "letter d",
+    "margin_other": -0.27
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "t a t i t i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.08,
+    "rival": "letter d",
+    "margin_other": -0.27
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "S a S i S a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 2.71,
+    "rival": "letter s",
+    "margin_other": 0.29
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "S a S i S i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.83,
+    "rival": "letter s",
+    "margin_other": 0.29
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "s a s i s a",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -1.21,
+    "rival": "letter ^",
+    "margin_other": -7.15
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "s a s i s i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -1.21,
+    "rival": "letter ^",
+    "margin_other": -7.15
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "z a z i z a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 1.28,
+    "rival": "letter *",
+    "margin_other": 1.51
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "z a z i z i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.28,
+    "rival": "letter *",
+    "margin_other": 0.09
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "Z a Z i Z a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 0.14,
+    "rival": "letter *",
+    "margin_other": -4.99
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "Z a Z i Z i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 0.14,
+    "rival": "letter *",
+    "margin_other": -4.99
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "* a * i * a",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -1.19,
+    "rival": "letter z",
+    "margin_other": -0.16
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "* a * i * i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -1.19,
+    "rival": "letter z",
+    "margin_other": -0.84
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "^ a ^ i ^ a",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "letter s",
+    "margin_other": -4.71
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "^ a ^ i ^ i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "letter s",
+    "margin_other": -5.66
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "f a f i f a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.23,
+    "rival": "vowel",
+    "margin_other": -0.78
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "f a f i f i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.22,
+    "rival": "vowel",
+    "margin_other": -0.78
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "w a w i w a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.24,
+    "rival": "no vowel",
+    "margin_other": -5.7
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "w a w i w i",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 0.49,
+    "rival": "no vowel",
+    "margin_other": -6.29
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "b a b i b a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.89,
+    "rival": "no vowel",
+    "margin_other": 0.24
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "b a b i b i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.89,
+    "rival": "no vowel",
+    "margin_other": 0.24
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "m a m i m a",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.57,
+    "rival": "vowel",
+    "margin_other": -2.23
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "m a m i m i",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 2.56,
+    "rival": "vowel",
+    "margin_other": -3.57
+   }
+  ],
+  "middle_vowel_wrong": [
+   {
+    "said": "أَ إِ أُ",
+    "card": "< a < a < u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.75,
+    "rival": "vowel",
+    "margin_other": -3.75
+   },
+   {
+    "said": "أَ إِ أُ",
+    "card": "< a < u < u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.66,
+    "rival": "vowel",
+    "margin_other": -3.33
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "h a h a h u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -3.06,
+    "rival": "vowel",
+    "margin_other": 0.99
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "h a h u h u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.08,
+    "rival": "vowel",
+    "margin_other": 0.11
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "E a E a E u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.91,
+    "rival": "vowel",
+    "margin_other": -1.28
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "E a E u E u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.88,
+    "rival": "vowel",
+    "margin_other": -1.11
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "H a H a H u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.58,
+    "rival": "vowel",
+    "margin_other": -5.78
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "H a H u H u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.18,
+    "rival": "vowel",
+    "margin_other": -8.38
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "g a g a g u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.67,
+    "rival": "vowel",
+    "margin_other": 0.14
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "g a g u g u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.47,
+    "rival": "vowel",
+    "margin_other": -2.18
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "x a x a x u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.88,
+    "rival": "vowel",
+    "margin_other": -4.91
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "x a x u x u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -7.05,
+    "rival": "vowel",
+    "margin_other": -8.08
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "q a q a q u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.81,
+    "rival": "vowel",
+    "margin_other": 0.76
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "q a q u q u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -7.02,
+    "rival": "vowel",
+    "margin_other": -2.45
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "k a k a k u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -2.19,
+    "rival": "vowel",
+    "margin_other": -6.12
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "k a k u k u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.7,
+    "rival": "vowel",
+    "margin_other": -8.63
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "j a j a j u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.06,
+    "rival": "vowel",
+    "margin_other": -8.86
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "j a j u j u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.62,
+    "rival": "vowel",
+    "margin_other": -11.43
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "$ a $ a $ u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.53,
+    "rival": "vowel",
+    "margin_other": -5.56
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "$ a $ u $ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.17,
+    "rival": "vowel",
+    "margin_other": -5.5
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "y a y a y u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.77,
+    "rival": "vowel",
+    "margin_other": 2.59
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "y a y u y u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.43,
+    "rival": "vowel",
+    "margin_other": 2.56
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "D a D a D u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.24,
+    "rival": "vowel",
+    "margin_other": -5.69
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "D a D u D u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.85,
+    "rival": "vowel",
+    "margin_other": -5.69
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "l a l a l u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.96,
+    "rival": "vowel",
+    "margin_other": 1.13
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "l a l u l u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.53,
+    "rival": "vowel",
+    "margin_other": 1.14
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "n a n a n u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.96,
+    "rival": "vowel",
+    "margin_other": -3.62
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "n a n u n u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.48,
+    "rival": "vowel",
+    "margin_other": -3.62
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "r a r a r u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.93,
+    "rival": "vowel",
+    "margin_other": -0.05
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "r a r u r u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.61,
+    "rival": "vowel",
+    "margin_other": 0.35
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "T a T a T u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.12,
+    "rival": "vowel",
+    "margin_other": -1.18
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "T a T u T u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.05,
+    "rival": "vowel",
+    "margin_other": -1.62
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "d a d a d u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.9,
+    "rival": "vowel",
+    "margin_other": -0.36
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "d a d u d u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.63,
+    "rival": "vowel",
+    "margin_other": -0.72
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "t a t a t u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.47,
+    "rival": "vowel",
+    "margin_other": -0.27
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "t a t u t u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.05,
+    "rival": "vowel",
+    "margin_other": -2.2
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "S a S a S u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.59,
+    "rival": "vowel",
+    "margin_other": 0.29
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "S a S u S u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.98,
+    "rival": "vowel",
+    "margin_other": -0.56
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "s a s a s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -2.99,
+    "rival": "vowel",
+    "margin_other": -7.15
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "s a s u s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.69,
+    "rival": "vowel",
+    "margin_other": -8.17
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "z a z a z u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.54,
+    "rival": "vowel",
+    "margin_other": -0.56
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "z a z u z u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.88,
+    "rival": "vowel",
+    "margin_other": -2.9
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "Z a Z a Z u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -2.74,
+    "rival": "vowel",
+    "margin_other": -4.99
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "Z a Z u Z u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.17,
+    "rival": "vowel",
+    "margin_other": -5.85
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "* a * a * u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.4,
+    "rival": "vowel",
+    "margin_other": -1.81
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "* a * u * u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.65,
+    "rival": "vowel",
+    "margin_other": -4.06
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "^ a ^ a ^ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "letter s",
+    "margin_other": -4.84
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "^ a ^ u ^ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "letter s",
+    "margin_other": -6.53
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "f a f a f u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.23,
+    "rival": "vowel",
+    "margin_other": -3.0
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "f a f u f u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.8,
+    "rival": "vowel",
+    "margin_other": -5.58
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "w a w a w u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -3.86,
+    "rival": "vowel",
+    "margin_other": -9.49
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "w a w u w u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.8,
+    "rival": "vowel",
+    "margin_other": -12.43
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "b a b a b u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -3.45,
+    "rival": "vowel",
+    "margin_other": 0.25
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "b a b u b u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.44,
+    "rival": "vowel",
+    "margin_other": 0.2
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "m a m a m u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": -2.57,
+    "rival": "vowel",
+    "margin_other": -0.7
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "m a m u m u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -5.21,
+    "rival": "vowel",
+    "margin_other": -0.69
+   }
+  ],
+  "lookalike": [
+   {
+    "said": "أَ إِ أُ",
+    "card": "E a E i E u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.9,
+    "rival": "letter <",
+    "margin_other": -5.93
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "H a H i H u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -9.58,
+    "rival": "letter h",
+    "margin_other": -5.33
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "< a < i < u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -8.22,
+    "rival": "letter E",
+    "margin_other": -4.45
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "h a h i h u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.87,
+    "rival": "letter H",
+    "margin_other": -6.94
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "k a k i k u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -8.95,
+    "rival": "letter q",
+    "margin_other": -4.38
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "q a q i q u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.97,
+    "rival": "letter k",
+    "margin_other": -5.06
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "d a d i d u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -3.69,
+    "rival": "letter D",
+    "margin_other": -6.08
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "t a t i t u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": -3.44,
+    "rival": "letter T",
+    "margin_other": -0.78
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "t a t i t u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -7.73,
+    "rival": "letter d",
+    "margin_other": -4.65
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "d a d i d u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.71,
+    "rival": "letter t",
+    "margin_other": -3.02
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "s a s i s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.99,
+    "rival": "letter S",
+    "margin_other": -3.23
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "S a S i S u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.49,
+    "rival": "letter s",
+    "margin_other": -11.91
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "Z a Z i Z u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -7.22,
+    "rival": "letter z",
+    "margin_other": -6.19
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "z a z i z u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -8.05,
+    "rival": "letter Z",
+    "margin_other": -8.73
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "z a z i z u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.67,
+    "rival": "letter *",
+    "margin_other": -3.98
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "s a s i s u",
+    "answer": "passed",
+    "hint_last_vowel": false,
+    "margin": 1.45,
+    "rival": "letter ^",
+    "margin_other": -1.2
+   }
+  ],
+  "unrelated": [
+   {
+    "said": "أَ إِ أُ",
+    "card": "r a r i r u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 0.29,
+    "rival": "no vowel",
+    "margin_other": -6.51
+   },
+   {
+    "said": "هَ هِ هُ",
+    "card": "b a b i b u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 1.97,
+    "rival": "no vowel",
+    "margin_other": -10.34
+   },
+   {
+    "said": "عَ عِ عُ",
+    "card": "T a T i T u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -1.65,
+    "rival": "letter t",
+    "margin_other": -11.52
+   },
+   {
+    "said": "حَ حِ حُ",
+    "card": "E a E i E u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -0.75,
+    "rival": "letter <",
+    "margin_other": -8.58
+   },
+   {
+    "said": "غَ غِ غُ",
+    "card": "$ a $ i $ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.27,
+    "rival": "no vowel",
+    "margin_other": -10.85
+   },
+   {
+    "said": "خَ خِ خُ",
+    "card": "t a t i t u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -3.54,
+    "rival": "letter T",
+    "margin_other": -9.57
+   },
+   {
+    "said": "قَ قِ قُ",
+    "card": "t a t i t u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -4.2,
+    "rival": "letter T",
+    "margin_other": -8.77
+   },
+   {
+    "said": "كَ كِ كُ",
+    "card": "r a r i r u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -0.38,
+    "rival": "no vowel",
+    "margin_other": -6.58
+   },
+   {
+    "said": "جَ جِ جُ",
+    "card": "b a b i b u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 3.53,
+    "rival": "no vowel",
+    "margin_other": -7.59
+   },
+   {
+    "said": "شَ شِ شُ",
+    "card": "m a m i m u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.52,
+    "rival": "no vowel",
+    "margin_other": -8.56
+   },
+   {
+    "said": "يَ يِ يُ",
+    "card": "$ a $ i $ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 0.49,
+    "rival": "no vowel",
+    "margin_other": -10.11
+   },
+   {
+    "said": "ضَ ضِ ضُ",
+    "card": "t a t i t u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -6.71,
+    "rival": "letter d",
+    "margin_other": -10.4
+   },
+   {
+    "said": "لَ لِ لُ",
+    "card": "D a D i D u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -3.66,
+    "rival": "letter d",
+    "margin_other": -11.53
+   },
+   {
+    "said": "نَ نِ نُ",
+    "card": "s a s i s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 1.54,
+    "rival": "letter S",
+    "margin_other": -12.64
+   },
+   {
+    "said": "رَ رِ رُ",
+    "card": "q a q i q u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -0.42,
+    "rival": "letter k",
+    "margin_other": -8.92
+   },
+   {
+    "said": "طَ طِ طُ",
+    "card": "S a S i S u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 0.39,
+    "rival": "letter s",
+    "margin_other": -8.95
+   },
+   {
+    "said": "دَ دِ دُ",
+    "card": "g a g i g u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 3.38,
+    "rival": "no vowel",
+    "margin_other": -11.75
+   },
+   {
+    "said": "تَ تِ تُ",
+    "card": "$ a $ i $ u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.03,
+    "rival": "no vowel",
+    "margin_other": -9.19
+   },
+   {
+    "said": "صَ صِ صُ",
+    "card": "g a g i g u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.4,
+    "rival": "no vowel",
+    "margin_other": -10.95
+   },
+   {
+    "said": "سَ سِ سُ",
+    "card": "m a m i m u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.99,
+    "rival": "vowel",
+    "margin_other": -10.32
+   },
+   {
+    "said": "زَ زِ زُ",
+    "card": "H a H i H u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -1.38,
+    "rival": "letter h",
+    "margin_other": -8.35
+   },
+   {
+    "said": "ظَ ظِ ظُ",
+    "card": "s a s i s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -2.31,
+    "rival": "letter S",
+    "margin_other": -10.39
+   },
+   {
+    "said": "ذَ ذِ ذُ",
+    "card": "j a j i j u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.83,
+    "rival": "no vowel",
+    "margin_other": -6.14
+   },
+   {
+    "said": "ثَ ثِ ثُ",
+    "card": "t a t i t u",
+    "answer": "again",
+    "hint_last_vowel": true,
+    "margin": 1.47,
+    "rival": "no vowel",
+    "margin_other": -4.17
+   },
+   {
+    "said": "فَ فِ فُ",
+    "card": "* a * i * u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": -0.27,
+    "rival": "letter Z",
+    "margin_other": -8.63
+   },
+   {
+    "said": "وَ وِ وُ",
+    "card": "b a b i b u",
+    "answer": "again",
+    "hint_last_vowel": false,
+    "margin": 1.82,
+    "rival": "no vowel",
+    "margin_other": -5.04
+   },
+   {
+    "said": "بَ بِ بُ",
+    "card": "s a s i s u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 0.98,
+    "rival": "letter S",
+    "margin_other": -11.19
+   },
+   {
+    "said": "مَ مِ مُ",
+    "card": "g a g i g u",
+    "answer": "error",
+    "hint_last_vowel": false,
+    "margin": 2.56,
+    "rival": "vowel",
+    "margin_other": -11.31
+   }
+  ]
+ }
+}

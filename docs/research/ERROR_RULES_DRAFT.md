@@ -30,7 +30,7 @@ taught** — fewer variants, fewer false alarms for a beginner.
 | `sun_lam` / `moon_lam` | reads the lam of the article before a sun letter / drops it before a moon letter | ٱلشَّمْسُ read with «l»; ٱلْقَمَرُ read without it | `extra_sound` / `sound_missing` |
 | `other_syllable` | says a different syllable altogether (not a look-alike) | بَ → زُ | `letter_substitution` |
 
-Measured with MostafaMaroof on correct readers (PHASE_3 §11.8g–11.8h): `vowel_on_sukun` with any of the three vowels 97.9–99.5 %, `drop_sukun_letter` 97.3 %, `other_syllable` as a rival closes the hole where 18 of 100 wrong syllables passed. Not measured yet: `read_merged`, `sun_lam` / `moon_lam`, `no_tanwin`, `read_silent` — they need the book-text → phoneme converter.
+Measured with MostafaMaroof on correct readers (PHASE_3 §11.8g–11.8h): `vowel_on_sukun` with any of the three vowels 97.9–99.5 %, `drop_sukun_letter` 97.3 %, `other_syllable` as a rival closes the hole where 18 of 100 wrong syllables passed. Not measured yet: `read_merged`, `sun_lam` / `moon_lam`, `no_tanwin`, `read_silent` — the converter exists (`to_maroof.py`); they need recordings of the lesson lines.
 
 `no_vowel` is tested on single syllables (`variants_check.py`), not yet on phrases. `no_tanwin` and `read_silent` are not in the code yet: they need word boundaries and the rules of
 joining; the current symbols come from a phonemiser that already applied them.
@@ -50,6 +50,8 @@ joining; the current symbols come from a phonemiser that already applied them.
 | 54–55 · mim with sukun | وَلَكُم مَّا | as 49–52; ghunna — teacher only |
 | any · qalqala letter (ق ط ب ج د) with sukun at the end | لَمْ يَلِدْ | `vowel_on_sukun` only as a soft hint: the correct echo can sound like a fatha (89.5 %, §11.8h) |
 | any · the last word at a stop | — | both readings correct: with the final vowel and without it |
+| 3–30 · the last syllable of a card of several syllables | رَ رِ رُ | **clear vowel** (approved by the author, ADR-0087 point 9): the right vowel heard — passed; another vowel clearly heard — error; a vowel hardly heard — «say it again, hold the last vowel» (PHASE_3 §11.8i) |
+| 2 · alphabet | ا ب ت … | not checked by voice — the book teaches sounds, not names (ADR-0087 point 10) |
 | 56–70 · nun and tanwin (izhar, idgham, ikhfa, iqlab), qalqala | مَنْ ءَامَنَ | the same rules; tajwid-specific errors (missing ghunna, idgham) — **not proposed yet**: they need length and nasality, which the current model does not measure (PHASE_3 §11.8b) |
 | 71–96 · small letters, silent letters, stops, kinds of madd | — | as above; kinds of madd (2, 4, 6 counts) need length measurement — later |
 | 97–125 · suras | lines | all rules taught so far |
