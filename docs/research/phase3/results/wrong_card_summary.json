@@ -1,0 +1,104 @@
+{
+ "recordings": 840,
+ "wrong_card_trials": 2520,
+ "margin_only": {
+  "own_card": {
+   "passed": 76.1,
+   "again": 16.1,
+   "error": 7.9
+  },
+  "wrong_card": {
+   "passed": 18.2,
+   "again": 42.0,
+   "error": 39.8
+  }
+ },
+ "fit": {
+  "-0.1": {
+   "own_card": {
+    "passed": 68.9,
+    "again": 9.4,
+    "error": 21.7
+   },
+   "wrong_card": {
+    "passed": 3.8,
+    "again": 1.9,
+    "error": 94.3
+   }
+  },
+  "-0.2": {
+   "own_card": {
+    "passed": 75.0,
+    "again": 15.1,
+    "error": 9.9
+   },
+   "wrong_card": {
+    "passed": 14.1,
+    "again": 19.0,
+    "error": 66.9
+   }
+  },
+  "-0.3": {
+   "own_card": {
+    "passed": 76.1,
+    "again": 15.8,
+    "error": 8.1
+   },
+   "wrong_card": {
+    "passed": 17.5,
+    "again": 35.3,
+    "error": 47.2
+   }
+  }
+ },
+ "other_syllable": {
+  "0.0/-4.0": {
+   "own_card": {
+    "passed": 61.5,
+    "again": 21.3,
+    "error": 17.1
+   },
+   "wrong_card": {
+    "passed": 0.5,
+    "again": 3.0,
+    "error": 96.5
+   }
+  },
+  "-2.0/-6.0": {
+   "own_card": {
+    "passed": 66.8,
+    "again": 21.0,
+    "error": 12.3
+   },
+   "wrong_card": {
+    "passed": 0.8,
+    "again": 9.7,
+    "error": 89.5
+   }
+  },
+  "-3.0/-6.0": {
+   "own_card": {
+    "passed": 68.9,
+    "again": 18.8,
+    "error": 12.3
+   },
+   "wrong_card": {
+    "passed": 1.2,
+    "again": 9.4,
+    "error": 89.5
+   }
+  },
+  "-3.0/-8.0": {
+   "own_card": {
+    "passed": 68.9,
+    "again": 21.5,
+    "error": 9.5
+   },
+   "wrong_card": {
+    "passed": 1.2,
+    "again": 21.8,
+    "error": 77.1
+   }
+  }
+ }
+}

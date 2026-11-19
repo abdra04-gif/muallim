@@ -25,6 +25,12 @@ taught** — fewer variants, fewer false alarms for a beginner.
 | `added_length` | lengthens a short vowel | كَتَبَ → كَاتَبَ | `madd_too_long` |
 | `no_tanwin` | drops the n of tanwin | بًا → بَا | `sound_missing` |
 | `read_silent` | pronounces a letter that is not read (hamzat al-wasl in joining, silent alif) | ٱلْقَمَرُ → أَلْقَمَرُ in the middle of speech | `extra_sound` |
+| `drop_sukun_letter` | does not read a letter with sukun | نَسْتَعِينُ → نَتَعِينُ | `sound_missing` |
+| `read_merged` | reads the first of two merging letters (idgham) instead of doubling the second | قَد تَّبَيَّنَ read as «qad tabayyana» | `extra_sound` |
+| `sun_lam` / `moon_lam` | reads the lam of the article before a sun letter / drops it before a moon letter | ٱلشَّمْسُ read with «l»; ٱلْقَمَرُ read without it | `extra_sound` / `sound_missing` |
+| `other_syllable` | says a different syllable altogether (not a look-alike) | بَ → زُ | `letter_substitution` |
+
+Measured with MostafaMaroof on correct readers (PHASE_3 §11.8g–11.8h): `vowel_on_sukun` with any of the three vowels 97.9–99.5 %, `drop_sukun_letter` 97.3 %, `other_syllable` as a rival closes the hole where 18 of 100 wrong syllables passed. Not measured yet: `read_merged`, `sun_lam` / `moon_lam`, `no_tanwin`, `read_silent` — they need the book-text → phoneme converter.
 
 `no_vowel` is tested on single syllables (`variants_check.py`), not yet on phrases. `no_tanwin` and `read_silent` are not in the code yet: they need word boundaries and the rules of
 joining; the current symbols come from a phonemiser that already applied them.
@@ -38,7 +44,12 @@ joining; the current symbols come from a phonemiser that already applied them.
 | 38–41 · tashdid | رَبَّ | + `no_shadda` |
 | 42–44 · tanwin | بًا بٍ بٌ | + `no_tanwin` |
 | 45–48 · hamza, hamzat al-wasl, ta marbuta | ٱلْ… | + `read_silent` |
-| 49–55 · sukun, the article, mim with sukun | قَدْ تَبَيَّنَ | + `vowel_on_sukun` |
+| 49–51 · two neighbouring letters, the first with sukun (merge or clear) | قَدْ تَبَيَّنَ · قَد تَّبَيَّنَ | + `vowel_on_sukun`, `drop_sukun_letter`, `read_merged`; partial merge (أَحَطتُ — ط keeps its heaviness) — teacher only |
+| 52 · sukun inside words | نَسْتَعِينُ | + `vowel_on_sukun`, `drop_sukun_letter` |
+| 53 · the article, sun and moon letters | ٱلشَّمْسُ · ٱلْقَمَرُ | + `sun_lam`, `moon_lam` |
+| 54–55 · mim with sukun | وَلَكُم مَّا | as 49–52; ghunna — teacher only |
+| any · qalqala letter (ق ط ب ج د) with sukun at the end | لَمْ يَلِدْ | `vowel_on_sukun` only as a soft hint: the correct echo can sound like a fatha (89.5 %, §11.8h) |
+| any · the last word at a stop | — | both readings correct: with the final vowel and without it |
 | 56–70 · nun and tanwin (izhar, idgham, ikhfa, iqlab), qalqala | مَنْ ءَامَنَ | the same rules; tajwid-specific errors (missing ghunna, idgham) — **not proposed yet**: they need length and nasality, which the current model does not measure (PHASE_3 §11.8b) |
 | 71–96 · small letters, silent letters, stops, kinds of madd | — | as above; kinds of madd (2, 4, 6 counts) need length measurement — later |
 | 97–125 · suras | lines | all rules taught so far |

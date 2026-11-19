@@ -1,0 +1,80 @@
+{
+ "counts": {
+  "syllables": 840,
+  "other_vowel": 1680,
+  "lookalike": 600,
+  "ayahs": 200
+ },
+ "curve": {
+  "-8.0": {
+   "correct_syllable_passed": 98.8,
+   "correct_syllable_scolded": 1.2,
+   "other_vowel_missed": 98.2,
+   "lookalike_missed": 86.7,
+   "correct_ayah_flagged": 0.0
+  },
+  "-6.0": {
+   "correct_syllable_passed": 96.0,
+   "correct_syllable_scolded": 4.0,
+   "other_vowel_missed": 83.9,
+   "lookalike_missed": 67.7,
+   "correct_ayah_flagged": 0.5
+  },
+  "-5.0": {
+   "correct_syllable_passed": 94.9,
+   "correct_syllable_scolded": 5.1,
+   "other_vowel_missed": 68.2,
+   "lookalike_missed": 54.7,
+   "correct_ayah_flagged": 2.0
+  },
+  "-4.0": {
+   "correct_syllable_passed": 92.1,
+   "correct_syllable_scolded": 7.9,
+   "other_vowel_missed": 45.6,
+   "lookalike_missed": 44.3,
+   "correct_ayah_flagged": 5.0
+  },
+  "-3.0": {
+   "correct_syllable_passed": 90.0,
+   "correct_syllable_scolded": 10.0,
+   "other_vowel_missed": 24.3,
+   "lookalike_missed": 36.5,
+   "correct_ayah_flagged": 6.5
+  },
+  "-2.0": {
+   "correct_syllable_passed": 86.7,
+   "correct_syllable_scolded": 13.3,
+   "other_vowel_missed": 12.7,
+   "lookalike_missed": 28.7,
+   "correct_ayah_flagged": 9.0
+  },
+  "-1.0": {
+   "correct_syllable_passed": 82.4,
+   "correct_syllable_scolded": 17.6,
+   "other_vowel_missed": 6.3,
+   "lookalike_missed": 23.2,
+   "correct_ayah_flagged": 14.5
+  },
+  "0.0": {
+   "correct_syllable_passed": 76.1,
+   "correct_syllable_scolded": 23.9,
+   "other_vowel_missed": 3.2,
+   "lookalike_missed": 18.0,
+   "correct_ayah_flagged": 22.0
+  },
+  "1.0": {
+   "correct_syllable_passed": 67.3,
+   "correct_syllable_scolded": 32.7,
+   "other_vowel_missed": 0.9,
+   "lookalike_missed": 15.0,
+   "correct_ayah_flagged": 32.5
+  },
+  "2.0": {
+   "correct_syllable_passed": 54.3,
+   "correct_syllable_scolded": 45.7,
+   "other_vowel_missed": 0.4,
+   "lookalike_missed": 9.8,
+   "correct_ayah_flagged": 47.0
+  }
+ }
+}

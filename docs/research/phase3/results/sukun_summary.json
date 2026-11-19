@@ -1,0 +1,95 @@
+{
+ "ayahs": 200,
+ "by_case": {
+  "drop|inner|other": {
+   "pairs": 875,
+   "correct_wins": 97.3,
+   "error_ahead_by_4": 0.3
+  },
+  "drop|inner|qalqala": {
+   "pairs": 85,
+   "correct_wins": 97.6,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_a|final|other": {
+   "pairs": 136,
+   "correct_wins": 96.3,
+   "error_ahead_by_4": 0.7
+  },
+  "vowel_a|final|qalqala": {
+   "pairs": 19,
+   "correct_wins": 89.5,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_a|inner|other": {
+   "pairs": 875,
+   "correct_wins": 98.4,
+   "error_ahead_by_4": 0.5
+  },
+  "vowel_a|inner|qalqala": {
+   "pairs": 85,
+   "correct_wins": 97.6,
+   "error_ahead_by_4": 1.2
+  },
+  "vowel_i|final|other": {
+   "pairs": 136,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_i|final|qalqala": {
+   "pairs": 19,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_i|inner|other": {
+   "pairs": 875,
+   "correct_wins": 99.3,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_i|inner|qalqala": {
+   "pairs": 85,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_u|final|other": {
+   "pairs": 136,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_u|final|qalqala": {
+   "pairs": 19,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_u|inner|other": {
+   "pairs": 875,
+   "correct_wins": 98.9,
+   "error_ahead_by_4": 0.0
+  },
+  "vowel_u|inner|qalqala": {
+   "pairs": 85,
+   "correct_wins": 100.0,
+   "error_ahead_by_4": 0.0
+  }
+ },
+ "vowel_a": {
+  "pairs": 1115,
+  "correct_wins": 97.9,
+  "error_ahead_by_4": 0.5
+ },
+ "vowel_i": {
+  "pairs": 1115,
+  "correct_wins": 99.5,
+  "error_ahead_by_4": 0.0
+ },
+ "vowel_u": {
+  "pairs": 1115,
+  "correct_wins": 99.1,
+  "error_ahead_by_4": 0.0
+ },
+ "drop": {
+  "pairs": 960,
+  "correct_wins": 97.3,
+  "error_ahead_by_4": 0.3
+ }
+}

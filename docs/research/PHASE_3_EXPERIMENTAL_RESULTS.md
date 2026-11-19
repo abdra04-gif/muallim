@@ -475,6 +475,51 @@ Reading the result: on what is not about length (vowels, letters, sukun) Mostafa
 
 **Baseline “before training”** — `results/baseline_840.csv`, one row per recording (840): what was asked; what the bot heard, its score, verdict and errors; the 84-syllable choice (best syllable, probability of the asked one, decision); the per-sound check (sound heard on the letter and on the vowel, confidence, GOP, decision); what the four other models wrote; how many models disagree with the asked syllable; empty columns `teacher_heard` and `teacher_verdict` for a teacher. Built by `baseline.py` from `align_check.py` and `demo_data.py`; `results/align_summary.json` keeps the alignment of every recording. After any training or change of model, rebuild the same table and compare it row by row with this file (and with the teacher columns once they are filled).
 
+### 11.8f Thresholds of the three answers (MostafaMaroof, card variants)
+
+margin = correct reading − best error variant. `margin ≥ PASS` → “passed”; `ERROR ≤ margin < PASS` → “say it again”; `margin < ERROR` → “error”. “Obvious error” is simulated: the same correct syllable recording checked as if another vowel (1,680 trials) or a look-alike letter (600 trials) had been asked. `thresholds.py` → `results/thresholds_summary.json`.
+
+| Threshold | Correct syllables reaching it (of 840) | Other vowel slips past (of 1,680) | Look-alike slips past (of 600) | Correct ayahs below it (of 200) |
+|---|---|---|---|---|
+| −6 | 96.0 % | 83.9 % | 67.7 % | 0.5 % |
+| −5 | 94.9 % | 68.2 % | 54.7 % | 2.0 % |
+| −4 | 92.1 % | 45.6 % | 44.3 % | 5.0 % |
+| −2 | 86.7 % | 12.7 % | 28.7 % | 9.0 % |
+| −1 | 82.4 % | 6.3 % | 23.2 % | 14.5 % |
+| 0 | 76.1 % | 3.2 % | 18.0 % | 22.0 % |
+| +1 | 67.3 % | 0.9 % | 15.0 % | 32.5 % |
+| +2 | 54.3 % | 0.4 % | 9.8 % | 47.0 % |
+
+Reading: one number is not enough — a strict PASS (0) lets almost no wrong vowel through but stops a quarter of correct syllables; a soft ERROR (−4…−5) keeps wrongly scolded correct readings at 5–8 % of syllables and 2–5 % of ayahs. Between the two the learner hears “say it again”, which is safe both ways. Look-alike letters are the weak point at any threshold (18 % slip past even at 0) — the main target of fine-tuning (ADR-0087). The values for the bot are the author's choice (`domain/policy.py`); to be revisited on the 200 recordings labelled by the teacher. Caveat: the syllable recordings are not labelled by a teacher — some “correct” ones may contain real errors, which lowers the first column.
+
+### 11.8g The learner said something else entirely
+
+Each of the 840 syllable recordings checked against 3 cards of an unrelated syllable (another, not look-alike, letter; any vowel) — 2,520 trials, e.g. a recording of “zu” against the card “ba”. `wrong_card.py` → `results/wrong_card_summary.json`. Thresholds of the card variants 0 / −4 (§11.8f; ADR-0087 point 4, the strict option chosen by the author).
+
+| Check | Own card: passed / again / error | Wrong card: passed / again / error |
+|---|---|---|
+| card variants only | 76.1 / 16.1 / 7.9 | **18.2** / 42.0 / 39.8 |
+| + absolute fit per frame ≥ −0.1 | 68.9 / 9.4 / 21.7 | 3.8 / 1.9 / 94.3 |
+| + absolute fit per frame ≥ −0.2 | 75.0 / 15.1 / 9.9 | 14.1 / 19.0 / 66.9 |
+| + “another syllable” rival, again −3 / error −6 | 68.9 / 18.8 / 12.3 | **1.2** / 9.4 / 89.5 |
+| + “another syllable” rival, again 0 / error −4 | 61.5 / 21.3 / 17.1 | 0.5 / 3.0 / 96.5 |
+
+Reading: the card variants only compare the card with its own typical errors, so a different syllable can win as “the least bad” — 18 of 100 wrong syllables would pass. Adding every other syllable (another, not look-alike, letter) as one more rival closes the hole (1 of 100) at a price of 7 fewer correct syllables passed at once; an absolute per-frame fit does worse at every cut. For words and phrases the same rival is the free decoding — not yet measured; to be done before the bot uses phrases. Caveat as in §11.8f: the syllable recordings are not labelled by a teacher.
+
+### 11.8h Sukun with MostafaMaroof
+
+MostafaMaroof has no sukun symbol: a letter with sukun is a consonant with no vowel after it. Every sukun position of the 200 correct ayahs of §11.8e (1,115; inside the phrase 960, last letter 155), no sampling; the correct reading against: a vowel added after the letter (each of a / i / u, not only fatha as in §11.8e), and the letter not read at all. `sukun_check.py` → `results/sukun_summary.json`; MostafaMaroof outputs cached for later checks.
+
+| Error variant | Correct wins | Error ahead by more than 4 |
+|---|---|---|
+| vowel a added | 97.9 % (1,115) | 0.5 % |
+| vowel i added | 99.5 % | 0.0 % |
+| vowel u added | 99.1 % | 0.0 % |
+| sukun letter dropped (inside) | 97.3 % (960) | 0.3 % |
+| vowel a added, qalqala letter (ق ط ب ج د) at the end | **89.5 %** (19) | 0.0 % |
+
+Reading: plain sukun is safe to check strictly. The one weak spot is a qalqala letter at the stop — its correct light echo can sound like a fatha; the sample is small (19), so there the bot should only hint. Not measured: what the book's sukun lessons 49–51 actually teach — two neighbouring letters that merge (idgham: قَد تَّبَيَّنَ, the first letter is not read) or stay clear (قَدْ تَبَيَّنَ) — and the article with sun / moon letters (lesson 53). These need the book-text → phoneme converter and recordings of the lesson lines; to be measured before those lessons use the new check. Caveat: readers are not beginners; only false alarms are measured.
+
 ### 11.9 How to repeat
 
 ```sh
