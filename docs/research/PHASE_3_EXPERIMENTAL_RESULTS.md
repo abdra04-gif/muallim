@@ -456,6 +456,23 @@ Per phrase (about 12 variants each), the share of correct phrases where at least
 
 Caveats: the speakers are fluent, not beginners; MostafaMaroof was trained on IqraEval `Iqra_train` (its train split, not dev), so the material is close to its training data and the numbers are optimistic; only “does it leave a correct reading alone” is measured, not real learner errors. A first bug — the word-boundary symbol “|” was not folded into the blank, which made every inserted vowel look likely (2 % instead of 96 % for the sukun rule) — was found on a single phrase and fixed before these numbers.
 
+### 11.8e MostafaMaroof against Muaalem on whole ayahs
+
+Material: 200 phrases of `Iqra_train` dev that are exactly one whole ayah (663 found among 2,588; matched by the undiacritised text with `quran_transcript`), read correctly. Each model gets its reference as in the bot: MostafaMaroof the Halabi transcription of the dataset, Muaalem the bot's phonetiser on the Uthmani text (`_references`, reading with a stop). The same kinds of errors are made on each reference, two positions per rule and ayah. `compare_models.py`; listening page `muallim-listen-models.html` (`listen_models.py`).
+
+| Error | MostafaMaroof: correct wins | Muaalem: correct wins |
+|---|---|---|
+| another vowel | 99.0 % (400) | 94.0 % (400) |
+| vowel on a sukun | 99.2 % (375) | 99.7 % (343) |
+| shadda dropped | 94.8 % (249) | 33.6 % (327) |
+| madd shortened | 93.6 % (393) | 43.3 % (393) |
+| short vowel lengthened | 98.8 % (400) | 99.8 % (400) |
+| look-alike letter | 99.8 % (400) | 93.5 % (400) |
+
+Correct ayahs the model would scold (at least one error variant ahead): MostafaMaroof 22 % strict, 5 % with a tolerance of 4; Muaalem 88 % and 82 %.
+
+Reading the result: on what is not about length (vowels, letters, sukun) MostafaMaroof is equal or better. On shadda and madd Muaalem judges by recitation rules — its output on these readers is `قِۦ` where the reference has `قِۦۦ`, `كَذَبُ` for `كَذذَبُ` — the readers of this set read fast, so by Muaalem's standard they did shorten; MostafaMaroof, trained on ordinary speech, is lenient about length. For beginners, with shadda and madd judged softly (ADR-0086), the lenient model fits; Muaalem's strictness is what an advanced tajwid mode would need. MostafaMaroof has no symbols for ikhfa, ghunna or qalqala, so tajwid itself can only be checked with Muaalem. Caveats: MostafaMaroof was trained on the train split of the same dataset; the readers are not beginners and seem not to be professional reciters; only false alarms are measured.
+
 **Baseline “before training”** — `results/baseline_840.csv`, one row per recording (840): what was asked; what the bot heard, its score, verdict and errors; the 84-syllable choice (best syllable, probability of the asked one, decision); the per-sound check (sound heard on the letter and on the vowel, confidence, GOP, decision); what the four other models wrote; how many models disagree with the asked syllable; empty columns `teacher_heard` and `teacher_verdict` for a teacher. Built by `baseline.py` from `align_check.py` and `demo_data.py`; `results/align_summary.json` keeps the alignment of every recording. After any training or change of model, rebuild the same table and compare it row by row with this file (and with the teacher columns once they are filled).
 
 ### 11.9 How to repeat
