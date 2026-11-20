@@ -12,7 +12,11 @@ from muallim.application.feedback import FeedbackCatalog
 from muallim.application.ports.annotation import AnnotationTasks, AnnotatorDirectory
 from muallim.application.ports.erasures import ErasureLog
 from muallim.application.ports.reading import AyahSyllables, ReadingGuide
-from muallim.application.ports.recognition import PronunciationRecognizer, SuraRecognizer
+from muallim.application.ports.recognition import (
+    CardListener,
+    PronunciationRecognizer,
+    SuraRecognizer,
+)
 from muallim.application.ports.repositories import (
     AttemptRepository,
     CurriculumSnapshots,
@@ -64,8 +68,8 @@ from muallim.application.use_cases.sura import ReadSura
 from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.bootstrap.config import PROJECT_ROOT, Settings
 from muallim.domain.curriculum import Curriculum
-from muallim.domain.policy import GradingPolicy
-from muallim.infrastructure.asr.stub import StubRecognizer
+from muallim.domain.policy import CardPolicy, GradingPolicy
+from muallim.infrastructure.asr.stub import DisabledRecognizer, StubCardListener, StubRecognizer
 from muallim.infrastructure.audio.ffmpeg import trim_silence
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.audio.http import fetch
@@ -126,6 +130,11 @@ class AppProvider(Provider):
         return GradingPolicy(self.settings.pass_threshold, self.settings.excellent_threshold)
 
     @provide
+    def card_policy(self) -> CardPolicy:
+        """Пороги «вариантов карточки» (ADR-0087 п. 4) — из домена, как утвердил автор."""
+        return CardPolicy()
+
+    @provide
     def feedback_catalog(self) -> FeedbackCatalog:
         return load_feedback_catalog(self.settings.curriculum_dir)
 
@@ -177,6 +186,8 @@ class AppProvider(Provider):
     def recognizer(self) -> PronunciationRecognizer:
         if self.settings.asr_backend == "stub":
             return StubRecognizer()
+        if self.settings.checker == "maroof":  # Muaalem не нужна и не грузится (ADR-0088)
+            return DisabledRecognizer()
         from muallim.infrastructure.asr.muaalem import MuaalemRecognizer  # noqa: PLC0415
 
         recognizer = MuaalemRecognizer(device=self.settings.asr_device)
@@ -184,8 +195,29 @@ class AppProvider(Provider):
         return recognizer
 
     @provide
+    def maybe_card_listener(self) -> CardListener | None:
+        """Слушатель «вариантов карточки» (FR-70, ADR-0088); ``checker=muaalem`` — нет его, и
+        MostafaMaroof не грузится. Один на бота: модель загружается при старте один раз."""
+        if self.settings.checker != "maroof":
+            return None
+        if self.settings.asr_backend == "stub":
+            return StubCardListener()
+        from muallim.infrastructure.asr.maroof import MaroofListener  # noqa: PLC0415
+
+        listener = MaroofListener(device=self.settings.asr_device)
+        listener.load()
+        return listener
+
+    @provide
+    def card_listener(self, listener: CardListener | None) -> CardListener:
+        if listener is None:
+            raise TypeError("CHECKER=muaalem: слушателя карточек нет")
+        return listener
+
+    @provide
     def sura_recognizer(self, recognizer: PronunciationRecognizer) -> SuraRecognizer:
-        """Та же модель: и заглушка, и Muaalem умеют читать суру целиком (ADR-0076)."""
+        """Та же модель: и заглушка, и Muaalem умеют читать суру целиком (ADR-0076); при
+        ``checker=maroof`` — заглушка-отказ, пока суры на MostafaMaroof не сделаны."""
         if not isinstance(recognizer, SuraRecognizer):
             raise TypeError(f"{type(recognizer).__name__} не умеет проверять суру целиком")
         return recognizer

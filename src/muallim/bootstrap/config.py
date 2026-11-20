@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # настоящий журнал.
     erasure_log: Path | None = None
     asr_backend: Literal["muaalem", "stub"] = "muaalem"
+    # Чем проверять карточки (ADR-0088): maroof — «варианты карточки» на MostafaMaroof, вся книга,
+    # Muaalem не грузится; muaalem — прежняя проверка (откат). При asr_backend=stub — заглушки.
+    checker: Literal["maroof", "muaalem"] = "maroof"
     # auto: видеочип Mac (mps) или NVIDIA (cuda), если есть, иначе cpu (mps быстрее в ~10 раз)
     asr_device: Literal["auto", "cpu", "mps", "cuda"] = "auto"
     audio_dir: Path = PROJECT_ROOT / "data" / "audio"

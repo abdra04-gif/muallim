@@ -541,6 +541,19 @@ Reading: the teacher reads fast and the last vowel of the three fades — the mo
 
 The soft rule lets half of the wrong last vowels through: once a stop counts as correct, a faded vowel of any kind passes. The clear rule never passes a wrong last vowel and scolds the correct reading only twice (ث heard as س — the known weak pair — and و); a vowel the model cannot hear is asked again. The model cannot judge a vowel that is hardly pronounced — the learner has to say it clearly (a held vowel is allowed on lessons 3–30, ADR-0086). Caveats: one reader, a fast style, trimmed files; learners read slower (on the 840 learner syllables «no vowel» was rarely the rival, §11.8a). `results/library_check.json` holds the clear rule; the strict and soft rows are runs of the same script with `--last strict` / `--last soft --last-error=-4`. Which rule the bot uses is the author's decision.
 
+### 11.8j The bot's own check on whole ayahs and suras (FR-70, lessons 42+ and 97–125)
+
+The check as the bot will run it (`domain.card_check.decide`, rules of lessons 42+, thresholds of `CardPolicy`), accepted readings from the bot's phonetiser (Hafs, with and without a stop). Recordings are correct: every «error» is a false alarm, every «again» a needless repeat.
+
+| Material | Ayahs | Passed | Again | Error |
+|---|---|---|---|---|
+| IqraEval dev, whole ayahs (§11.8e), `bot_false_alarms.py` | 200 | 92.0 % | 6.5 % | 1.5 % |
+| the same, plus a second accepted reading «word by word with a stop» (`word_by_word.py`) | 200 | 93.5 % | 5.0 % | 1.5 % |
+| EveryAyah, al-Afasy, suras 1, 103, 108, 110–114 (`sura_ayahs_check.py`) | 36 | 34 | 2 | **0** |
+| EveryAyah, al-Husary «Muallim» (slow teaching recitation), the same suras | 36 | 33 | 3 | **0** |
+
+Reading: the fear of §11.8i — that MostafaMaroof, trained on spelling-style transcriptions, would scold the book's reading on tanwin, merges and suras — does not hold for the bot's decision. Every error variant is built from the same reference, so where the model disagrees with Hafs it pulls the correct reading and the errors down together, and the margin stays fair. On 72 ayahs of two professional reciters with full tajwid there is not a single false «error»; the 5 «again» are in 108:1–2, 110:3, 114:6 (margins −0.9…−3.5). The word-by-word reading adds 1.5 points on IqraEval and nothing on the suras, and would hide a dropped tanwin — not added. Caveats: reciters, not beginners; per-ayah files (the sura flow cuts a long recording into pieces — part 7); only false alarms measured.
+
 ### 11.9 How to repeat
 
 ```sh

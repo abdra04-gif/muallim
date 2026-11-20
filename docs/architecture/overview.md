@@ -3,8 +3,9 @@
 ## 1. Контекст
 ![Контекст](diagrams/01-context.svg)
 
-Ученик общается с ботом в Telegram. Бот берёт уроки из `curriculum/*.yaml`, распознаёт голос
-моделью Quran Muaalem, сохраняет результаты в PostgreSQL. Исследователь работает с данными через
+Ученик общается с ботом в Telegram. Бот берёт уроки из `curriculum/*.yaml`, проверяет голос
+моделью MostafaMaroof способом «варианты карточки» (ADR-0088; Muaalem выключена настройкой `checker`,
+код остаётся), сохраняет результаты в PostgreSQL. Исследователь работает с данными через
 CLI `muallim-research`, разметчик получает CSV-очереди.
 
 ## 2. Слои
@@ -14,7 +15,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 |---|---|---|
 | domain | `src/muallim/domain/` | `assessment.py` (сравнение фонем, типы ошибок), `policy.py` (пороги), `curriculum.py`, `learner.py`, `attempt.py`, `phonetics.py`, `arabic.py` (строка на буквы и слова, сопоставление с эталоном — FR-54, ADR-0070) |
 | application | `src/muallim/application/` | `use_cases/*.py` (сценарии), `ports/*.py` (протоколы; `LessonLinks` — ссылки на видеоурок, ADR-0082; `BookPages` — картинки страниц книги, ADR-0084), `feedback.py` (полный текст каждой ошибки для БД), `breakdown.py` (разбор попытки группами для экрана — FR-54, ADR-0070), `transcription.py` |
-| infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (Muaalem, заглушка), `audio/` (ffmpeg, файлы), `curriculum/` (YAML; `lesson_links.py` — читает `curriculum/lesson_links.yaml`, провайдер в `bootstrap/di.py`), `erasures.py` (журнал удалений, ADR-0054) |
+| infrastructure | `src/muallim/infrastructure/` | `db/` (таблицы, репозитории), `asr/` (MostafaMaroof `maroof.py` — порт `CardListener`; общий фонетизатор `phonetizer.py`, перевод в звуки модели `maroof_script.py`, CTC `ctc.py`; Muaalem — выключена; заглушки `stub.py`), `audio/` (ffmpeg, файлы), `curriculum/` (YAML; `lesson_links.py` — читает `curriculum/lesson_links.yaml`, провайдер в `bootstrap/di.py`), `erasures.py` (журнал удалений, ADR-0054) |
 | presentation | `src/muallim/presentation/telegram/` | `handlers/` (по темам: команды, навигация, данные, эталон и жалоба, голосовое), `annotation.py`, `errors.py` (перехват сбоев), `display.py` (показ экранов), `opening.py` (начало занятия: истиаза и басмала, ADR-0050; что на экране и идёт ли начало занятия — в БД, сценарий `use_cases/screen.py`, ADR-0061), `keyboards.py`, `views.py`, `texts.py`, `learner.py` |
 | research | `src/muallim/research/` | `reports.py`, `annotation.py`, `dataset.py`, `integrity.py` (сверка БД и файлов), `erasures.py` (повтор журнала удалений) |
 | bootstrap | `src/muallim/bootstrap/` | `config.py`, `di.py` (вся «склейка»), `main.py`, `research_cli.py`, `console.py` (проверка в терминале `muallim --test`, ADR-0045) |
@@ -50,7 +51,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 |---|---|---|
 | новое правило оценки | `domain/assessment.py` + тест в `tests/unit/test_assessment.py` | новый `ErrorKind` |
 | новый сценарий | `application/use_cases/` → зарегистрировать в `bootstrap/di.py` → обработчик | интервальное повторение |
-| новую модель | класс с методами `recognize` и `recognize_sura` (порты `PronunciationRecognizer`, `SuraRecognizer`, ADR-0076 п. 10) в `infrastructure/asr/` → выбор в `di.py` | Whisper |
+| новую модель | для карточек — класс с `listen` (порт `CardListener`: баллы вариантов, решение — `domain/card_check.py`, ADR-0088); для прежней проверки — `recognize`/`recognize_sura` (`PronunciationRecognizer`, `SuraRecognizer`, ADR-0076 п. 10); всё в `infrastructure/asr/` → выбор в `di.py` (`checker`) | дообученная MostafaMaroof — новая ревизия `MODEL_REVISION` |
 | новый мессенджер / веб | новая папка в `presentation/` | `presentation/web/` |
 | поле в БД | `infrastructure/db/tables.py` → `make migration m="..."` → `docs/data/data-dictionary.md` | |
 | отчёт | `analytics/sql/NN_название.sql` | |
@@ -67,7 +68,7 @@ CLI `muallim-research`, разметчик получает CSV-очереди.
 | Telegram | aiogram 3 | асинхронный, типизированный |
 | DI | dishka | области видимости APP/REQUEST, интеграция с aiogram (SRC-008) |
 | БД | PostgreSQL 16 + SQLAlchemy 2 Core + Alembic | ADR-0004 |
-| Распознавание | quran-muaalem | SRC-002 |
+| Распознавание | MostafaMaroof (wav2vec2, transformers) — по умолчанию; quran-muaalem — выключена (`checker=muaalem` — откат) | SRC-169, SRC-002, ADR-0088 |
 | Пакеты | uv | быстрый, lock-файл |
 | Качество | pytest, ruff, mypy --strict, import-linter, pip-audit, gitleaks | NFR-MNT-*, NFR-SEC-* |
 

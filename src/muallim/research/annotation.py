@@ -39,7 +39,7 @@ from muallim.domain.annotation import (
     valid_annotator_code,
 )
 from muallim.domain.annotation import AnnotationStatus as AttemptStatus
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.repositories.annotation import bot_errors, queue_query
 from muallim.infrastructure.db.tables import annotations, attempts, learners
@@ -120,7 +120,7 @@ async def export_package(
                     "n": n, "attempt_id": str(r.id), "annotator": annotator, "audio": audio,
                     "item_id": r.item_id, "item_text": r.text or "", "page": r.page or "",
                     "line": r.line or "", "learner_says": _LEARNER_SAYS.get(r.report or "", ""),
-                    "bot_verdict": "не засчитано" if r.verdict == Verdict.FAILED else "засчитано",
+                    "bot_verdict": _bot_verdict(r.verdict),
                     "bot_errors": errors.get(r.id, ""), "reference_phonemes": r.reference_phonemes,
                     "bot_heard": r.heard_phonemes, "actual_phonemes": r.heard_phonemes,
                     "status": "", "self_corrected": "", "comment": "",
@@ -271,3 +271,8 @@ async def import_package(
         imported += 1
     await session.commit()
     return ImportResult(imported, unchanged, len(parsed) - len(labels), gone)
+
+
+def _bot_verdict(verdict: str) -> str:
+    """Решение бота для разметчика: «ещё раз» — не засчитано (ADR-0088 п. 7)."""
+    return "засчитано" if is_mastered_verdict(Verdict(verdict)) else "не засчитано"

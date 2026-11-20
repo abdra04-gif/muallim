@@ -14,7 +14,7 @@ from aiogram.types import BotCommand
 from dishka import AsyncContainer
 from dishka.integrations.aiogram import setup_dishka
 
-from muallim.application.ports.recognition import PronunciationRecognizer
+from muallim.application.ports.recognition import CardListener, PronunciationRecognizer
 from muallim.application.ports.system import BuildInfo
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.bootstrap.config import Settings
@@ -79,12 +79,14 @@ async def main() -> None:
     log = logging.getLogger(__name__)
     container = create_container(settings)
     recognizer = await container.get(PronunciationRecognizer)  # загрузить модель до сообщений
+    listener = await container.get(CardListener | None)
     log.info(
-        "Запуск: версия %s, программа %s, распознавание %s (%s)",
+        "Запуск: версия %s, программа %s, распознавание %s (%s, карточки — %s)",
         (await container.get(BuildInfo)).version,
         (await container.get(Curriculum)).version,
         settings.asr_backend,
         type(recognizer).__name__,
+        type(listener).__name__,
     )
     async with container() as request:  # снимок программы в БД: страница и строка у каждой попытки
         added = await (await request.get(PublishCurriculum)).execute()

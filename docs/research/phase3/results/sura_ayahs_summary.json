@@ -1,0 +1,1322 @@
+{
+ "summary": {
+  "Alafasy_128kbps": {
+   "book": {
+    "passed": 34,
+    "again": 2
+   },
+   "book_or_word_by_word": {
+    "passed": 34,
+    "again": 2
+   }
+  },
+  "Husary_Muallim_128kbps": {
+   "book": {
+    "passed": 33,
+    "again": 3
+   },
+   "book_or_word_by_word": {
+    "passed": 33,
+    "again": 3
+   }
+  }
+ },
+ "rows": [
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:1",
+   "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+   "greedy": "b i s m i ll a h i rr a H m a n i rr a H ii",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.019523180823387776,
+    "margin_other": 4.726526083181739
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.019523180823387776,
+    "margin_other": 4.726526083181739
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:2",
+   "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
+   "greedy": "< a l H a m d u l i ll a h i r a bb i l E aa l a m ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002968367714988318,
+    "margin_other": 11.615275385021292
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002968481637228848,
+    "margin_other": 11.615275396413516
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:3",
+   "text": "ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+   "greedy": "< a l rr a H m a n i rr a H ii m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00013611216258979653,
+    "margin_other": 10.904739431282934
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00014720356779740484,
+    "margin_other": 10.904750522688142
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:4",
+   "text": "مَـٰلِكِ يَوْمِ ٱلدِّينِ",
+   "greedy": "m aa l i k y a w n i dd ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.01222797993854563,
+    "margin_other": 3.300405980660681
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.013050251792408929,
+    "margin_other": 3.3012282525145444
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:5",
+   "text": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+   "greedy": "< i y aa k a n a E b u l u w a < i yy y aa k aa n a s t a E ii",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00550795333665377,
+    "margin_other": 2.01063774487962
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.006463186844115398,
+    "margin_other": 2.011592978387082
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:6",
+   "text": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+   "greedy": "< d i n a SS I r AA T A t l m u s t A q II n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0030020917881294906,
+    "margin_other": 4.941076796060871
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.003002094821573209,
+    "margin_other": 4.941076799094315
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "1:7",
+   "text": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
+   "greedy": "S I r AA T AA ll a * ii n a < a n E a m t a E a l a y h i m g A y r i l m a g D UU b i E a l a y h i m w a l a D AA ll ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0004698666577773736,
+    "margin_other": 7.950189597247645
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0004698666577773736,
+    "margin_other": 7.950189597247645
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "103:1",
+   "text": "وَٱلْعَصْرِ",
+   "greedy": "w a l E a S S",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.682438504590894,
+    "margin_other": 5.3823962802383845
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.780963162052836,
+    "margin_other": 6.4809209377003265
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "103:2",
+   "text": "إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ",
+   "greedy": "< i nn a l < i h s aa n a l aa f ii x U S",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.4971962425444545,
+    "margin_other": 3.8501858054312628
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.497208343829474,
+    "margin_other": 3.850197906716282
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "103:3",
+   "text": "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+   "greedy": "< i ll aa ll a * ii n a < aa m a n uu u w a E a m i l u SS AA l i H aa E a t i w a t a w AA S A b i l H A qq I w a t a w AA S A b i SS A m i r",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.208850059572015,
+    "margin_other": 2.5206399324894804
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.208850059572015,
+    "margin_other": 2.5206399324894804
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "108:1",
+   "text": "إِنَّآ أَعْطَيْنَـٰكَ ٱلْكَوْثَرَ",
+   "greedy": "< i nn aa < a E T A y n aa k a l k a w s",
+   "book": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -1.8675391137287924,
+    "margin_other": -0.37009848873590556
+   },
+   "book_or_word_by_word": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -1.8671748900146632,
+    "margin_other": -0.3697342650217763
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "108:2",
+   "text": "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ",
+   "greedy": "f A S A ll ii l i r a bb i k a w a n H a",
+   "book": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -2.588935145624168,
+    "margin_other": -0.8027022593156943
+   },
+   "book_or_word_by_word": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -2.551422469472337,
+    "margin_other": -0.7651895831638633
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "108:3",
+   "text": "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ",
+   "greedy": "< i mm a $ E aa n i < a k a h u w a l < a b t r",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.167174767182427,
+    "margin_other": 6.421025573707368
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.167176181887045,
+    "margin_other": 6.421026988411986
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "110:1",
+   "text": "إِذَا جَآءَ نَصْرُ ٱللَّهِ وَٱلْفَتْحُ",
+   "greedy": "< i * aa j aa < A n A S r u ll a h i w a l f a a",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 5.754826496213438,
+    "margin_other": 2.7698428683029395
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 5.754826534771107,
+    "margin_other": 2.7698429068606085
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "110:2",
+   "text": "وَرَأَيْتَ ٱلنَّاسَ يَدْخُلُونَ فِى دِينِ ٱللَّهِ أَفْوَاجًۭا",
+   "greedy": "w a r a < a y t a nn aa s a y a d x U l uu n a f ii d ii n i ll a h i < a s w aa j aa",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.203885587835057,
+    "margin_other": 8.412543963676146
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.2038855878350585,
+    "margin_other": 8.412543963676148
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "110:3",
+   "text": "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَٱسْتَغْفِرْهُ إِنَّهُۥ كَانَ تَوَّابًۢا",
+   "greedy": "f a s a bb i H b i H a n d i r a bb i k a w aa s t a g f i r < i nn a h u k aa n a t a w aa b aa",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 8.26670847000278,
+    "margin_other": 8.745410203290408
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 8.266799925196462,
+    "margin_other": 8.745501658484091
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "111:1",
+   "text": "تَبَّتْ يَدَآ أَبِى لَهَبٍۢ وَتَبَّ",
+   "greedy": "t a bb a t y a d aa < a b ii l a h aa b i y w a t a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0006468632880824998,
+    "margin_other": 8.283026315217061
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.71107336248863,
+    "margin_other": 10.993452814417608
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "111:2",
+   "text": "مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ",
+   "greedy": "m aa < a g n aa E a n h u m aa l u h u w a m aa k a s a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0006756304873984931,
+    "margin_other": 10.94102427392575
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.020378706229623234,
+    "margin_other": 10.960727349667975
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "111:3",
+   "text": "سَيَصْلَىٰ نَارًۭا ذَاتَ لَهَبٍۢ",
+   "greedy": "s a y A S l aa n aa r aa * aa t a l a h a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 8.796948192545932,
+    "margin_other": 11.203978414225638
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 9.158936824897177,
+    "margin_other": 11.565967046576883
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "111:4",
+   "text": "وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ",
+   "greedy": "w a < m r a < a t u h u H a mm a l a t a l H A T A b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001309583209074816,
+    "margin_other": 8.645566249168935
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00013149383197763598,
+    "margin_other": 8.645566784680005
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "111:5",
+   "text": "فِى جِيدِهَا حَبْلٌۭ مِّن مَّسَدٍۭ",
+   "greedy": "f ii j ii d i h aa H a b a l m i n m a s a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.6062569503096285,
+    "margin_other": 10.238948579558773
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 19.473452453828312,
+    "margin_other": 22.106144083077456
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "112:1",
+   "text": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+   "greedy": "q U l h u w a ll a h u < aa H aa d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.896712866865654,
+    "margin_other": 4.512119551316978
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.89671294573435,
+    "margin_other": 4.5121196301856745
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "112:2",
+   "text": "ٱللَّهُ ٱلصَّمَدُ",
+   "greedy": "< a l ll a h u SS AA m a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00014441727648417668,
+    "margin_other": 7.718341771232413
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00016252951852013808,
+    "margin_other": 7.718359883474449
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "112:3",
+   "text": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+   "greedy": "l a m y a l i d w a l a m y uu l a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.2350566109587353,
+    "margin_other": 1.9488884182462454
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.9282037915186807,
+    "margin_other": 2.6420355988061908
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "112:4",
+   "text": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+   "greedy": "w a l a m y a k u n l a h u k u f u w aa < a H aa d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.9814474857229705,
+    "margin_other": 7.9778974158787825
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 24.99518856059057,
+    "margin_other": 24.991638490746382
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "113:1",
+   "text": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
+   "greedy": "q U l < a E uu * u b i r a bb i l f a l A q",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.256882690676036e-05,
+    "margin_other": 11.25718733996886
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.350763548163997e-05,
+    "margin_other": 11.257188278777434
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "113:2",
+   "text": "مِن شَرِّ مَا خَلَقَ",
+   "greedy": "m i n $ a rr i m aa x AA l A q",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.027945707902006234,
+    "margin_other": 6.2046419076142385
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.1879301150429562,
+    "margin_other": 6.3646263147551885
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "113:3",
+   "text": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+   "greedy": "w a m i n $ a rr i g AA s I q < i * aa w A q AA b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0018047977269546323,
+    "margin_other": 6.465684714422844
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 5.650958885983023,
+    "margin_other": 12.114838802678912
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "113:4",
+   "text": "وَمِن شَرِّ ٱلنَّفَّـٰثَـٰتِ فِى ٱلْعُقَدِ",
+   "greedy": "w a m i n $ a rr nn a ff aa ^ aa E a t i f i l E u q AA d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 4.398181235565346e-05,
+    "margin_other": 13.103594712205727
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 4.39900552020589e-05,
+    "margin_other": 13.103594720448573
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "113:5",
+   "text": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+   "greedy": "w a m i n $ a rr i H aa s i d < i * aa H a s a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.003687814099126996,
+    "margin_other": 5.617781114028029
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 4.880856019125415,
+    "margin_other": 10.494949319054317
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:1",
+   "text": "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
+   "greedy": "q U l < a E uu * u b i r a bb i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001107092408130228,
+    "margin_other": 5.777271079364512
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001390856028828935,
+    "margin_other": 5.777299455726582
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:2",
+   "text": "مَلِكِ ٱلنَّاسِ",
+   "greedy": "a l i k nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00016587036842530267,
+    "margin_other": 3.9329521686008295
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.008619807123880108,
+    "margin_other": 3.9414061053562843
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:3",
+   "text": "إِلَـٰهِ ٱلنَّاسِ",
+   "greedy": "< i l aa < a E h i m a s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002642241857024885,
+    "margin_other": 3.9794171519339336
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.005462840491411214,
+    "margin_other": 3.9846157682396424
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:4",
+   "text": "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ",
+   "greedy": "m i $ a rr i l w A s w aa s i l x A nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002870381992998716,
+    "margin_other": 6.232587202994075
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.000287038894802194,
+    "margin_other": 6.232587203689578
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:5",
+   "text": "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ",
+   "greedy": "< a ll a * ii y u w a S w I S U f ii S U d uu r i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001798153122578583,
+    "margin_other": 3.58528663736851
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00021879003538671782,
+    "margin_other": 3.585325612091639
+   }
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "114:6",
+   "text": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
+   "greedy": "m i n l j i nn a t i w a nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001487907225845575,
+    "margin_other": 5.562102917362722
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00014881040863645723,
+    "margin_other": 5.562102937048774
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:1",
+   "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+   "greedy": "b i s m i ll a h i rr a H m a n i rr a H ii m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0004278848422636372,
+    "margin_other": 12.495658288159468
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0004278848422636372,
+    "margin_other": 12.495658288159468
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:2",
+   "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
+   "greedy": "< a l H a m d u l i ll a h i r a bb i l E aa l a m ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0026040828795057536,
+    "margin_other": 12.251360496399021
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0026040863185858854,
+    "margin_other": 12.251360499838102
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:3",
+   "text": "ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+   "greedy": "< a l rr a H m a n i rr a H ii m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00024489836081720284,
+    "margin_other": 12.531944341640756
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002705945926440023,
+    "margin_other": 12.531970037872583
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:4",
+   "text": "مَـٰلِكِ يَوْمِ ٱلدِّينِ",
+   "greedy": "m aa l i k y a w m i dd ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00022813605775517942,
+    "margin_other": 12.90120669964439
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.001483050517679274,
+    "margin_other": 12.902461614104315
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:5",
+   "text": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+   "greedy": "< ii y aa k a n a E b u d u w a < ii y aa k a n a s t a E ii n",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0002908721586081242,
+    "margin_other": 12.972815425765315
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0011621708135205466,
+    "margin_other": 12.973686724420228
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:6",
+   "text": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+   "greedy": "< i h d i n aa SS I r AA T A l m u s t A q II m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0021959098823591816,
+    "margin_other": 7.29449376000455
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0021959335891157394,
+    "margin_other": 7.294493783711307
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "1:7",
+   "text": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
+   "greedy": "g I r AA T A ll a * ii n a < a n E a m t a E a l a y h i m g A y r i l m a g D UU b i E a l a y h i m w a l aa DD AA A ll ii m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.006149767012992413,
+    "margin_other": -1.440043068163984
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.006149767012992413,
+    "margin_other": -1.440043068163984
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "103:1",
+   "text": "وَٱلْعَصْرِ",
+   "greedy": "w a l E A S",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.4194216842795,
+    "margin_other": -0.9327787449743123
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.51790130489745,
+    "margin_other": 0.1657008756436369
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "103:2",
+   "text": "إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ",
+   "greedy": "< i nn a l < i n s aa n a l a f ii x U S",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.686898730716653,
+    "margin_other": 8.229521180001282
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.6869157885837645,
+    "margin_other": 8.229538237868393
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "103:3",
+   "text": "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+   "greedy": "< i ll aa ll a * ii n a < aa m a n uu w a E a m i l u AA l i H AA t i w a t a w AA UU w a t a w AA S A w b i l H A qq I w a t a w AA S w b i SS A b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 3.519165538149558,
+    "margin_other": 2.5656850380769427
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 3.519165538149565,
+    "margin_other": 2.56568503807695
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "108:1",
+   "text": "إِنَّآ أَعْطَيْنَـٰكَ ٱلْكَوْثَرَ",
+   "greedy": "< i nn aa < a E T A y n aa k a l t a w s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.7252363397410537,
+    "margin_other": 0.06786708148223575
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.726776610062938,
+    "margin_other": 0.06940735180412005
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "108:2",
+   "text": "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ",
+   "greedy": "f A S A ll i l i r a bb i k a w a n H m",
+   "book": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -0.9319758350734881,
+    "margin_other": -0.5776885826931455
+   },
+   "book_or_word_by_word": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -0.9132302562375125,
+    "margin_other": -0.5589430038571699
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "108:3",
+   "text": "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ",
+   "greedy": "< i nn a $ aa n i < a k a h u w a l < a b t u m",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 4.081464140045922,
+    "margin_other": -2.3949742654416895
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 4.081464229717916,
+    "margin_other": -2.394974175769695
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "110:1",
+   "text": "إِذَا جَآءَ نَصْرُ ٱللَّهِ وَٱلْفَتْحُ",
+   "greedy": "< i * aa j aa < a n aa r u ll a h i w a l f a t",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 5.225209821772822,
+    "margin_other": 0.07094217433375505
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 5.225209913507015,
+    "margin_other": 0.07094226606794862
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "110:2",
+   "text": "وَرَأَيْتَ ٱلنَّاسَ يَدْخُلُونَ فِى دِينِ ٱللَّهِ أَفْوَاجًۭا",
+   "greedy": "w a r a < a y t h aa s aa y a d x U l uu n a f ii d ii n i ll a h i < a f w aa j aa",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.418196862736059,
+    "margin_other": 7.561757779389557
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.418196862764043,
+    "margin_other": 7.561757779417542
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "110:3",
+   "text": "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَٱسْتَغْفِرْهُ إِنَّهُۥ كَانَ تَوَّابًۢا",
+   "greedy": "f a s a bb i H b i H a m d i r a bb i k a w a s t a g f i r < i nn a h u k aa n a t a ww a b",
+   "book": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -3.1111225989073716,
+    "margin_other": -2.9771357973030774
+   },
+   "book_or_word_by_word": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -3.1070045497156613,
+    "margin_other": -2.973017748111367
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "111:1",
+   "text": "تَبَّتْ يَدَآ أَبِى لَهَبٍۢ وَتَبَّ",
+   "greedy": "t a bb a t y a d aa < a b ii l a h a b w a t a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0007563982548948189,
+    "margin_other": 9.314679530009531
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.878836609847794,
+    "margin_other": 16.19275974160243
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "111:2",
+   "text": "مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ",
+   "greedy": "m aa < a g n aa E a n h u m aa l u h u w a m aa k a s a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0008170893345837982,
+    "margin_other": 10.90521779013599
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.008841983962659228,
+    "margin_other": 10.913242684764066
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "111:3",
+   "text": "سَيَصْلَىٰ نَارًۭا ذَاتَ لَهَبٍۢ",
+   "greedy": "s a y A S ll aa n aa r aa * aa t a l a h a b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 8.707854377126207,
+    "margin_other": 11.311859954976438
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 11.388842857192394,
+    "margin_other": 13.992848435042625
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "111:4",
+   "text": "وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ",
+   "greedy": "w aa m r a < a t u h u H a m aa l a t a l H A T A b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00019321943740990832,
+    "margin_other": 11.1203131852771
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001933616838183383,
+    "margin_other": 11.120313327523508
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "111:5",
+   "text": "فِى جِيدِهَا حَبْلٌۭ مِّن مَّسَدٍۭ",
+   "greedy": "f ii j ii d i h aa H a b a l m i mm a s a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.404975996235541,
+    "margin_other": 10.601345468470543
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 9.024325746133936,
+    "margin_other": 13.220695218368938
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "112:1",
+   "text": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+   "greedy": "q U l h u w a ll a h u < a H a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.740906565391337,
+    "margin_other": 9.001304943821914
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 7.740906621724642,
+    "margin_other": 9.00130500015522
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "112:2",
+   "text": "ٱللَّهُ ٱلصَّمَدُ",
+   "greedy": "< a ll a h u SS A m a D",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00024129054829380436,
+    "margin_other": 7.646633956863006
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00024275488541736223,
+    "margin_other": 7.64663542120013
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "112:3",
+   "text": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+   "greedy": "l a m y a l i d w a l E a m y uu l a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 2.549161559982929,
+    "margin_other": 1.3282798695469804
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 3.2423087405428745,
+    "margin_other": 2.021427050106926
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "112:4",
+   "text": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+   "greedy": "w a l a m y a k u ll a h u k u f u w aa n < a E a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.771391757720966,
+    "margin_other": 9.806969603991732
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 6.771448169637296,
+    "margin_other": 9.807026015908061
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "113:1",
+   "text": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
+   "greedy": "q U l < a E uu * u b i r a bb i l f a l A q",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00018579156595333046,
+    "margin_other": 10.910085716153736
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00018711623690359502,
+    "margin_other": 10.910087040824687
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "113:2",
+   "text": "مِن شَرِّ مَا خَلَقَ",
+   "greedy": "m i n $ a rr i m aa x AA l A q",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0013769204529068269,
+    "margin_other": 9.93561481622605
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.10141230308821303,
+    "margin_other": 10.035650198861354
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "113:3",
+   "text": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+   "greedy": "w a m i n $ aa r i g AA s I q < i * aa w A q A b",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0011790845421053575,
+    "margin_other": 8.262295634959596
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 3.7463784254927397,
+    "margin_other": 12.00749497591023
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "113:4",
+   "text": "وَمِن شَرِّ ٱلنَّفَّـٰثَـٰتِ فِى ٱلْعُقَدِ",
+   "greedy": "w a m i n $ a E i nn a * f aa ^ aa t i f ii l l E U q A d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00014459144052025863,
+    "margin_other": 8.843664088083607
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00014470839938596214,
+    "margin_other": 8.843664205042472
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "113:5",
+   "text": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+   "greedy": "w a m i n $ aa r i H aa s i d < i * aa H a s a d",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.006192651697784157,
+    "margin_other": 7.235195044319278
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 1.3257297632154534,
+    "margin_other": 8.554732155836948
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:1",
+   "text": "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
+   "greedy": "h u l < a E uu * u b i r a bb i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00015398896006679763,
+    "margin_other": 0.9481768927035521
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00015703833852143134,
+    "margin_other": 0.9481799420820067
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:2",
+   "text": "مَلِكِ ٱلنَّاسِ",
+   "greedy": "m a l k i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001675431291219276,
+    "margin_other": 12.669087457255568
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0018009625500803317,
+    "margin_other": 12.670720876676526
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:3",
+   "text": "إِلَـٰهِ ٱلنَّاسِ",
+   "greedy": "< i l aa h i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.0001532969714839183,
+    "margin_other": 11.473857721053163
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.001191400345572191,
+    "margin_other": 11.47489582442725
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:4",
+   "text": "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ",
+   "greedy": "m i n $ a E i l l w a s w aa s i l x A nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00018996420671690828,
+    "margin_other": 9.194491487125745
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00019068607665850834,
+    "margin_other": 9.194492208995687
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:5",
+   "text": "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ",
+   "greedy": "< a ll a * ii y u w a s w i s u f ii S U d uu r i nn aa s",
+   "book": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00017963050768354805,
+    "margin_other": 10.687667164635055
+   },
+   "book_or_word_by_word": {
+    "outcome": "passed",
+    "kind": "None",
+    "margin": 0.00022591295903939823,
+    "margin_other": 10.68771344708641
+   }
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "114:6",
+   "text": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
+   "greedy": "m i n a l j i nn a t i w a nn aa s S A d A q A ll a h u l E A D II m",
+   "book": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -3.4757013448293037,
+    "margin_other": -3.551253457285867
+   },
+   "book_or_word_by_word": {
+    "outcome": "again",
+    "kind": "None",
+    "margin": -3.475701339119908,
+    "margin_other": -3.5512534515764713
+   }
+  }
+ ]
+}

@@ -133,6 +133,23 @@ async def test_sura_passed_by_text_counts_in_best_scores(session: AsyncSession) 
     assert await SqlSuraReadingRepository(session).credited(learner.id) == set(credited)
 
 
+async def test_sura_passed_by_text_counts_in_mastered_cards(session: AsyncSession) -> None:
+    """Освоение по вердикту (FR-70 п. 8, ADR-0088 п. 7) — и карточки суры, сданной по тексту
+    (FR-58): как в ``best_scores``. Сура с пропущенным аятом — ничего."""
+    clock = FixedClock()
+    learner = _learner(clock)
+    await SqlLearnerRepository(session).add(learner)
+    clean = "قُلْهُوَ" + "سَمَدْكَرِيمْ"
+    credited = ("L123-01", "L123-02", "L123-03")
+    suras = SqlSuraReadingRepository(session)
+    await suras.add(
+        _reading(learner, clock, n=1, heard=clean, mode=SuraMode.TEXT, credited=credited)
+    )
+    await suras.add(_reading(learner, clock, n=2, heard="قُلْهُوَ", mode=SuraMode.TEXT))
+    await session.commit()
+    assert await SqlAttemptRepository(session).mastered(learner.id) == frozenset(credited)
+
+
 async def test_deleting_learner_deletes_sura_readings(session: AsyncSession) -> None:
     """Удаление данных ученика стирает и чтения сур (FR-60, docs/security/privacy.md)."""
     clock = FixedClock()

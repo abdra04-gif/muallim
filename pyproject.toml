@@ -124,7 +124,7 @@ packages = ["muallim", "tests"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["quran_muaalem.*", "quran_transcript.*", "torch.*", "numpy.*"]
+module = ["quran_muaalem.*", "quran_transcript.*", "torch.*", "numpy.*", "transformers.*"]
 ignore_missing_imports = true
 
 # ---------- объявленные зависимости: make hygiene (deptry) ----------
@@ -136,8 +136,8 @@ pyyaml = "yaml"
 pillow = "PIL"
 
 [tool.deptry.per_rule_ignores]
-# alembic и asyncpg подключаются строкой (alembic.ini, URL БД), transformers нужен модели Muaalem
-DEP002 = ["alembic", "asyncpg", "transformers"]
+# alembic и asyncpg подключаются строкой (alembic.ini, URL БД)
+DEP002 = ["alembic", "asyncpg"]
 
 # ---------- архитектура: правила слоёв (ADR-0002) ----------
 [tool.importlinter]
@@ -159,13 +159,13 @@ layers = [
 name = "Домен чистый: без фреймворков и ввода-вывода"
 type = "forbidden"
 source_modules = ["muallim.domain"]
-forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "pydantic", "yaml", "alembic", "asyncpg", "PIL"]
+forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "pydantic", "yaml", "alembic", "asyncpg", "PIL", "numpy", "torch", "transformers", "quran_muaalem", "quran_transcript"]
 
 [[tool.importlinter.contracts]]
 name = "Application не знает о Telegram, БД и модели"
 type = "forbidden"
 source_modules = ["muallim.application"]
-forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "alembic", "asyncpg", "quran_muaalem", "torch", "PIL"]
+forbidden_modules = ["aiogram", "sqlalchemy", "dishka", "alembic", "asyncpg", "quran_muaalem", "torch", "PIL", "numpy", "transformers", "quran_transcript"]
 
 [[tool.importlinter.contracts]]
 name = "Presentation и infrastructure не зависят друг от друга"

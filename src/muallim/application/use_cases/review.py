@@ -23,15 +23,11 @@ class GetReview:
     settings: LearnerSettingsRepository | None = None  # нет — «сегодня» по UTC+3
 
     async def execute(self, learner: Learner) -> tuple[review.ReviewEntry, ...]:
-        best = await self.attempts.best_scores(learner.id)
+        done = await self.attempts.mastered(learner.id)  # по вердикту (ADR-0088 п. 7)
         passed = [
             lesson.id
             for lesson in self.curriculum.lessons
-            if lesson.practice_items
-            and all(
-                item.id in best and self.policy.is_mastered(best[item.id])
-                for item in lesson.practice_items
-            )
+            if lesson.practice_items and all(item.id in done for item in lesson.practice_items)
         ]  # уроки, пройденные целиком (LessonStatus.DONE)
         return await self.for_day(learner, await self.today(learner), passed)
 

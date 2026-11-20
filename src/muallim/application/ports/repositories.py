@@ -9,6 +9,7 @@ from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
+from muallim.domain.policy import Verdict
 from muallim.domain.quiz import QuizAnswer
 from muallim.domain.report import LearnerReport
 from muallim.domain.review import Outcome
@@ -45,6 +46,14 @@ class AttemptRepository(Protocol):
     async def best_scores(self, learner_id: UUID) -> Mapping[str, int]:
         """Лучший балл по каждой карточке: item_id -> score. Карточки суры, прочитанной целиком
         по тексту без ошибок, — 100 (FR-58, ADR-0076 п. 8)."""
+
+    async def mastered(self, learner_id: UUID) -> frozenset[str]:
+        """Освоенные карточки — по вердикту (``is_mastered_verdict``, ADR-0088 п. 7): хоть одна
+        попытка «отлично» или «засчитано»; карточки суры, сданной по тексту, — тоже (FR-58)."""
+
+    async def last_verdict(self, learner_id: UUID, item_id: str) -> Verdict | None:
+        """Вердикт последней попытки этой карточки — «ещё раз не больше раза подряд» (FR-70 п. 6);
+        None — первая попытка."""
 
     async def count(self, learner_id: UUID) -> int: ...
 

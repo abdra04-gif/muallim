@@ -90,7 +90,7 @@
 | `reference_phonemes` | text | эталон, по которому оценено (лучший из вакф/васл) |
 | `heard_phonemes` | text | что распознала модель |
 | `score` | smallint 0–100 | сходство последовательностей фонем (`difflib.SequenceMatcher.ratio`) |
-| `verdict` | varchar(16) | `excellent` / `passed` / `failed` (пороги — `domain/policy.py`) |
+| `verdict` | varchar(16) | `excellent` / `passed` / `failed` / `again` — «прочитай ещё раз», бот не уверен (миграция 0015, FR-70; пороги — `domain/policy.py`) |
 | `audio_sha256` | varchar(64), null | хеш записи; `null` — согласия не было |
 | `audio_duration_ms` | int, null | длительность записи |
 | `processing_ms` | int | время распознавания и оценки (NFR-PERF-01) |
@@ -209,7 +209,7 @@
 | `used_at` | timestamptz, null | погашено при входе (один раз); неиспользованные удаляются при отзыве |
 
 ## Ограничения в самой БД (ADR-0055)
-- `attempts.verdict` ∈ excellent / passed / failed; `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 13 видов `MarkKind` (миграции 0011 и 0012), уникально `(annotation_id, cell, kind)`; `annotations.phonemes_source` ∈ typed / marks / confirmed / reference или NULL (миграция 0012); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
+- `attempts.verdict` ∈ excellent / passed / failed / again (again — с миграции 0015; откат превращает его в failed); `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 13 видов `MarkKind` (миграции 0011 и 0012), уникально `(annotation_id, cell, kind)`; `annotations.phonemes_source` ∈ typed / marks / confirmed / reference или NULL (миграция 0012); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
 - Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
 - `annotations.detected_error_id` удалено миграцией 0007.
 - `learner_settings` (миграция 0008): `how_to_read` ∈ spoiler / shown / hidden; `reminder_minute` NULL или 0…1439; `utc_offset_min` −720…840; одна строка на ученика (PK `learner_id`).

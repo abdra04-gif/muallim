@@ -21,18 +21,15 @@ from muallim.application.ports.recognition import (
 )
 from muallim.domain.sura import AyahReference
 from muallim.infrastructure.asr.chunks import quiet_cuts
+from muallim.infrastructure.asr.phonetizer import (
+    _WASL_SUFFIX,
+    MOSHAF_PARAMS,
+    _model_sounds,
+    _references,
+)
 from muallim.infrastructure.asr.script import for_phonetizer
 from muallim.infrastructure.audio.ffmpeg import SAMPLE_RATE, decode_to_pcm
 
-# Параметры чтения: риваят Хафс, все мадды по 4 харакята. Методическое решение — менять
-# только человеку. Строка входит в model_version, поэтому видна в каждой попытке в БД.
-MOSHAF_PARAMS: dict[str, Any] = {
-    "rewaya": "hafs",
-    "madd_monfasel_len": 4,
-    "madd_mottasel_len": 4,
-    "madd_mottasel_waqf": 4,
-    "madd_aared_len": 4,
-}
 # Ревизия модели obadx/muaalem-model-v3_2 на Hugging Face, на которой сделаны замеры (SRC-003).
 # Библиотека берёт последнюю версию; другую замечаем при старте и пишем в лог (TD-FN-121).
 EXPECTED_MODEL_REVISION: Final = "01a1ef9fbe40d144ef845101e89ff924aed3fef5"
@@ -40,8 +37,8 @@ _UNKNOWN_REVISION: Final = "unknown"
 
 logger: Final = logging.getLogger(__name__)
 
-# Слог, который дописываем, чтобы получить чтение без остановки (васл) — см. ADR-0007.
-_WASL_SUFFIX = " مَ"
+# MOSHAF_PARAMS и _references живут в phonetizer.py; прежние имена здесь — для тестов и скриптов
+__all__ = ["MOSHAF_PARAMS", "MuaalemRecognizer", "_references", "sura_reference"]
 
 
 @dataclass
@@ -207,26 +204,6 @@ def _jsonable(value: Any) -> Any:
     return value
 
 
-@lru_cache(maxsize=1024)
-def _references(text: str) -> tuple[Any, tuple[tuple[str, str], tuple[str, str]]]:
-    """Эталон для модели и два допустимых варианта: со слитным чтением (васл) и с остановкой.
-
-    Варианты — только из звуков, которые модель умеет выдать: знак мадда «ٓ» над словом, вырезанным
-    из аята, фонетизатор оставляет как есть (в аяте за ним шла хамза), а это письмо, не звук.
-    """
-    from quran_transcript import MoshafAttributes, quran_phonetizer  # noqa: PLC0415
-
-    moshaf = MoshafAttributes(**MOSHAF_PARAMS)
-    text = for_phonetizer(text)
-    waqf = quran_phonetizer(text, moshaf, remove_spaces=True)
-    wasl = quran_phonetizer(text + _WASL_SUFFIX, moshaf, remove_spaces=True).phonemes[:-1]
-    sounds = _model_sounds()
-    return waqf, (
-        ("wasl", "".join(ch for ch in wasl if ch in sounds)),
-        ("waqf", "".join(ch for ch in waqf.phonemes if ch in sounds)),
-    )
-
-
 def sura_reference(ayahs: Sequence[tuple[str, int, str]]) -> tuple[AyahReference, ...]:
     """Эталон суры по аятам (FR-57, ADR-0076): (id карточки, номер аята, текст) → фонемы по словам.
 
@@ -268,12 +245,3 @@ def _ayah_reference(item_id: str, number: int, text: str) -> AyahReference:
     wasl = words(quran_phonetizer(text + _WASL_SUFFIX, moshaf).phonemes)[:-1]
     last = wasl[-1] if wasl and wasl[-1] != waqf[-1] else ""
     return AyahReference(item_id, number, tuple(waqf), wasl_last=last)
-
-
-@lru_cache(maxsize=1)
-def _model_sounds() -> frozenset[str]:
-    """Алфавит фонем модели (quran-transcript): буквы, огласовки, мадд, калькаля, ихфа…"""
-    from quran_transcript import alphabet  # noqa: PLC0415
-
-    ph = alphabet.phonetics
-    return frozenset("".join(getattr(ph, f.name) for f in fields(ph)))

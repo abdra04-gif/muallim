@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from muallim.application.ports.repositories import AttemptRepository
 from muallim.domain.assessment import Assessment, ErrorKind, PronunciationError
 from muallim.domain.attempt import Attempt
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 from muallim.domain.report import LearnerReport
 from muallim.domain.review import Outcome
 from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
@@ -96,11 +96,46 @@ class SqlAttemptRepository(AttemptRepository):
             best.update(dict.fromkeys(credited, 100))
         return best
 
+    async def mastered(self, learner_id: UUID) -> frozenset[str]:
+        query = (
+            select(attempts.c.item_id)
+            .where(
+                attempts.c.learner_id == learner_id,
+                attempts.c.verdict.in_([v for v in Verdict if is_mastered_verdict(v)]),
+            )
+            .distinct()
+        )
+        done = set((await self.session.scalars(query)).all())
+        # Сура, прочитанная целиком по тексту без ошибок, засчитывает все свои карточки (FR-58)
+        passed = select(sura_readings.c.credited).where(
+            sura_readings.c.learner_id == learner_id, sura_readings.c.passed.is_(True)
+        )
+        for credited in (await self.session.scalars(passed)).all():
+            done.update(credited)
+        return frozenset(done)
+
+    async def last_verdict(self, learner_id: UUID, item_id: str) -> Verdict | None:
+        # «не расслышано» (model_output["unheard"]) — не попытка (автор 2026-11-20); флаг читаем в
+        # Python: JSON в SQLite и PostgreSQL сравнивается по-разному
+        query = (
+            select(attempts.c.verdict, attempts.c.model_output)
+            .where(attempts.c.learner_id == learner_id, attempts.c.item_id == item_id)
+            .order_by(attempts.c.created_at.desc(), attempts.c.id.desc())
+        )
+        for verdict, output in await self.session.execute(query):
+            if not (output or {}).get("unheard"):
+                return Verdict(verdict)
+        return None
+
     async def last_assessment(self, learner_id: UUID, item_id: str) -> Assessment | None:
         query = (
             select(attempts.c.id, attempts.c.reference_phonemes, attempts.c.heard_phonemes,
                    attempts.c.score)
-            .where(attempts.c.learner_id == learner_id, attempts.c.item_id == item_id)
+            .where(
+                attempts.c.learner_id == learner_id,
+                attempts.c.item_id == item_id,
+                attempts.c.verdict != Verdict.AGAIN,  # с «ещё раз» не сравнивают (FR-70)
+            )
             .order_by(attempts.c.created_at.desc())
             .limit(1)
         )  # fmt: skip
@@ -213,7 +248,7 @@ class SqlAttemptRepository(AttemptRepository):
                     row.created_at,
                     DEFAULT_UTC_OFFSET_MIN if row.utc_offset_min is None else row.utc_offset_min,
                 ),
-                row.verdict != Verdict.FAILED,
+                is_mastered_verdict(Verdict(row.verdict)),
             )
             for row in (await self.session.execute(query)).all()
         ]

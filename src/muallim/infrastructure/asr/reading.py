@@ -17,7 +17,7 @@ logger: Final = logging.getLogger(__name__)
 class QuranReadingGuide(ReadingGuide):
     def phonemes(self, text: str) -> str | None:
         try:
-            from muallim.infrastructure.asr.muaalem import _references  # noqa: PLC0415
+            from muallim.infrastructure.asr.phonetizer import _references  # noqa: PLC0415
 
             _, variants = _references(text)
         except ImportError:

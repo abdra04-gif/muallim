@@ -94,6 +94,7 @@ _VERDICT: Final = {
     Verdict.EXCELLENT: texts.VERDICT_EXCELLENT,
     Verdict.PASSED: texts.VERDICT_PASSED,
     Verdict.FAILED: texts.VERDICT_FAILED,
+    Verdict.AGAIN: texts.VERDICT_AGAIN,
 }
 
 
@@ -637,21 +638,25 @@ def result(
             ok=breakdown.words_ok, words=words, total=breakdown.words_total
         )
     image = None
-    if render.available() and r.lesson_completed and not a.errors:  # с ошибками — сначала разбор
+    # «ещё раз» (FR-70): только просьба прочитать снова — без разбора, балла и «услышано»
+    again = r.verdict is Verdict.AGAIN
+    drawn = render.available() and not again
+    if drawn and r.lesson_completed and not a.errors:  # с ошибками — сначала разбор
         image = _postcard_image(lesson)
-    elif render.available():
+    elif drawn:
         image = render.result_marks(text=r.item.text, breakdown=breakdown, score_label=counter)
     blocks = ["\n".join(x for x in (_VERDICT[r.verdict], counter) if x)]  # «Верно 2 слова из 5»
-    other = r.attempt.policy.is_other_line(a)  # совпало очень мало — разбор всё равно ниже
+    blocks += _card_hints(r)
+    other = not again and r.attempt.policy.is_other_line(a)  # совпало мало — разбор ниже
     blocks += [texts.RESULT_OTHER_LINE] * other
     if image is None:
         blocks.append(f"<b>{escape(r.item.text)}</b>")
-    blocks += _progress(r)
+    blocks += [] if again else _progress(r)
     if r.lesson_completed:
         blocks.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
     if r.next_item is None:
         blocks.append(texts.LAST_ITEM)
-    if staff and not r.feedback:
+    if staff and not r.feedback and not again:
         blocks.append(escape(texts.HEARD_LINE.format(text=r.heard_transcription)))
     shown = len(groups) if image is None else views.MAX_ERRORS_SHOWN
     blocks += [_group_point(curriculum, n, g) for n, g in enumerate(groups[:shown])]
@@ -671,6 +676,13 @@ def result(
         curriculum, r, lesson, has_audio, resume, after=after, sura_errors=sura_errors
     )
     return Screen(caption, keyboard, image, details=details)
+
+
+def _card_hints(r: RecitationResult) -> list[str]:
+    """Подсказки «вариантов карточки» (FR-70 п. 3, 5): мягкие шадда и мадд, последняя гласная,
+    «прочитан другой слог»; у попыток прежней проверки их нет."""
+    hints = [*r.hints, *(["other_syllable"] if r.other_syllable else [])]
+    return [texts.CARD_HINTS[h] for h in hints if h in texts.CARD_HINTS]
 
 
 _WORDS_SHOWN: Final = 3  # слов в пункте; дальше — texts.WORDS_MORE

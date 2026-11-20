@@ -1,0 +1,14 @@
+{
+ "book_reading_only": {
+  "ayahs": 200,
+  "accepted_not_behind_pct": 30.0,
+  "behind_by_more_than_4_pct": 65.0,
+  "median": -9.01
+ },
+ "book_or_word_by_word": {
+  "ayahs": 200,
+  "accepted_not_behind_pct": 34.5,
+  "behind_by_more_than_4_pct": 59.0,
+  "median": -5.79
+ }
+}

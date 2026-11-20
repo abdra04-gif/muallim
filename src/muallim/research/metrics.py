@@ -27,7 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from muallim.application.ports.reading import AyahSyllables
 from muallim.domain.annotation import MAIN_KINDS, MORE_KINDS, Entry, annotation_cells, bot_cells
 from muallim.domain.assessment import ErrorKind, assess, phoneme_errors
-from muallim.domain.policy import GradingPolicy, Verdict
+from muallim.domain.policy import GradingPolicy, Verdict, is_mastered_verdict
 from muallim.infrastructure.db.tables import (
     annotation_marks,
     annotations,
@@ -579,7 +579,7 @@ async def collect(
             errors[kind] += 1
             caught[kind] += pos in by_model
         _count_sounds(by_sound, lab.reference, set(by_model), set(by_human))
-        teacher = lab.policy.verdict(assess(lab.reference, lab.actual)) != Verdict.FAILED
+        teacher = is_mastered_verdict(lab.policy.verdict(assess(lab.reference, lab.actual)))
         pairs.append((lab.bot_passed, teacher))
         clusters[lab.learner].append(_Unit(decided, (lab.bot_passed, teacher)))
         learner_of[attempt_id] = lab.learner
@@ -673,8 +673,8 @@ async def _latest_labels(
         source,
     ) in rows.all():
         latest[(attempt_id, annotator)] = _Label(
-            learner, status, actual, reference, heard, verdict != Verdict.FAILED, _policy(policy),
-            bool(own), source,
+            learner, status, actual, reference, heard, is_mastered_verdict(Verdict(verdict)),
+            _policy(policy), bool(own), source,
         )  # fmt: skip
     return latest
 

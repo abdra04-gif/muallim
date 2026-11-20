@@ -1,21 +1,35 @@
 """Главный сценарий: ученик прислал голосовое — проверить, объяснить, сохранить."""
 
+import asyncio
 import time
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, field
+from typing import Any
 
 from muallim.application.breakdown import Breakdown, ErrorGroup, build_breakdown
 from muallim.application.feedback import Explanation, FeedbackCatalog
-from muallim.application.ports.recognition import PronunciationRecognizer, RecognitionError
+from muallim.application.ports.recognition import (
+    CardListener,
+    PronunciationRecognizer,
+    RecognitionError,
+)
 from muallim.application.ports.repositories import AttemptRepository, UnitOfWork
 from muallim.application.ports.storage import AudioStore
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.application.transcription import Reading, as_text, legend, reading
 from muallim.application.use_cases.cards import OpenItem
-from muallim.domain.assessment import Assessment, assess_variants, unread_from
+from muallim.domain.assessment import Assessment, Candidate, assess, assess_variants, unread_from
 from muallim.domain.attempt import Attempt
-from muallim.domain.curriculum import Curriculum, LessonItem, Lexicon, lesson_letter
+from muallim.domain.card_check import (
+    accepted_references,
+    card_verdict,
+    decide,
+    full_reading,
+    syllable_card,
+)
+from muallim.domain.curriculum import Curriculum, Lesson, LessonItem, Lexicon, lesson_letter
 from muallim.domain.learner import Learner
-from muallim.domain.policy import GradingPolicy, Verdict
+from muallim.domain.policy import CardPolicy, GradingPolicy, Verdict
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,10 +48,27 @@ class RecitationResult:
     previous_score: int | None = None  # балл прошлой попытки этой строки
     fixed: tuple[str, ...] = ()  # подписи групп ошибок прошлой попытки, которых теперь нет
     breakdown: Breakdown | None = None  # разбор группами для экрана (FR-54); сценарий заполняет
+    hints: tuple[str, ...] = ()  # подсказки «вариантов карточки» (FR-70 п. 3, 5)
+    other_syllable: bool = False  # прочитан другой слог (FR-70 п. 3)
 
     @property
     def verdict(self) -> Verdict:
         return self.attempt.verdict
+
+
+@dataclass(frozen=True, slots=True)
+class _Heard:
+    """Итог распознавания любой из двух проверок — дальше сценарий общий."""
+
+    best: Candidate
+    candidates: tuple[Candidate, ...]
+    heard: str  # что прозвучало, в записи бота
+    verdict: Verdict
+    model_version: str
+    audio_duration_ms: int
+    model_output: Mapping[str, Any]
+    hints: tuple[str, ...] = ()
+    other_syllable: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,15 +85,22 @@ class AssessRecitation:
     ids: IdGenerator
     events: EventLog
     build: BuildInfo
+    # «Варианты карточки» на MostafaMaroof (FR-70, ADR-0088); None — прежняя проверка Muaalem
+    listener: CardListener | None = None
+    card_policy: CardPolicy = field(default_factory=CardPolicy)
 
     async def execute(
         self, learner: Learner, audio: bytes, item_id: str | None = None
     ) -> RecitationResult:
         """Проверить чтение текущей карточки или ``item_id`` (начало занятия: курсор на месте)."""
         item = self.curriculum.item(item_id) if item_id else self.cards.current(learner)
+        lesson, _ = self.curriculum.locate(item.id)
         started = time.perf_counter()
         try:
-            recognition = await self.recognizer.recognize(audio, item.text)
+            if self.listener is not None and lesson.number in self.card_policy.maroof_lessons:
+                result = await self._listen(self.listener, learner, audio, item, lesson)
+            else:
+                result = await self._recognize(audio, item)
         except RecognitionError as error:
             # Сбой — в журнал, иначе долю сбоев не посчитать (NFR-REL-02). Без текста ошибки.
             await self.events.record(
@@ -76,7 +114,7 @@ class AssessRecitation:
             )
             await self.uow.commit()
             raise
-        best, candidates = assess_variants(recognition.references, recognition.heard)
+        best = result.best
         processing_ms = round((time.perf_counter() - started) * 1000)
 
         # Запись храним только с согласия ученика (FR-09, docs/security/privacy.md).
@@ -89,31 +127,40 @@ class AssessRecitation:
             learner_id=learner.id,
             item_id=item.id,
             curriculum_version=self.curriculum.version,
-            model_version=recognition.model_version,
+            model_version=result.model_version,
             assessment=best.assessment,
-            verdict=self.policy.verdict(best.assessment),
+            verdict=result.verdict,
             audio_sha256=audio_sha,
-            audio_duration_ms=recognition.audio_duration_ms,
+            audio_duration_ms=result.audio_duration_ms,
             processing_ms=processing_ms,
             created_at=self.clock.now(),
             reference_variant=best.variant,
-            candidates=candidates,
-            model_output=dict(recognition.raw),
+            candidates=result.candidates,
+            model_output=dict(result.model_output),
             policy=self.policy,
             app_version=self.build.version,
             feedback_language=language,
         )
         errors = best.assessment.errors
         reference = best.assessment.reference
-        unread = unread_from(reference, recognition.heard)
-        expected = _read_part(
-            reading(reference, renderer.lexicon, [e.syllable for e in errors]), unread
-        )
-        heard = reading(recognition.heard, renderer.lexicon)
-        lesson, _ = self.curriculum.locate(item.id)
         letter = lesson_letter(lesson)
-        breakdown = build_breakdown(
-            best.assessment, item.text, renderer.lexicon, unread=unread, lesson_letter=letter
+        # «ещё раз» (FR-70): ни разбора, ни «услышанного» — бот не уверен, что услышал
+        again = result.verdict is Verdict.AGAIN
+        unread = None if again else unread_from(reference, result.heard)
+        expected: Reading = (
+            ()
+            if again
+            else _read_part(
+                reading(reference, renderer.lexicon, [e.syllable for e in errors]), unread
+            )
+        )
+        heard: Reading = () if again else reading(result.heard, renderer.lexicon)
+        breakdown = (
+            None
+            if again
+            else build_breakdown(
+                best.assessment, item.text, renderer.lexicon, unread=unread, lesson_letter=letter
+            )
         )
         was_done = await self._lesson_done(learner, lesson.practice_items)
         previous = await self.attempts.last_assessment(learner.id, item.id)
@@ -128,7 +175,7 @@ class AssessRecitation:
             item=item,
             attempt=attempt,
             feedback=renderer.explain(errors, reference, unread),
-            heard_transcription=as_text(heard),
+            heard_transcription="" if again else as_text(heard),
             next_item=self.curriculum.next_item(item.id),
             lesson_completed=not was_done
             and await self._lesson_done(learner, lesson.practice_items),
@@ -139,14 +186,65 @@ class AssessRecitation:
             unread_from=unread,
             previous_score=previous.score if previous else None,
             fixed=_fixed(previous, breakdown, item.text, renderer.lexicon, letter)
-            if previous
+            if previous and breakdown
             else (),
             breakdown=breakdown,
+            hints=result.hints,
+            other_syllable=result.other_syllable,
         )
 
+    async def _recognize(self, audio: bytes, item: LessonItem) -> _Heard:
+        """Прежняя проверка: строка фонем Muaalem против эталонов, балл 0–100 → вердикт."""
+        recognition = await self.recognizer.recognize(audio, item.text)
+        best, candidates = assess_variants(recognition.references, recognition.heard)
+        return _Heard(
+            best, candidates, recognition.heard, self.policy.verdict(best.assessment),
+            recognition.model_version, recognition.audio_duration_ms, recognition.raw,
+        )  # fmt: skip
+
+    async def _listen(
+        self, listener: CardListener, learner: Learner, audio: bytes, item: LessonItem,
+        lesson: Lesson,
+    ) -> _Heard:  # fmt: skip
+        """«Варианты карточки» (ADR-0088 п. 5, 6): решение в домене по баллам вариантов; разбор —
+        ``Assessment(верное, победивший вариант)``; «ещё раз» — не больше раза подряд."""
+        policy = self.card_policy
+        listening = await listener.listen(
+            audio, item.text, long_is_short=policy.long_is_short(lesson.number)
+        )
+        references = accepted_references(item.text, listening.references)
+        accepted = [reading for _, reading in references]
+        # сотни вариантов — секунды на длинной строке: не в потоке бота
+        d = await asyncio.to_thread(
+            decide, accepted, listening.score, policy,
+            separate_syllables=syllable_card(item.text), rules=policy.rules_for(lesson.number),
+            sounds=listening.sounds, score_many=listening.score_many,
+        )  # fmt: skip
+        if d.unheard:  # тишина — не попытка для «ещё раз подряд» (автор 2026-11-20)
+            verdict, for_teacher = Verdict.AGAIN, False
+        else:
+            previous = await self.attempts.last_verdict(learner.id, item.id)
+            verdict, for_teacher = policy.after_repeat(previous, card_verdict(d))
+        heard = "" if verdict is Verdict.AGAIN else d.winner
+        reference = d.winner if d.outcome != "error" else full_reading(accepted)
+        if verdict is Verdict.AGAIN:  # балла верного чтения нет: 0, без ошибок (FR-70)
+            reference = full_reading(accepted)
+            candidates = tuple(
+                Candidate(name, Assessment(ref, "", 0, ())) for name, ref in references
+            )
+        else:
+            candidates = tuple(Candidate(name, assess(ref, heard)) for name, ref in references)
+        best = next(c for c in candidates if c.assessment.reference == reference)
+        output = {**asdict(d), "hints": list(d.hints), "raw": listening.raw,
+                  "for_teacher": for_teacher}  # fmt: skip
+        return _Heard(
+            best, candidates, heard, verdict, listening.model_version,
+            listening.audio_duration_ms, output, d.hints, d.other_syllable,
+        )  # fmt: skip
+
     async def _lesson_done(self, learner: Learner, items: tuple[LessonItem, ...]) -> bool:
-        best = await self.attempts.best_scores(learner.id)
-        return bool(items) and all(self.policy.is_mastered(best.get(i.id, 0)) for i in items)
+        done = await self.attempts.mastered(learner.id)  # по вердикту (ADR-0088 п. 7)
+        return bool(items) and all(i.id in done for i in items)
 
 
 def _read_part(shown: Reading, unread: int | None) -> Reading:

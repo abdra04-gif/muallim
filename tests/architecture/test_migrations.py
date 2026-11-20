@@ -65,10 +65,20 @@ def test_latest_migration_creates_views_exactly_as_in_code() -> None:
     assert _migration(with_views[-1]).VIEWS == VIEWS
 
 
+def _latest_with(name: str) -> Any:
+    """Последняя миграция, где задан список ``name``: CHECK меняют новой миграцией, не старой."""
+    found = sorted(
+        p.name[:4] for p in (ROOT / "migrations" / "versions").glob("0*.py")
+        if f"\n{name} = " in p.read_text(encoding="utf-8")
+    )  # fmt: skip
+    return _migration(found[-1])
+
+
 def test_check_constraints_in_migration_match_code() -> None:
-    """Значения в CHECK миграции 0007 — те же, что в коде: новое значение — только с миграцией."""
+    """Значения в CHECK последней миграции, где они заданы, — те же, что в коде: новое значение —
+    только с миграцией (вердикт «ещё раз» — FR-70, ADR-0088)."""
     m = _migration("0007")
-    assert set(m.VERDICTS) == {str(v) for v in Verdict}
+    assert set(_latest_with("VERDICTS").VERDICTS) == {str(v) for v in Verdict}
     assert set(m.REPORT_REASONS) == {str(r) for r in ReportReason}
     assert set(m.LABELS) == {str(s) for s in AnnotationStatus} | set(LEGACY_LABELS)
     assert set(m.SOURCES) == {str(s) for s in AnnotationSource}
@@ -379,3 +389,34 @@ def test_migration_0014_renames_heard_and_keeps_the_marks(tmp_path: Path) -> Non
             "SELECT cell, kind, heard_letter FROM annotation_marks ORDER BY cell"
         ).all()
     assert back == [(0, "letter", "س"), (1, "vowel", "-")]
+
+
+# ---------- 0015: вердикт «ещё раз» (FR-70, ADR-0088) ----------
+_ATTEMPT = "0" * 31 + "2"
+
+
+def test_migration_0015_allows_verdict_again_and_downgrades_it_to_failed(tmp_path: Path) -> None:
+    """«Ещё раз» (again) — отдельный вердикт: после 0015 его можно записать, чужое значение — нет;
+    прежняя попытка не меняется. Откат: again → failed (до 0015 такого вердикта не было)."""
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    db = tmp_path / "m15.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0014")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_annotation(conn)  # одна попытка с вердиктом excellent
+    command.upgrade(cfg, "0015")
+    engine = create_engine(f"sqlite:///{db}")
+    with engine.connect() as conn:
+        before = conn.exec_driver_sql("SELECT verdict FROM attempts").all()
+    assert before == [("excellent",)]
+    with engine.begin() as conn:
+        conn.exec_driver_sql("UPDATE attempts SET verdict = 'again' WHERE id = ?", (_ATTEMPT,))
+    with pytest.raises(IntegrityError), engine.begin() as conn:
+        conn.exec_driver_sql("UPDATE attempts SET verdict = 'unsure' WHERE id = ?", (_ATTEMPT,))
+    engine.dispose()
+
+    command.downgrade(cfg, "0014")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        after = conn.exec_driver_sql("SELECT verdict FROM attempts").all()
+    assert after == [("failed",)]

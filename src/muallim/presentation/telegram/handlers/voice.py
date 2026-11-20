@@ -27,7 +27,7 @@ from muallim.application.use_cases.staff import StaffAccess
 from muallim.application.use_cases.sura import ReadSura
 from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner, Question
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import is_mastered_verdict
 from muallim.domain.quiz import read_passed
 from muallim.presentation.telegram import opening, screens, sura_errors, texts
 from muallim.presentation.telegram.display import Display
@@ -157,7 +157,7 @@ async def on_voice(
     )
     resume = None
     basmala = result.item.id == opening.OPENING_ITEMS[-1]
-    if shown.opening_active and basmala and attempt.verdict is not Verdict.FAILED:
+    if shown.opening_active and basmala and is_mastered_verdict(attempt.verdict):
         with suppress(KeyError):  # басмала прочитана — вернуть, где был
             resume = cur.item(shown.resume_item) if shown.resume_item else None
     # «Для исследования» и номер попытки — только учителю и разметчику (FR-50, ADR-0082:
@@ -165,7 +165,7 @@ async def on_voice(
     staff = await staff_access.is_staff(learner)
     await wait.delete()
     has_audio = library.has(result.item.id)
-    if attempt.verdict is not Verdict.FAILED:  # аят из списка ошибок суры исправлен — ✅
+    if is_mastered_verdict(attempt.verdict):  # аят из списка ошибок суры исправлен — ✅
         await sura_errors.mark_fixed(state, result.item.id)
     back = await sura_errors.sura_of(state, result.item.id)
     screen = screens.result(

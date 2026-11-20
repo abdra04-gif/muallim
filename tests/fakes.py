@@ -1,9 +1,9 @@
 """Тестовые реализации портов: в памяти, детерминированные."""
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, replace
 from datetime import UTC, date, datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from muallim.application.ports.erasures import ErasureAction
@@ -12,12 +12,13 @@ from muallim.domain.annotation import AnnotationTask, Label, next_annotator_code
 from muallim.domain.assessment import Assessment, PronunciationError
 from muallim.domain.attempt import Attempt
 from muallim.domain.learner import ConsentRecord, Learner, LearnerProfile
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 from muallim.domain.report import LearnerReport
 from muallim.domain.settings import DEFAULT_UTC_OFFSET_MIN, local_date
 from muallim.domain.sura import AyahReference, SuraMode, SuraReading
 
 if TYPE_CHECKING:
+    from muallim.application.ports.recognition import Listening
     from muallim.application.ports.storage import Video
     from muallim.domain import review
     from muallim.domain.annotation import CellMark
@@ -104,14 +105,45 @@ class InMemoryAttempts:
         self.items.append((attempt, feedback))
 
     async def last_assessment(self, learner_id: UUID, item_id: str) -> Assessment | None:
+        """Оценка последней попытки этой карточки для «было → стало»; «ещё раз» (балл 0, без
+        разбора) пропускается — с ним не сравнивают (FR-70, решение автора 2026-11-20)."""
         return next(
             (
                 a.assessment
                 for a, _ in reversed(self.items)
-                if a.learner_id == learner_id and a.item_id == item_id
+                if a.learner_id == learner_id
+                and a.item_id == item_id
+                and a.verdict is not Verdict.AGAIN
             ),
             None,
         )
+
+    async def last_verdict(self, learner_id: UUID, item_id: str) -> Verdict | None:
+        """Вердикт последней попытки этой карточки — для «ещё раз не больше раза подряд»
+        (FR-70 п. 6, ADR-0088 п. 6); None — первая попытка. «Не расслышано»
+        (``model_output["unheard"]``) — не попытка: пропускается (решение автора 2026-11-20)."""
+        return next(
+            (
+                a.verdict
+                for a, _ in reversed(self.items)
+                if a.learner_id == learner_id
+                and a.item_id == item_id
+                and a.model_output.get("unheard") is not True
+            ),
+            None,
+        )
+
+    async def mastered(self, learner_id: UUID) -> frozenset[str]:
+        """Освоенные карточки — по вердикту (ADR-0088 п. 7): хоть одна попытка «отлично» или
+        «засчитано»; карточки суры, сданной целиком по тексту, — тоже (FR-58)."""
+        done = {
+            a.item_id
+            for a, _ in self.items
+            if a.learner_id == learner_id and is_mastered_verdict(a.verdict)
+        }
+        if self.suras is not None:
+            done |= await self.suras.credited(learner_id)
+        return frozenset(done)
 
     async def best_scores(self, learner_id: UUID) -> Mapping[str, int]:
         best: dict[str, int] = {}
@@ -152,7 +184,8 @@ class InMemoryAttempts:
 
     async def outcomes(self, learner_id: UUID) -> "list[review.Outcome]":
         """История исходов (ADR-0062): по порядку попыток, местный день — UTC+3, как без
-        настроек в БД; засчитано — вердикт не ``failed``."""
+        настроек в БД; засчитано — по вердикту (``is_mastered_verdict``: «ещё раз» не засчитано,
+        ADR-0088 п. 7)."""
         from muallim.domain import review  # noqa: PLC0415
 
         own = sorted(
@@ -162,7 +195,7 @@ class InMemoryAttempts:
             review.Outcome(
                 a.item_id,
                 local_date(a.created_at, DEFAULT_UTC_OFFSET_MIN),
-                a.verdict is not Verdict.FAILED,
+                is_mastered_verdict(a.verdict),
             )
             for a in own
         ]
@@ -213,6 +246,89 @@ class ScriptedRecognizer:
             model_version="scripted",
             audio_duration_ms=1500,
             raw={"phonemes": heard},
+        )
+
+
+UNHEARD = -1000.0  # балл варианта, которого нет в таблице ScriptedCardListener
+
+
+def _maroof_cards() -> dict[str, tuple[str, str]]:
+    """Текст карточки → (wasl, waqf) в записи фонетизатора бота: фикстура уроков 1–41
+    (`tests/fixtures/maroof_cards.json`), фонетизатора в тестах нет."""
+    import json  # noqa: PLC0415
+    from pathlib import Path  # noqa: PLC0415
+
+    path = Path(__file__).resolve().parent / "fixtures" / "maroof_cards.json"
+    cards = json.loads(path.read_text(encoding="utf-8"))
+    return {c["text"]: (c["wasl"], c["waqf"]) for c in cards}
+
+
+@dataclass
+class ScriptedCardListener:
+    """Слушатель «вариантов карточки» без модели (FR-70, ADR-0088 п. 1).
+
+    Эталоны wasl/waqf — как у фонетизатора бота (фикстура; ``references`` — свои, для карточек
+    вне фикстуры); балл варианта — по его звукам MostafaMaroof (``to_maroof``), как у настоящей
+    модели: таблица ``scores`` задаётся записями бота, варианты с теми же звуками получают тот же
+    балл, остальные — ``unheard`` (``-math.inf`` — как у настоящей CTC, когда вариант невозможен).
+    ``long_is_short`` — как ``ctc.prepare``: долгая гласная (aa ii uu) для модели — короткая.
+    """
+
+    scores: Mapping[str, float] = field(default_factory=dict)
+    raw: str = "b u"
+    fail: bool = False
+    fail_stage: str = "model"
+    unheard: float = UNHEARD
+    references: tuple[tuple[str, str], ...] | None = None
+    calls: list[tuple[str, bool]] = field(default_factory=list)  # (текст, long_is_short)
+    single_calls: int = 0  # сколько раз звали поштучный score
+    many_calls: list[int] = field(default_factory=list)  # score_many: сколько вариантов за вызов
+
+    async def listen(self, audio: bytes, text: str, *, long_is_short: bool) -> "Listening":
+        from muallim.application.ports.recognition import Listening  # noqa: PLC0415
+        from muallim.infrastructure.asr.maroof_script import to_maroof  # noqa: PLC0415
+
+        self.calls.append((text, long_is_short))
+        if self.fail:
+            raise RecognitionError("битая запись", stage=self.fail_stage)
+        references: tuple[tuple[str, str], ...]
+        if self.references is None:
+            wasl, waqf = _maroof_cards()[text]
+            references = (("wasl", wasl), ("waqf", waqf))
+        else:
+            references = self.references
+
+        def sounds(variant: str) -> tuple[str, ...]:
+            out = to_maroof(variant)
+            if long_is_short:  # aa → a, ii → i, uu → u
+                out = tuple(s[0] if s in ("aa", "ii", "uu") else s for s in out)
+            return out
+
+        by_sounds = {sounds(k): v for k, v in self.scores.items()}
+
+        def score(variant: str) -> float:
+            self.single_calls += 1
+            return by_sounds.get(sounds(variant), self.unheard)
+
+        def score_many(variants: Sequence[str]) -> list[float]:
+            self.many_calls.append(len(variants))
+            return [by_sounds.get(sounds(v), self.unheard) for v in variants]
+
+        # score_many — поле порта из блокера ревью (батч-CTC); пока его нет у Listening —
+        # не передаём, чтобы прежние тесты сценария работали
+        extra: dict[str, Any] = (
+            {"score_many": score_many}
+            if "score_many" in {f.name for f in fields(Listening)}
+            else {}
+        )
+        return Listening(
+            references=references,
+            model_version="scripted-maroof",
+            audio_duration_ms=1200,
+            raw=self.raw,
+            score=score,
+            sounds=sounds,
+            **extra,
         )
 
 

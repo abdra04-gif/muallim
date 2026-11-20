@@ -74,12 +74,12 @@ class GetProgress:
 
     async def execute(self, learner: Learner) -> Progress:
         best = await self.attempts.best_scores(learner.id)
+        done = await self.attempts.mastered(learner.id)  # по вердикту, не по баллу (ADR-0088 п. 7)
         lessons: list[LessonProgress] = []
         for lesson in self.curriculum.lessons:
-            items = lesson.practice_items
-            tried = [(item, best[item.id]) for item in items if item.id in best]
-            mastered = sum(1 for _, score in tried if self.policy.is_mastered(score))
-            weak = tuple(item for item, score in tried if not self.policy.is_mastered(score))
+            tried = [item for item in lesson.practice_items if item.id in best or item.id in done]
+            mastered = sum(1 for item in tried if item.id in done)
+            weak = tuple(item for item in tried if item.id not in done)
             lessons.append(LessonProgress(lesson, mastered, weak))
         days = await self.attempts.activity(learner.id)
         reviews = GetReview(self.curriculum, self.attempts, self.policy, self.clock, self.settings)

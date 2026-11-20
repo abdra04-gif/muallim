@@ -34,7 +34,7 @@ from muallim.domain.annotation import (
     Label,
     next_annotator_code,
 )
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 from muallim.infrastructure.db.tables import (
     annotation_marks,
     annotations,
@@ -140,7 +140,7 @@ class SqlAnnotationTasks(AnnotationTasks):
         errors = await bot_errors(self.session, [row.id])
         return AnnotationTask(
             attempt_id=row.id, item_id=row.item_id, item_text=row.text or "", page=row.page,
-            line=row.line, bot_passed=row.verdict != Verdict.FAILED,
+            line=row.line, bot_passed=is_mastered_verdict(Verdict(row.verdict)),
             bot_errors=errors.get(row.id, ()), reference_phonemes=row.reference_phonemes,
             bot_heard=row.heard_phonemes, learner_says=row.report, audio_sha256=row.audio_sha256,
         )  # fmt: skip

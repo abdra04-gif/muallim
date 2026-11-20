@@ -1,6 +1,6 @@
 # Typical beginner errors per stage of the book — DRAFT for the author
 
-Status: **draft, not approved.** Which errors the bot looks for on which cards is a methodology
+Status: **draft; the table of rules for lessons 3–41 (vowel, lookalike, no_vowel; + short_madd from 31; + no_shadda from 38; both soft) approved by the author 2026-11-19 (FR-70).** Which errors the bot looks for on which cards is a methodology
 decision of the author (CLAUDE.md, «Только человек»). The agent proposes; examples come from
 `curriculum/course.ru.yaml`. Code: `docs/research/phase3/error_rules.py`; test on phrases:
 `docs/research/phase3/words_check.py` (PHASE_3 §11.8d).

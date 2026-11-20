@@ -20,7 +20,7 @@ from typing import Final
 from uuid import UUID
 
 from muallim.domain.curriculum import Curriculum, ItemKind, Lesson, LessonItem
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 
 # Параметры методики (M-19): меняет только автор (ADR-0066, решения автора 2026-10-22).
 QUIZ_ROUND: Final = 10  # вопросов в раунде
@@ -419,8 +419,9 @@ def build_question(
 
 
 def read_passed(verdict: Verdict) -> bool:
-    """Ступень ③ засчитана, если строка засчитана при чтении (M-01: вердикт не ``failed``)."""
-    return verdict is not Verdict.FAILED
+    """Ступень ③ засчитана, если строка засчитана при чтении (M-01): «ещё раз» — не ответ
+    (ADR-0088 п. 7)."""
+    return is_mastered_verdict(verdict)
 
 
 # ---------- итог и «ждут» ----------

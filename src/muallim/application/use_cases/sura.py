@@ -87,8 +87,8 @@ class ReadSura:
     ) -> SuraReadingResult:
         sura = self.sura(number)
         items = tuple(i for lesson in sura.lessons for i in lesson.practice_items)
-        best = await self.attempts.best_scores(learner.id)
-        studied = bool(items) and all(self.policy.is_mastered(best.get(i.id, 0)) for i in items)
+        done = await self.attempts.mastered(learner.id)  # по вердикту (ADR-0088 п. 7)
+        studied = bool(items) and all(i.id in done for i in items)
         ayahs = [(a.id, int(a.quran.split(":")[1]), a.text) for a in sura.ayahs]
         opening = sura.opening.text if sura.opening else ""
         preamble = self._istiadha()

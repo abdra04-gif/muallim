@@ -18,7 +18,7 @@ from uuid import UUID
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from muallim.domain.policy import Verdict
+from muallim.domain.policy import Verdict, is_mastered_verdict
 from muallim.infrastructure.db.tables import (
     attempts,
     curriculum_items,
@@ -264,7 +264,7 @@ async def collect(session: AsyncSession, today: date) -> PilotReport:
     tries = [
         Try(
             str(r.learner_id), r.item_id, r.lesson_number, r.created_at, r.score,
-            r.verdict != Verdict.FAILED, r.reference_phonemes, frozenset(named[r.id]),
+            is_mastered_verdict(Verdict(r.verdict)), r.reference_phonemes, frozenset(named[r.id]),
         )
         for r in rows
     ]  # fmt: skip
