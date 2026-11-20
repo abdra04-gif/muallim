@@ -474,6 +474,7 @@ sura_reading_ayahs = Table(
     Column("pronunciation_errors", SmallInteger, nullable=False),
     Column("reference_phonemes", Text, nullable=False),
     Column("heard_phonemes", Text, nullable=False),
+    Column("model_output", JSON),  # решение аята на MostafaMaroof (FR-70 ч. 7); Muaalem — NULL
     CheckConstraint(_one_of("outcome", AyahOutcome), name="outcome_values"),
     CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
 )

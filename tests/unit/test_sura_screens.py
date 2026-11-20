@@ -100,7 +100,7 @@ def test_result_of_clean_text_reading_says_lessons_are_counted(curriculum: Curri
     sura = _sura(curriculum, 112)
     screen = screens.sura_result(_result(sura, SuraMode.TEXT))
     assert texts.SURA_PASSED_TEXT in screen.caption
-    assert "4 из 4" in screen.caption
+    assert "4 аята из 4" in screen.caption  # склонение «аят / аята / аятов» — автор 2026-11-20
 
 
 def test_result_of_clean_memory_reading_gives_the_mark(curriculum: Curriculum) -> None:
@@ -113,7 +113,7 @@ def test_result_lists_bad_ayahs_and_leads_to_them(curriculum: Curriculum) -> Non
     sura = _sura(curriculum, 112)
     result = _result(sura, SuraMode.TEXT, skip=3)
     screen = screens.sura_result(result)
-    assert "3 из 4" in screen.caption
+    assert "3 аята из 4" in screen.caption
     assert texts.SURA_OUTCOME["skipped"] in screen.caption
     assert texts.SURA_PASSED_TEXT not in screen.caption
     buttons = _buttons(screen.keyboard)

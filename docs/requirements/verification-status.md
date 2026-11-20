@@ -1,21 +1,21 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-11-18T21:10:10+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-11-20T18:04:28+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `d889dd3fba677bb7` | 129 |
+| код | `7df1c6abb29a58f7` | 135 |
 | программа (книга) | `da57065c4a211250` | 4 |
-| SQL-отчёты | `1bfd72df05ffefd3` | 12 |
-| миграции | `f07073a7509b71c2` | 14 |
+| SQL-отчёты | `6b1ab1a4c8f54ab3` | 12 |
+| миграции | `3421b8207664162f` | 16 |
 | зависимости | `e33bf9dd0f3b4cc1` | 1 |
 | предрегистрация | `47d170f95f136aae` | 1 |
 
 ## Требования
-Проверено зелёными тестами: **78 из 82**.
+Проверено зелёными тестами: **81 из 83**.
 
 | ID | Тесты из матрицы | Сейчас |
 |---|---|---|
@@ -82,9 +82,10 @@
 | FR-66 | `tests/integration/test_deep_bot.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_deep_screens.py`, `tests/unit/test_screens.py`, `tests/unit/test_settings_screens.py` | ✅ |
 | FR-67 | `tests/integration/test_deep_bot.py`, `tests/unit/test_deep_screens.py`, `tests/unit/test_lesson_links.py` | ✅ |
 | FR-68 | `tests/unit/test_nav_layout.py` | ✅ |
+| FR-70 | `tests/architecture/test_card_check_rules.py`, `tests/architecture/test_migrations.py`, `tests/integration/test_again_bot.py`, `tests/integration/test_again_sql.py`, `tests/integration/test_di_card_listener.py`, `tests/integration/test_di_sura_listener.py`, `tests/integration/test_maroof_cards.py`, `tests/integration/test_sura_ayah_output_sql.py`, `tests/integration/test_sura_wait_bot.py`, `tests/unit/test_again_not_counted.py`, `tests/unit/test_align.py`, `tests/unit/test_card_check.py`, `tests/unit/test_card_policy.py`, `tests/unit/test_card_recitation.py`, `tests/unit/test_card_score_many.py`, `tests/unit/test_card_texts_final.py`, `tests/unit/test_ctc.py`, `tests/unit/test_ctc_batch.py`, `tests/unit/test_maroof_book_cards.py`, `tests/unit/test_maroof_listener.py`, `tests/unit/test_maroof_script.py`, `tests/unit/test_maroof_sura.py`, `tests/unit/test_maroof_sura_final.py`, `tests/unit/test_sura_maroof.py`, `tests/unit/test_sura_screens.py` | ✅ |
 | FR-69 | — | нет автотестов |
 | NFR-TR-01 | `tests/unit/test_curriculum_content.py` | ✅ |
-| NFR-TR-02 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
+| NFR-TR-02 | `tests/architecture/test_docs.py` | ✅ |
 | NFR-TR-03 | `tests/architecture/test_db_scripts.py`, `tests/integration/test_audio_store.py`, `tests/integration/test_integrity.py`, `tests/integration/test_sura_audio_privacy.py` | ✅ |
 | NFR-TR-04 | `tests/architecture/test_hooks.py` | ✅ |
 | NFR-REL-02 | `tests/architecture/test_logging.py`, `tests/integration/test_audio_decode.py`, `tests/integration/test_metrics_report.py`, `tests/unit/test_use_cases.py` | ✅ |
@@ -100,7 +101,7 @@
 | NFR-MNT-06 | `tests/architecture/test_learner_texts.py` | ✅ |
 | NFR-MNT-07 | `tests/integration/test_console.py` | ✅ |
 | NFR-SEC-07 | `tests/architecture/test_logging.py`, `tests/unit/test_logs.py` | ✅ |
-| NFR-TR-05 | `tests/architecture/test_docs.py` | ❌ падают: `tests/architecture/test_docs.py` |
+| NFR-TR-05 | `tests/architecture/test_docs.py` | ✅ |
 
 ## Исследование
 Строк в матрице: 34 — считается ✅ 9, частично 🟡 5, нет ❌ 15, данных не собираем 5.

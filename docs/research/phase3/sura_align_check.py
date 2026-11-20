@@ -31,7 +31,7 @@ from letters_test import decode  # noqa: E402
 from muallim.domain.card_check import decide  # noqa: E402
 from muallim.domain.policy import CardPolicy  # noqa: E402
 from muallim.infrastructure.asr.chunks import quiet_cuts  # noqa: E402
-from muallim.infrastructure.asr.ctc import ctc_logprob, prepare  # noqa: E402
+from muallim.infrastructure.asr.ctc import ctc_logprob_many, prepare  # noqa: E402
 from muallim.infrastructure.asr.maroof_script import to_maroof  # noqa: E402
 from muallim.infrastructure.asr.phonetizer import _references  # noqa: E402
 
@@ -77,6 +77,17 @@ def main() -> None:
     parser.add_argument(
         "--cut", type=int, default=0, help="frames dropped before the next ayah's first sound"
     )
+    parser.add_argument("--chunks", action="store_true", help="the model on quiet-cut pieces")
+    parser.add_argument(
+        "--window", type=float, default=0.0, help="seconds per model window (0 — whole)"
+    )
+    parser.add_argument("--overlap", type=float, default=4.0, help="seconds of window overlap")
+    parser.add_argument(
+        "--second", action="store_true", help="re-hear an unpassed ayah cut out alone"
+    )
+    parser.add_argument(
+        "--context", type=int, default=0, help="frames into the next ayah, its first sounds added"
+    )
     args = parser.parse_args()
     import torch  # noqa: PLC0415
     from huggingface_hub import hf_hub_download  # noqa: PLC0415
@@ -109,6 +120,27 @@ def main() -> None:
                             model(torch.from_numpy(norm).unsqueeze(0)).logits[0], -1
                         ).numpy()
                     )
+            if args.window:
+                # long recordings: windows of W s overlapping by O s; in each overlap keep the half of
+                # the frames that is farther from its window's edge (≈ 50 frames per second)
+                step, win = int((args.window - args.overlap) * SR), int(args.window * SR)
+                fps = 50
+                parts, s = [], 0
+                while True:
+                    w = wave[s : s + win]
+                    norm = (w - w.mean()) / (w.std() + 1e-7)
+                    with torch.no_grad():
+                        part = torch.log_softmax(
+                            model(torch.from_numpy(norm).unsqueeze(0)).logits[0], -1
+                        ).numpy()
+                    half = int(args.overlap * fps / 2)
+                    first, last = s == 0, s + win >= len(wave)
+                    parts.append(
+                        part[(0 if first else half) : (len(part) if last else len(part) - half)]
+                    )
+                    if last:
+                        break
+                    s += step
             lp = prepare(np.concatenate(parts), mv, long_is_short=False)
             t_model = time.perf_counter() - t0
             frame_s = len(wave) / SR / lp.shape[0]
@@ -127,22 +159,63 @@ def main() -> None:
                 # the ayah's stretch: a little silence before its first sound, up to the next ayah's
                 # first sound (a margin after it would add the next ayah's first consonant)
                 a, b = max(0, bounds[k] - args.before), max(bounds[k] + 1, bounds[k + 1] - args.cut)
+                # --context N: the stretch goes on into the next ayah by N frames, and every variant
+                # (the correct one and each error) gets the next ayah's first sounds — the same for all,
+                # so the edge cannot favour a variant that changes the last syllable
+                suffix: list[str] = []
+                if args.context and k + 1 < len(refs):
+                    b = min(lp.shape[0], bounds[k + 1] + args.context)
+                    suffix = list(to_maroof(refs[k + 1]["waqf"])[:2])
                 seg = lp[a:b]
-                cache: dict[str, float] = {}
 
-                def score(v: str, seg: np.ndarray = seg, cache: dict[str, float] = cache) -> float:
-                    if v not in cache:
-                        try:
-                            toks = to_maroof(v)
-                        except ValueError:
-                            cache[v] = -np.inf
-                        else:
-                            cache[v] = ctc_logprob(seg, [mv[t] for t in toks], blank)
-                    return cache[v]
+                def ids(v: str, suffix: list[str] = suffix) -> list[int] | None:
+                    try:
+                        return [mv[t] for t in (*to_maroof(v), *suffix)]
+                    except (ValueError, KeyError):
+                        return None
+
+                def score_many(vs: list[str], seg: np.ndarray = seg) -> list[float]:
+                    targets = [ids(v) for v in vs]
+                    ok = [t for t in targets if t is not None]
+                    got = iter(ctc_logprob_many(seg, ok, blank))
+                    return [next(got) if t is not None else -np.inf for t in targets]
+
+                def score(v: str) -> float:
+                    return score_many([v])[0]
 
                 d = decide(
-                    (r["wasl"], r["waqf"]), score, policy, separate_syllables=False, rules=rules
+                    (r["wasl"], r["waqf"]),
+                    score,
+                    policy,
+                    separate_syllables=False,
+                    rules=rules,
+                    score_many=score_many,
                 )
+                if args.second and str(d.outcome) != "passed":
+                    # second pass: the ayah cut out of the recording at the found bounds and heard
+                    # on its own (the model no longer hears the neighbouring ayahs)
+                    s0 = max(0, int(bounds[k] * frame_s * SR) - int(0.15 * SR))
+                    s1 = min(len(wave), int(bounds[k + 1] * frame_s * SR))
+                    w = wave[s0:s1]
+                    norm = (w - w.mean()) / (w.std() + 1e-7)
+                    with torch.no_grad():
+                        lo = model(torch.from_numpy(norm).unsqueeze(0)).logits[0]
+                    seg2 = prepare(torch.log_softmax(lo, -1).numpy(), mv, long_is_short=False)
+
+                    def many2(vs: list[str], seg: np.ndarray = seg2) -> list[float]:
+                        targets = [ids(v, []) for v in vs]
+                        ok = [t for t in targets if t is not None]
+                        got = iter(ctc_logprob_many(seg, ok, blank))
+                        return [next(got) if t is not None else -np.inf for t in targets]
+
+                    d = decide(
+                        (r["wasl"], r["waqf"]),
+                        lambda v, m=many2: m([v])[0],
+                        policy,
+                        separate_syllables=False,
+                        rules=rules,
+                        score_many=many2,
+                    )
                 outcomes[str(d.outcome)] += 1
                 off = abs(bounds[k] * frame_s - true_starts[k]) * 1000
                 offsets.append(off)

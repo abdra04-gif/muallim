@@ -8,7 +8,7 @@
 
 Telegram-бот, который учит **с нуля** читать по-арабски по учебнику Ахмада Хади Максуди
 «Муаллим ас-Сани» («Второй учитель»). Ученик читает вслух букву, слог или слово — бот распознаёт
-произношение моделью [Quran Muaalem](https://github.com/obadx/quran-muaalem), находит ошибки и
+произношение моделью MostafaMaroof способом «варианты карточки» (ADR-0088; прежняя модель [Quran Muaalem](https://github.com/obadx/quran-muaalem) выключена настройкой), находит ошибки и
 объясняет их по-русски простыми словами. Каждая попытка сохраняется (голос — только с согласия
 ученика), чтобы изучать ошибки учеников и модели, размечать данные и улучшать проверку.
 
@@ -19,7 +19,7 @@ Telegram-бот, который учит **с нуля** читать по-ар�
 
 > **In English.** *Muallim* is a Telegram bot that teaches Russian-speaking beginners to read Arabic
 > from scratch, following the classic primer *al-Muallim ath-Thani* ("The Second Teacher"). The learner
-> sends a voice message; the [Quran Muaalem](https://github.com/obadx/quran-muaalem) model recognises
+> sends a voice message; the MostafaMaroof phoneme model (ADR-0088; the earlier [Quran Muaalem](https://github.com/obadx/quran-muaalem) model is switched off by a setting) recognises
 > phonemes, the bot detects reading errors and explains them in Russian. Attempts are stored (audio only
 > with consent) to build a curated speech dataset. It is the software part of the master's thesis
 > *Automated Error Detection in Beginner Arabic and Quranic Reading* (Innopolis University, 2027).
@@ -86,7 +86,7 @@ Telegram-бот, который учит **с нуля** читать по-ар�
 ```mermaid
 flowchart LR
     A["🎤 Голосовое ученика"] --> B["ffmpeg<br/>OGG → 16 кГц"]
-    B --> C["Quran Muaalem<br/>фонемы"]
+    B --> C["MostafaMaroof<br/>варианты карточки"]
     C --> D["domain.assessment<br/>сравнение с эталоном<br/>книги → ошибки"]
     D --> E["💬 Объяснение<br/>по-русски"]
     D --> F[("PostgreSQL<br/>попытка + след решения")]
@@ -101,7 +101,7 @@ flowchart LR
 |---|---|---|
 | domain | [`src/muallim/domain/`](src/muallim/domain/) | правила: оценка чтения, типы ошибок, уроки, пороги — только стандартная библиотека Python |
 | application | [`src/muallim/application/`](src/muallim/application/) | сценарии (`use_cases/`) и порты — интерфейсы к внешнему миру (`ports/`) |
-| infrastructure | [`src/muallim/infrastructure/`](src/muallim/infrastructure/) | PostgreSQL, модель Muaalem, ffmpeg, аудиофайлы, YAML-программа |
+| infrastructure | [`src/muallim/infrastructure/`](src/muallim/infrastructure/) | PostgreSQL, модель MostafaMaroof (Muaalem — выключена), ffmpeg, аудиофайлы, YAML-программа |
 | presentation | [`src/muallim/presentation/telegram/`](src/muallim/presentation/telegram/) | обработчики, клавиатуры, тексты, картинки экранов |
 | research | [`src/muallim/research/`](src/muallim/research/) | отчёты, разметка, датасет, сверка данных |
 | bootstrap | [`src/muallim/bootstrap/`](src/muallim/bootstrap/) | конфиг, сборка зависимостей (`di.py`), точки входа |

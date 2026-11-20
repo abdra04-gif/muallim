@@ -15,6 +15,7 @@ from muallim.application.ports.reading import AyahSyllables, ReadingGuide
 from muallim.application.ports.recognition import (
     CardListener,
     PronunciationRecognizer,
+    SuraListener,
     SuraRecognizer,
 )
 from muallim.application.ports.repositories import (
@@ -209,6 +210,12 @@ class AppProvider(Provider):
         return listener
 
     @provide
+    def maybe_sura_listener(self, listener: CardListener | None) -> SuraListener | None:
+        """Сура — тот же слушатель, что карточки (одна модель в памяти; FR-70 ч. 7). Заглушка
+        карточек суру не слушает — тогда сура идёт через ``SuraRecognizer`` (заглушку)."""
+        return listener if isinstance(listener, SuraListener) else None
+
+    @provide
     def card_listener(self, listener: CardListener | None) -> CardListener:
         if listener is None:
             raise TypeError("CHECKER=muaalem: слушателя карточек нет")
@@ -217,7 +224,7 @@ class AppProvider(Provider):
     @provide
     def sura_recognizer(self, recognizer: PronunciationRecognizer) -> SuraRecognizer:
         """Та же модель: и заглушка, и Muaalem умеют читать суру целиком (ADR-0076); при
-        ``checker=maroof`` — заглушка-отказ, пока суры на MostafaMaroof не сделаны."""
+        ``checker=maroof`` — заглушка-отказ: суру слушает ``SuraListener`` (FR-70 ч. 7)."""
         if not isinstance(recognizer, SuraRecognizer):
             raise TypeError(f"{type(recognizer).__name__} не умеет проверять суру целиком")
         return recognizer

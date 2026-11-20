@@ -210,6 +210,7 @@
 
 ## Ограничения в самой БД (ADR-0055)
 - `attempts.verdict` ∈ excellent / passed / failed / again (again — с миграции 0015; откат превращает его в failed); `annotations.label` ∈ agree / fix / audio_unusable / off_task и метки 1.0 (correct, false_alarm, missed_error, wrong_error); `annotations.source` ∈ excel / telegram или NULL; `annotations.entry` ∈ cells / phonemes или NULL; `annotation_marks.layout` ∈ syllables / letters, `annotation_marks.kind` — 13 видов `MarkKind` (миграции 0011 и 0012), уникально `(annotation_id, cell, kind)`; `annotations.phonemes_source` ∈ typed / marks / confirmed / reference или NULL (миграция 0012); `learner_reports.reason` ∈ read_correctly / wrong_error / other.
+- `sura_reading_ayahs.outcome` ∈ clean / pronunciation / forgot_part / skipped / not_reached / again (CHECK `ck_sura_reading_ayahs_outcome_values`; again — с миграции 0016, откат превращает его в pronunciation и удаляет `model_output`).
 - Уникально: `detected_errors(attempt_id, ordinal)`; `learner_reports(attempt_id, learner_id)` — одна жалоба ученика на попытку.
 - `annotations.detected_error_id` удалено миграцией 0007.
 - `learner_settings` (миграция 0008): `how_to_read` ∈ spoiler / shown / hidden; `reminder_minute` NULL или 0…1439; `utc_offset_min` −720…840; одна строка на ученика (PK `learner_id`).
@@ -280,12 +281,13 @@
 | `reading_id` | UUID → sura_readings, CASCADE, PK | |
 | `ayah` | smallint, PK | номер аята в суре |
 | `item_id` | varchar(32) | карточка аята в программе |
-| `outcome` | varchar(16) | `clean`, `pronunciation`, `forgot_part`, `skipped`, `not_reached` |
-| `score` | smallint 0–100 | балл аята |
+| `outcome` | varchar(16) | `clean`, `pronunciation`, `forgot_part`, `skipped`, `not_reached`, `again` — «прочитай ещё раз», MostafaMaroof не уверена (миграция 0016, FR-70 ч. 7; откат → `pronunciation`) |
+| `score` | smallint 0–100 | балл аята (у `again` — 0) |
 | `forgotten_words`, `extra_words`, `pronunciation_errors` | smallint | сколько забыто слов, лишних слов, ошибок произношения |
-| `reference_phonemes`, `heard_phonemes` | text | эталон аята и услышанное в нём |
+| `reference_phonemes`, `heard_phonemes` | text | эталон аята и услышанное в нём (на MostafaMaroof — верное чтение и победивший вариант; у `again` услышанное пусто) |
+| `model_output` | JSON, NULL | решение аята на MostafaMaroof (миграция 0016, FR-70 ч. 7): `outcome`, `margin`, `margin_other`, `winner`, `kind`, `other_syllable`, `hints`, `unheard`, `second_pass` (был ли второй проход — аят вырезан и услышан отдельно); у чтений Muaalem — NULL |
 
-## `sura_reading_chunks` — куски записи 6–10 с (FR-60)
+## `sura_reading_chunks` — куски записи 6–10 с (FR-60; на MostafaMaroof, ADR-0088, кусок = отрезок аята, найденный выравниванием)
 Строка для разметки и датасета (TD-FN-115): кусок можно вырезать из записи по `start_ms`–`end_ms`.
 | Поле | Тип | Описание |
 |---|---|---|

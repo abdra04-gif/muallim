@@ -50,6 +50,8 @@ class RecitationResult:
     breakdown: Breakdown | None = None  # разбор группами для экрана (FR-54); сценарий заполняет
     hints: tuple[str, ...] = ()  # подсказки «вариантов карточки» (FR-70 п. 3, 5)
     other_syllable: bool = False  # прочитан другой слог (FR-70 п. 3)
+    unheard: bool = False  # «ещё раз» из-за тишины: бот ничего не расслышал (FR-70 п. 6)
+    forced_pass: bool = False  # второе «не уверен» подряд — засчитано (ADR-0087 п. 4)
 
     @property
     def verdict(self) -> Verdict:
@@ -69,6 +71,8 @@ class _Heard:
     model_output: Mapping[str, Any]
     hints: tuple[str, ...] = ()
     other_syllable: bool = False
+    unheard: bool = False
+    forced_pass: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,6 +195,8 @@ class AssessRecitation:
             breakdown=breakdown,
             hints=result.hints,
             other_syllable=result.other_syllable,
+            unheard=result.unheard,
+            forced_pass=result.forced_pass,
         )
 
     async def _recognize(self, audio: bytes, item: LessonItem) -> _Heard:
@@ -240,6 +246,7 @@ class AssessRecitation:
         return _Heard(
             best, candidates, heard, verdict, listening.model_version,
             listening.audio_duration_ms, output, d.hints, d.other_syllable,
+            d.unheard and verdict is Verdict.AGAIN, for_teacher,
         )  # fmt: skip
 
     async def _lesson_done(self, learner: Learner, items: tuple[LessonItem, ...]) -> bool:

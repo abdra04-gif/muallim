@@ -1,0 +1,531 @@
+{
+ "summary": {
+  "ayahs": 60,
+  "outcomes": {
+   "passed": 53,
+   "again": 6,
+   "error": 1
+  },
+  "start_offset_ms": {
+   "median": 40,
+   "p90": 130,
+   "max": 337
+  },
+  "timing": [
+   {
+    "reciter": "Alafasy_128kbps",
+    "sura": 87,
+    "audio_s": 94.7,
+    "model_s": 20.9,
+    "align_s": 0.11,
+    "decide_s": 5.66
+   },
+   {
+    "reciter": "Alafasy_128kbps",
+    "sura": 93,
+    "audio_s": 54.3,
+    "model_s": 8.44,
+    "align_s": 0.04,
+    "decide_s": 1.97
+   },
+   {
+    "reciter": "Husary_Muallim_128kbps",
+    "sura": 87,
+    "audio_s": 166.7,
+    "model_s": 37.85,
+    "align_s": 0.18,
+    "decide_s": 12.21
+   },
+   {
+    "reciter": "Husary_Muallim_128kbps",
+    "sura": 93,
+    "audio_s": 98.1,
+    "model_s": 17.28,
+    "align_s": 0.08,
+    "decide_s": 7.14
+   }
+  ]
+ },
+ "rows": [
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:1",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.8895935236364352,
+   "start_offset_ms": 60
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:2",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.528106551681538,
+   "start_offset_ms": 40
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:3",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.2563422910305575,
+   "start_offset_ms": 56
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:4",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.8746418405928855,
+   "start_offset_ms": 53
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:5",
+   "outcome": "again",
+   "kind": "None",
+   "margin": -1.7959604323845042,
+   "start_offset_ms": 29
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:6",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.08627374642162,
+   "start_offset_ms": 7
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:7",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.4409549487057447,
+   "start_offset_ms": 38
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:8",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.1834259666698284,
+   "start_offset_ms": 34
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:9",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.255878014792836,
+   "start_offset_ms": 25
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:10",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.7434789976049014,
+   "start_offset_ms": 40
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:11",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.541871041623553,
+   "start_offset_ms": 23
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:12",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.5051768304271853,
+   "start_offset_ms": 34
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:13",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.8679367269436442,
+   "start_offset_ms": 11
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:14",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.2971778310612008,
+   "start_offset_ms": 11
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:15",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.3513483577257546,
+   "start_offset_ms": 33
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:16",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.91508665741098,
+   "start_offset_ms": 23
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:17",
+   "outcome": "again",
+   "kind": "None",
+   "margin": -2.0210591901279127,
+   "start_offset_ms": 13
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:18",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.1281990372967075,
+   "start_offset_ms": 33
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "87:19",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.2739279604356604,
+   "start_offset_ms": 62
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:1",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.758924854396538,
+   "start_offset_ms": 60
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:2",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 4.302769531309791,
+   "start_offset_ms": 41
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:3",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.5524053212208555,
+   "start_offset_ms": 30
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:4",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.121073615461781,
+   "start_offset_ms": 46
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:5",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.054481598961835,
+   "start_offset_ms": 37
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:6",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.42740322121331964,
+   "start_offset_ms": 41
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:7",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.208113336547716,
+   "start_offset_ms": 32
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:8",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.6091381930978885,
+   "start_offset_ms": 38
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:9",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.9852916149666484,
+   "start_offset_ms": 45
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:10",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.501183570714298,
+   "start_offset_ms": 60
+  },
+  {
+   "reciter": "Alafasy_128kbps",
+   "where": "93:11",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 3.0678382209618693,
+   "start_offset_ms": 35
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:1",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.8390939652873275,
+   "start_offset_ms": 80
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:2",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.1749423798514442,
+   "start_offset_ms": 28
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:3",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.962002347706634,
+   "start_offset_ms": 44
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:4",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.092862106397676,
+   "start_offset_ms": 5
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:5",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.7430147182863323,
+   "start_offset_ms": 4
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:6",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.5672326974691408,
+   "start_offset_ms": 10
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:7",
+   "outcome": "error",
+   "kind": "no_vowel",
+   "margin": -6.871038603938803,
+   "start_offset_ms": 43
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:8",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.6724929470169698,
+   "start_offset_ms": 82
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:9",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.6664285005355488,
+   "start_offset_ms": 5
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:10",
+   "outcome": "again",
+   "kind": "None",
+   "margin": -0.1379626265264129,
+   "start_offset_ms": 27
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:11",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.1469597796585216,
+   "start_offset_ms": 19
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:12",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.5317797605837882,
+   "start_offset_ms": 25
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:13",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.7822557194692124,
+   "start_offset_ms": 38
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:14",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.574541667328024,
+   "start_offset_ms": 65
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:15",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.10455967967558344,
+   "start_offset_ms": 105
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:16",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.8238380943128014,
+   "start_offset_ms": 78
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:17",
+   "outcome": "again",
+   "kind": "None",
+   "margin": -2.215824188964703,
+   "start_offset_ms": 174
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:18",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.1943620638094448,
+   "start_offset_ms": 16
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "87:19",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.4889738323390276,
+   "start_offset_ms": 33
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:1",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.6715148324048306,
+   "start_offset_ms": 100
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:2",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.8016386942802463,
+   "start_offset_ms": 123
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:3",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.3535740949808002,
+   "start_offset_ms": 200
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:4",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.8192675703598145,
+   "start_offset_ms": 124
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:5",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.7214627039324135,
+   "start_offset_ms": 98
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:6",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.3093654066532903,
+   "start_offset_ms": 127
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:7",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 0.6584742013811367,
+   "start_offset_ms": 225
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:8",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 1.4660270791429024,
+   "start_offset_ms": 91
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:9",
+   "outcome": "again",
+   "kind": "None",
+   "margin": 0.17707466059729882,
+   "start_offset_ms": 265
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:10",
+   "outcome": "again",
+   "kind": "None",
+   "margin": 1.2844891542071366,
+   "start_offset_ms": 155
+  },
+  {
+   "reciter": "Husary_Muallim_128kbps",
+   "where": "93:11",
+   "outcome": "passed",
+   "kind": "None",
+   "margin": 2.421792022058842,
+   "start_offset_ms": 337
+  }
+ ]
+}

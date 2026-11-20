@@ -4,7 +4,7 @@ sequenceDiagram
     actor L as Ученик
     participant H as handlers.voice.on_voice
     participant UC as AssessRecitation
-    participant R as MuaalemRecognizer
+    participant R as MaroofListener
     participant D as domain.assess_best
     participant S as AudioStore
     participant DB as PostgreSQL
@@ -16,11 +16,11 @@ sequenceDiagram
         H-->>L: VOICE_ON_RULE «это правило, нажми ▶️ Дальше»
     else карточка для чтения (или истиаза/басмала начала занятия)
     H->>UC: execute(learner, audio, item_id карточки на экране)
-    UC->>R: recognize(audio, текст карточки)
-    R->>R: ffmpeg → 16 кГц, фонетизация эталона (васл/вакф)
-    R-->>UC: heard, references, model_version
-    UC->>D: сравнить с каждым эталоном
-    D-->>UC: лучший эталон, все кандидаты, ошибки
+    UC->>R: listen(audio, текст карточки, long_is_short)
+    R->>R: ffmpeg → 16 кГц, модель (под замком), фонетизация эталона (васл/вакф) → звуки модели
+    R-->>UC: references, score_many(варианты), model_version
+    UC->>D: decide в отдельном потоке: верное против типичных ошибок и «другого слога» (ADR-0088)
+    D-->>UC: засчитано / ещё раз / ошибка, победивший вариант, маржи, подсказки
     alt есть согласие на исследование
         UC->>S: save(audio) → sha256
     end

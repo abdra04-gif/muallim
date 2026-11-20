@@ -554,6 +554,21 @@ The check as the bot will run it (`domain.card_check.decide`, rules of lessons 4
 
 Reading: the fear of §11.8i — that MostafaMaroof, trained on spelling-style transcriptions, would scold the book's reading on tanwin, merges and suras — does not hold for the bot's decision. Every error variant is built from the same reference, so where the model disagrees with Hafs it pulls the correct reading and the errors down together, and the margin stays fair. On 72 ayahs of two professional reciters with full tajwid there is not a single false «error»; the 5 «again» are in 108:1–2, 110:3, 114:6 (margins −0.9…−3.5). The word-by-word reading adds 1.5 points on IqraEval and nothing on the suras, and would hide a dropped tanwin — not added. Caveats: reciters, not beginners; per-ayah files (the sura flow cuts a long recording into pieces — part 7); only false alarms measured.
 
+### 11.8k A whole sura in one recording (part 7 of FR-70, before code)
+
+The 72 ayahs of §11.8j joined per sura and reciter into one recording (16 recordings, 13–65 s), as a learner reads a sura at once. MostafaMaroof hears the recording; CTC Viterbi over the joined correct readings finds where each ayah starts; each ayah is checked by `decide` on its stretch. `sura_align_check.py` → `results/sura_align_summary.json` (second pass, 69/2/1), `results/sura_align_one_pass.json` (one pass, 59/12/1), `results/sura_align_long_whole.json` and `results/sura_align_long_windows.json` (longer suras); the runs with a 5-frame margin and with quiet-cut pieces (50/19/3) were not kept.
+
+| How the bot hears the sura | Passed | Again | Error |
+|---|---|---|---|
+| each ayah a separate file (§11.8j, not possible for a learner) | 67 | 5 | 0 |
+| whole recording, ayah stretch with a margin of 5 frames after it | 50 | 19 | 3 |
+| whole recording, stretch up to the next ayah's first sound | 59 | 12 | 1 |
+| the same, with the next ayah's first sounds added to every variant | 59 | 12 | 1 |
+| pieces cut at quiet places (as the Muaalem sura flow), logits joined | 50 | 19 | 3 |
+| **whole recording, then every ayah not passed cut out at the found bounds and heard alone (second pass)** | **69** | 2 | 1 |
+
+Ayah starts found by the alignment: median 37 ms from the true join, 90 % within 154 ms, at most 380 ms; the alignment itself takes 0.01–0.05 s. Reading: the model hears an ayah differently with its neighbours around it; hearing the doubtful ayahs again on their own (about a fifth of them) brings the result to the level of separate files. The one false error is al-Husary 110:3 («another syllable», −6.8). Time on the MacBook Air M1, with the batch CTC: 537 s of audio in 110 s — on average 25 s per 2 minutes of recording, at worst 36 s (short suras); the budget set by the author is 30 s per 2 minutes — to be checked on the server. Longer suras (87 and 93, al-Afasy and al-Husary, 54–167 s, 60 ayahs, second pass on): the whole recording at once — 53 passed / 6 again / 1 error, 50 s for the 167 s recording on the M1 (≈ 36 s per 2 minutes; the memory was enough); windows of 30 s overlapping by 4 s, logits joined at the middle of each overlap — 54 / 5 / 1, the same quality but slower (82 s), because the overlaps are heard twice. So: up to ~3 minutes the bot hears the recording whole; longer — windows with overlap. Caveats: reciters, not beginners; the forgotten-word check («by heart») is not measured yet.
+
 ### 11.9 How to repeat
 
 ```sh

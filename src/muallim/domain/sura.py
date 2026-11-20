@@ -7,10 +7,11 @@
 
 import difflib
 import re
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 from uuid import UUID
 
 from muallim.domain.assessment import ErrorKind, assess
@@ -136,6 +137,7 @@ class AyahOutcome(StrEnum):
     FORGOT_PART = "forgot_part"  # забыто хотя бы одно слово
     SKIPPED = "skipped"  # пропущен целиком, а следующие прочитаны
     NOT_REACHED = "not_reached"  # чтение закончилось раньше
+    AGAIN = "again"  # «прочитай ещё раз»: MostafaMaroof не уверена (FR-70 ч. 7, ADR-0088)
 
 
 class EventKind(StrEnum):
@@ -168,6 +170,9 @@ class AyahResult:
     forgotten_words: int = 0
     extra_words: int = 0
     pronunciation_errors: int = 0
+    # след решения «вариантов карточки» (маржи, победивший вариант, второй проход; FR-70 ч. 7);
+    # у чтений Muaalem — пусто
+    model_output: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)

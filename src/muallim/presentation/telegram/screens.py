@@ -603,6 +603,12 @@ def page_intro(curriculum: Curriculum, page: Page, image: bytes | None) -> Scree
     return Screen("\n\n".join(lines), kb.as_markup(), image, f"page:{page.number}")
 
 
+def _sura_outcome(outcome: str) -> str:
+    """Подпись исхода аята; у «ещё раз» (FR-70 ч. 7) своей подписи пока нет — просьба записать
+    голосовое ещё раз (утверждённый текст)."""
+    return texts.SURA_OUTCOME.get(outcome, texts.RECORD_AGAIN)
+
+
 # ---------- результат ----------
 def result(
     curriculum: Curriculum,
@@ -645,8 +651,9 @@ def result(
         image = _postcard_image(lesson)
     elif drawn:
         image = render.result_marks(text=r.item.text, breakdown=breakdown, score_label=counter)
-    blocks = ["\n".join(x for x in (_VERDICT[r.verdict], counter) if x)]  # «Верно 2 слова из 5»
-    blocks += _card_hints(r)
+    verdict = _verdict_line(r, has_audio)
+    blocks = ["\n".join(x for x in (verdict, counter) if x)]  # «Верно 2 слова из 5»
+    blocks += _card_hints(r, has_audio)
     other = not again and r.attempt.policy.is_other_line(a)  # совпало мало — разбор ниже
     blocks += [texts.RESULT_OTHER_LINE] * other
     if image is None:
@@ -678,11 +685,33 @@ def result(
     return Screen(caption, keyboard, image, details=details)
 
 
-def _card_hints(r: RecitationResult) -> list[str]:
+def _verdict_line(r: RecitationResult, has_audio: bool) -> str:
+    """Строка вердикта (FR-70 п. 6): тишина — «запись пустая»; второе «не уверен» подряд —
+    «засчитано, в следующий раз чётче»; «ещё раз» — «послушай образец», если есть 🔊."""
+    if r.unheard:
+        return texts.VERDICT_SILENT
+    if r.forced_pass:
+        return texts.VERDICT_PASSED_AFTER_AGAIN
+    line = _VERDICT[r.verdict]
+    if r.verdict is Verdict.AGAIN and has_audio:
+        return f"{line} {texts.VERDICT_AGAIN_LISTEN}"
+    return line
+
+
+_LISTEN_HINTS: Final = frozenset({"no_shadda", "short_madd"})
+
+
+def _card_hints(r: RecitationResult, has_audio: bool) -> list[str]:
     """Подсказки «вариантов карточки» (FR-70 п. 3, 5): мягкие шадда и мадд, последняя гласная,
-    «прочитан другой слог»; у попыток прежней проверки их нет."""
+    «прочитан другой слог»; у попыток прежней проверки их нет. «Послушай образец» — при 🔊."""
     hints = [*r.hints, *(["other_syllable"] if r.other_syllable else [])]
-    return [texts.CARD_HINTS[h] for h in hints if h in texts.CARD_HINTS]
+    return [
+        f"{texts.CARD_HINTS[h]} {texts.CARD_HINT_LISTEN}"
+        if has_audio and h in _LISTEN_HINTS
+        else texts.CARD_HINTS[h]
+        for h in hints
+        if h in texts.CARD_HINTS
+    ]
 
 
 _WORDS_SHOWN: Final = 3  # слов в пункте; дальше — texts.WORDS_MORE
@@ -1389,7 +1418,7 @@ def sura_result(result: SuraReadingResult) -> Screen:
             texts.SURA_PASSED_TEXT if reading.mode is SuraMode.TEXT else texts.SURA_PASSED_MEMORY
         )
         a = reading.assessment
-        summary = texts.SURA_SUMMARY.format(clean=a.clean_count, total=len(a.ayahs))
+        summary = _sura_summary(a.clean_count, len(a.ayahs))
         kb = InlineKeyboardBuilder()
         mode = "t" if reading.mode is SuraMode.TEXT else "m"
         kb.button(text=texts.SURA_AGAIN_BUTTON, callback_data=SuraOpen(n=sura.number, m=mode))
@@ -1397,6 +1426,12 @@ def sura_result(result: SuraReadingResult) -> Screen:
         kb.adjust(1, 2)
         return Screen("\n\n".join((head, summary, passed)), kb.as_markup())
     return sura_errors(sura, SuraErrorList.of(result), head)
+
+
+def _sura_summary(clean: int, total: int) -> str:
+    """«Чисто 2 аята из 5» — склонение по числу (FR-70 ч. 7)."""
+    ayahs = views.plural(clean, texts.AYAH_FORMS)
+    return texts.SURA_SUMMARY.format(clean=clean, ayahs=ayahs, total=total)
 
 
 def sura_errors(sura: Sura, errors: SuraErrorList, head: str = "") -> Screen:
@@ -1408,12 +1443,12 @@ def sura_errors(sura: Sura, errors: SuraErrorList, head: str = "") -> Screen:
     lines = [
         texts.SURA_FIXED_LINE.format(n=n)
         if item_id in errors.fixed
-        else texts.SURA_AYAH_LINE.format(n=n, outcome=texts.SURA_OUTCOME[outcome])
+        else texts.SURA_AYAH_LINE.format(n=n, outcome=_sura_outcome(outcome))
         for n, item_id, outcome in errors.bad[:SURA_BAD_SHOWN]
     ]
     if len(errors.bad) > SURA_BAD_SHOWN:
         lines.append(texts.SURA_MORE.format(n=len(errors.bad) - SURA_BAD_SHOWN))
-    summary = texts.SURA_SUMMARY.format(clean=errors.clean, total=errors.total)
+    summary = _sura_summary(errors.clean, errors.total)
     parts = [head, summary, "\n".join(lines), texts.SURA_NOT_PASSED]
     kb = InlineKeyboardBuilder()
     shown = errors.bad[:SURA_BAD_BUTTONS]

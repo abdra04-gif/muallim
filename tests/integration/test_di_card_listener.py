@@ -36,7 +36,6 @@ async def _settings(tmp_path: Path, **kwargs: str) -> Settings:
 def loaded(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     """Какие модели загрузились при сборке (вместо настоящей загрузки — отметка)."""
     from muallim.infrastructure.asr.maroof import MaroofListener  # noqa: PLC0415
-
     from muallim.infrastructure.asr.muaalem import MuaalemRecognizer  # noqa: PLC0415
 
     calls: list[str] = []
@@ -53,7 +52,6 @@ async def test_maroof_is_the_card_listener_and_muaalem_is_not_loaded(
     tmp_path: Path, loaded: list[str]
 ) -> None:
     from muallim.infrastructure.asr.maroof import MaroofListener  # noqa: PLC0415
-
     from muallim.infrastructure.asr.muaalem import MuaalemRecognizer  # noqa: PLC0415
 
     container = create_container(await _settings(tmp_path, asr_backend="muaalem"))

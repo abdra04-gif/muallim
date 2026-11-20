@@ -399,6 +399,125 @@ class ScriptedSuraRecognizer:
         )
 
 
+SURA_SCORE_RIGHT = -1.0  # балл верного чтения аята у ScriptedSuraListener
+# Балл всех остальных вариантов аята по исходу, который должен выйти у `decide` с CardPolicy():
+# верное −1 против −20 — «засчитано»; против 0 — маржа ≈ −0,3: «ещё раз»; против 10 — маржа
+# ≈ −10 (ниже other_error): «ошибка»
+_SURA_RIVAL = {"passed": -20.0, "again": 0.0, "error": 10.0}
+
+
+@dataclass
+class ScriptedSuraListener:
+    """Сура на «вариантах карточки» без модели (FR-70 ч. 7, FR-57; ADR-0088 «Суры»).
+
+    Исход каждого аята задаётся сценарием: ``first`` — номер аята → ``passed`` | ``again`` |
+    ``error`` | ``unheard`` (тишина: все варианты −inf) | ``broken`` (баллы бросают KeyError) |
+    ``skipped`` / ``not_reached`` (аят
+    пропущен или не дочитан — отрезка нет; что именно, сценарий решает по соседям).
+    Нет в таблице — ``passed``. Верные чтения аята — его текст из программы (слитно и с
+    остановкой одинаково); баллы подобраны так, чтобы `decide` дал нужный исход.
+    ``second`` — исход второго прохода (аят, вырезанный и услышанный отдельно); нет — как
+    ``first``. ``reheard`` — какие аяты слушали вторым проходом (порядок вызовов).
+    """
+
+    first: Mapping[int, str] = field(default_factory=dict)
+    second: Mapping[int, str] = field(default_factory=dict)
+    prefix: tuple[str, ...] = ()  # что прозвучало перед сурой: "preamble", "opening"
+    fail: bool = False
+    fail_stage: str = "model"
+    error: Exception | None = None  # необработанный сбой адаптера (не RecognitionError)
+    calls: list[dict[str, Any]] = field(default_factory=list)
+    reheard: list[int] = field(default_factory=list)
+
+    @staticmethod
+    def _listening(text: str, how: str) -> "Listening":
+        import math  # noqa: PLC0415
+
+        from muallim.application.ports.recognition import Listening  # noqa: PLC0415
+
+        if how == "broken":  # звука нет в словаре модели — сбой на подсчёте баллов
+
+            def score(variant: str) -> float:
+                raise KeyError("sh")
+
+        else:
+            rival = -math.inf if how == "unheard" else _SURA_RIVAL[how]
+            right = -math.inf if how == "unheard" else SURA_SCORE_RIGHT
+
+            def score(variant: str) -> float:
+                return right if variant == text else rival
+
+        def score_many(variants: Sequence[str]) -> list[float]:
+            return [score(v) for v in variants]
+
+        return Listening(
+            references=(("wasl", text), ("waqf", text)),
+            model_version="scripted-maroof-sura",
+            audio_duration_ms=3000,
+            raw="second",
+            score=score,
+            sounds=tuple,
+            score_many=score_many,
+        )
+
+    async def listen_sura(
+        self,
+        audio: bytes,
+        ayahs: Sequence[tuple[str, int, str]],
+        opening: str,
+        preamble: str,
+        *,
+        long_is_short: bool,
+    ) -> Any:
+        from muallim.application.ports.recognition import (  # noqa: PLC0415
+            AyahListening,
+            SuraListening,
+        )
+
+        self.calls.append(
+            {
+                "ayahs": tuple(ayahs),
+                "opening": opening,
+                "preamble": preamble,
+                "long_is_short": long_is_short,
+            }
+        )
+        if self.fail:
+            raise RecognitionError("битая запись", stage=self.fail_stage)
+        if self.error is not None:
+            raise self.error
+        out = []
+        for k, (item_id, number, text) in enumerate(ayahs):
+            how = self.first.get(number, "passed")
+            reached = how not in ("not_reached", "skipped")
+            first = self._listening(text, how if reached else "unheard")
+
+            async def rehear(number: int = number, text: str = text, how: str = how) -> Any:
+                self.reheard.append(number)
+                return self._listening(text, self.second.get(number, how))
+
+            out.append(
+                AyahListening(
+                    item_id=item_id,
+                    number=number,
+                    references=first.references,
+                    raw=f"ayah {number}",
+                    score=first.score,
+                    sounds=first.sounds,
+                    score_many=first.score_many,
+                    span_ms=(k * 3000, (k + 1) * 3000) if reached else None,
+                    rehear=rehear if reached else None,
+                )
+            )
+        return SuraListening(
+            ayahs=tuple(out),
+            prefix=self.prefix,
+            raw="whole sura",
+            model_version="scripted-maroof-sura",
+            audio_duration_ms=3000 * len(ayahs),
+        )
+
+
 @dataclass
 class ListErasureLog:
     """Журнал удалений в памяти; пишет в общий журнал «erase:<действие>» — проверяем порядок."""

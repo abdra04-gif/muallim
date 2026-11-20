@@ -2,15 +2,17 @@
 
 Telegram-бот — тренажёр чтения по учебнику «Аль-Муаллим ас-Сани» (магистерская диссертация,
 дальше — докторантура). **Ученики — русскоязычные, учат арабское чтение С НУЛЯ**
-(`docs/requirements/audience.md`): каждое решение проверяй этим. Ученик шлёт голосовое → модель Quran Muaalem распознаёт фонемы →
-`domain.assessment` находит ошибки → бот объясняет их по-русски → попытка сохраняется для исследования.
+(`docs/requirements/audience.md`): каждое решение проверяй этим. Ученик шлёт голосовое → модель MostafaMaroof оценивает,
+на что запись похожа больше: на верное чтение или на типичные ошибки карточки → `domain.card_check` решает
+(засчитано / ещё раз / ошибка, ADR-0088; Muaalem выключена настройкой `CHECKER`) → бот объясняет по-русски →
+попытка сохраняется для исследования.
 
 ## Карта
 | Где | Что |
 |---|---|
 | `src/muallim/domain/` | правила: оценка чтения, типы ошибок, уроки, пороги — только stdlib |
 | `src/muallim/application/` | сценарии (`use_cases/`) и порты (`ports/`) |
-| `src/muallim/infrastructure/` | PostgreSQL, Muaalem, ffmpeg, аудиофайлы, YAML |
+| `src/muallim/infrastructure/` | PostgreSQL, MostafaMaroof (`asr/maroof.py`; Muaalem — выключена), ffmpeg, аудиофайлы, YAML |
 | `src/muallim/presentation/telegram/` | обработчики, клавиатуры, тексты |
 | `src/muallim/research/` | отчёты, разметка, датасет |
 | `src/muallim/bootstrap/` | конфиг, DI (`di.py`), точки входа |

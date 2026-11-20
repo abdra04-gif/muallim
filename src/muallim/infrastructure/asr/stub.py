@@ -62,10 +62,9 @@ class StubCardListener(CardListener):
 
 
 class DisabledRecognizer(PronunciationRecognizer, SuraRecognizer):
-    """Muaalem выключена (``CHECKER=maroof``, ADR-0088): модель не грузится. Карточки проверяет
-    MostafaMaroof; суры на ней — следующий шаг (FR-70 ч. 7), до него голосовое суры —
-    ``RecognitionError``: ученик видит «не получилось обработать», в журнале — этап
-    ``disabled``."""
+    """Muaalem выключена (``CHECKER=maroof``, ADR-0088): модель не грузится. Карточки и суры
+    слушает MostafaMaroof (``CardListener``, ``SuraListener``); сюда вызов не доходит, а если
+    дойдёт — ``RecognitionError`` с этапом ``disabled``, ученик видит «не получилось обработать»."""
 
     async def recognize(self, audio: bytes, text: str) -> Recognition:
         raise RecognitionError("Muaalem выключена (CHECKER=maroof)", stage="disabled")
@@ -77,4 +76,4 @@ class DisabledRecognizer(PronunciationRecognizer, SuraRecognizer):
         opening: str = "",
         preamble: str = "",
     ) -> SuraRecognition:
-        raise RecognitionError("Сура на MostafaMaroof ещё не сделана", stage="disabled")
+        raise RecognitionError("Muaalem выключена (CHECKER=maroof)", stage="disabled")

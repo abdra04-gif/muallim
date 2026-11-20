@@ -420,3 +420,89 @@ def test_migration_0015_allows_verdict_again_and_downgrades_it_to_failed(tmp_pat
     with create_engine(f"sqlite:///{db}").connect() as conn:
         after = conn.exec_driver_sql("SELECT verdict FROM attempts").all()
     assert after == [("failed",)]
+
+
+# ---------- 0016: аят суры на MostafaMaroof — again и model_output (FR-70 ч. 7, FR-57) ----------
+_READING = "0" * 31 + "5"
+_PUPIL = "0" * 31 + "1"
+
+
+def _seed_sura_ayah(conn: Any) -> None:
+    """Ученик, чтение суры и один аят — как до 0016 (без ``model_output``)."""
+    conn.exec_driver_sql(
+        "INSERT INTO learners (id, telegram_user_id, pseudonym, language, research_consent,"
+        " blocked_bot, created_at) VALUES (?, 5, 'L-1', 'ru', 1, 0, '2026-10-31 12:00:00')",
+        (_PUPIL,),
+    )
+    conn.exec_driver_sql(
+        "INSERT INTO sura_readings (id, learner_id, sura, mode, attempt_number, studied_by_text,"
+        " clean_ayahs, total_ayahs, score, passed, credited, reference_phonemes, heard_phonemes,"
+        " audio_duration_ms, processing_ms, model_version, curriculum_version, app_version,"
+        " created_at) VALUES (?, ?, 112, 'text', 1, 0, 1, 2, 50, 0, '[]', 'a', 'a', 9000, 700,"
+        " 'm', 'v1', 'a', '2026-10-31 12:00:00')",
+        (_READING, _PUPIL),
+    )
+    conn.exec_driver_sql(
+        "INSERT INTO sura_reading_ayahs (reading_id, ayah, item_id, outcome, score,"
+        " forgotten_words, extra_words, pronunciation_errors, reference_phonemes,"
+        " heard_phonemes) VALUES (?, 1, 'L123-02', 'clean', 100, 0, 0, 0, 'a', 'a')",
+        (_READING,),
+    )
+
+
+_AYAH_2 = (
+    "INSERT INTO sura_reading_ayahs (reading_id, ayah, item_id, outcome, score, forgotten_words,"
+    " extra_words, pronunciation_errors, reference_phonemes, heard_phonemes, model_output)"
+    " VALUES (?, 2, 'L123-03', ?, 0, 0, 0, 0, 'a', '', ?)"
+)
+
+
+def test_migration_0016_allows_ayah_again_and_model_output_then_downgrades(
+    tmp_path: Path,
+) -> None:
+    """После 0016 у аята суры — исход ``again`` и JSON ``model_output`` (маржи, соперник, второй
+    проход); чужой исход — нет; прежний аят не меняется (``model_output`` пуст). Откат: again →
+    ``pronunciation`` (прежнее «не засчитано»: прочитан, но не чисто), столбец уходит."""
+    import json  # noqa: PLC0415
+
+    from sqlalchemy.exc import IntegrityError  # noqa: PLC0415
+
+    db = tmp_path / "m16.sqlite3"
+    cfg = _config(f"sqlite+aiosqlite:///{db}")
+    command.upgrade(cfg, "0015")
+    with create_engine(f"sqlite:///{db}").begin() as conn:
+        _seed_sura_ayah(conn)
+    command.upgrade(cfg, "0016")
+    engine = create_engine(f"sqlite:///{db}")
+    output = json.dumps({"margin": -0.3, "margin_other": 2.0, "second_pass": True})
+    with engine.begin() as conn:
+        old = conn.exec_driver_sql(
+            "SELECT outcome, model_output FROM sura_reading_ayahs WHERE ayah = 1"
+        ).all()
+        conn.exec_driver_sql(_AYAH_2, (_READING, "again", output))
+        saved = conn.exec_driver_sql(
+            "SELECT outcome, model_output FROM sura_reading_ayahs WHERE ayah = 2"
+        ).one()
+    assert old == [("clean", None)]
+    assert saved[0] == "again" and json.loads(saved[1])["second_pass"] is True
+    with pytest.raises(IntegrityError), engine.begin() as conn:
+        conn.exec_driver_sql("UPDATE sura_reading_ayahs SET outcome = 'unsure' WHERE ayah = 2")
+    engine.dispose()
+
+    command.downgrade(cfg, "0015")
+    with create_engine(f"sqlite:///{db}").connect() as conn:
+        after = conn.exec_driver_sql(
+            "SELECT ayah, outcome FROM sura_reading_ayahs ORDER BY ayah"
+        ).all()
+        columns = [r[1] for r in conn.exec_driver_sql("PRAGMA table_info(sura_reading_ayahs)")]
+    assert after == [(1, "clean"), (2, "pronunciation")]
+    assert "model_output" not in columns
+
+
+def test_ayah_outcomes_in_migration_match_code() -> None:
+    """Исходы аята в CHECK последней миграции (``AYAH_OUTCOMES``) — те же, что ``AyahOutcome``;
+    среди них «ещё раз» (again)."""
+    from muallim.domain.sura import AyahOutcome  # noqa: PLC0415
+
+    assert set(_latest_with("AYAH_OUTCOMES").AYAH_OUTCOMES) == {str(o) for o in AyahOutcome}
+    assert "again" in {str(o) for o in AyahOutcome}

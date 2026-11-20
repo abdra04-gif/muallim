@@ -1,6 +1,6 @@
 """Распознавание произношения (ASR)."""
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
@@ -44,6 +44,52 @@ class CardListener(Protocol):
     async def listen(self, audio: bytes, text: str, *, long_is_short: bool) -> Listening:
         """``audio`` — запись из Telegram, ``text`` — текст карточки; ``long_is_short`` — на уроке
         протянутая гласная не ошибка (`CardPolicy.long_is_short`)."""
+
+
+@dataclass(frozen=True, slots=True)
+class AyahListening:
+    """Аят в записи суры (FR-70 ч. 7): баллы вариантов — на его отрезке. ``span_ms is None`` —
+    аят не прозвучал (пропущен или не дочитан). ``rehear()`` — второй проход: аят вырезается из
+    записи и слушается отдельно (модель зовётся только при вызове)."""
+
+    item_id: str
+    number: int
+    references: tuple[tuple[str, str], ...]
+    raw: str
+    score: Callable[[str], float]
+    sounds: Callable[[str], Sequence[str]]
+    score_many: Callable[[Sequence[str]], Sequence[float]] | None
+    span_ms: tuple[int, int] | None
+    rehear: Callable[[], Awaitable[Listening]] | None
+
+
+@dataclass(frozen=True, slots=True)
+class SuraListening:
+    """Сура целиком на «вариантах карточки». ``prefix`` — что прозвучало перед сурой:
+    ``"preamble"`` (истиаза), ``"opening"`` (басмала)."""
+
+    ayahs: tuple[AyahListening, ...]
+    prefix: tuple[str, ...]
+    raw: str
+    model_version: str
+    audio_duration_ms: int
+    pauses: tuple[tuple[int, int], ...] = ()
+    chunks: tuple[tuple[int, int, int, int], ...] = ()
+
+
+@runtime_checkable
+class SuraListener(Protocol):
+    async def listen_sura(
+        self,
+        audio: bytes,
+        ayahs: Sequence[tuple[str, int, str]],
+        opening: str,
+        preamble: str,
+        *,
+        long_is_short: bool,
+    ) -> SuraListening:
+        """``ayahs`` — (id карточки, номер аята, текст); ``opening`` — басмала, ``preamble`` —
+        истиаза (необязательные начала)."""
 
 
 @dataclass(frozen=True, slots=True)

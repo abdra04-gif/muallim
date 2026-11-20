@@ -6,6 +6,7 @@
 
 import io
 import logging
+import math
 from typing import Final
 
 from aiogram import Bot, Router
@@ -26,6 +27,18 @@ logger: Final = logging.getLogger(__name__)
 router: Final = Router(name="learner.sura")
 
 TEXT, LOOK, MEMORY = "text", "look", "memory"  # что на экране (ScreenState.sura)
+
+
+# Сколько ждать проверку суры (ADR-0088 «Порог времени для суры»): ~0,25 с на секунду записи на
+# CPU (замер PHASE_3 §11.8k), вверх до 5 с
+_CHECK_S_PER_RECORDED_S = 0.25
+_CHECK_ROUND_S = 5
+
+
+def check_seconds(recorded_s: int) -> int:
+    """Оценка «займёт ~N с» по длине голосового — сообщается ученику до результата."""
+    n = math.ceil(recorded_s * _CHECK_S_PER_RECORDED_S / _CHECK_ROUND_S) * _CHECK_ROUND_S
+    return max(_CHECK_ROUND_S, n)
 
 
 @router.callback_query(SuraList.filter())
@@ -102,9 +115,14 @@ async def read_sura_voice(
         await m.reply(texts.SURA_PRESS_READY)
         return
     assert m.voice is not None  # noqa: S101 — вызывается из обработчика F.voice
+    try:
+        uc.sura(number)
+    except KeyError:  # суру убрали из программы (только это: сбой проверки — ниже)
+        await m.reply(texts.STALE_BUTTON)
+        return
     buf = io.BytesIO()
     await bot.download(m.voice, destination=buf)
-    wait = await m.reply(texts.SURA_LISTENING)
+    wait = await m.reply(texts.SURA_CHECKING.format(seconds=check_seconds(m.voice.duration)))
     try:
         result = await uc.execute(
             learner, buf.getvalue(), number, SuraMode.TEXT if mode == TEXT else SuraMode.MEMORY
@@ -117,10 +135,8 @@ async def read_sura_voice(
             error.stage,
             exc_info=True,
         )
-        await wait.edit_text(texts.CANT_PROCESS)
-        return
-    except KeyError:  # суру убрали из программы
-        await wait.edit_text(texts.STALE_BUTTON)
+        await wait.delete()  # «🎧 Проверяю…» не висит
+        await m.reply(texts.CANT_PROCESS)
         return
     reading = result.reading
     logger.info(

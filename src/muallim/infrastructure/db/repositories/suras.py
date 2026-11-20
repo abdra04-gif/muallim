@@ -69,6 +69,7 @@ class SqlSuraReadingRepository(SuraReadingRepository):
                         "pronunciation_errors": r.pronunciation_errors,
                         "reference_phonemes": r.reference,
                         "heard_phonemes": r.heard,
+                        "model_output": dict(r.model_output) or None,
                     }
                     for r in a.ayahs
                 ],
