@@ -210,3 +210,16 @@ def test_attempt_and_sura_reading_are_training_by_default() -> None:
     for model in (Attempt, SuraReading):
         default = {f.name: f.default for f in fields(model)}.get("part")
         assert default is Part.TRAIN, model
+
+
+# ---------- шаг 3: отпечаток соли в журнал при запуске бота (предрегистрация 0.7) ----------
+def test_bot_start_logs_the_salt_fingerprint_not_the_salt(tmp_path: Path) -> None:
+    """Отпечаток (SHA-256) — в журнал бота, оттуда в research-log до первого обучения; самой
+    соли в журнале нет. Нет соли — бот создаёт её здесь же, до первой попытки."""
+    from muallim.bootstrap.main import split_line  # noqa: PLC0415
+
+    salt = FileSplitSalt(tmp_path / "salt")
+    line = split_line(salt)
+    assert salt.fingerprint() in line and "TD-FN-174" in line
+    assert salt.get().hex() not in line
+    assert split_line(None) == ""

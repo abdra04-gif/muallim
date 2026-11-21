@@ -15,6 +15,7 @@ from dishka import AsyncContainer
 from dishka.integrations.aiogram import setup_dishka
 
 from muallim.application.ports.recognition import CardListener, PronunciationRecognizer
+from muallim.application.ports.storage import SplitSalt
 from muallim.application.ports.system import BuildInfo
 from muallim.application.use_cases.curriculum import PublishCurriculum
 from muallim.bootstrap.config import Settings
@@ -72,6 +73,14 @@ def _log_crash(task: asyncio.Task[None]) -> None:
     logging.getLogger(__name__).error("Фоновая задача %s упала", task.get_name(), exc_info=error)
 
 
+def split_line(salt: SplitSalt | None) -> str:
+    """Строка журнала про деление на учёбу и тест: отпечаток соли, не сама соль (TD-FN-174).
+    Соли ещё нет — создаётся здесь, до первой попытки; пропала при уже идущем делении — ошибка."""
+    if salt is None:
+        return ""
+    return f"Деление на учёбу и тест: отпечаток соли SHA-256 {salt.fingerprint()} (TD-FN-174)"
+
+
 async def main() -> None:
     settings = Settings()  # поля читаются из окружения и .env
     secrets = (settings.bot_token.get_secret_value(), settings.database_url.get_secret_value())
@@ -91,6 +100,8 @@ async def main() -> None:
     async with container() as request:  # снимок программы в БД: страница и строка у каждой попытки
         added = await (await request.get(PublishCurriculum)).execute()
     log.info("Программа в БД: новых карточек %s", added)
+    if line := split_line(await container.get(SplitSalt | None)):
+        log.info(line)  # отпечаток — в research-log до первого обучения (предрегистрация 0.7)
 
     bot = Bot(
         settings.bot_token.get_secret_value(),

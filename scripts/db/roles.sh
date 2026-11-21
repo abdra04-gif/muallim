@@ -59,5 +59,5 @@ url.write_text(f"postgresql+asyncpg://muallim_agent:{os.environ['AGENT']}@localh
 url.chmod(0o600)
 PY
 
-echo "Готово: три входа созданы, пароли записаны в .env (DBeaver — пользователь muallim_reader,"
+echo "Готово: четыре входа созданы (вход агента — data/agent/database.url), пароли записаны в .env (DBeaver — пользователь muallim_reader,"
 echo "пароль — READER_DB_PASSWORD). Перезапустите бота: make run"
