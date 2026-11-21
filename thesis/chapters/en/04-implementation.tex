@@ -58,7 +58,7 @@ the tutor contains only the Arabic exercises and its own explanations, never the
 \paragraph{From pages to lessons} A lesson corresponds to a section of the book; long sections are split
 into parts of at most eight lines. A card corresponds to a printed line and stores its page and line
 number, so every attempt can be traced back to the book. Table~\ref{tab:book} shows the result: the whole
-book in nine parts, 125 lessons and 800 cards.
+book in nine parts, 124 lessons and 797 cards.
 
 \begin{table}[ht]
 \centering\small
@@ -68,7 +68,7 @@ book in nine parts, 125 lessons and 800 cards.
 \toprule
 Part & Lessons & Cards & Pages \\
 \midrule
-1. Introduction (\emph{isti'adha}, \emph{basmala}, alphabet) & 2 & 8 & 10 \\
+1. Introduction (alphabet) & 1 & 5 & 10 \\
 2. Letters and short vowels & 28 & 128 & 10--24 \\
 3. Long vowels & 7 & 50 & 25--29 \\
 4. \emph{Shadda} and \emph{tanwin} & 7 & 52 & 30--34 \\
@@ -78,7 +78,7 @@ Part & Lessons & Cards & Pages \\
 8. Pausing and \emph{madd} & 11 & 78 & 63--74 \\
 9. Suras & 29 & 193 & 75--85 \\
 \midrule
-Total & 125 & 800 & 10--85 \\
+Total & 124 & 797 & 10--85 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -254,8 +254,9 @@ reading \cite{SRC-144}; a person listens to the recordings before use. Speech sy
 \paragraph{Other features} A ``the bot was wrong'' button lets the learner dispute a verdict with a reason;
 disputed attempts go first into the annotation queue. Short consolidation questions (``how is this syllable
 read?'') revisit learned letters. A streak of days and today's attempts are shown on the home screen. The
-first lesson begins with \emph{isti'adha} and \emph{basmala}; the alphabet table on page~10 is shown for
-reference without voice checking, because Maksudi teaches sounds, not names.
+first lesson follows the book: the scan of page~10 with the \emph{basmala} as its heading, then the alphabet
+table, shown for reference without voice checking because Maksudi teaches sounds, not names; the first voice
+message is on \emph{hamza}.
 
 \section{Research data and annotation}\label{sec:impl-data}
 
@@ -302,9 +303,9 @@ features for B1: nothing has to be recomputed. The recogniser sits behind a port
 recogniser has already shown that a new model plugs in without changing the domain
 (Section~\ref{sec:impl-architecture}).
 
-\paragraph{Export and split} An export command assembles the training and test parts from the frozen list
-of test learners and writes a datasheet \cite{SRC-123} and fingerprints next to them: of the learner list,
-of each part and of the annotation-guide version. Test labels are stored in a directory that a hook forbids
+\paragraph{Export and split} An export command assembles the training and test parts by the fixed split
+salt and writes a datasheet \cite{SRC-123} and fingerprints next to them: of the split salt,
+of each part and of the annotation-guide version. Test attempts and their labels are stored in a directory that a hook forbids
 the agent to read; the evaluator loads them itself.
 
 \paragraph{B1} Per-phoneme features are built from the stored model output; training and calibration run on
@@ -332,8 +333,8 @@ database, not to logs. Tests enforce these rules.
 
 \paragraph{Threat model} A STRIDE analysis covers spoofing (identity only from Telegram-signed user IDs; no
 inbound ports thanks to long polling), tampering (audio addressed by SHA-256; restore with verification;
-frozen tests against test gaming), information disclosure (pseudonymised exports; agent forbidden to read
-learner data and secrets; files with owner-only permissions), denial of service (60-second limit) and
+frozen tests against test gaming), information disclosure (pseudonymised exports; the agent reads learner
+data only locally and cannot modify originals or read secrets and the test part; files with owner-only permissions), denial of service (60-second limit) and
 elevation of privilege (parameterised queries, dependency audit, a non-root container, and a hook that blocks
 non-existent packages).
 
@@ -366,7 +367,7 @@ the action is refused.
 \toprule
 Hook & Event & What it does \\
 \midrule
-guard & before a tool call & Blocks reading of secrets and learner data, editing tests in the
+guard & before a tool call & Blocks reading of secrets and the test part, modifying original learner data, editing tests in the
 implementation phase, changing the phase directly, bypassing checks, force pushes; with the training
 pipeline (TD-FN-72) it will also block reading test-set labels. \\
 human\_zones & before a tool call & Asks for approval with a reason before changes to content, learner

@@ -37,7 +37,7 @@ reading in the learners' language. \\
 Design evaluation & Annotation reliability and agreement of off-the-shelf models with teachers (RQ-1),
 controlled experiment against baseline configurations on a frozen test set under a fixed budget (RQ-2). \\
 Research contributions & Dataset; reliability of off-the-shelf models on beginners; a system built by agentic pipeline optimization with a configuration log. \\
-Research rigour & Preregistration; learner-disjoint split and frozen test set; standard MDD metrics; agreement statistics with confidence intervals;
+Research rigour & Preregistration; attempt-level split with a fixed salt and frozen test set; standard MDD metrics; agreement statistics with confidence intervals;
 case-study protocol \cite{SRC-102}; Empirical Standards as checklist \cite{SRC-103}. \\
 Design as a search process & 50 recorded decisions with rejected alternatives; seven design iterations. \\
 Communication & Thesis, dataset card, fine-tuned weights, open architecture, and a doctoral roadmap. \\
@@ -54,7 +54,7 @@ Russian-speaking adults who learn to read Arabic from zero. Seven rules follow f
 in Russian before it is needed; follow the book's order in small steps; let the learner hear before
 reading; explain errors through familiar sounds and show them in the text; consolidate with short
 questions; never punish; and treat the Qur'anic text with respect, using the exact text of the Medina
-mushaf and starting with \emph{isti'adha} and \emph{basmala}.
+mushaf, and starting as the book does, with the \emph{basmala} as the heading of page~10.
 
 \subsection{Functional requirements and user stories}
 
@@ -63,7 +63,7 @@ written with stable identifiers and MoSCoW priorities. The current specification
 requirements, grouped as follows: curriculum from the book (FR-01, FR-16, FR-36--FR-41), assessment and
 feedback (FR-03--FR-05, FR-20--FR-22, FR-43), learner experience (FR-02, FR-07, FR-31--FR-35), research
 data (FR-06, FR-11--FR-14, FR-17, FR-24, FR-26--FR-29), privacy (FR-08--FR-10, FR-44) and
-later interface additions (FR-45--FR-47). User stories
+later interface additions (FR-46). User stories
 describe the same requirements from the viewpoints of learner, teacher and researcher. A traceability matrix
 links each requirement to code and tests; an automated report shows which requirements are covered by
 passing tests (59 of 60 at the time of writing).
@@ -165,7 +165,7 @@ The pilot is closed: learners are invited through teachers and the author's acqu
 questionnaire, asked only of consenting learners, records age (18+), first language and prior experience of
 reading Arabic. Consent to voice recording explicitly covers training the model on the recording and
 releasing the weights. Learners who do not consent can still use the tutor; their attempts are graded but no audio
-is kept and they are excluded from the analysis. Learners are split into training, validation and test parts without overlap; test learners are not used for training or tuning. The materials are the cards of the letter and vowel lessons
+is kept and they are excluded from the analysis. Attempts are split into training, validation and test parts; test attempts are not used for training or tuning. The materials are the cards of the letter and vowel lessons
 (pages 10--24 of the book) and, for exploratory analysis, later lessons that learners reach. The unit of
 analysis is an attempt; learners are clusters, because attempts by one learner are not independent.
 
@@ -326,16 +326,18 @@ phonemes of the paired card, is a substitution example) \cite{SRC-119}, and by s
 $0.9/1.0/1.1$ \cite{SRC-120}. The hyperparameter grid ($r\in\{8,16\}$, learning rate, number of epochs with
 early stopping) is fixed in the preregistration.
 
-\paragraph{Split and test-set protection} Before the agentic optimization first runs, about 30\,\% of learners, stratified
-by first language and activity, are assigned to the test set, and the list is fixed with a SHA-256
-fingerprint. The split is by learner, not by attempt; otherwise one speaker's voice would appear in both
-training and evaluation \cite{SRC-122}. The agent searches configurations --- including B2's
-hyperparameters and B1's calibration --- only by 5-fold learner-grouped cross-validation inside the training
+\paragraph{Split and test-set protection} About 30\,\% of attempts go to the test set: each attempt's part is
+decided when it is saved, by a salted hash of its identifier, and the salt is fixed with a SHA-256
+fingerprint before the agentic optimization first runs \cite{SRC-122}. A learner may have attempts in both
+the training and the test part, so metrics are computed per learner first and then averaged over learners,
+with confidence intervals from a learner-level bootstrap. The agent searches configurations --- including
+B2's hyperparameters and B1's calibration --- only by 5-fold cross-validation inside the training
 part \cite{SRC-121}; the log of every configuration tried is published, so that choosing the best cannot be
-mistaken for overfitting. Both teachers annotate the
-test attempts, seeing the tutor's answer and correcting it, and reconcile disagreements; these gold labels are
-what the baselines and the best configuration are compared against. The test set is opened once, after the
-agentic optimization has finished, the best configuration is frozen and the evaluator is fixed by fingerprint.
+mistaken for overfitting. Teachers annotate the
+test attempts, seeing the tutor's answer and correcting it; an attempt enters the test set if at least one of
+them has annotated it, and where both did and disagree the difference is reconciled. These gold labels are
+what the baselines and the best configuration are compared against. The test set is opened once, when at
+least 200 test attempts are annotated, the agentic optimization has finished, the best configuration is frozen and the evaluator is fixed by fingerprint.
 
 \paragraph{Metrics and analysis} For the baselines and the best configuration the Study~1 metrics are computed
 on the test set: phoneme-level precision, recall, F1 and diagnosis accuracy, verdict-level FAR and FRR, and
@@ -386,14 +388,14 @@ Three mechanisms protect the results from being shaped after the fact.
 
 \paragraph{Preregistration} Hypotheses, exclusions, sample size and analysis are written down before data
 collection. When the author and supervisor approve the plan, its SHA-256 fingerprint and date are recorded,
-and any later change requires a new version with a stated reason. Separately, before the agentic optimization first runs, the list of test learners and the RQ-1 and RQ-2 evaluator code are fixed
+and any later change requires a new version with a stated reason. Separately, before the agentic optimization first runs, the split salt and the RQ-1 and RQ-2 evaluator code are fixed
 by fingerprint. Freezing data and
 evaluator by hash follows the practice of the supervisor's group \cite{SRC-067}.
 
 \paragraph{Protected evaluator and test set} The module that computes RQ-1 and RQ-2 metrics is a human-owned
 zone: the coding agent must ask before changing it, because an agent that can edit the evaluator can
-improve the score without improving the system \cite{SRC-027,SRC-082}. A hook forbids the agent to read the
-test learners' labels: an agent that had seen the test set could fit a model to it.
+improve the score without improving the system \cite{SRC-027,SRC-082}. Test attempts and their labels are
+stored in a closed part that a hook forbids the agent to read: an agent that had seen the test set could fit a model to it.
 
 \paragraph{Provenance} Every attempt stores the canonical variants, the recognised phonemes, the raw model
 output, the thresholds, the code, curriculum and model versions, the book line as shown to the learner, and
@@ -433,10 +435,10 @@ Type & Threat & Response \\
 Construct & An annotator's label is not the ``true'' error; teachers may disagree. & Two annotators;
 teacher--teacher $\kappa$ as ceiling; written guide with versions. \\
 Construct & Annotators see the tutor's answer and may agree by suggestion, which favours B0. & Both
-teachers annotate every test attempt; teacher--teacher agreement is reported next to model--teacher; agreement analysed separately for
+teacher--teacher agreement is computed on attempts annotated by both and reported next to model--teacher; agreement analysed separately for
 passed and failed attempts. \\
-Internal & Leakage between training and test (same speaker, tuning on the test set). & Learner-disjoint
-split; frozen test list; CV inside training; hook on test labels; test set opened once. \\
+Internal & Leakage between training and test (same speaker, tuning on the test set). & Split salt fixed
+before training; CV inside training; test part closed by a hook; test set opened once. \\
 Internal & Gains on beginners bought by forgetting. & A fine-tuned model is tested on held-out expert
 recitation. \\
 Internal & The agentic optimization tries many configurations and may fit the choice to the data. & Search only by

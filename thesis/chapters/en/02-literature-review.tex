@@ -267,8 +267,8 @@ Small data make inflated results easy. Tuning hyperparameters on the data on whi
 biases the estimate upwards; nested cross-validation or a separate test set is required \cite{SRC-121}.
 Kapoor and Narayanan found data leakage in hundreds of ML-based studies and proposed a taxonomy of it
 \cite{SRC-122}; in speech, the main leak is the same speaker in training and evaluation. Hence the rules
-of this work: a learner-disjoint split, a test set frozen before training, annotation of the test
-set by two teachers, and a single run on it. The supervisor's group formulated the same requirements for studies in
+of this work: an attempt-level split with a fixed salt and per-learner metrics, a test set frozen before training, annotation of the test
+set by the teachers, and a single run on it. The supervisor's group formulated the same requirements for studies in
 which models are tuned by AI agents \cite{SRC-067}. The dataset to be released comes with a datasheet
 following Gebru and colleagues \cite{SRC-123}.
 
