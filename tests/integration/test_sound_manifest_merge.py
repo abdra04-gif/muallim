@@ -1,8 +1,8 @@
-"""Истиаза звучит готовой записью Мишари Рашида аль-Афаси, а не из папки записей учителя (FR-49).
+"""Пересборка манифеста готовых записей не теряет ручные и отклонённые строки (FR-49).
 
-``curriculum/audio/<id>.ogg`` — только записи учителя; готовые записи (буквы и слоги ар-Раи,
-истиаза аль-Афаси) лежат в ``curriculum/audio/library`` и описаны в ``sounds.yaml``. Строку,
+Готовые записи лежат в ``curriculum/audio/library`` и описаны в ``sounds.yaml``. Строку,
 добавленную вручную (``manual: true``), пересборка ``scripts/audio/library_sounds.py`` не теряет.
+Проверки записи истиазы убраны вместе с карточкой (автор 2026-11-21: истиазы в книге нет).
 """
 
 import importlib.util
@@ -10,37 +10,12 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
-import yaml
-
-from muallim.domain.curriculum import Curriculum
-from muallim.infrastructure.audio.reference_library import SoundLibrary
 
 pytestmark = pytest.mark.integration
 
 ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "curriculum" / "audio"
 LIBRARY = AUDIO / "library"
-ISTI_ADHA = "L001-02"
-
-
-def test_teacher_folder_has_no_isti_adha_file() -> None:
-    assert not (AUDIO / f"{ISTI_ADHA}.ogg").exists()
-
-
-def test_isti_adha_is_a_manual_alafasy_recording(curriculum: Curriculum) -> None:
-    text = curriculum.item(ISTI_ADHA).text
-    rows = yaml.safe_load((LIBRARY / "sounds.yaml").read_text(encoding="utf-8")) or []
-    found = [r for r in rows if r.get("text") == text]
-    assert len(found) == 1, "истиазы нет в sounds.yaml"
-    row = found[0]
-    assert row.get("manual") is True
-    assert row.get("status") != "bad"
-    assert "Alafasy" in str(row.get("origin", ""))
-    assert (LIBRARY / Path(row["file"]).name).is_file()
-
-
-def test_library_finds_isti_adha_by_text(curriculum: Curriculum) -> None:
-    assert SoundLibrary.load(LIBRARY).has(curriculum.item(ISTI_ADHA).text)
 
 
 # ---------- пересборка манифеста не теряет ручные строки ----------

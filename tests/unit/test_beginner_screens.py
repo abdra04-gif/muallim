@@ -76,7 +76,7 @@ def _result(
 
 # ---------- FR-49: первая кнопка, шаги, замок, счётчики ----------
 def test_start_button_does_not_promise_the_alphabet() -> None:
-    """Новичок начинает с истиазы и басмалы, а не с алфавита — кнопка называет урок."""
+    """Новичок начинает с басмалы (с. 10 книги), а не с алфавита — кнопка называет урок."""
     assert "алфавит" not in texts.START_BUTTON.casefold()
     assert "урок" in texts.START_BUTTON.casefold()
 
@@ -135,8 +135,8 @@ def test_fresh_learner_start_button_opens_lesson_one(curriculum: Curriculum) -> 
     s = screens.home(curriculum, _progress(curriculum, attempts=0))
     label, data = _buttons(s.keyboard)[0]
     assert label == texts.START_BUTTON
-    assert data == cb.GoItem(item_id=curriculum.first_item().id).pack()
-    assert curriculum.locate(curriculum.first_item().id)[0].number == 1
+    assert data == cb.PageOpen(n=10).pack()  # сначала скан с. 10 (ADR-0089)
+    assert curriculum.locate(curriculum.first_item().id)[0] == curriculum.lessons[0]
 
 
 def test_card_head_counts_steps_not_lines(curriculum: Curriculum) -> None:
@@ -193,7 +193,7 @@ def test_quiz_lock_does_not_send_learner_back(curriculum: Curriculum, current: s
 
 def test_part_counters_count_only_lessons_with_reading(curriculum: Curriculum) -> None:
     """Главная, список частей и прогресс считают одни и те же уроки — с чтением вслух."""
-    p = _progress(curriculum, done={curriculum.lessons[0].id})
+    p = _progress(curriculum)
     s = screens.lessons(curriculum, p, part=None)
     labels = [t for t, d in _buttons(s.keyboard) if d.startswith("lessons:")]
     fractions = [_FRACTION.search(t) for t in labels]
@@ -201,8 +201,8 @@ def test_part_counters_count_only_lessons_with_reading(curriculum: Curriculum) -
     totals = [int(m.group(2)) for m in fractions if m]
     with_reading = sum(1 for les in curriculum.lessons if les.practice_items)
     assert sum(totals) == with_reading == p.practice_lessons
-    assert totals[0] == 1  # «Знакомство»: истиаза и басмала; алфавит только смотрят
-    assert labels[0].startswith("✅") and labels[0].endswith("1/1")
+    assert totals[0] == 0  # «Знакомство»: только алфавит — его смотрят, не читают (ADR-0089)
+    assert labels[0].endswith("0/0")
     pages = [pg for pg in curriculum.pages() if any(x.practice_items for x in pg.lessons)]
     assert f"из {len(pages)}" in screens.home(curriculum, p).caption  # страницы книги
     assert f"из {with_reading}" in screens.progress(curriculum, p).caption
@@ -302,7 +302,7 @@ def _failed_reviewed(c: Curriculum) -> RecitationResult:
 
 
 def test_correct_result_hides_research_block_and_heard_line(curriculum: Curriculum) -> None:
-    item = curriculum.item("L001-02")
+    item = curriculum.item("L097-02")
     s = screens.result(curriculum, _result(curriculum, item.id, item.text), has_audio=True)
     assert _research_shown(s) == []
 
@@ -326,7 +326,7 @@ def test_failed_result_lets_learner_go_on(curriculum: Curriculum) -> None:
 @pytest.mark.parametrize("failed", [False, True], ids=["correct", "with_errors"])
 def test_nobody_sees_research_block(curriculum: Curriculum, failed: bool) -> None:
     """Автор 2026-11-08: «Для исследования» убран и у учителя; номер — в «🚩 Бот ошибся»."""
-    item = curriculum.item("L001-02")
+    item = curriculum.item("L097-02")
     r = _failed(curriculum) if failed else _result(curriculum, item.id, item.text)
     s = screens.result(curriculum, r, has_audio=True, staff=True)
     shown = _everything(s)
@@ -336,7 +336,7 @@ def test_nobody_sees_research_block(curriculum: Curriculum, failed: bool) -> Non
 
 def test_result_still_offers_dispute_with_attempt(curriculum: Curriculum) -> None:
     """Номер попытки уходит в «🚩 Бот ошибся» — кнопка остаётся и ведёт к этой попытке."""
-    item = curriculum.item("L001-02")
+    item = curriculum.item("L097-02")
     r = _result(curriculum, item.id, item.text)
     s = screens.result(curriculum, r, has_audio=True)
     dispute = cb.Dispute(attempt=r.attempt.id.hex).pack()
@@ -344,14 +344,14 @@ def test_result_still_offers_dispute_with_attempt(curriculum: Curriculum) -> Non
 
 
 def test_unchanged_score_has_no_before_after_line(curriculum: Curriculum) -> None:
-    item = curriculum.item("L001-02")
+    item = curriculum.item("L097-02")
     r = _result(curriculum, item.id, item.text)
     same = replace(r, previous_score=r.attempt.assessment.score)
     assert "Было" not in _everything(screens.result(curriculum, same, has_audio=True))
 
 
 def test_changed_score_still_shows_before_after_line(curriculum: Curriculum) -> None:
-    item = curriculum.item("L001-02")
+    item = curriculum.item("L097-02")
     r = _result(curriculum, item.id, item.text, previous=40)
     score = r.attempt.assessment.score
     assert f"Было 40% → стало {score}%" in screens.result(curriculum, r, has_audio=True).caption

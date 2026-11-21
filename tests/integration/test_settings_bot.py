@@ -62,14 +62,12 @@ from muallim.presentation.telegram.callbacks import (
     Consent,
     GoItem,
     Home,
-    Opening,
     ShowSettings,
 )
 from muallim.presentation.telegram.handlers import router
 from tests.fakes import ScriptedReadingGuide
 from tests.integration.test_bot_flow import BOT_USER, NOW, FakeTelegram, Learner
-from tests.integration.test_opening_bot import RESUME, _seed
-from tests.integration.test_opening_bot import TG as SEEDED_TG
+from tests.integration.test_returning_learner_bot import _seed
 from tests.unit.test_readable_images import MAX_WIDTH, _on_phone
 
 pytestmark = pytest.mark.integration
@@ -77,7 +75,7 @@ pytestmark = pytest.mark.integration
 TEACHER, PUPIL = 7201, 7202
 WITH_REFERENCE = "L006-02"  # «مَ» — слог, не аят: эталон — файл учителя из tmp
 WITHOUT_REFERENCE = "L006-03"  # «مِ» — эталона нет
-ISTI_ADHA = "L001-02"
+BASMALA = "L097-02"  # басмала — аят 1:1 аль-Фатихи (урок L001 снят, ADR-0089)
 CALLBACK_LIMIT = 64  # байт, Telegram Bot API
 REMINDER_ICON = "🔔"  # «🔔 Напоминание: выкл.» / «🔔 Напоминание: 19:00»
 EVENING = 19 * 60  # 19:00 — минута местных суток
@@ -90,7 +88,6 @@ HOW_TO_READ_LABELS = {  # подписи утвердил автор 2026-10-21
 }
 # переключатель → (значок на кнопке, умолчание)
 TOGGLES = {
-    "daily_opening": ("🌙", True),
     "large_font": ("🔎", False),
 }
 
@@ -419,8 +416,8 @@ def _result_text(person: Learner) -> str:
     return "\n".join(shown[start + 1 :])
 
 
-async def _read_isti_adha(person: Learner) -> str:
-    await person.press(GoItem(item_id=ISTI_ADHA))
+async def _read_basmala(person: Learner) -> str:
+    await person.press(GoItem(item_id=BASMALA))
     await person.voice()
     return _result_text(person)
 
@@ -432,7 +429,7 @@ async def test_pupil_with_old_research_flag_does_not_see_it(
     dp, container = app
     ali = await _on_home(dp)
     await _set(container, PUPIL, research_block=True)
-    result = await _read_isti_adha(ali)
+    result = await _read_basmala(ali)
     assert texts.VERDICT_EXCELLENT in result
     assert "Для исследования" not in result and "Попытка №" not in result
 
@@ -441,28 +438,8 @@ async def test_pupil_without_research_block_does_not_see_it(
     app: tuple[Dispatcher, AsyncContainer],
 ) -> None:
     dp, _ = app
-    result = await _read_isti_adha(await _on_home(dp))
+    result = await _read_basmala(await _on_home(dp))
     assert "Для исследования" not in result and "Попытка №" not in result
-
-
-async def test_daily_opening_off_is_not_offered(app: tuple[Dispatcher, AsyncContainer]) -> None:
-    """Урок 1 пройден вчера, сегодня не занимался — но начало занятия выключено."""
-    dp, container = app
-    await _set(container, SEEDED_TG, daily_opening=False)
-    ali = _person(dp, SEEDED_TG)
-    await ali.write("/start")
-    assert texts.OPENING_TITLE not in ali.tg.texts()[-1]
-    assert ali.button(GoItem) == GoItem(item_id=RESUME).pack()
-    await ali.press(Home())
-    assert texts.OPENING_TITLE not in ali.tg.texts()[-1]
-
-
-async def test_daily_opening_on_is_offered(app: tuple[Dispatcher, AsyncContainer]) -> None:
-    dp, _ = app
-    ali = _person(dp, SEEDED_TG)
-    await ali.write("/start")
-    assert texts.OPENING_TITLE in ali.tg.texts()[-1]
-    assert ali.button(Opening)
 
 
 # --- крупный шрифт ---

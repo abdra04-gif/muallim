@@ -48,7 +48,7 @@ class Progress:
     streak_days: int = 0  # сколько дней подряд занимается (сегодня или вчера — серия жива)
     today_attempts: int = 0
     continue_item: LessonItem | None = None  # где остановился
-    today: date | None = None  # местное «сегодня» ученика — для начала занятия (ADR-0061)
+    today: date | None = None  # местное «сегодня» ученика (ADR-0061)
     week: tuple[bool, ...] = ()  # 7 дней, последний — сегодня: была ли хоть одна попытка
     review_due: int = 0  # строк в «🔁 Повторении» на сегодня (= длина списка GetReview, ADR-0062)
 

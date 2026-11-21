@@ -26,8 +26,10 @@ ONBOARDING = [
     texts.PROFILE_READING_OPTIONS["none"],
     texts.PROFILE_PRAYER_OPTIONS["regular"],
 ]
-# Урок 1: правило → ▶️ → истиаза голосом → ▶️ → басмала голосом (урок пройден)
-LESSON_ONE = [texts.START_BUTTON, "▶️", "🎤", "▶️", "🎤"]
+# По книге (ADR-0089): скан с. 10 → «▶️ Начать» → алфавит (урок 1: правило и 4 строки — смотреть) →
+# хамза (урок 2): первый шаг — правило «أَ إِ أُ», его проверяют голосом
+LESSON_ONE = [texts.START_BUTTON, "▶️", "▶️", "▶️", "▶️", "▶️", "▶️"]
+FIRST_READING = LESSON_ONE  # открыта первая карточка, которую читают вслух
 
 
 def _steps(out: str) -> list[str]:
@@ -55,18 +57,17 @@ BUTTONS = {
 RESEARCH_MARKS = ("Для исследования", "Услышано", "Попытка №", "Эталон:")
 
 
-# ---------- FR-49: голосовое на правиле и на алфавите ----------
-async def test_voice_on_readable_rule_card_is_checked() -> None:
-    """Автор 2026-11-08: правило с огласованным текстом (басмала) — сразу проверяем голосовое."""
+# ---------- FR-49: голосовое на скане и на алфавите ----------
+async def test_start_opens_the_scan_and_voice_there_is_not_checked() -> None:
+    """«Начать» → скан с. 10 (урок = страница, ADR-0084): карточки нет — голосовое не в зачёт."""
     out = await _run([*ONBOARDING, texts.START_BUTTON, "🎤"])
-    answer = _steps(out)[-1]
-    assert _plain(texts.VOICE_ON_RULE) not in answer
-    assert _plain(texts.NOT_PRACTICE) not in answer
+    assert _plain(texts.PAGE_START) in _steps(out)[-2]
+    assert _plain(texts.VOICE_ON_HOME) in _steps(out)[-1]
 
 
 async def test_voice_on_alphabet_card_says_reading_is_not_needed() -> None:
-    # урок 1 (3 шага) → правило алфавита → первая строка таблицы (стр. 10, шаг 5)
-    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "▶️", "▶️", "▶️", "🎤"])
+    # скан → правило алфавита (шаг 1) → первая строка таблицы (стр. 10, шаг 2)
+    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "▶️", "🎤"])
     answer = _steps(out)[-1]
     assert _plain(texts.NOT_PRACTICE) in answer
 
@@ -75,9 +76,7 @@ async def test_voice_on_alphabet_card_says_reading_is_not_needed() -> None:
 async def test_home_after_lesson_one_continues_with_lesson_two(curriculum: Curriculum) -> None:
     second = curriculum.lessons[1]
     out = await _run([*ONBOARDING, *LESSON_ONE, texts.HOME_BUTTON])
-    home = _steps(out)[-1]
-    done = texts.LESSON_DONE.format(lesson=curriculum.lessons[0].title)
-    assert _plain(done) in out  # урок 1 действительно пройден
+    home = _steps(out)[-1]  # алфавит просмотрен (читать в нём нечего), открыт урок 2
     assert unit_title(second) in home  # «Дальше: Стр. 10 · …» — следующий раздел
     first_button = next(line for line in home.splitlines() if line.startswith("   ["))
     assert unit_title(second) in first_button
@@ -87,17 +86,17 @@ async def test_home_after_lesson_one_continues_with_lesson_two(curriculum: Curri
     assert f"{unit_title(second)} · шаг" in opened  # открылась карточка урока 2
 
 
-# ---------- FR-49: у истиазы есть 🔊 ----------
-async def test_isti_adha_card_offers_listen() -> None:
+# ---------- по книге: первая карточка — правило алфавита, басмала только на скане ----------
+async def test_first_card_is_the_alphabet_rule() -> None:
     out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️"])
     card = _steps(out)[-1]
-    assert _plain(texts.CARD_READ) in card  # открыта строка для чтения — истиаза (L001-02)
-    assert f"[{texts.LISTEN_BUTTON}]" in card
+    assert "Арабский алфавит · шаг 1" in card and _plain(texts.CARD_READ) not in card
+    assert "истиаз" not in out.casefold()
 
 
 # ---------- FR-50: разбор без лишнего ----------
 async def test_result_shows_no_research_block_or_heard_line() -> None:
-    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "🎤", texts.DISPUTE_BUTTON])
+    out = await _run([*ONBOARDING, *FIRST_READING, "🎤", texts.DISPUTE_BUTTON])
     *_, result, dispute = _steps(out)
     found = re.search(r"№ ([0-9A-F]{8})", dispute)  # код этой попытки — из «Бот ошибся»
     assert found
@@ -107,21 +106,21 @@ async def test_result_shows_no_research_block_or_heard_line() -> None:
 
 
 async def test_attempt_number_is_shown_after_dispute() -> None:
-    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "🎤", texts.DISPUTE_BUTTON])
+    out = await _run([*ONBOARDING, *FIRST_READING, "🎤", texts.DISPUTE_BUTTON])
     dispute = _steps(out)[-1]
     assert _plain(texts.DISPUTE_ASK.split("{")[0]) in dispute
     assert re.search(r"№ [0-9A-F]{8}", dispute)
 
 
 async def test_same_score_twice_has_no_before_after_line() -> None:
-    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "🎤", "🎤"])
+    out = await _run([*ONBOARDING, *FIRST_READING, "🎤", "🎤"])
     second = _steps(out)[-1]
     assert _plain(texts.VERDICT_EXCELLENT) in second  # вторая попытка проверена
     assert "Было" not in second
 
 
 async def test_text_on_open_card_is_one_hint_without_repeating_card() -> None:
-    out = await _run([*ONBOARDING, texts.START_BUTTON, "▶️", "привет"])
+    out = await _run([*ONBOARDING, *FIRST_READING, "привет"])
     answer = _steps(out)[-1]
     replies = [line for line in answer.splitlines() if line.startswith("🤖")]
     assert replies == [f"🤖 {_plain(texts.SEND_VOICE)}"]

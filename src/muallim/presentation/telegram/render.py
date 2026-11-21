@@ -877,28 +877,6 @@ def book_progress(
     return _png(img)
 
 
-def opening(lines: Sequence[str]) -> bytes:
-    """Начало занятия: истиаза и басмала, каждая отдельной строкой (остановка после каждой).
-
-    Длинная фраза переносится; между фразами — промежуток шире, чем между строками фразы.
-    """
-    font, line_h, gap = _font(100), 180, 70
-    wrapped = [_wrap(line.split(), font, TEXT_WIDTH) for line in lines]
-    rows = sum(len(w) for w in wrapped)
-    img = Image.new("RGB", (WIDTH, 100 + line_h * rows + gap * (len(lines) - 1)), PAPER)
-    draw = _frame(img)
-    y = 50 + line_h // 2
-    for k, phrase in enumerate(wrapped):
-        if k:  # черта между фразами: здесь остановка
-            mid = y - line_h // 2 - gap // 2
-            draw.line((WIDTH // 2 - 120, mid, WIDTH // 2 + 120, mid), fill=FRAME, width=2)
-        for line in phrase:
-            draw.text((WIDTH // 2, y), line, font=font, fill=INK, anchor="mm", direction="rtl")
-            y += line_h
-        y += gap
-    return _png(img)
-
-
 # ---------- аят по слогам (FR-61, ADR-0077) ----------
 # Аят — из клеток-слогов прямо в слове: кусочек рисуется с ZWJ по краям (буквы в той же форме,
 # что внутри слова), цвет клеток чередуется, под клеткой — как звучит. Слово переносится только

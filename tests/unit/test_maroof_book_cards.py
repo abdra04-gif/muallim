@@ -57,11 +57,10 @@ def test_every_card_reading_converts_to_model_sounds() -> None:
 
 
 @pytest.mark.parametrize(
-    ("card_id", "wasl"),
+    ("reading", "wasl"),
     [
-        ("L001-01", ("b", "i", "s", "m", "i")),  # بِسْمِ
+        ("بِسمِ", ("b", "i", "s", "m", "i")),  # بِسْمِ — запись фонетизатора (была карточка L001-01)
     ],
 )
-def test_book_card_in_model_sounds(card_id: str, wasl: tuple[str, ...]) -> None:
-    card = next(c for c in CARDS if c["id"] == card_id)
-    assert to_maroof(card["wasl"]) == wasl
+def test_book_card_in_model_sounds(reading: str, wasl: tuple[str, ...]) -> None:
+    assert to_maroof(reading) == wasl

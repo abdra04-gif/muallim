@@ -40,7 +40,7 @@ def _labels(kb: InlineKeyboardMarkup) -> list[str]:
 
 def _edges(c: Curriculum) -> list[str]:
     """Первый и последний шаг урока в середине книги и средний шаг."""
-    lesson = c.lessons[10]
+    lesson = c.lesson("L011")
     return [lesson.items[0].id, lesson.items[1].id, lesson.items[-1].id]
 
 
@@ -90,7 +90,7 @@ def test_result_nav_matches_card(curriculum: Curriculum, renderer: FeedbackRende
 
 
 def test_result_of_last_step_goes_to_next_lesson(curriculum: Curriculum) -> None:
-    last = curriculum.lessons[10].items[-1]
+    last = curriculum.lesson("L011").items[-1]
     r = _result(curriculum, last.id, last.text, completed=True)
     kb = screens.result(curriculum, r, has_audio=False).keyboard
     nxt = curriculum.next_item(last.id)

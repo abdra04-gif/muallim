@@ -1,6 +1,8 @@
-"""Пять экранов из макетов (ADR-0050): формы буквы, разбор по словам, открытка, прогресс, начало."""
+"""Экраны из макетов (ADR-0050): формы буквы, разбор по словам, открытка, прогресс.
 
-from datetime import date, timedelta
+Экран «начало занятия» убран (автор 2026-11-21: истиазы в книге нет)."""
+
+from datetime import date
 from typing import Any
 from uuid import UUID
 
@@ -17,7 +19,6 @@ from muallim.domain.phonetics import Zone, articulation_zone
 from muallim.domain.policy import GradingPolicy
 from muallim.presentation.telegram import callbacks as cb
 from muallim.presentation.telegram import render, screens, texts
-from muallim.presentation.telegram.opening import OPENING_ITEMS, needs_opening
 from tests.fakes import FixedClock
 
 PNG = b"\x89PNG"
@@ -136,41 +137,3 @@ def test_letter_card_shows_forms(curriculum: Curriculum) -> None:
     item = next(i for i in lesson.items if i.kind is ItemKind.LETTER)
     s = screens.card(curriculum, item, has_audio=False, is_teacher=False)
     assert s.image is not None and s.image != render.card(item.text, lesson.accent, (0, 1))
-
-
-# ---------- начало занятия (истиаза и басмала, SRC-110) ----------
-def test_opening_items_are_isti_adha_then_basmala(curriculum: Curriculum) -> None:
-    first, second = (curriculum.item(i) for i in OPENING_ITEMS)
-    assert first.text.startswith("أَعُوذُ") and second.quran == "1:1"
-
-
-def test_opening_needed_once_a_day_after_lesson_one(curriculum: Curriculum) -> None:
-    beginner = _progress(curriculum)
-    assert not needs_opening(beginner, skipped_on=None), "урок 1 и так начинается с них"
-    after_one = _progress(curriculum, done=frozenset({"L001"}))
-    assert needs_opening(after_one, skipped_on=None)
-    assert not needs_opening(after_one, skipped_on=TODAY), "пропустил сегодня — не спрашивать"
-    assert needs_opening(after_one, skipped_on=TODAY - timedelta(days=1))
-    read_today = _progress(curriculum, done=frozenset({"L001"}), today_attempts=1)
-    assert not needs_opening(read_today, skipped_on=None), "сегодня уже занимался"
-
-
-def test_opening_screen_offers_read_and_skip(curriculum: Curriculum) -> None:
-    s = screens.opening(curriculum)
-    data = [d for _, d in _buttons(s.keyboard)]
-    assert cb.Opening(act="start").pack() in data and cb.Opening(act="skip").pack() in data
-    if render.available():
-        assert s.image is not None and s.image.startswith(PNG)
-
-
-def test_result_of_basmala_in_opening_continues_session(curriculum: Curriculum) -> None:
-    basmala = curriculum.item(OPENING_ITEMS[1])
-    resume = _letter_lesson(curriculum, "Мим").items[0]
-    a = assess(basmala.text, basmala.text)
-    attempt = Attempt(
-        UUID(int=1), UUID(int=2), basmala.id, "v", "stub", a, GradingPolicy().verdict(a),
-        None, None, 1, FixedClock().now(),
-    )  # fmt: skip
-    r = RecitationResult(basmala, attempt, (), "", curriculum.next_item(basmala.id))
-    s = screens.result(curriculum, r, has_audio=False, resume=resume)
-    assert cb.GoItem(item_id=resume.id).pack() in [d for _, d in _buttons(s.keyboard)]

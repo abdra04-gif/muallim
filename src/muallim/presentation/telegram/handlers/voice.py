@@ -29,7 +29,7 @@ from muallim.domain.curriculum import Curriculum, ItemKind
 from muallim.domain.learner import Learner, Question
 from muallim.domain.policy import is_mastered_verdict
 from muallim.domain.quiz import read_passed
-from muallim.presentation.telegram import opening, screens, sura_errors, texts
+from muallim.presentation.telegram import screens, sura_errors, texts
 from muallim.presentation.telegram.display import Display
 from muallim.presentation.telegram.handlers.reference import take_recording
 from muallim.presentation.telegram.handlers.sura import read_sura_voice
@@ -68,17 +68,21 @@ async def _off_card(
     display: Display,
     state: FSMContext,
 ) -> bool:
-    """На экране не карточка: сура целиком — проверить суру; меню или вчерашнее начало занятия —
-    не оцениваем, предлагаем открыть урок (решение автора). True — голосовое обработано."""
+    """На экране не карточка: сура целиком — проверить суру; меню или карточка, которой больше
+    нет в программе (истиаза L001-02 со старого экрана, ADR-0089), — не оцениваем, предлагаем
+    открыть урок (решение автора): иначе попытка ушла бы чужой карточке. True — обработано."""
     if shown.sura is not None:  # FR-57, FR-59
         await read_sura_voice(
             m, bot, shown.sura, learner=learner, uc=sura_uc, display=display, state=state
         )
         return True
-    if shown.item_id is not None and not shown.stale:
-        return False
-    if shown.stale:
-        await screen_state.menu(learner, finish=True)
+    if shown.item_id is not None:
+        try:
+            cur.item(shown.item_id)
+        except KeyError:
+            await screen_state.menu(learner)  # карточки нет — на экране меню
+        else:
+            return False
     screen = screens.voice_on_home(cur, await progress.execute(learner))
     await m.answer(screen.caption, reply_markup=screen.keyboard)
     return True
@@ -155,11 +159,6 @@ async def on_voice(
         attempt.assessment.score,
         attempt.processing_ms,
     )
-    resume = None
-    basmala = result.item.id == opening.OPENING_ITEMS[-1]
-    if shown.opening_active and basmala and is_mastered_verdict(attempt.verdict):
-        with suppress(KeyError):  # басмала прочитана — вернуть, где был
-            resume = cur.item(shown.resume_item) if shown.resume_item else None
     # «Для исследования» и номер попытки — только учителю и разметчику (FR-50, ADR-0082:
     # флаг ученика ``research_block`` больше ничего не включает)
     staff = await staff_access.is_staff(learner)
@@ -168,9 +167,7 @@ async def on_voice(
     if is_mastered_verdict(attempt.verdict):  # аят из списка ошибок суры исправлен — ✅
         await sura_errors.mark_fixed(state, result.item.id)
     back = await sura_errors.sura_of(state, result.item.id)
-    screen = screens.result(
-        cur, result, has_audio, resume, staff=staff, videos=videos, sura_errors=back
-    )
+    screen = screens.result(cur, result, has_audio, staff=staff, videos=videos, sura_errors=back)
     # ступень ③ закрепления: попытка — ответ на открытый вопрос этой строки (ADR-0066 п. 8)
     passed = read_passed(attempt.verdict)
     linked = await quiz.attach_attempt(learner, result.item.id, attempt.id, passed=passed)

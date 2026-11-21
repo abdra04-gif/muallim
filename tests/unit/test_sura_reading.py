@@ -130,11 +130,11 @@ async def test_basmala_goes_to_the_recognizer_as_opening(curriculum: Curriculum)
     assert all(item_id.startswith(("L099", "L100")) for item_id, _, _ in ayahs)
 
 
-async def test_istiadha_goes_to_the_recognizer_as_preamble(curriculum: Curriculum) -> None:
-    """Истиаза перед сурой — необязательное начало, как басмала (ревью кода 2026-10-31)."""
+async def test_no_istiadha_preamble_since_the_book_has_none(curriculum: Curriculum) -> None:
+    """Истиазы в книге нет и в программе нет (автор 2026-11-21) — перед сурой её не ждём."""
     w = World(curriculum)
     await w.uc.execute(w.learner, b"ogg", DUHA, SuraMode.TEXT)
-    assert w.recognizer.preambles == [curriculum.item("L001-02").text]
+    assert w.recognizer.preambles == [""]
 
 
 async def test_chunks_know_their_ayahs(curriculum: Curriculum) -> None:

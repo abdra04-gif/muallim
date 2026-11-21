@@ -15,7 +15,7 @@ from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.presentation.telegram import keyboards, screens, texts, views
 from muallim.presentation.telegram.display import Display
-from muallim.presentation.telegram.handlers.daily import home_or_opening
+from muallim.presentation.telegram.handlers.daily import home_screen
 from muallim.presentation.telegram.handlers.quiz import quiz_screen
 from muallim.presentation.telegram.learner import NewLearner
 
@@ -46,9 +46,7 @@ async def start(
         return
     waiting = (await quiz.overview(learner)).waiting
     p = await progress.execute(learner)
-    await display.send(
-        bot, m.chat.id, await home_or_opening(cur, p, learner, screen_state, waiting)
-    )
+    await display.send(bot, m.chat.id, await home_screen(cur, p, learner, screen_state, waiting))
 
 
 @router.message(Command("lessons"))

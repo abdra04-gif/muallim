@@ -240,7 +240,7 @@ async def test_voice_on_another_card_is_not_linked(w: World) -> None:
     w.answers.rows[view.answer_id] = replace(
         row, step=3, item_id=row.letter_id, options=(), answer=-1
     )
-    assert await w.quiz().attach_attempt(learner, "L001-01", UUID(int=1), passed=True) is None
+    assert await w.quiz().attach_attempt(learner, "L097-02", UUID(int=1), passed=True) is None
     assert w.answers.rows[view.answer_id].answered_at is None
 
 

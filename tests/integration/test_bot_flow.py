@@ -62,6 +62,7 @@ from muallim.presentation.telegram.callbacks import (
     Dispute,
     DisputeReason,
     GoItem,
+    PageOpen,
     Profile,
     QuizAnswer,
 )
@@ -278,7 +279,7 @@ async def test_new_learner_consents_reads_disputes_and_deletes_data(
     assert texts.CONSENT_SAVED_YES in ali.tg.alerts()
     assert ali.tg.texts()[-1] == texts.PROFILE_NAME
     await _answer_profile(ali)
-    assert ali.button(GoItem)  # на главном есть «Начать»/«Продолжить»
+    assert ali.button(PageOpen)  # новичок на главной: «Начать» → скан с. 10 (ADR-0089)
 
     # 3. Открыть строку для чтения и прочитать её голосовым
     await ali.press(GoItem(item_id=_first_practice_item(curriculum)))
@@ -432,7 +433,7 @@ async def test_questionnaire_is_asked_only_once(
 
     await ali.write("/start")  # вернулся — анкеты больше нет, сразу главный экран
     assert ali.tg.texts().count(texts.PROFILE_NAME) == asked == 1
-    assert ali.button(GoItem)
+    assert ali.button(PageOpen)  # ещё не читал — «Начать» ведёт на скан с. 10
 
 
 async def test_unfinished_questionnaire_resumes_at_next_question(
@@ -480,7 +481,7 @@ async def test_declined_consent_skips_questionnaire(
     await ali.write("/start")
     await ali.press(Consent(granted=False))
     assert texts.PROFILE_NAME not in ali.tg.texts()
-    assert ali.button(GoItem)
+    assert ali.button(PageOpen)  # «Начать» → скан с. 10 (ADR-0089)
 
 
 # ---------- устаревшие и подделанные кнопки «Закрепления» (ревью пакета Б, круг 1) ----------

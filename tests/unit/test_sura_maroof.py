@@ -101,7 +101,7 @@ async def test_maroof_listens_to_the_sura_and_muaalem_is_not_called(
         curriculum.item(f"L123-0{k}").text for k in range(2, 6)
     ]
     assert call["opening"] == curriculum.item("L123-01").text
-    assert call["preamble"] == curriculum.item("L001-02").text
+    assert call["preamble"] == ""  # истиазы в книге нет (ADR-0089)
 
 
 async def test_long_is_short_comes_from_the_card_policy_of_the_sura_lesson(

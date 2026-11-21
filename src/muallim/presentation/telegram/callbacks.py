@@ -148,7 +148,8 @@ class AnnotateMark(CallbackData, prefix="am"):
 
 
 class Opening(CallbackData, prefix="open"):
-    """Начало занятия (ADR-0050): ``start`` — читать истиазу и басмалу, ``skip`` — пропустить."""
+    """Кнопки «начала занятия» из старых сообщений (ADR-0050): ведут на главную — само начало
+    занятия убрано (ADR-0089). ``start``/``skip`` — что было на кнопке."""
 
     act: str
 

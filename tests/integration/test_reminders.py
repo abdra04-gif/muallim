@@ -73,7 +73,7 @@ OFFSET = 10 * 60
 MORNING = 7 * 60  # напомнить в 07:00 местного
 LOCAL_TODAY = date(2026, 10, 21)
 RESUME = "L006-01"  # где остановился ученик
-PRACTICE_ITEM = "L001-02"
+PRACTICE_ITEM = "L003-10"
 YESTERDAY = NOW - timedelta(days=1)  # 07:10 20 октября местного
 EARLIER_TODAY = NOW - timedelta(hours=1)  # 20:10 UTC 20-го — но уже 06:10 21-го местного
 TICK_TIMEOUT_S = 5  # тик не ждёт 429 по 30 с и не зависает

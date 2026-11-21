@@ -1,4 +1,4 @@
-"""Правила настроек ученика: местная дата, начало занятия, напоминание (FR-51, TD-FN-90, ADR-0061).
+"""Правила настроек ученика: местная дата, напоминание (FR-51, TD-FN-90, ADR-0061).
 
 Чистые правила `domain/settings.py` (stdlib). Решения автора 2026-10-21: смещение от UTC хранится
 в минутах, до ответа «который у тебя час?» — UTC+3; напоминание раз в местный день в выбранную
@@ -10,7 +10,6 @@ from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
-import pytest
 from hypothesis import given
 from hypothesis import settings as hsettings
 from hypothesis import strategies as st
@@ -19,11 +18,9 @@ from muallim.domain.settings import (
     HowToRead,
     LearnerSettings,
     local_date,
-    needs_opening,
     reminder_due,
 )
 
-ISTI_ADHA, BASMALA = "L001-02", "L001-03"  # карточки начала занятия (ADR-0050)
 offsets = st.integers(min_value=2, max_value=12).map(lambda h: h * 60)  # UTC+2…UTC+12, минуты
 days = st.dates(min_value=date(2026, 1, 1), max_value=date(2030, 12, 31))
 
@@ -39,7 +36,7 @@ def test_defaults_match_current_bot_and_author_decisions() -> None:
     s = LearnerSettings()
     assert s.how_to_read is HowToRead.SPOILER  # «Закрыта» (ADR-0029)
     assert s.auto_reference is False  # В5
-    assert s.daily_opening is True  # ADR-0050
+    assert s.daily_opening is True  # колонка осталась; начало занятия убрано (автор 2026-11-21)
     assert s.large_font is False
     assert s.research_block is False  # ADR-0057: по умолчанию выкл.
     assert s.reminder_minute is None  # напоминание выключено
@@ -68,52 +65,6 @@ def test_local_date_changes_exactly_at_local_midnight(day: date, offset: int) ->
     assert local_date(midnight, offset) == day
     assert local_date(midnight - timedelta(minutes=1), offset) == day - timedelta(days=1)
     assert local_date(midnight + timedelta(hours=23, minutes=59), offset) == day
-
-
-# ---------- начало занятия (перенесено из presentation/telegram/opening.py) ----------
-TODAY = date(2026, 10, 21)
-
-
-def _opening(
-    settings: LearnerSettings | None = None,
-    *,
-    first_lesson_done: bool = True,
-    practiced_today: bool = False,
-    cursor_item: str | None = "L006-01",
-) -> bool:
-    result: bool = needs_opening(
-        settings or LearnerSettings(),
-        today=TODAY,
-        first_lesson_done=first_lesson_done,
-        practiced_today=practiced_today,
-        cursor_item=cursor_item,
-    )
-    return result
-
-
-def test_opening_offered_when_lesson_one_done_and_not_practiced_today() -> None:
-    assert _opening() is True
-
-
-@pytest.mark.parametrize(
-    "overrides",
-    [
-        {"first_lesson_done": False},  # новичку урока 1 не предлагается
-        {"practiced_today": True},
-        {"settings": LearnerSettings(opening_skipped_on=TODAY)},
-        {"settings": LearnerSettings(daily_opening=False)},  # выключено в настройках
-        {"cursor_item": ISTI_ADHA},  # вернулся повторить — без круга (TD-FN-90 п. 5)
-        {"cursor_item": BASMALA},
-    ],
-    ids=["lesson_one_not_done", "practiced_today", "skipped_today", "turned_off",
-         "cursor_on_isti_adha", "cursor_on_basmala"],
-)  # fmt: skip
-def test_opening_not_offered(overrides: dict[str, Any]) -> None:
-    assert _opening(**overrides) is False
-
-
-def test_yesterdays_skip_does_not_count_today() -> None:
-    assert _opening(settings=LearnerSettings(opening_skipped_on=TODAY - timedelta(days=1)))
 
 
 # ---------- напоминание ----------

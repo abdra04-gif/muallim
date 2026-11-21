@@ -27,13 +27,13 @@ from tests.conftest import CURRICULUM_DIR
 from tests.integration import test_settings_bot as settings_bot
 from tests.integration.test_bot_flow import Learner
 from tests.integration.test_settings_bot import (
-    ISTI_ADHA,
+    BASMALA,
     PUPIL,
     WITH_REFERENCE,
     _buttons,
     _events,
     _on_home,
-    _read_isti_adha,
+    _read_basmala,
     _set,
     _view,
 )
@@ -110,7 +110,7 @@ async def test_deep_video_link_override_by_lesson_via_di(
     ali = await _on_home(dp)
     await ali.press(cb.Deep(item_id=WITH_REFERENCE))  # урок 6
     assert _urls(ali) == [("🎥 Видеоурок на YouTube", own)]
-    await ali.press(cb.Deep(item_id=ISTI_ADHA))  # урок 1 — default
+    await ali.press(cb.Deep(item_id=BASMALA))  # урок 1 — default
     assert _urls(ali) == [("🎥 Видеоурок на YouTube", other)]
 
 
@@ -225,7 +225,7 @@ async def test_pupil_does_not_see_research_block_even_if_old_flag_is_set(
     dp, container = app
     ali = await _on_home(dp)
     await _set(container, PUPIL, research_block=True)
-    result = await _read_isti_adha(ali)
+    result = await _read_basmala(ali)
     assert texts.VERDICT_EXCELLENT in result
     assert "Для исследования" not in result and "Попытка №" not in result
 

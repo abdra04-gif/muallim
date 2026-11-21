@@ -66,11 +66,13 @@ _SKIP_DIRS = {
     "external",
     "worktrees",  # копии параллельных сессий (.claude/worktrees, ADR-0073) — вне git
 }
+_SKIP_PATHS = ("docs/site/build/",)  # сборка make site — вне git (копии документов, скан книги)
 _MARKDOWN = sorted(
     p
     for p in ROOT.rglob("*.md")
     if not _SKIP_DIRS & set(p.relative_to(ROOT).parts)
     and "journal/prompts" not in p.relative_to(ROOT).as_posix()
+    and not p.relative_to(ROOT).as_posix().startswith(_SKIP_PATHS)
 )
 _LINK = re.compile(r"\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 # Путь от корня проекта в `…`: однозначный, поэтому проверяется. data/ — вне git, не проверяем

@@ -349,15 +349,6 @@ def test_result_drops_lessons_button(curriculum: Curriculum, captions_only: None
         assert texts.LESSONS_BUTTON not in _labels(s.keyboard)
 
 
-def test_result_keeps_resume_row_after_basmala(curriculum: Curriculum, captions_only: None) -> None:
-    basmala = curriculum.item("L001-02")  # любой шаг «начала занятия»
-    resume = _middle_step(curriculum)
-    r = _result(curriculum, basmala.id, basmala.text, False)
-    s = screens.result(curriculum, r, True, resume=resume)
-    label = texts.RESUME_BUTTON.format(title=curriculum.locate(resume.id)[0].title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=resume.id).pack())]
-
-
 def test_result_breakdown_unchanged(curriculum: Curriculum, renderer: FeedbackRenderer) -> None:
     """ADR-0070 не трогаем: подпись — те же пункты групп и план; картинка — тот же рисунок."""
     r = _with_errors(curriculum, renderer)
@@ -428,7 +419,7 @@ def test_fresh_learner_home_still_starts_first_lesson(
     s = screens.home(curriculum, replace(p, attempts_total=0))
     [(label, data)] = _rows(s.keyboard)[0]
     assert label == texts.START_BUTTON
-    assert data == cb.GoItem(item_id=curriculum.first_item().id).pack()
+    assert data == cb.PageOpen(n=10).pack()  # сначала скан с. 10 (ADR-0089)
     assert (MORE, cb.More().pack()) in _flat(s.keyboard)
 
 
@@ -558,16 +549,6 @@ def test_wrong_result_without_sound_has_only_deep_in_first_row(
     assert r.attempt.assessment.errors
     s = screens.result(curriculum, r, has_audio=False)
     assert _rows(s.keyboard)[0] == [(DEEP, cb.Deep(item_id=item.id).pack())]
-
-
-def test_wrong_result_keeps_resume_row(curriculum: Curriculum, captions_only: None) -> None:
-    basmala = curriculum.item("L001-02")
-    resume = _middle_step(curriculum)
-    r = _result(curriculum, basmala.id, "سَ سِ سُ", False)
-    assert r.attempt.assessment.errors
-    s = screens.result(curriculum, r, True, resume=resume)
-    label = texts.RESUME_BUTTON.format(title=curriculum.locate(resume.id)[0].title)
-    assert _row_with(s.keyboard, label) == [(label, cb.GoItem(item_id=resume.id).pack())]
 
 
 def _last_of_course(c: Curriculum) -> LessonItem:

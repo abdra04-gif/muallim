@@ -2,6 +2,7 @@
 
 - **Статус:** Принято; частично заменяет ADR-0024 (точки и подпись «строка k из n» → «шаг N из M»;
   «▶️ Продолжить» — по правилу ниже)
+- **Статус (дополнено 2026-11-21):** пункты о начале занятия и 🔊 истиазы отменены ADR-0089; названные в «Как проверить» тесты начала занятия удалены, файл переименован в `test_returning_learner_bot.py`
 - **Дата:** 2026-10-20
 - **Кто решил:** автор (UX-обход новичком, пакет А; формулировки и выбор вариантов — в сессии 2026-10-20);
   добавления агента утверждены автором («Оставить всё»)
@@ -66,9 +67,9 @@
 ## Как проверить
 `tests/unit/test_use_cases.py` (`test_continue_*`: после пройденного урока, после неудачного последнего
 шага, после шага без чтения — в следующий урок; непробованный шаг и последний урок книги — на месте),
-`tests/integration/test_opening_bot.py` (`test_opening_does_not_move_continue`,
+`tests/integration/test_returning_learner_bot.py` (`test_opening_does_not_move_continue`,
 `test_interrupted_opening_keeps_continue`, `test_voice_on_home_is_not_assessed`),
 `tests/unit/test_quiz.py` (`test_first_quiz_lesson_*`, `test_options_come_only_from_started_letters`),
 `tests/unit/test_beginner_screens.py`, `tests/integration/test_console_beginner.py` (сценарий новичка в
 `muallim --test`: голосовое на правиле, «Продолжить» после урока 1, 🔊 истиазы),
-`tests/integration/test_isti_adha_audio.py` (ручная нарезка находится по тексту и не теряется при пересборке).
+`tests/integration/test_sound_manifest_merge.py` (ручная нарезка находится по тексту и не теряется при пересборке).

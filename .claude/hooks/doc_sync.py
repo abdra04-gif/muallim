@@ -135,6 +135,7 @@ NOISE = (
     ".mypy_cache",
     ".DS_Store",
     "thesis/build/",
+    "docs/site/build/",  # make site: страницы скана книги, в git нельзя
     ".claude/worktrees/",
 )
 

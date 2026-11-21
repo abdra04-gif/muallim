@@ -96,7 +96,7 @@ class AssessRecitation:
     async def execute(
         self, learner: Learner, audio: bytes, item_id: str | None = None
     ) -> RecitationResult:
-        """Проверить чтение текущей карточки или ``item_id`` (начало занятия: курсор на месте)."""
+        """Проверить чтение текущей карточки или ``item_id`` (карточка на экране)."""
         item = self.curriculum.item(item_id) if item_id else self.cards.current(learner)
         lesson, _ = self.curriculum.locate(item.id)
         started = time.perf_counter()

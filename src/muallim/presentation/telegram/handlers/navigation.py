@@ -24,7 +24,7 @@ from muallim.application.use_cases.settings import GetSettings
 from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import opening, screens, sura_errors, texts
+from muallim.presentation.telegram import screens, sura_errors, texts
 from muallim.presentation.telegram.callbacks import (
     Again,
     Deep,
@@ -39,7 +39,7 @@ from muallim.presentation.telegram.callbacks import (
     Signs,
 )
 from muallim.presentation.telegram.display import Display, drop_sound, message_of
-from muallim.presentation.telegram.handlers.daily import home_or_opening
+from muallim.presentation.telegram.handlers.daily import home_screen
 from muallim.presentation.telegram.handlers.reference import show_card
 
 router: Final = Router(name="learner.navigation")
@@ -60,7 +60,7 @@ async def cb_home(
         await drop_sound(display, msg)  # ушёл с карточки — автоэталон убрать
         waiting = (await quiz.overview(learner)).waiting
         p = await progress.execute(learner)
-        await display.show(msg, await home_or_opening(cur, p, learner, screen_state, waiting))
+        await display.show(msg, await home_screen(cur, p, learner, screen_state, waiting))
     await cb.answer()
 
 
@@ -200,19 +200,12 @@ async def cb_go(
     syllables: FromDishka[AyahSyllables],
     watch: FromDishka[GetArticulationVideo],
     played: FromDishka[RecordVideoPlayed],
+    links: FromDishka[LessonLinks],
     state: FSMContext,
 ) -> None:
     try:
-        # пока идёт начало занятия, кнопки его экранов не сдвигают «Продолжить» (FR-49);
-        # переход к обычной карточке его завершает. Карточка, выбранная с экрана меню
-        # («📚 Уроки»), — сознательный выбор: начало занятия завершается и курсор двигается.
-        shown = await screen_state.execute(learner)
-        in_opening = shown.opening_active
-        if in_opening and shown.item_id is None:  # с экрана меню — начало занятия завершается
-            in_opening = False
-        item = await uc.execute(learner, callback_data.item_id, move=not in_opening)
-        step = in_opening and item.id in opening.OPENING_ITEMS
-        await screen_state.card(learner, item.id, opening=step, finish=not step)
+        item = await uc.execute(learner, callback_data.item_id, move=True)
+        await screen_state.card(learner, item.id)
     except KeyError:
         await cb.answer(texts.STALE_BUTTON, show_alert=True)
         return
@@ -229,6 +222,7 @@ async def cb_go(
             videos=videos,
             syllables=syllables,
             sura_errors=await sura_errors.sura_of(state, item.id),
+            lesson_video=links.for_lesson(cur.locate(item.id)[0].id),
         )
         await show_card(
             msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,

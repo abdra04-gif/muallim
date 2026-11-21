@@ -31,7 +31,8 @@ class OpenItem:
     events: EventLog
 
     async def execute(self, learner: Learner, item_id: str, *, move: bool = True) -> LessonItem:
-        """Открыть карточку. ``move=False`` — «Продолжить» не сдвигается (начало занятия, FR-49)."""
+        """Открыть карточку. ``move=False`` — «Продолжить» не сдвигается (FR-49; с ADR-0089 бот
+        так не вызывает — начало занятия убрано)."""
         item = self.curriculum.item(item_id)  # KeyError — устаревшая кнопка, ловит presentation
         if move:
             learner.current_item_id = item.id

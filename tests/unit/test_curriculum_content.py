@@ -13,7 +13,7 @@ BOOK = "SRC-040"
 BOOK_LETTER_ORDER = "ءرزمتنيبكلوهفقشسثصطجخحغعدضذظ"
 FATHA, KASRA, DAMMA = "َ", "ِ", "ُ"
 BOOK_SECTIONS = [  # разделы книги по оглавлению (book/contents.yaml), в её порядке
-    "start", "alphabet", "letter", "madd", "exercises", "tashdid", "tanwin", "tanwin_tashdid",
+    "alphabet", "letter", "madd", "exercises", "tashdid", "tanwin", "tanwin_tashdid",
     "hamza", "wasla", "ta_marbuta", "sukun", "article", "mim", "noon_izhar", "noon_idgham",
     "noon_ikhfa", "iqlab", "qalqala", "small", "ya_alif", "waw_alif", "silent", "noon_kasra",
     "waqf", "sakt", "madd_types", "muqattaat", "signs", "sura",
@@ -34,11 +34,11 @@ def test_sections_follow_book_contents(curriculum: Curriculum) -> None:
     assert seen == BOOK_SECTIONS
 
 
-def test_starts_with_istiadha_and_basmala(curriculum: Curriculum) -> None:
+def test_starts_with_the_alphabet_of_page_10(curriculum: Curriculum) -> None:
+    """Как в книге (ADR-0089): басмала — заголовок с. 10 (на скане), упражнения — с алфавита."""
     first = curriculum.lessons[0]
-    texts = [i.text for i in first.items if i.is_practice]
-    assert texts[0].startswith("أَعُوذُ") and texts[1].startswith("بِسْمِ")
-    assert first.items[1].source is not None and first.items[1].source.page == 10
+    assert first.section == "alphabet" and not first.practice_items
+    assert first.items[0].source is not None and first.items[0].source.page == 10
 
 
 def test_alphabet_table_from_page_10(curriculum: Curriculum) -> None:
@@ -106,7 +106,8 @@ def test_quran_items_have_valid_reference(curriculum: Curriculum) -> None:
 
 def test_lessons_are_short_and_ids_sequential(curriculum: Curriculum) -> None:
     for n, lesson in enumerate(curriculum.lessons, start=1):
-        assert (lesson.number, lesson.id) == (n, f"L{n:03}")
+        # L001 снят ADR-0089: номера не сдвигаем (на них пороги CardPolicy и lesson_number в БД)
+        assert (lesson.number, lesson.id) == (n + 1, f"L{n + 1:03}")
         assert len(lesson.practice_items) <= 12, lesson.id
         assert lesson.part, lesson.id
         for item in lesson.items:

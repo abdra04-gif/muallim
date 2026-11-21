@@ -1,8 +1,8 @@
 """Настройки ученика и состояние его экрана (FR-51, TD-FN-90, ADR-0061). Только правила.
 
-Одна запись на ученика: выбор ученика (как показывать «Как читается», автозвук, начало занятия,
-крупный шрифт, блок исследования, напоминание) и состояние экрана (что открыто, идёт ли начало
-занятия) — чтобы перезапуск бота ничего не терял. Умолчания — как бот работал до настроек.
+Одна запись на ученика: выбор ученика (как показывать «Как читается», автозвук, крупный шрифт,
+блок исследования, напоминание) и состояние экрана (что открыто) — чтобы перезапуск бота ничего не
+терял. Умолчания — как бот работал до настроек.
 
 «Сегодня» для ученика — его местная дата: постоянное смещение от UTC в минутах (Россия без
 летнего времени с 2014 г., Казахстан — единый UTC+5 с 2024 г.). До ответа «который у тебя час?» —
@@ -25,9 +25,6 @@ REMINDER_PAUSE_AFTER_DAYS: Final = 14  # молчит дольше — напо�
 REMINDER_HOURS: Final = range(7, 23)  # 7:00 … 22:00 местного, целые часы
 ASK_OFFSET_HOURS: Final = range(2, 13)  # «который у тебя час?»: UTC+2 … UTC+12, целые часы
 
-OPENING_ITEMS: Final = ("L001-02", "L001-03")  # истиаза, басмала (ADR-0050)
-FIRST_LESSON: Final = "L001"
-
 
 class HowToRead(StrEnum):
     """Подсказка «🔤 Как читается» на карточке (ADR-0029)."""
@@ -42,18 +39,20 @@ class LearnerSettings:
     # выбор ученика
     how_to_read: HowToRead = HowToRead.SPOILER
     auto_reference: bool = False  # В5: автозвук выключен
-    daily_opening: bool = True  # ADR-0050: начало занятия предлагается
+    # «начало занятия» (ADR-0050) убрано автором 2026-11-21: истиазы в книге нет. Поля ниже с
+    # opening — только колонки БД (схему не меняем), бот их не читает и не пишет.
+    daily_opening: bool = True
     large_font: bool = False
     # не используется с ADR-0082 (переключатель удалён); колонка БД остаётся, TD-FN-158
     research_block: bool = False
     reminder_minute: int | None = None  # минута местных суток; None — напоминание выключено
     utc_offset_min: int = DEFAULT_UTC_OFFSET_MIN
-    # состояние экрана и начала занятия (TD-FN-90)
+    # состояние экрана (TD-FN-90)
     screen_item_id: str | None = None  # None — на экране меню, не карточка
-    screen_opening: bool = False  # карточка открыта как шаг начала занятия
-    opening_resume_item: str | None = None  # куда вернуться после басмалы
-    opening_day: date | None = None  # местная дата начала занятия: вчерашнее не действует
-    opening_skipped_on: date | None = None  # «Пропустить» — местная дата
+    screen_opening: bool = False
+    opening_resume_item: str | None = None
+    opening_day: date | None = None
+    opening_skipped_on: date | None = None
     reminder_sent_on: date | None = None  # местная дата последнего напоминания
 
 
@@ -76,27 +75,6 @@ def local_minute(now: datetime, utc_offset_min: int) -> int:
 def local_date(now: datetime, utc_offset_min: int) -> date:
     """Местная дата ученика в момент ``now`` (время с часовым поясом)."""
     return (now.astimezone(UTC) + timedelta(minutes=utc_offset_min)).date()
-
-
-def needs_opening(
-    settings: LearnerSettings,
-    *,
-    today: date,
-    first_lesson_done: bool,
-    practiced_today: bool,
-    cursor_item: str | None,
-) -> bool:
-    """Предложить начало занятия: включено, урок 1 пройден, сегодня не занимался и не пропускал.
-
-    Новичку урока 1 не предлагается: урок и так с них начинается. Курсор на истиазе или басмале
-    (вернулся повторить) — не предлагать: иначе «Продолжить» после басмалы открывает начало
-    занятия по кругу (TD-FN-90 п. 5).
-    """
-    if not settings.daily_opening or not first_lesson_done or practiced_today:
-        return False
-    if cursor_item in OPENING_ITEMS:
-        return False
-    return settings.opening_skipped_on != today
 
 
 def reminder_due(now: datetime, settings: LearnerSettings, last_practiced: date | None) -> bool:

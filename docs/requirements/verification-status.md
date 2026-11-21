@@ -1,14 +1,14 @@
 # Статус трассировки (сгенерировано `make trace`, не править руками)
 
-Сформирован: 2026-11-20T18:04:28+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
+Сформирован: 2026-11-21T09:13:00+00:00. Матрицы: `docs/requirements/traceability.md`, `docs/research/traceability.md` (ADR-0036).
 
 ## Отпечаток версии
 Записывайте в паспорт рисунка или таблицы (`docs/thesis/figures.md`) и рядом с отчётом.
 
 | Часть | SHA-256 (16 знаков) | Файлов |
 |---|---|---|
-| код | `7df1c6abb29a58f7` | 135 |
-| программа (книга) | `da57065c4a211250` | 4 |
+| код | `69419112348b9757` | 134 |
+| программа (книга) | `88a9d404496ab750` | 4 |
 | SQL-отчёты | `6b1ab1a4c8f54ab3` | 12 |
 | миграции | `3421b8207664162f` | 16 |
 | зависимости | `e33bf9dd0f3b4cc1` | 1 |
@@ -55,15 +55,15 @@
 | FR-38 | `tests/unit/test_render.py`, `tests/unit/test_screens.py` | ✅ |
 | FR-39 | `tests/unit/test_quiz.py`, `tests/unit/test_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-40 | `tests/integration/test_audio_decode.py`, `tests/integration/test_reference_audio.py` | ✅ |
-| FR-41 | `tests/unit/test_curriculum_content.py` | ✅ |
+| FR-41 | `tests/unit/test_book_start.py`, `tests/unit/test_curriculum_content.py` | ✅ |
 | FR-42 | `tests/integration/test_di.py` | ✅ |
 | FR-43 | `tests/integration/test_reading_guide.py`, `tests/unit/test_feedback.py`, `tests/unit/test_phonetizer_script.py`, `tests/unit/test_screens.py`, `tests/unit/test_send.py`, `tests/unit/test_syllables.py`, `tests/unit/test_transcription.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-44 | `tests/integration/test_bot_flow.py`, `tests/integration/test_sql_repositories.py`, `tests/unit/test_use_cases.py` | ✅ |
-| FR-45 | `tests/integration/test_opening_bot.py`, `tests/unit/test_new_screens.py` | ✅ |
+| FR-45 | `tests/integration/test_returning_learner_bot.py`, `tests/unit/test_book_start.py` | ✅ |
 | FR-46 | `tests/unit/test_new_screens.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-47 | `tests/unit/test_new_screens.py` | ✅ |
 | FR-48 | `tests/unit/test_readable_images.py` | ✅ |
-| FR-49 | `tests/integration/test_console_beginner.py`, `tests/integration/test_isti_adha_audio.py`, `tests/integration/test_opening_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ✅ |
+| FR-49 | `tests/integration/test_console_beginner.py`, `tests/integration/test_returning_learner_bot.py`, `tests/integration/test_sound_manifest_merge.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_quiz.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-50 | `tests/integration/test_console_beginner.py`, `tests/integration/test_staff_bot.py`, `tests/unit/test_beginner_screens.py`, `tests/unit/test_staff.py`, `tests/unit/test_use_cases.py` | ✅ |
 | FR-51 | `tests/integration/test_learner_settings_sql.py`, `tests/integration/test_reminders.py`, `tests/integration/test_screen_state.py`, `tests/integration/test_settings_bot.py`, `tests/unit/test_reminder_setting.py`, `tests/unit/test_settings_rules.py`, `tests/unit/test_settings_screens.py` | ✅ |
 | FR-52 | `tests/integration/test_letters_sheet_bot.py`, `tests/unit/test_letters_sheet.py` | ✅ |

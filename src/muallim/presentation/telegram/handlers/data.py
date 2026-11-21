@@ -123,7 +123,7 @@ async def cb_delete(
     uc: FromDishka[DeleteMyData],
 ) -> None:
     await uc.execute(learner)
-    await state.clear()  # ожидание эталона забыто; экран и начало занятия удалены каскадом
+    await state.clear()  # ожидание эталона забыто; экран удалён каскадом
     if msg := message_of(cb):
         await msg.edit_text(texts.DELETE_DONE)
     await cb.answer()

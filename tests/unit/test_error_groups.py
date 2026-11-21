@@ -375,7 +375,7 @@ def test_word_reading_with_phoneme_reference_is_the_same(lexicon: Lexicon) -> No
 
 # ---------- раунд 2 (ревью 2026-10-24) ----------
 # Эталоны — выход quran-transcript с MOSHAF_PARAMS бота (``muaalem._references``), без модели
-BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"  # L001-03
+BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"  # L097-02 (аят 1:1)
 BASMALA_PHONEMES = "بِسمِللَااهِررَحمَاانِررَحِۦۦۦۦم"  # waqf
 L031_03 = "بَا بِي بُو تَا تِي تُو ثَا ثِي ثُو"
 L031_03_PHONEMES = "بَاابِۦۦبُۥۥتَااتِۦۦتُۥۥثَااثِۦۦثُۥۥ"

@@ -8,7 +8,7 @@
 # Огласовки строк с. 10–37 перенесены агентом со скана — verified: false до сверки человеком.
 # Меняет ТОЛЬКО ЧЕЛОВЕК (CLAUDE.md). При любой правке увеличьте version.
 id: al-muallim-al-thani-ru
-version: 2026.11.08-book-7
+version: 2026.11.21-book-8
 title: Муаллим сани — вся книга Максуди
 source:
   source_id: SRC-040
@@ -16,49 +16,6 @@ source:
   verified: false
   note: 'Вся книга, с. 10–85, в порядке книги. Сборка: scripts/book/build.py'
 lessons:
-- id: L001
-  number: 1
-  title: '1. Начало: истиаза и басмала'
-  kind: line
-  accent: ''
-  section: start
-  part: 1. Знакомство
-  source:
-    source_id: SRC-040
-    page: 10
-    verified: false
-  items:
-  - id: L001-01
-    kind: rule
-    text: بِسْمِ
-    name: С чего начинают чтение
-    tip: Перед чтением Корана мусульмане говорят истиазу — «Прибегаю к Аллаху от проклятого шайтана» — и басмалу
-      — «С именем Аллаха, Милостивого, Милосердного». Книга тоже открывается басмалой. Прочитай обе строки, как
-      получится, даже если пока не знаешь букв, и отправь голосовое.
-    source:
-      source_id: SRC-040
-      page: 10
-      line: 1
-      verified: false
-      note: правило — своими словами
-  - id: L001-02
-    kind: line
-    text: أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ
-    source:
-      source_id: SRC-040
-      page: 10
-      line: 1
-      verified: false
-      note: истиаза — перед чтением Корана (в книге не напечатана)
-  - id: L001-03
-    kind: line
-    text: بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-    quran: '1:1'
-    source:
-      source_id: SRC-040
-      page: 10
-      line: 1
-      verified: false
 - id: L002
   number: 2
   title: 2. Арабский алфавит

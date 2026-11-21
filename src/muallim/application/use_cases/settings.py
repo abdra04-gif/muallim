@@ -25,7 +25,7 @@ from muallim.domain.settings import (
 HOW_TO_READ: Final = "how_to_read"
 # ``research_block`` не переключается: колонка осталась в БД, но ничего не значит (ADR-0082)
 # ``auto_reference`` (автозвук) убран автором 2026-11-08: колонка в БД осталась, всегда выкл.
-TOGGLES: Final = ("daily_opening", "large_font")
+TOGGLES: Final = ("large_font",)  # «Истиаза в начале дня» убрана (автор 2026-11-21)
 REMINDER_MINUTE: Final = "reminder_minute"
 UTC_OFFSET: Final = "utc_offset_min"
 REMINDER_OFF: Final = "off"  # значение кнопки «выключить напоминание»

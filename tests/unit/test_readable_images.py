@@ -27,8 +27,7 @@ FRAME_MARGIN = 40  # px — рамка и уголки по краям карт�
 INK_TOLERANCE = 40  # сумма |ΔR|+|ΔG|+|ΔB| — сглаживание краёв букв
 
 # Строки из curriculum/course.ru.yaml
-ISTI_ADHA = "أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ"  # L001-02
-BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"  # L001-03
+BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"  # L097-02 (аят 1:1)
 AHAD = "أَحَدٌ"  # L086-05, Коран 112:1
 SIX_SYLLABLES = "صُمْ صِفْ فَصْ صَرَفَ صَبَرَ بَصَرَ"  # урок буквы ص
 
@@ -74,9 +73,8 @@ def _ink_box(
 
 
 LESSON_IMAGES: dict[str, Callable[[], bytes]] = {
-    "card_isti_adha": lambda: render.card(ISTI_ADHA, (), (1, 3)),
     "card_one_syllable": lambda: render.card("مَ", (), (0, 3)),
-    "card_basmala": lambda: render.card(BASMALA, set(), (2, 3)),
+    "card_basmala": lambda: render.card(BASMALA, set(), (1, 1)),
     "rule": lambda: render.rule("بَ بِ بُ"),
     "letters": lambda: render.letters("ا ب ت ث ج ح خ"),
     "letter_forms": lambda: render.letter_forms(
@@ -90,7 +88,6 @@ LESSON_IMAGES: dict[str, Callable[[], bytes]] = {
         "Верно 5 слов из 6",
     ),
     "result_marks": lambda: _marks(SIX_SYLLABLES, "سُمْ صِفْ فَصْ صَلَفَ صَبَرَ مَصَرَ"),
-    "opening": lambda: render.opening([ISTI_ADHA, BASMALA]),
     "alphabet": lambda: render.alphabet([[("ا", render.Mark.DONE), ("ب", render.Mark.CURRENT)]]),
     "signs": render.signs,
     "postcard": lambda: render.postcard("م", texts.POSTCARD_TITLE, "6. Мим · с. 14", (True,) * 7),
@@ -153,12 +150,6 @@ def test_result_words_are_large_on_a_phone_screen() -> None:
     states = [render.WordState.OK] * 2
     png = render.result_words("صُمْ صِفْ", states, 85, "Верно 2 слова из 2")
     assert _on_phone(png, render.OK) >= 38
-
-
-@needs_raqm
-def test_opening_line_is_large_on_a_phone_screen() -> None:
-    """Строка истиазы в начале занятия — не меньше 50 pt (сейчас ≈ 45, при 900 px ≈ 54)."""
-    assert _on_phone(render.opening([ISTI_ADHA])) >= 50
 
 
 @needs_raqm

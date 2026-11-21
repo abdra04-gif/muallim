@@ -69,7 +69,7 @@ def test_fresh_learner_starts_with_basmala_lesson(curriculum: Curriculum) -> Non
     p = replace(_progress(curriculum), attempts_total=0)
     s = screens.home(curriculum, p)
     label, data = _buttons(s.keyboard)[0]
-    assert "Начать" in label and data == cb.GoItem(item_id=curriculum.first_item().id).pack()
+    assert "Начать" in label and data == cb.PageOpen(n=10).pack()  # скан с. 10 (ADR-0089)
 
 
 def test_lessons_screen_lists_book_parts_with_progress(curriculum: Curriculum) -> None:

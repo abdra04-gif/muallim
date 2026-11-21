@@ -40,8 +40,6 @@ from muallim.domain.sura import (
     suras,
 )
 
-ISTIADHA_ITEM = "L001-02"  # «أَعُوذُ بِٱللَّهِ…» — урок 1, начало занятия (ADR-0050)
-
 
 @dataclass(frozen=True, slots=True)
 class SuraReadingResult:
@@ -84,13 +82,6 @@ class ReadSura:
         learner.current_item_id = following.id
         await self.learners.save(learner)
 
-    def _istiadha(self) -> str:
-        """Истиаза из урока 1 — необязательное начало перед сурой (ревью кода 2026-10-31)."""
-        try:
-            return self.curriculum.item(ISTIADHA_ITEM).text
-        except KeyError:
-            return ""
-
     def sura(self, number: int) -> Sura:
         for sura in suras(self.curriculum):
             if sura.number == number:
@@ -106,7 +97,7 @@ class ReadSura:
         studied = bool(items) and all(i.id in done for i in items)
         ayahs = [(a.id, int(a.quran.split(":")[1]), a.text) for a in sura.ayahs]
         opening = sura.opening.text if sura.opening else ""
-        preamble = self._istiadha()
+        preamble = ""  # истиазу перед сурой не ждём: её нет в книге (автор 2026-11-21, ADR-0089)
 
         started = time.perf_counter()
         try:

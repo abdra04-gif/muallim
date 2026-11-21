@@ -1,4 +1,8 @@
-"""Начало занятия (истиаза и басмала раз в день) и открытка «урок пройден» (ADR-0050)."""
+"""Главная после /start и 🏠, старые кнопки «начала занятия», открытка «урок пройден» (ADR-0050).
+
+«Начало занятия» с истиазой и басмалой убрано автором 2026-11-21: истиазы в книге нет. Кнопки
+«🎙 Читать истиазу» и «⏭ Пропустить» из старых сообщений показывают главную.
+"""
 
 from typing import Final
 
@@ -7,92 +11,43 @@ from aiogram.exceptions import TelegramAPIError
 from aiogram.types import BufferedInputFile, CallbackQuery
 from dishka import FromDishka
 
-from muallim.application.ports.reading import AyahSyllables
-from muallim.application.ports.storage import ArticulationVideoLibrary, ReferenceAudioLibrary
-from muallim.application.use_cases.cards import OpenItem
 from muallim.application.use_cases.progress import GetProgress, Progress
-from muallim.application.use_cases.reading import HowToRead
-from muallim.application.use_cases.reference import GetReferenceAudio, RecordReference
 from muallim.application.use_cases.screen import ScreenState
-from muallim.application.use_cases.settings import GetSettings
-from muallim.application.use_cases.video import GetArticulationVideo, RecordVideoPlayed
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
-from muallim.presentation.telegram import opening, screens, texts
+from muallim.presentation.telegram import screens, texts
 from muallim.presentation.telegram.callbacks import Opening, ShareLesson
 from muallim.presentation.telegram.display import Display, message_of
-from muallim.presentation.telegram.handlers.reference import show_card
 from muallim.presentation.telegram.screens import Screen
 
 router: Final = Router(name="learner.daily")
 
 
-async def home_or_opening(
+async def home_screen(
     cur: Curriculum,
     progress: Progress,
     learner: Learner,
     screen_state: ScreenState,
     quiz_waiting: int = 0,
 ) -> Screen:
-    """Главная — или сначала «Начнём занятие», если сегодня его ещё не было.
-
-    Начатое начало занятия при этом снимается (🏠, /start), на экране — меню, не карточка.
-    """
-    await screen_state.menu(learner, finish=True)
-    if await screen_state.needs_opening(learner, progress):
-        return screens.opening(cur)
+    """Главная; на экране — меню, не карточка (голосовое не оценивается)."""
+    await screen_state.menu(learner)
     return screens.home(cur, progress, quiz_waiting)
 
 
 @router.callback_query(Opening.filter())
-async def cb_opening(
+async def cb_old_opening(
     cb: CallbackQuery,
-    callback_data: Opening,
     display: FromDishka[Display],
     learner: FromDishka[Learner],
     cur: FromDishka[Curriculum],
     progress: FromDishka[GetProgress],
-    cards: FromDishka[OpenItem],
-    library: FromDishka[ReferenceAudioLibrary],
-    recorder: FromDishka[RecordReference],
-    reading: FromDishka[HowToRead],
     screen_state: FromDishka[ScreenState],
-    learner_settings: FromDishka[GetSettings],
-    reference: FromDishka[GetReferenceAudio],
-    videos: FromDishka[ArticulationVideoLibrary],
-    syllables: FromDishka[AyahSyllables],
-    watch: FromDishka[GetArticulationVideo],
-    played: FromDishka[RecordVideoPlayed],
 ) -> None:
-    p = await progress.execute(learner)
-    msg = message_of(cb)
-    if callback_data.act == "skip":
-        await screen_state.skip_opening(learner)
-        if msg:
-            await display.show(msg, screens.home(cur, p))
-        await cb.answer()
-        return
-    resume = p.continue_item or cur.first_item()
-    item = await cards.execute(learner, opening.OPENING_ITEMS[0], move=False)  # FR-49
-    await screen_state.begin_opening(learner, resume.id, item.id)
-    if msg:
-        view = await learner_settings.execute(learner)
-        has_audio = library.has(item.id)
-        screen = screens.card(
-            cur,
-            item,
-            has_audio,
-            recorder.allowed(learner),
-            reading.execute(learner, item),
-            view=view,
-            videos=videos,
-            syllables=syllables,
-        )
-        await show_card(
-            msg, display, screen, learner=learner, item_id=item.id, has_audio=has_audio,
-            view=view, reference=reference, video_key=screens.card_video(videos, item),
-            watch=watch, played=played,
-        )  # fmt: skip
+    """Кнопка «начала занятия» из старого сообщения — главная."""
+    if msg := message_of(cb):
+        p = await progress.execute(learner)
+        await display.show(msg, await home_screen(cur, p, learner, screen_state))
     await cb.answer()
 
 

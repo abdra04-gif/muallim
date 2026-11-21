@@ -27,7 +27,7 @@ from tests.integration.test_bot_flow import FakeTelegram, Learner
 pytestmark = pytest.mark.integration
 
 TEACHER, PUPIL = 7101, 7102
-ISTI_ADHA = "L001-02"
+ISTI_ADHA = "L097-02"  # басмала, аят 1:1 аль-Фатихи (урок L001 снят, ADR-0089)
 
 
 @pytest.fixture

@@ -75,7 +75,7 @@ def test_hamza_lesson_has_no_letters_before(curriculum: Curriculum) -> None:
 
 
 def test_lessons_before_the_letters_have_no_letters_before(curriculum: Curriculum) -> None:
-    assert book.letters_before(curriculum, "L001") == ()
+    assert book.letters_before(curriculum, "L002") == ()
     assert book.letters_before(curriculum, "L002") == ()
 
 
@@ -173,7 +173,7 @@ def test_deep_with_known_letters_opens_the_sheet(curriculum: Curriculum, item_id
     assert texts.SHEET_BUTTON not in [t for t, _ in _buttons(card.keyboard)]
 
 
-@pytest.mark.parametrize("item_id", ["L001-02", "L002-02", "L003-01", "L003-10"])
+@pytest.mark.parametrize("item_id", ["L002-01", "L002-02", "L003-01", "L003-10"])
 def test_deep_without_known_letters_has_no_sheet_button(
     curriculum: Curriculum, item_id: str
 ) -> None:
@@ -187,7 +187,7 @@ def test_signs_open_the_sheet_of_the_learner_current_lesson(curriculum: Curricul
     assert (texts.SHEET_BUTTON, cb.LettersSheet(lesson_id=MIM).pack()) in _buttons(s.keyboard)
 
 
-@pytest.mark.parametrize("current", ["L001-02", "L003-04"])
+@pytest.mark.parametrize("current", ["L002-02", "L003-04"])
 def test_signs_without_known_letters_have_no_sheet_button(
     curriculum: Curriculum, current: str
 ) -> None:

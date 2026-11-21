@@ -98,6 +98,9 @@ def quran_phrase(spec: str) -> tuple[str, str]:
     return text, f"{s}:{a}"
 
 
+RETIRED_LESSONS = 1  # L001 (истиаза и басмала) снят — ADR-0089
+
+
 def sections() -> list[tuple[str, list[dict]]]:
     """Все карточки книги по порядку, сгруппированные по разделам (подряд идущие ключи)."""
     out: list[tuple[str, list[dict]]] = []
@@ -108,18 +111,8 @@ def sections() -> list[tuple[str, list[dict]]]:
             out.append((key, []))
         out[-1][1].append(card)
 
-    # Начало: истиаза (не из книги, но так начинают чтение) и басмала (с. 10, строка 1)
-    fatiha = Aya(1, 1).get()
-    add(
-        "start",
-        {
-            "kind": "line",
-            "text": fatiha.istiaatha_uthmani,
-            "quran": "",
-            "source": src(10, 1, "истиаза — перед чтением Корана (в книге не напечатана)"),
-        },
-    )
-    add("start", {"kind": "line", "text": fatiha.uthmani, "quran": "1:1", "source": src(10, 1)})
+    # Басмала открывает книгу заголовком (с. 10, строка 1) — видна на скане страницы, отдельной
+    # карточки нет; истиазы в книге нет (автор 2026-11-21, ADR-0089). Урок L001 снят.
 
     # с. 10–24: алфавит, хамза, буквы по одной
     for page in sorted(letters.LETTER_PAGES):
@@ -225,14 +218,16 @@ def lessons() -> list[dict]:
         if base == "sura" and any(les["section"] == "sura" for les in out):
             rule = None  # правило про суры — только перед первой
         practice = [c for c in cards if c["kind"] not in ("alphabet",)]
-        if base in ("letter", "alphabet", "start") or len(practice) <= LINES_PER_LESSON + 2:
+        if base in ("letter", "alphabet") or len(practice) <= LINES_PER_LESSON + 2:
             chunks = [cards]
         else:  # поровну: 20 строк → 7+7+6, а не 8+8+4
             k = -(-len(cards) // LINES_PER_LESSON)
             size = -(-len(cards) // k)
             chunks = [cards[i : i + size] for i in range(0, len(cards), size)]
         for part, chunk in enumerate(chunks, start=1):
-            n = len(out) + 1
+            # L001 снят (ADR-0089): номера не сдвигаем — на lesson.number завязаны пороги проверки
+            # (CardPolicy, ADR-0088) и колонка lesson_number в БД
+            n = len(out) + 1 + RETIRED_LESSONS
             lid = f"L{n:03}"
             items = []
             if rule and part == 1:
@@ -328,7 +323,7 @@ def order(item: dict) -> dict:
 
 CONTENTS = [  # оглавление книги (с. 86) -> разделы программы
     ("Введение", 5, []), ("Предисловие", 6, []),
-    ("Арабский алфавит", 10, ["start", "alphabet", "letter"]),
+    ("Арабский алфавит", 10, ["alphabet", "letter"]),
     ("Буквы «мадд»", 25, ["madd"]), ("Упражнения", 27, ["exercises"]),
     ("Буквы с «ташдидом» (удвоением)", 30, ["tashdid"]), ("Буквы с «танвином»", 32, ["tanwin"]),
     ("Встреча «танвина» с «ташдидом»", 34, ["tanwin_tashdid"]),
@@ -371,7 +366,7 @@ def write_contents(lessons_: list[dict]) -> None:
 def main() -> None:
     doc = {
         "id": "al-muallim-al-thani-ru",
-        "version": "2026.11.08-book-7",  # сверка со сканом, образцы, знаки остановки (ADR-0084)
+        "version": "2026.11.21-book-8",  # с. 10 по книге: басмала — на скане, урок L001 снят (ADR-0089)
         "title": "Муаллим сани — вся книга Максуди",
         "source": {
             "source_id": SRC,

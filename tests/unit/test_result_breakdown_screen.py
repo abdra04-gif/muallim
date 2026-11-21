@@ -435,7 +435,7 @@ def test_words_counter_is_declined(n: int, word: str) -> None:
 
 
 # ---------- раунд 2: вид пункта (Р6, Р7), баги ревью 2026-10-24 ----------
-L001_03 = "L001-03"  # басмала
+L001_03 = "L097-02"  # басмала — аят 1:1 в уроке аль-Фатихи (урок L001 снят, ADR-0089)
 BASMALA_PHONEMES = "بِسمِللَااهِررَحمَاانِررَحِۦۦۦۦم"  # quran-transcript, MOSHAF_PARAMS бота
 L031_03 = "L031-03"  # بَا بِي بُو تَا تِي تُو ثَا ثِي ثُو
 L031_03_PHONEMES = "بَاابِۦۦبُۥۥتَااتِۦۦتُۥۥثَااثِۦۦثُۥۥ"
@@ -609,7 +609,7 @@ def test_learner_literals_live_in_texts() -> None:
 
 
 # ---------- раунд 3: текст и картинка согласованы (Н1) ----------
-BASMALA_WASL = "بِسمِللَااهِررَحمَاانِررَحِۦۦمِ"  # L001-03, quran-transcript (wasl)
+BASMALA_WASL = "بِسمِللَااهِررَحمَاانِررَحِۦۦمِ"  # L097-02, quran-transcript (wasl)
 
 
 def test_groups_sent_to_the_image_are_on_the_image(
