@@ -18,7 +18,7 @@ source:
 lessons:
 - id: L002
   number: 2
-  title: 2. Арабский алфавит
+  title: Арабский алфавит
   kind: line
   accent: ''
   section: alphabet
@@ -79,7 +79,7 @@ lessons:
       verified: false
 - id: L003
   number: 3
-  title: 3. أَ إِ أُ · Элиф с хэмзэ
+  title: أَ إِ أُ · Элиф с хэмзэ
   kind: line
   accent: ءأإؤئآ
   section: letter
@@ -246,7 +246,7 @@ lessons:
       verified: false
 - id: L004
   number: 4
-  title: 4. ر · Ра
+  title: ر · Ра
   kind: line
   accent: ر
   section: letter
@@ -330,7 +330,7 @@ lessons:
       verified: false
 - id: L005
   number: 5
-  title: 5. ز · Зэй
+  title: ز · Зэй
   kind: line
   accent: ز
   section: letter
@@ -418,7 +418,7 @@ lessons:
       verified: false
 - id: L006
   number: 6
-  title: 6. م · Мим
+  title: م · Мим
   kind: line
   accent: م
   section: letter
@@ -506,7 +506,7 @@ lessons:
       verified: false
 - id: L007
   number: 7
-  title: 7. ت · Тэ
+  title: ت · Тэ
   kind: line
   accent: ت
   section: letter
@@ -604,7 +604,7 @@ lessons:
       verified: false
 - id: L008
   number: 8
-  title: 8. ن · Нун
+  title: ن · Нун
   kind: line
   accent: ن
   section: letter
@@ -700,7 +700,7 @@ lessons:
       verified: false
 - id: L009
   number: 9
-  title: 9. ي · Йэ
+  title: ي · Йэ
   kind: line
   accent: ي
   section: letter
@@ -797,7 +797,7 @@ lessons:
       verified: false
 - id: L010
   number: 10
-  title: 10. ب · Бэ
+  title: ب · Бэ
   kind: line
   accent: ب
   section: letter
@@ -893,7 +893,7 @@ lessons:
       verified: false
 - id: L011
   number: 11
-  title: 11. ك · Кэф
+  title: ك · Кэф
   kind: line
   accent: ك
   section: letter
@@ -997,7 +997,7 @@ lessons:
       verified: false
 - id: L012
   number: 12
-  title: 12. ل · Лэм
+  title: ل · Лэм
   kind: line
   accent: ل
   section: letter
@@ -1102,7 +1102,7 @@ lessons:
       verified: false
 - id: L013
   number: 13
-  title: 13. و · Уау
+  title: و · Уау
   kind: line
   accent: و
   section: letter
@@ -1206,7 +1206,7 @@ lessons:
       verified: false
 - id: L014
   number: 14
-  title: 14. ه · Һэ
+  title: ه · Һэ
   kind: line
   accent: ه
   section: letter
@@ -1302,7 +1302,7 @@ lessons:
       verified: false
 - id: L015
   number: 15
-  title: 15. ف · Фэ
+  title: ف · Фэ
   kind: line
   accent: ف
   section: letter
@@ -1406,7 +1406,7 @@ lessons:
       verified: false
 - id: L016
   number: 16
-  title: 16. ق · Каф
+  title: ق · Каф
   kind: line
   accent: ق
   section: letter
@@ -1513,7 +1513,7 @@ lessons:
       verified: false
 - id: L017
   number: 17
-  title: 17. ش · Шин
+  title: ش · Шин
   kind: line
   accent: ش
   section: letter
@@ -1617,7 +1617,7 @@ lessons:
       verified: false
 - id: L018
   number: 18
-  title: 18. س · Син
+  title: س · Син
   kind: line
   accent: س
   section: letter
@@ -1721,7 +1721,7 @@ lessons:
       verified: false
 - id: L019
   number: 19
-  title: 19. ث · Сэ
+  title: ث · Сэ
   kind: line
   accent: ث
   section: letter
@@ -1834,7 +1834,7 @@ lessons:
       verified: false
 - id: L020
   number: 20
-  title: 20. ص · Сад
+  title: ص · Сад
   kind: line
   accent: ص
   section: letter
@@ -1931,7 +1931,7 @@ lessons:
       verified: false
 - id: L021
   number: 21
-  title: 21. ط · Та
+  title: ط · Та
   kind: line
   accent: ط
   section: letter
@@ -2044,7 +2044,7 @@ lessons:
       verified: false
 - id: L022
   number: 22
-  title: 22. ج · Джим
+  title: ج · Джим
   kind: line
   accent: ج
   section: letter
@@ -2140,7 +2140,7 @@ lessons:
       verified: false
 - id: L023
   number: 23
-  title: 23. خ · Ха
+  title: خ · Ха
   kind: line
   accent: خ
   section: letter
@@ -2244,7 +2244,7 @@ lessons:
       verified: false
 - id: L024
   number: 24
-  title: 24. ح · Хэ
+  title: ح · Хэ
   kind: line
   accent: ح
   section: letter
@@ -2358,7 +2358,7 @@ lessons:
       verified: false
 - id: L025
   number: 25
-  title: 25. غ · Гайн
+  title: غ · Гайн
   kind: line
   accent: غ
   section: letter
@@ -2454,7 +2454,7 @@ lessons:
       verified: false
 - id: L026
   number: 26
-  title: 26. ع · Эйн
+  title: ع · Эйн
   kind: line
   accent: ع
   section: letter
@@ -2560,7 +2560,7 @@ lessons:
       verified: false
 - id: L027
   number: 27
-  title: 27. د · Дэль
+  title: د · Дэль
   kind: line
   accent: د
   section: letter
@@ -2664,7 +2664,7 @@ lessons:
       verified: false
 - id: L028
   number: 28
-  title: 28. ض · Дад
+  title: ض · Дад
   kind: line
   accent: ض
   section: letter
@@ -2778,7 +2778,7 @@ lessons:
       verified: false
 - id: L029
   number: 29
-  title: 29. ذ · Зэль
+  title: ذ · Зэль
   kind: line
   accent: ذ
   section: letter
@@ -2883,7 +2883,7 @@ lessons:
       verified: false
 - id: L030
   number: 30
-  title: 30. ظ · За
+  title: ظ · За
   kind: line
   accent: ظ
   section: letter
@@ -3003,7 +3003,7 @@ lessons:
       verified: false
 - id: L031
   number: 31
-  title: 31. Долгие гласные (мадд) (1/3)
+  title: Долгие гласные (мадд) (1/3)
   kind: line
   accent: ''
   section: madd
@@ -3085,7 +3085,7 @@ lessons:
       verified: false
 - id: L032
   number: 32
-  title: 32. Долгие гласные (мадд) (2/3)
+  title: Долгие гласные (мадд) (2/3)
   kind: line
   accent: ''
   section: madd
@@ -3153,7 +3153,7 @@ lessons:
       verified: false
 - id: L033
   number: 33
-  title: 33. Долгие гласные (мадд) (3/3)
+  title: Долгие гласные (мадд) (3/3)
   kind: line
   accent: ''
   section: madd
@@ -3205,7 +3205,7 @@ lessons:
       verified: false
 - id: L034
   number: 34
-  title: '34. Упражнения: слова с мадд (1/4)'
+  title: 'Упражнения: слова с мадд (1/4)'
   kind: line
   accent: ''
   section: exercises
@@ -3293,7 +3293,7 @@ lessons:
       verified: false
 - id: L035
   number: 35
-  title: '35. Упражнения: слова с мадд (2/4)'
+  title: 'Упражнения: слова с мадд (2/4)'
   kind: line
   accent: ''
   section: exercises
@@ -3369,7 +3369,7 @@ lessons:
       verified: false
 - id: L036
   number: 36
-  title: '36. Упражнения: слова с мадд (3/4)'
+  title: 'Упражнения: слова с мадд (3/4)'
   kind: line
   accent: ''
   section: exercises
@@ -3445,7 +3445,7 @@ lessons:
       verified: false
 - id: L037
   number: 37
-  title: '37. Упражнения: слова с мадд (4/4)'
+  title: 'Упражнения: слова с мадд (4/4)'
   kind: line
   accent: ''
   section: exercises
@@ -3497,7 +3497,7 @@ lessons:
       verified: false
 - id: L038
   number: 38
-  title: 38. Ташдид — удвоение (1/4)
+  title: Ташдид — удвоение (1/4)
   kind: line
   accent: ''
   section: tashdid
@@ -3578,7 +3578,7 @@ lessons:
       verified: false
 - id: L039
   number: 39
-  title: 39. Ташдид — удвоение (2/4)
+  title: Ташдид — удвоение (2/4)
   kind: line
   accent: ''
   section: tashdid
@@ -3646,7 +3646,7 @@ lessons:
       verified: false
 - id: L040
   number: 40
-  title: 40. Ташдид — удвоение (3/4)
+  title: Ташдид — удвоение (3/4)
   kind: line
   accent: ''
   section: tashdid
@@ -3714,7 +3714,7 @@ lessons:
       verified: false
 - id: L041
   number: 41
-  title: 41. Ташдид — удвоение (4/4)
+  title: Ташдид — удвоение (4/4)
   kind: line
   accent: ''
   section: tashdid
@@ -3766,7 +3766,7 @@ lessons:
       verified: false
 - id: L042
   number: 42
-  title: 42. Танвин (1/2)
+  title: Танвин (1/2)
   kind: line
   accent: ''
   section: tanwin
@@ -3858,7 +3858,7 @@ lessons:
       verified: false
 - id: L043
   number: 43
-  title: 43. Танвин (2/2)
+  title: Танвин (2/2)
   kind: line
   accent: ''
   section: tanwin
@@ -3934,7 +3934,7 @@ lessons:
       verified: false
 - id: L044
   number: 44
-  title: 44. Танвин и ташдид вместе
+  title: Танвин и ташдид вместе
   kind: line
   accent: ''
   section: tanwin_tashdid
@@ -4014,7 +4014,7 @@ lessons:
       verified: false
 - id: L045
   number: 45
-  title: '45. Хэмзэ: как пишется (1/2)'
+  title: 'Хэмзэ: как пишется (1/2)'
   kind: line
   accent: ءأإؤئ
   section: hamza
@@ -4087,7 +4087,7 @@ lessons:
       verified: false
 - id: L046
   number: 46
-  title: '46. Хэмзэ: как пишется (2/2)'
+  title: 'Хэмзэ: как пишется (2/2)'
   kind: line
   accent: ءأإؤئ
   section: hamza
@@ -4147,7 +4147,7 @@ lessons:
       verified: false
 - id: L047
   number: 47
-  title: 47. Хэмзэ аль-васль ٱ
+  title: Хэмзэ аль-васль ٱ
   kind: line
   accent: ٱ
   section: wasla
@@ -4228,7 +4228,7 @@ lessons:
       verified: false
 - id: L048
   number: 48
-  title: 48. Та марбута ة
+  title: Та марбута ة
   kind: line
   accent: ة
   section: ta_marbuta
@@ -4285,7 +4285,7 @@ lessons:
       verified: false
 - id: L049
   number: 49
-  title: '49. Сукун: две буквы рядом (1/4)'
+  title: 'Сукун: две буквы рядом (1/4)'
   kind: line
   accent: ''
   section: sukun
@@ -4379,7 +4379,7 @@ lessons:
       note: фраза 1 из 2 · Коран 2:256
 - id: L050
   number: 50
-  title: '50. Сукун: две буквы рядом (2/4)'
+  title: 'Сукун: две буквы рядом (2/4)'
   kind: line
   accent: ''
   section: sukun
@@ -4461,7 +4461,7 @@ lessons:
       note: фраза 4 из 4 · Коран 12:80
 - id: L051
   number: 51
-  title: '51. Сукун: две буквы рядом (3/4)'
+  title: 'Сукун: две буквы рядом (3/4)'
   kind: line
   accent: ''
   section: sukun
@@ -4543,7 +4543,7 @@ lessons:
       note: фраза 1 из 5 · Коран 1:5
 - id: L052
   number: 52
-  title: '52. Сукун: две буквы рядом (4/4)'
+  title: 'Сукун: две буквы рядом (4/4)'
   kind: line
   accent: ''
   section: sukun
@@ -4625,7 +4625,7 @@ lessons:
       note: фраза 3 из 3 · Коран 106:4
 - id: L053
   number: 53
-  title: '53. Артикль ال: лунные и солнечные'
+  title: 'Артикль ال: лунные и солнечные'
   kind: line
   accent: ''
   section: article
@@ -4698,7 +4698,7 @@ lessons:
       verified: false
 - id: L054
   number: 54
-  title: 54. Мим с сукуном (1/2)
+  title: Мим с сукуном (1/2)
   kind: line
   accent: م
   section: mim
@@ -4785,7 +4785,7 @@ lessons:
       note: фраза 1 из 1 · Коран 18:21
 - id: L055
   number: 55
-  title: 55. Мим с сукуном (2/2)
+  title: Мим с сукуном (2/2)
   kind: line
   accent: م
   section: mim
@@ -4847,7 +4847,7 @@ lessons:
       note: фраза 1 из 1 · Коран 105:3
 - id: L056
   number: 56
-  title: '56. Нун и танвин: изхар (1/3)'
+  title: 'Нун и танвин: изхар (1/3)'
   kind: line
   accent: ن
   section: noon_izhar
@@ -4929,7 +4929,7 @@ lessons:
       note: фраза 3 из 3 · Коран 9:109
 - id: L057
   number: 57
-  title: '57. Нун и танвин: изхар (2/3)'
+  title: 'Нун и танвин: изхар (2/3)'
   kind: line
   accent: ن
   section: noon_izhar
@@ -5000,7 +5000,7 @@ lessons:
       note: фраза 3 из 3 · Коран 6:83
 - id: L058
   number: 58
-  title: '58. Нун и танвин: изхар (3/3)'
+  title: 'Нун и танвин: изхар (3/3)'
   kind: line
   accent: ن
   section: noon_izhar
@@ -5069,7 +5069,7 @@ lessons:
       note: фраза 3 из 3 · Коран 2:59
 - id: L059
   number: 59
-  title: '59. Нун и танвин: идгам (1/4)'
+  title: 'Нун и танвин: идгам (1/4)'
   kind: line
   accent: ن
   section: noon_idgham
@@ -5161,7 +5161,7 @@ lessons:
       note: фраза 4 из 4 · Коран 66:8
 - id: L060
   number: 60
-  title: '60. Нун и танвин: идгам (2/4)'
+  title: 'Нун и танвин: идгам (2/4)'
   kind: line
   accent: ن
   section: noon_idgham
@@ -5243,7 +5243,7 @@ lessons:
       note: фраза 3 из 4 · Коран 2:148
 - id: L061
   number: 61
-  title: '61. Нун и танвин: идгам (3/4)'
+  title: 'Нун и танвин: идгам (3/4)'
   kind: line
   accent: ن
   section: noon_idgham
@@ -5324,7 +5324,7 @@ lessons:
       note: фраза 2 из 3 · Коран 45:7
 - id: L062
   number: 62
-  title: '62. Нун и танвин: идгам (4/4)'
+  title: 'Нун и танвин: идгам (4/4)'
   kind: line
   accent: ن
   section: noon_idgham
@@ -5386,7 +5386,7 @@ lessons:
       note: фраза 4 из 4 · Коран 2:143
 - id: L063
   number: 63
-  title: '63. Нун и танвин: ихфа (1/6)'
+  title: 'Нун и танвин: ихфа (1/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5490,7 +5490,7 @@ lessons:
       note: фраза 2 из 3 · Коран 49:6
 - id: L064
   number: 64
-  title: '64. Нун и танвин: ихфа (2/6)'
+  title: 'Нун и танвин: ихфа (2/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5582,7 +5582,7 @@ lessons:
       note: фраза 1 из 3 · Коран 32:2
 - id: L065
   number: 65
-  title: '65. Нун и танвин: ихфа (3/6)'
+  title: 'Нун и танвин: ихфа (3/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5674,7 +5674,7 @@ lessons:
       note: фраза 3 из 3 · Коран 35:30
 - id: L066
   number: 66
-  title: '66. Нун и танвин: ихфа (4/6)'
+  title: 'Нун и танвин: ихфа (4/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5766,7 +5766,7 @@ lessons:
       note: фраза 2 из 3 · Коран 6:2
 - id: L067
   number: 67
-  title: '67. Нун и танвин: ихфа (5/6)'
+  title: 'Нун и танвин: ихфа (5/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5858,7 +5858,7 @@ lessons:
       note: фраза 1 из 3 · Коран 12:62
 - id: L068
   number: 68
-  title: '68. Нун и танвин: ихфа (6/6)'
+  title: 'Нун и танвин: ихфа (6/6)'
   kind: line
   accent: ن
   section: noon_ikhfa
@@ -5920,7 +5920,7 @@ lessons:
       note: фраза 3 из 3 · Коран 27:29
 - id: L069
   number: 69
-  title: '69. Нун и танвин: икляб'
+  title: 'Нун и танвин: икляб'
   kind: line
   accent: ن
   section: iqlab
@@ -5993,7 +5993,7 @@ lessons:
       note: фраза 2 из 2 · Коран 80:16
 - id: L070
   number: 70
-  title: 70. Калькаля
+  title: Калькаля
   kind: line
   accent: قطبجد
   section: qalqala
@@ -6065,7 +6065,7 @@ lessons:
       note: фраза 5 из 5 · Коран 2:111
 - id: L071
   number: 71
-  title: 71. Маленькие буквы (1/3)
+  title: Маленькие буквы (1/3)
   kind: line
   accent: ''
   section: small
@@ -6159,7 +6159,7 @@ lessons:
       note: фраза 3 из 4 · Коран 91:14
 - id: L072
   number: 72
-  title: 72. Маленькие буквы (2/3)
+  title: Маленькие буквы (2/3)
   kind: line
   accent: ''
   section: small
@@ -6241,7 +6241,7 @@ lessons:
       note: фраза 2 из 4 · Коран 111:2
 - id: L073
   number: 73
-  title: 73. Маленькие буквы (3/3)
+  title: Маленькие буквы (3/3)
   kind: line
   accent: ''
   section: small
@@ -6313,7 +6313,7 @@ lessons:
       note: фраза 1 из 1 · Коран 52:37
 - id: L074
   number: 74
-  title: 74. ى читается как элиф
+  title: ى читается как элиф
   kind: line
   accent: ى
   section: ya_alif
@@ -6436,7 +6436,7 @@ lessons:
       note: фраза 5 из 5 · Коран 2:51
 - id: L075
   number: 75
-  title: 75. و с маленьким элифом
+  title: و с маленьким элифом
   kind: line
   accent: و
   section: waw_alif
@@ -6508,7 +6508,7 @@ lessons:
       note: фраза 5 из 5
 - id: L076
   number: 76
-  title: 76. Буквы, которые не читаются (1/8)
+  title: Буквы, которые не читаются (1/8)
   kind: line
   accent: ''
   section: silent
@@ -6612,7 +6612,7 @@ lessons:
       note: фраза 3 из 4 · Коран 2:11
 - id: L077
   number: 77
-  title: 77. Буквы, которые не читаются (2/8)
+  title: Буквы, которые не читаются (2/8)
   kind: line
   accent: ''
   section: silent
@@ -6704,7 +6704,7 @@ lessons:
       note: фраза 2 из 2 · Коран 33:11
 - id: L078
   number: 78
-  title: 78. Буквы, которые не читаются (3/8)
+  title: Буквы, которые не читаются (3/8)
   kind: line
   accent: ''
   section: silent
@@ -6796,7 +6796,7 @@ lessons:
       note: фраза 1 из 2 · Коран 108:2
 - id: L079
   number: 79
-  title: 79. Буквы, которые не читаются (4/8)
+  title: Буквы, которые не читаются (4/8)
   kind: line
   accent: ''
   section: silent
@@ -6888,7 +6888,7 @@ lessons:
       note: фраза 3 из 3 · Коран 1:2
 - id: L080
   number: 80
-  title: 80. Буквы, которые не читаются (5/8)
+  title: Буквы, которые не читаются (5/8)
   kind: line
   accent: ''
   section: silent
@@ -6980,7 +6980,7 @@ lessons:
       note: фраза 2 из 2 · Коран 2:129
 - id: L081
   number: 81
-  title: 81. Буквы, которые не читаются (6/8)
+  title: Буквы, которые не читаются (6/8)
   kind: line
   accent: ''
   section: silent
@@ -7072,7 +7072,7 @@ lessons:
       note: фраза 1 из 2 · Коран 9:3
 - id: L082
   number: 82
-  title: 82. Буквы, которые не читаются (7/8)
+  title: Буквы, которые не читаются (7/8)
   kind: line
   accent: ''
   section: silent
@@ -7164,7 +7164,7 @@ lessons:
       note: фраза 1 из 1 · Коран 2:14
 - id: L083
   number: 83
-  title: 83. Буквы, которые не читаются (8/8)
+  title: Буквы, которые не читаются (8/8)
   kind: line
   accent: ''
   section: silent
@@ -7226,7 +7226,7 @@ lessons:
       note: фраза 1 из 1 · Коран 2:25
 - id: L084
   number: 84
-  title: 84. Кясра у танвина при слитном чтении (1/2)
+  title: Кясра у танвина при слитном чтении (1/2)
   kind: line
   accent: ''
   section: noon_kasra
@@ -7309,7 +7309,7 @@ lessons:
       note: фраза 1 из 3
 - id: L085
   number: 85
-  title: 85. Кясра у танвина при слитном чтении (2/2)
+  title: Кясра у танвина при слитном чтении (2/2)
   kind: line
   accent: ''
   section: noon_kasra
@@ -7381,7 +7381,7 @@ lessons:
       note: фраза 3 из 3 · Коран 26:160
 - id: L086
   number: 86
-  title: 86. Остановка и её знаки (1/3)
+  title: Остановка и её знаки (1/3)
   kind: line
   accent: ''
   section: waqf
@@ -7476,7 +7476,7 @@ lessons:
       note: фраза 1 из 2 · Коран 80:24
 - id: L087
   number: 87
-  title: 87. Остановка и её знаки (2/3)
+  title: Остановка и её знаки (2/3)
   kind: line
   accent: ''
   section: waqf
@@ -7557,7 +7557,7 @@ lessons:
       note: фраза 2 из 3 · Коран 89:30
 - id: L088
   number: 88
-  title: 88. Остановка и её знаки (3/3)
+  title: Остановка и её знаки (3/3)
   kind: line
   accent: ''
   section: waqf
@@ -7629,7 +7629,7 @@ lessons:
       note: фраза 1 из 1 · Коран 2:2
 - id: L089
   number: 89
-  title: 89. Сакт — короткая пауза
+  title: Сакт — короткая пауза
   kind: line
   accent: ''
   section: sakt
@@ -7724,7 +7724,7 @@ lessons:
       note: фраза 1 из 1 · Коран 83:14
 - id: L090
   number: 90
-  title: 90. Виды мадда (1/4)
+  title: Виды мадда (1/4)
   kind: line
   accent: ''
   section: madd_types
@@ -7818,7 +7818,7 @@ lessons:
       note: фраза 1 из 3 · Коран 2:37
 - id: L091
   number: 91
-  title: 91. Виды мадда (2/4)
+  title: Виды мадда (2/4)
   kind: line
   accent: ''
   section: madd_types
@@ -7900,7 +7900,7 @@ lessons:
       note: фраза 2 из 3 · Коран 40:58
 - id: L092
   number: 92
-  title: 92. Виды мадда (3/4)
+  title: Виды мадда (3/4)
   kind: line
   accent: ''
   section: madd_types
@@ -7982,7 +7982,7 @@ lessons:
       note: фраза 2 из 3 · Коран 10:51
 - id: L093
   number: 93
-  title: 93. Виды мадда (4/4)
+  title: Виды мадда (4/4)
   kind: line
   accent: ''
   section: madd_types
@@ -8054,7 +8054,7 @@ lessons:
       note: фраза 2 из 2 · Коран 2:255
 - id: L094
   number: 94
-  title: 94. Буквы в начале сур (1/2)
+  title: Буквы в начале сур (1/2)
   kind: line
   accent: ''
   section: muqattaat
@@ -8157,7 +8157,7 @@ lessons:
       note: фраза 4 из 4 · Коран 20:1
 - id: L095
   number: 95
-  title: 95. Буквы в начале сур (2/2)
+  title: Буквы в начале сур (2/2)
   kind: line
   accent: ''
   section: muqattaat
@@ -8239,7 +8239,7 @@ lessons:
       note: фраза 4 из 4 · Коран 68:1
 - id: L096
   number: 96
-  title: 96. Особые знаки
+  title: Особые знаки
   kind: line
   accent: ''
   section: signs
@@ -8303,7 +8303,7 @@ lessons:
       note: фраза 1 из 1 · Коран 84:21
 - id: L097
   number: 97
-  title: 97. Сура аль-Фатиха
+  title: Сура аль-Фатиха
   kind: line
   accent: ''
   section: sura
@@ -8397,7 +8397,7 @@ lessons:
       note: сура аль-Фатиха, аят 7
 - id: L098
   number: 98
-  title: 98. Сура аль-Бакара, 1–5
+  title: Сура аль-Бакара, 1–5
   kind: line
   accent: ''
   section: sura
@@ -8469,7 +8469,7 @@ lessons:
       note: сура аль-Бакара, 1–5, аят 5
 - id: L099
   number: 99
-  title: 99. Сура ад-Духа (1/2)
+  title: Сура ад-Духа (1/2)
   kind: line
   accent: ''
   section: sura
@@ -8541,7 +8541,7 @@ lessons:
       note: сура ад-Духа, аят 5
 - id: L100
   number: 100
-  title: 100. Сура ад-Духа (2/2)
+  title: Сура ад-Духа (2/2)
   kind: line
   accent: ''
   section: sura
@@ -8613,7 +8613,7 @@ lessons:
       note: сура ад-Духа, аят 11
 - id: L101
   number: 101
-  title: 101. Сура аш-Шарх
+  title: Сура аш-Шарх
   kind: line
   accent: ''
   section: sura
@@ -8715,7 +8715,7 @@ lessons:
       note: сура аш-Шарх, аят 8
 - id: L102
   number: 102
-  title: 102. Сура ат-Тин
+  title: Сура ат-Тин
   kind: line
   accent: ''
   section: sura
@@ -8817,7 +8817,7 @@ lessons:
       note: сура ат-Тин, аят 8
 - id: L103
   number: 103
-  title: 103. Сура аль-Алак (1/3)
+  title: Сура аль-Алак (1/3)
   kind: line
   accent: ''
   section: sura
@@ -8899,7 +8899,7 @@ lessons:
       note: сура аль-Алак, аят 6
 - id: L104
   number: 104
-  title: 104. Сура аль-Алак (2/3)
+  title: Сура аль-Алак (2/3)
   kind: line
   accent: ''
   section: sura
@@ -8981,7 +8981,7 @@ lessons:
       note: сура аль-Алак, аят 13
 - id: L105
   number: 105
-  title: 105. Сура аль-Алак (3/3)
+  title: Сура аль-Алак (3/3)
   kind: line
   accent: ''
   section: sura
@@ -9053,7 +9053,7 @@ lessons:
       note: сура аль-Алак, аят 19
 - id: L106
   number: 106
-  title: 106. Сура аль-Кадр
+  title: Сура аль-Кадр
   kind: line
   accent: ''
   section: sura
@@ -9125,7 +9125,7 @@ lessons:
       note: сура аль-Кадр, аят 5
 - id: L107
   number: 107
-  title: 107. Сура аль-Баййина
+  title: Сура аль-Баййина
   kind: line
   accent: ''
   section: sura
@@ -9231,7 +9231,7 @@ lessons:
       note: сура аль-Баййина, аят 8
 - id: L108
   number: 108
-  title: 108. Сура аз-Зальзаля
+  title: Сура аз-Зальзаля
   kind: line
   accent: ''
   section: sura
@@ -9333,7 +9333,7 @@ lessons:
       note: сура аз-Зальзаля, аят 8
 - id: L109
   number: 109
-  title: 109. Сура аль-Адийат (1/2)
+  title: Сура аль-Адийат (1/2)
   kind: line
   accent: ''
   section: sura
@@ -9405,7 +9405,7 @@ lessons:
       note: сура аль-Адийат, аят 5
 - id: L110
   number: 110
-  title: 110. Сура аль-Адийат (2/2)
+  title: Сура аль-Адийат (2/2)
   kind: line
   accent: ''
   section: sura
@@ -9477,7 +9477,7 @@ lessons:
       note: сура аль-Адийат, аят 11
 - id: L111
   number: 111
-  title: 111. Сура аль-Кариа (1/2)
+  title: Сура аль-Кариа (1/2)
   kind: line
   accent: ''
   section: sura
@@ -9549,7 +9549,7 @@ lessons:
       note: сура аль-Кариа, аят 5
 - id: L112
   number: 112
-  title: 112. Сура аль-Кариа (2/2)
+  title: Сура аль-Кариа (2/2)
   kind: line
   accent: ''
   section: sura
@@ -9621,7 +9621,7 @@ lessons:
       note: сура аль-Кариа, аят 11
 - id: L113
   number: 113
-  title: 113. Сура ат-Такасур
+  title: Сура ат-Такасур
   kind: line
   accent: ''
   section: sura
@@ -9723,7 +9723,7 @@ lessons:
       note: сура ат-Такасур, аят 8
 - id: L114
   number: 114
-  title: 114. Сура аль-Аср
+  title: Сура аль-Аср
   kind: line
   accent: ''
   section: sura
@@ -9775,7 +9775,7 @@ lessons:
       note: сура аль-Аср, аят 3
 - id: L115
   number: 115
-  title: 115. Сура аль-Хумаза
+  title: Сура аль-Хумаза
   kind: line
   accent: ''
   section: sura
@@ -9887,7 +9887,7 @@ lessons:
       note: сура аль-Хумаза, аят 9
 - id: L116
   number: 116
-  title: 116. Сура аль-Филь
+  title: Сура аль-Филь
   kind: line
   accent: ''
   section: sura
@@ -9959,7 +9959,7 @@ lessons:
       note: сура аль-Филь, аят 5
 - id: L117
   number: 117
-  title: 117. Сура Курайш
+  title: Сура Курайш
   kind: line
   accent: ''
   section: sura
@@ -10021,7 +10021,7 @@ lessons:
       note: сура Курайш, аят 4
 - id: L118
   number: 118
-  title: 118. Сура аль-Маун
+  title: Сура аль-Маун
   kind: line
   accent: ''
   section: sura
@@ -10113,7 +10113,7 @@ lessons:
       note: сура аль-Маун, аят 7
 - id: L119
   number: 119
-  title: 119. Сура аль-Каусар
+  title: Сура аль-Каусар
   kind: line
   accent: ''
   section: sura
@@ -10165,7 +10165,7 @@ lessons:
       note: сура аль-Каусар, аят 3
 - id: L120
   number: 120
-  title: 120. Сура аль-Кафирун
+  title: Сура аль-Кафирун
   kind: line
   accent: ''
   section: sura
@@ -10247,7 +10247,7 @@ lessons:
       note: сура аль-Кафирун, аят 6
 - id: L121
   number: 121
-  title: 121. Сура ан-Наср
+  title: Сура ан-Наср
   kind: line
   accent: ''
   section: sura
@@ -10299,7 +10299,7 @@ lessons:
       note: сура ан-Наср, аят 3
 - id: L122
   number: 122
-  title: 122. Сура аль-Масад
+  title: Сура аль-Масад
   kind: line
   accent: ''
   section: sura
@@ -10371,7 +10371,7 @@ lessons:
       note: сура аль-Масад, аят 5
 - id: L123
   number: 123
-  title: 123. Сура аль-Ихлас
+  title: Сура аль-Ихлас
   kind: line
   accent: ''
   section: sura
@@ -10433,7 +10433,7 @@ lessons:
       note: сура аль-Ихлас, аят 4
 - id: L124
   number: 124
-  title: 124. Сура аль-Фаляк
+  title: Сура аль-Фаляк
   kind: line
   accent: ''
   section: sura
@@ -10505,7 +10505,7 @@ lessons:
       note: сура аль-Фаляк, аят 5
 - id: L125
   number: 125
-  title: 125. Сура ан-Нас
+  title: Сура ан-Нас
   kind: line
   accent: ''
   section: sura

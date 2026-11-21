@@ -248,7 +248,7 @@ def lessons() -> list[dict]:
                 {
                     "id": lid,
                     "number": n,
-                    "title": f"{n}. {title}{suffix}",
+                    "title": f"{title}{suffix}",  # без номера книги: автор 2026-11-21 (4Б)
                     "kind": "line",
                     "accent": accent,
                     "section": base,

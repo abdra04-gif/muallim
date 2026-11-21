@@ -128,3 +128,11 @@ def test_voice_on_home_sends_newcomer_to_the_scan_too(curriculum: Curriculum) ->
 def test_voice_on_home_continues_a_returning_learner(curriculum: Curriculum) -> None:
     s = screens.voice_on_home(curriculum, _progress(curriculum, attempts=3, current="L006-01"))
     assert _buttons(s.keyboard)[0][1] == GoItem(item_id="L006-01").pack()
+
+
+def test_lesson_titles_have_no_book_numbers(curriculum: Curriculum) -> None:
+    """Автор 2026-11-21 (4Б): ученик не видит «2. Арабский алфавит» — номер урока только внутри
+    (`lesson.number`, на нём пороги проверки), в названии его нет."""
+    numbered = [les.title for les in curriculum.lessons if les.title[:1].isdigit()]
+    assert numbered == []
+    assert curriculum.lessons[0].title == "Арабский алфавит"
