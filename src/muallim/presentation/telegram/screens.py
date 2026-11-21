@@ -74,7 +74,6 @@ from muallim.presentation.telegram.callbacks import (
     QuizAnswer,
     QuizSkip,
     RecordReference,
-    ShareLesson,
     ShowProgress,
     ShowSettings,
     Signs,
@@ -658,9 +657,7 @@ def result(
     # «ещё раз» (FR-70): только просьба прочитать снова — без разбора, балла и «услышано»
     again = r.verdict is Verdict.AGAIN
     drawn = render.available() and not again
-    if drawn and r.lesson_completed and not a.errors:  # с ошибками — сначала разбор
-        image = _postcard_image(lesson)
-    elif drawn:
+    if drawn:
         image = render.result_marks(text=r.item.text, breakdown=breakdown, score_label=counter)
     verdict = _verdict_line(r, has_audio)
     blocks = ["\n".join(x for x in (verdict, counter) if x)]  # «Верно 2 слова из 5»
@@ -670,8 +667,6 @@ def result(
     if image is None:
         blocks.append(f"<b>{escape(r.item.text)}</b>")
     blocks += [] if again else _progress(r)
-    if r.lesson_completed:
-        blocks.append(texts.LESSON_DONE.format(lesson=escape(lesson.title)))
     if r.next_item is None:
         blocks.append(texts.LAST_ITEM)
     if staff and not r.feedback and not again:
@@ -864,13 +859,10 @@ def _result_keyboard(
         nav += 1
     kb.button(text=texts.AGAIN_BUTTON, callback_data=GoItem(item_id=item_id))
     kb.button(text=texts.DISPUTE_BUTTON, callback_data=Dispute(attempt=r.attempt.id.hex))
-    if r.lesson_completed:
-        kb.button(text=texts.SHARE_BUTTON, callback_data=ShareLesson(lesson=lesson.id))
     rows: Sequence[int] = (
         *((top,) if top else ()),
         nav,
         2,
-        *((1,) if r.lesson_completed else ()),
     )
     kb.adjust(*rows)
     markup = kb.as_markup()
@@ -941,7 +933,7 @@ def _book_progress(curriculum: Curriculum, p: Progress) -> tuple[bytes | None, s
     return image, key
 
 
-# ---------- открытка «урок пройден» (ADR-0050) ----------
+# ---------- названия для картинок ----------
 _ARABIC = re.compile(r"[\u0600-\u06ff\u0750-\u077f]+")
 
 
@@ -955,24 +947,6 @@ def plain_title(title: str) -> str:
     clean = re.sub(r"(\.)\s*·\s*", r"\1 ", clean)
     clean = re.sub(r"\s*·\s*(·\s*)+", " · ", clean)
     return re.sub(r"\s{2,}", " ", clean).strip(" ·")
-
-
-def _postcard_image(lesson: Lesson, p: Progress | None = None) -> bytes:
-    letter = _letter_shown(lesson) if lesson.section == "letter" else ""
-    page = lesson.source.page if lesson.source is not None else None
-    subtitle = texts.POSTCARD_SUBTITLE.format(lesson=plain_title(lesson.title), page=page or "—")
-    streak = texts.POSTCARD_STREAK.format(days=_days(p.streak_days)) if p and p.streak_days else ""
-    return render.postcard(
-        letter or str(lesson.number), texts.POSTCARD_TITLE, subtitle, p.week if p else (), streak
-    )
-
-
-def postcard(curriculum: Curriculum, lesson: Lesson, p: Progress, bot_username: str) -> Screen:
-    """Открытка для пересылки: картинка и приглашение в бот, без имени и псевдонима."""
-    caption = texts.SHARE_CAPTION.format(lesson=escape(plain_title(lesson.title)), bot=bot_username)
-    kb = InlineKeyboardBuilder()
-    image = _postcard_image(lesson, p) if render.available() else None
-    return Screen(caption, kb.as_markup(), image)
 
 
 def _clock(minute: int) -> str:

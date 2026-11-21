@@ -96,7 +96,7 @@ def test_result_of_last_step_goes_to_next_lesson(curriculum: Curriculum) -> None
     nxt = curriculum.next_item(last.id)
     assert nxt is not None
     assert (texts.NEXT_BUTTON, cb.GoItem(item_id=nxt.id).pack()) in _nav_row(kb)
-    assert texts.SHARE_BUTTON in _labels(kb)
+    assert "📤 Поделиться" not in _labels(kb)  # открытка убрана (автор 2026-11-21)
 
 
 def test_deep_offers_book_page_and_home(curriculum: Curriculum) -> None:

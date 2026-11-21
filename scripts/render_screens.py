@@ -127,7 +127,6 @@ def main() -> None:
         "14_progress": screens.progress(c, p),
         "15_help": screens.help_screen(),
         "16_teacher": card(letters[4].items[0].id, has_audio=False, teacher=True),
-        "18_postcard": screens.postcard(c, mim, p, bot_username="muallim_bot"),
         "19_settings": screens.settings(LearnerSettings()),
         "20_letters_sheet": screens.letters_sheet(
             c,

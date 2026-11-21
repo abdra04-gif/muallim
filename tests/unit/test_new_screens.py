@@ -95,7 +95,7 @@ def test_result_image_is_words(curriculum: Curriculum) -> None:
     assert s.image is not None and s.image.startswith(PNG)
 
 
-# ---------- открытка ----------
+# ---------- урок пройден — без открытки (автор 2026-11-21) ----------
 def _done_result(c: Curriculum) -> RecitationResult:
     lesson = _letter_lesson(c, "Мим")
     item = lesson.practice_items[-1]
@@ -107,20 +107,15 @@ def _done_result(c: Curriculum) -> RecitationResult:
     return RecitationResult(item, attempt, (), "", c.next_item(item.id), lesson_completed=True)
 
 
-def test_completed_lesson_offers_share(curriculum: Curriculum) -> None:
+def test_completed_lesson_does_not_distract(curriculum: Curriculum) -> None:
+    """Автор 2026-11-21: «Урок пройден!», открытка и «Поделиться» убраны — не отвлекать ученика.
+    Урок по-прежнему засчитывается (прогресс), просто без поздравления."""
     r = _done_result(curriculum)
     s = screens.result(curriculum, r, has_audio=False)
-    lesson, _ = curriculum.locate(r.item.id)
-    assert (texts.SHARE_BUTTON, cb.ShareLesson(lesson=lesson.id).pack()) in _buttons(s.keyboard)
-
-
-def test_share_postcard_has_no_personal_data(curriculum: Curriculum) -> None:
-    lesson = _letter_lesson(curriculum, "Мим")
-    s = screens.postcard(curriculum, lesson, _progress(curriculum), bot_username="muallim_bot")
-    assert "t.me/muallim_bot" in s.caption
-    assert "L-" not in s.caption  # без псевдонима
-    if render.available():
-        assert s.image is not None and s.image.startswith(PNG)
+    shown = s.caption + " ".join(t for t, _ in _buttons(s.keyboard))
+    assert "Урок пройден" not in shown and "Поделиться" not in shown
+    assert not [d for _, d in _buttons(s.keyboard) if d.startswith(cb.ShareLesson.__prefix__)]
+    assert not hasattr(texts, "LESSON_DONE") and not hasattr(texts, "SHARE_BUTTON")
 
 
 # ---------- прогресс ----------

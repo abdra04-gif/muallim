@@ -795,50 +795,6 @@ def result_marks(text: str, breakdown: Breakdown, score_label: str = "") -> byte
     return _png(img)
 
 
-def postcard(
-    medal: str, title: str, subtitle: str, week: Sequence[bool] = (), streak: str = ""
-) -> bytes:
-    """Открытка «урок пройден»: золотая медаль с буквой урока, название, неделя и серия.
-
-    Без имени и псевдонима: открытку пересылают (ADR-0050).
-    """
-    height = 720 if (week or streak) else 560
-    img = Image.new("RGB", (WIDTH, height), PAPER)
-    draw = _frame(img)
-    cx, cy, r = WIDTH // 2, 210, 130
-    for k in range(r, 0, -2):  # мягкий градиент золота от края к центру
-        t = k / r
-        light = (244, 227, 176)
-        color = tuple(int(a + (b - a) * (1 - t)) for a, b in zip(FRAME, light, strict=True))
-        draw.ellipse((cx - k, cy - k, cx + k, cy + k), fill=color)
-    draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=(180, 142, 54), width=5)
-    draw.ellipse((cx - r + 12, cy - r + 12, cx + r - 12, cy + r - 12), outline=PAPER, width=3)
-    arabic = any("؀" <= ch <= "ۿ" for ch in medal)
-    medal_font = _font(150) if arabic else _ui_font(96, bold=True)
-    direction = "rtl" if arabic else None
-    left, top, right, bottom = draw.textbbox((0, 0), medal, font=medal_font, direction=direction)
-    # по видимым границам, а не по строке шрифта: у буквы с хвостом центр строки ниже глаза
-    draw.text(
-        (cx - (left + right) / 2, cy - (top + bottom) / 2),
-        medal,
-        font=medal_font,
-        fill=(122, 31, 31),
-        direction=direction,
-    )
-    inner = WIDTH - 2 * PAD - 40
-    draw.text((cx, 400), title, font=_fit(title, 52, inner, bold=True), fill=INK, anchor="mm")
-    draw.text((cx, 465), subtitle, font=_fit(subtitle, 32, inner), fill=(107, 98, 88), anchor="mm")
-    if week:
-        gap = 44
-        x0 = cx - (len(week) - 1) * gap // 2
-        for i, active in enumerate(week):
-            x = x0 + i * gap
-            draw.ellipse((x - 14, 535, x + 14, 563), fill=OK if active else GREY_BG)
-    if streak:
-        draw.text((cx, 620), streak, font=_ui_font(34, bold=True), fill=INK, anchor="mm")
-    return _png(img)
-
-
 def book_progress(
     parts: Sequence[tuple[str, int, int]], week: Sequence[bool], day_labels: Sequence[str]
 ) -> bytes:

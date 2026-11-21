@@ -90,7 +90,6 @@ LESSON_IMAGES: dict[str, Callable[[], bytes]] = {
     "result_marks": lambda: _marks(SIX_SYLLABLES, "سُمْ صِفْ فَصْ صَلَفَ صَبَرَ مَصَرَ"),
     "alphabet": lambda: render.alphabet([[("ا", render.Mark.DONE), ("ب", render.Mark.CURRENT)]]),
     "signs": render.signs,
-    "postcard": lambda: render.postcard("م", texts.POSTCARD_TITLE, "6. Мим · с. 14", (True,) * 7),
     "book_progress": lambda: render.book_progress(
         [("1. Знакомство", 1, 1), ("2. Буквы и огласовки", 3, 28)],
         (True, False, True, True, False, False, True),

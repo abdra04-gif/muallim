@@ -1,4 +1,4 @@
-"""Главная после /start и 🏠, старые кнопки «начала занятия», открытка «урок пройден» (ADR-0050).
+"""Главная после /start и 🏠; старые кнопки «начала занятия» и «Поделиться» (ADR-0050, ADR-0089).
 
 «Начало занятия» с истиазой и басмалой убрано автором 2026-11-21: истиазы в книге нет. Кнопки
 «🎙 Читать истиазу» и «⏭ Пропустить» из старых сообщений показывают главную.
@@ -6,9 +6,8 @@
 
 from typing import Final
 
-from aiogram import Bot, Router
-from aiogram.exceptions import TelegramAPIError
-from aiogram.types import BufferedInputFile, CallbackQuery
+from aiogram import Router
+from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
 from muallim.application.use_cases.progress import GetProgress, Progress
@@ -52,31 +51,6 @@ async def cb_old_opening(
 
 
 @router.callback_query(ShareLesson.filter())
-async def cb_share(
-    cb: CallbackQuery,
-    callback_data: ShareLesson,
-    bot: Bot,
-    learner: FromDishka[Learner],
-    cur: FromDishka[Curriculum],
-    progress: FromDishka[GetProgress],
-) -> None:
-    """Открытка отдельным сообщением — ученик пересылает её сам. Без имени и псевдонима."""
-    try:
-        lesson = cur.lesson(callback_data.lesson)
-    except KeyError:
-        await cb.answer(texts.STALE_BUTTON, show_alert=True)
-        return
-    me = await bot.me()
-    screen = screens.postcard(cur, lesson, await progress.execute(learner), me.username or "")
-    msg = message_of(cb)
-    if msg is not None:
-        try:
-            if screen.image is not None:
-                photo = BufferedInputFile(screen.image, filename="muallim.png")
-                await bot.send_photo(msg.chat.id, photo, caption=screen.caption)
-            else:
-                await bot.send_message(msg.chat.id, screen.caption)
-        except TelegramAPIError:
-            await cb.answer(texts.SOMETHING_WENT_WRONG, show_alert=True)
-            return
-    await cb.answer(texts.SHARE_SENT)
+async def cb_old_share(cb: CallbackQuery) -> None:
+    """«📤 Поделиться» из старого сообщения: открытка убрана (автор 2026-11-21)."""
+    await cb.answer(texts.STALE_BUTTON, show_alert=True)
