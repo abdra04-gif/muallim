@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """PreToolUse: правила, которые агент не может нарушить (ADR-0011, ADR-0012, NFR-SEC-01).
 
-1. Секреты и данные учеников не читаются: .env, data/, дампы БД.
+1. Секреты не читаются: .env, токен, строка подключения к БД. Данные учеников (data/, файлы БД)
+   агент читает для исследования, но не меняет и не удаляет (ADR-0090). Тестовые ученики
+   (data/holdout/) закрыты и на чтение — так обещано в предрегистрации.
 2. Фаза меняется только через scripts/phase.
 3. В фазе impl тесты заморожены.
 4. Опасные команды git/shell запрещены.
@@ -22,12 +24,20 @@ WRITE_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
 
 SECRET_PATH = re.compile(r"(^|/)\.env(\.[^/]*)?$")
 SECRET_PATH_OK = re.compile(r"(^|/)\.env\.example$")
-PRIVATE_DIRS = ("data/",)
+# Оригиналы, которые не восстановить: голоса, суры, копии, журнал удалений, разметка учителя.
+# Остальное в data/ (наборы для обучения, веса, выгрузки) агент пишет сам (ADR-0090).
+PRIVATE_DIRS = (
+    "data/audio/",
+    "data/recitations/",
+    "data/backups/",
+    "data/erasures/",
+    "data/annotation/",
+)
+HOLDOUT = "data/holdout"  # записи и метки тестовых учеников: не читать (ADR-0090)
 DB_DUMP = re.compile(r"\.(sqlite3?|db|dump|sql\.gz|bak)$")
 
 SHELL_SECRET = re.compile(
-    r"(\.env(?!\.example)\b|(^|[\s/'\"])data/(audio|exports|annotation)|\.sqlite3?\b|progress\.db"
-    r"|\bpg_dump\b|\bprintenv\b|(^|\s)env(\s|$)|BOT_TOKEN|DATABASE_URL)"
+    r"(\.env(?!\.example)\b|data/holdout\b|\bpg_dump\b|\bprintenv\b|(^|\s)env(\s|$)|BOT_TOKEN|DATABASE_URL)"
 )
 SHELL_DANGER = re.compile(
     r"(--no-verify|git\s+push\s+.*(--force|-f\b)|git\s+reset\s+--hard|rm\s+-[a-z]*r[a-z]*f"
@@ -41,9 +51,15 @@ DB_DESTROY = re.compile(
     r"|(^|[;&|]\s*)(sh\s+|bash\s+)?\.?/?scripts/db/restore)",
     re.IGNORECASE,
 )
+# mv/cp поверх оригиналов данных (ADR-0090: читать можно, менять нельзя; автор 3А)
+SHELL_WRITES_ORIGINALS = re.compile(
+    r"\b(mv|cp|tee|dd|rsync|ln)\b[^|;&]*\bdata/(audio|recitations|backups|erasures|annotation)/"
+    r"|>>?\s*\S*data/(audio|recitations|backups|erasures|annotation)/"
+)
 SQL_CLIENT = re.compile(r"\b(psql|db-shell|sqlite3)\b")
 SQL_DESTROY = re.compile(
-    r"\b(drop\s+(table|database|schema|view|role|owned)|truncate|delete\s+from|alter\s+table)\b",
+    r"\b(drop\s+(table|database|schema|view|role|owned)|truncate|delete\s+from|alter\s+table"
+    r"|update\s+\w+\s+set|insert\s+into)\b",  # и правка оригиналов (ADR-0090, автор 3А)
     re.IGNORECASE,
 )
 SHELL_WRITES_TESTS = re.compile(
@@ -63,8 +79,10 @@ def check_file(tool: str, target: str) -> None:
     rel = _rel(target)
     if SECRET_PATH.search(rel) and not SECRET_PATH_OK.search(rel):
         block(f"Запрещено: {rel} содержит секреты. Шаблон настроек — .env.example.")
-    if rel.startswith(PRIVATE_DIRS) or DB_DUMP.search(rel):
-        block(f"Запрещено: {rel} — данные учеников. Для анализа используйте muallim-research.")
+    if rel == HOLDOUT or rel.startswith(HOLDOUT + "/"):
+        block(f"Запрещено: {rel} — тестовые ученики, агенту их не видеть (ADR-0090).")
+    if tool in WRITE_TOOLS and (rel.startswith(PRIVATE_DIRS) or DB_DUMP.search(rel)):
+        block(f"Запрещено: {rel} — оригиналы данных; читать можно, менять нельзя (ADR-0090).")
     if tool in WRITE_TOOLS and rel == ".agent-phase":
         block("Фазу меняют только через scripts/phase.")
     if tool in WRITE_TOOLS and phase() == "impl" and rel.startswith("tests/"):
@@ -76,6 +94,8 @@ def check_shell(command: str) -> None:
         block("Запрещено: команда обращается к секретам или данным учеников.")
     if SHELL_DANGER.search(command):
         block("Запрещено: опасная команда (--no-verify, force push, reset --hard, rm -rf...).")
+    if SHELL_WRITES_ORIGINALS.search(command):
+        block("Запрещено: команда меняет оригиналы данных учеников; читать можно (ADR-0090).")
     if DB_DESTROY.search(command) or (SQL_CLIENT.search(command) and SQL_DESTROY.search(command)):
         block(
             "Запрещено: команда может уничтожить данные пилота (том БД, откат миграций, "

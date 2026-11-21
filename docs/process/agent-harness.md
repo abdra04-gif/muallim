@@ -15,7 +15,7 @@
 | Хук | Событие | Что делает |
 |---|---|---|
 | `log_prompt.py` | UserPromptSubmit | сохраняет каждый запрос человека в `docs/journal/prompts/ГГГГ-ММ.md` (секреты маскируются) |
-| `guard.py` | PreToolUse | запрещает: читать `.env`, `data/`, дампы БД; менять `tests/` в фазе impl; менять `.agent-phase` напрямую; `--no-verify`, `push --force`, `rm -rf` |
+| `guard.py` | PreToolUse | запрещает: читать `.env` и секреты, тестовые записи `data/holdout/`; менять оригиналы данных учеников (ADR-0090; читать `data/` можно); менять `tests/` в фазе impl; менять `.agent-phase` напрямую; `--no-verify`, `push --force`, `rm -rf` |
 | `format_python.py` | PostToolUse | `ruff format` + `ruff check --fix` для изменённого .py, остатки ошибок — агенту |
 | `stop_gate.py` | Stop | если код изменён и не проходят `lint-imports`/`mypy`/`pytest` — агент не может закончить, получает ошибки и продолжает (это и есть «петля») |
 | `human_zones.py` | PreToolUse | правка зоны человека (учебный контент, тексты ученику, пороги, `MOSHAF_PARAMS`, схема БД, зависимости, сами проверки, оценщик RQ-1 `src/muallim/research/metrics.py` — ADR-0042) и `pip/uv add` — только с подтверждения человека, с причиной (ADR-0034) |

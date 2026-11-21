@@ -41,11 +41,20 @@ def guard(project: Path, tool: str, **tool_input: str) -> int:
     [
         ("Read", "file_path", ".env"),
         ("Read", "file_path", ".env.production"),
-        ("Read", "file_path", "data/audio/ab/x.ogg"),
-        ("Read", "file_path", "data/dev.sqlite3"),
-        ("Grep", "path", "data/exports"),
+        # оригиналы данных учеников: читать можно, менять нельзя (ADR-0090, автор 2026-11-21)
+        ("Write", "file_path", "data/audio/ab/x.ogg"),
+        ("Edit", "file_path", "data/annotation/labels.json"),
+        ("Write", "file_path", "data/dev.sqlite3"),
+        # и через shell (ревью 2026-11-21, автор: 3А)
+        ("Bash", "command", "mv /tmp/x.ogg data/audio/ab/x.ogg"),
+        ("Bash", "command", "cp new.ogg data/recitations/r.ogg"),
+        ("Bash", "command", "sqlite3 data/dev.sqlite3 \"update attempts set verdict='passed'\""),
+        ("Bash", "command", 'psql -c "insert into annotations values (1)"'),
+        # тестовые ученики закрыты и на чтение — предрегистрация (ADR-0090, вариант «отделить тест»)
+        ("Read", "file_path", "data/holdout/labels.csv"),
+        ("Grep", "path", "data/holdout"),
+        ("Bash", "command", "cat data/holdout/labels.csv"),
         ("Bash", "command", "cat .env"),
-        ("Bash", "command", "sqlite3 data/dev.sqlite3 'select * from learners'"),
         ("Bash", "command", "echo $BOT_TOKEN"),
         ("Bash", "command", "printenv"),
         ("Bash", "command", "git commit --no-verify -m x"),
@@ -65,6 +74,11 @@ def test_guard_blocks(project: Path, tool: str, arg: str, value: str) -> None:
     [
         ("Read", "file_path", ".env.example"),
         ("Read", "file_path", "src/muallim/domain/assessment.py"),
+        # чтение данных для исследования (ADR-0090): голоса, БД, выгрузки
+        ("Read", "file_path", "data/audio/ab/x.ogg"),
+        ("Read", "file_path", "data/dev.sqlite3"),
+        ("Grep", "path", "data/exports"),
+        ("Bash", "command", "sqlite3 data/dev.sqlite3 'select count(*) from attempts'"),
         ("Edit", "file_path", "tests/unit/test_policy.py"),
         ("Bash", "command", "uv run pytest -q"),
         ("Bash", "command", "scripts/phase impl"),
@@ -72,7 +86,7 @@ def test_guard_blocks(project: Path, tool: str, arg: str, value: str) -> None:
     ],
 )
 def test_guard_allows(project: Path, tool: str, arg: str, value: str) -> None:
-    target = str(project / value) if arg == "file_path" else value
+    target = str(project / value) if arg in {"file_path", "path"} else value
     assert guard(project, tool, **{arg: target}) == 0
 
 
