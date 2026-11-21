@@ -56,7 +56,16 @@ async def find(session: AsyncSession, pseudonym: str) -> LearnerCard | None:
         .outerjoin(learner_profiles, learner_profiles.c.learner_id == learners.c.id)
         .outerjoin(attempts, attempts.c.learner_id == learners.c.id)
         .where(learners.c.pseudonym == pseudonym)
-        .group_by(learners.c.id, learner_names.c.display_name, *learner_profiles.c)
+        # только выбранные поля анкеты: skipped — JSON, по нему PostgreSQL не группирует
+        .group_by(
+            learners.c.id,
+            learner_names.c.display_name,
+            learner_profiles.c.age_group,
+            learner_profiles.c.gender,
+            learner_profiles.c.native_language,
+            learner_profiles.c.arabic_reading,
+            learner_profiles.c.prayer,
+        )
     )
     row = (await session.execute(query)).mappings().first()
     return LearnerCard(**row) if row else None
