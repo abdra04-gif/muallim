@@ -25,8 +25,15 @@ docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRE
 docker compose exec -T postgres pg_restore --list < "$d/db.dump" > /dev/null \
   || fail "дамп не читается (pg_restore --list)"
 
-if [ "${1:-}" != "--db-only" ] && [ -d data/audio ]; then
-  tar -czf "$d/audio.tar.gz" -C data audio || fail "не удалось упаковать записи"
+# Записи и тестовая часть (голоса и соль деления, TD-FN-174) — каждая папка сама по себе: соль
+# появляется с первой оценки, даже когда обычных записей ещё нет; без соли деление не восстановить.
+if [ "${1:-}" != "--db-only" ]; then
+  parts=""
+  for p in audio holdout; do [ -d "data/$p" ] && parts="$parts $p"; done
+  if [ -n "$parts" ]; then
+    # shellcheck disable=SC2086 # parts — список папок
+    tar -czf "$d/audio.tar.gz" -C data $parts || fail "не удалось упаковать записи"
+  fi
 fi
 if [ -f data/erasures/erasures.jsonl ]; then
   cp data/erasures/erasures.jsonl "$d/erasures.jsonl" || fail "не удалось скопировать журнал удалений"

@@ -35,6 +35,7 @@ from muallim.application.ports.storage import (
     BookPages,
     LessonLinks,
     ReferenceAudioLibrary,
+    SplitSalt,
 )
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.application.use_cases.annotation import (
@@ -72,7 +73,8 @@ from muallim.domain.curriculum import Curriculum
 from muallim.domain.policy import CardPolicy, GradingPolicy
 from muallim.infrastructure.asr.stub import DisabledRecognizer, StubCardListener, StubRecognizer
 from muallim.infrastructure.audio.ffmpeg import trim_silence
-from muallim.infrastructure.audio.file_store import FileAudioStore
+from muallim.infrastructure.audio.file_store import HOLDOUT_DIR, FileAudioStore
+from muallim.infrastructure.audio.holdout import FileSplitSalt
 from muallim.infrastructure.audio.http import fetch
 from muallim.infrastructure.audio.reference_library import (
     CombinedReferenceAudio,
@@ -238,6 +240,11 @@ class AppProvider(Provider):
     @provide
     def audio_store(self) -> AudioStore:
         return FileAudioStore(self.settings.audio_dir)
+
+    @provide
+    def split_salt(self) -> SplitSalt | None:
+        """Соль деления на учёбу и тест — в закрытой части рядом с записями (TD-FN-174)."""
+        return FileSplitSalt(self.settings.audio_dir.parent / HOLDOUT_DIR / "salt")
 
     @provide
     def erasure_log(self, clock: Clock) -> ErasureLog:

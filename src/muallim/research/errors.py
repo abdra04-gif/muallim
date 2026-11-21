@@ -12,6 +12,7 @@ from typing import Any
 from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.domain.split import Part
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.tables import UtcDateTime
 
@@ -89,4 +90,8 @@ def write_csv(rows: list[dict[str, Any]], path: Path, audio_dir: Path) -> None:
         writer.writeheader()
         for row in rows:
             sha = row.get("audio_sha256")
-            writer.writerow({**row, "audio_path": str(store.path_for(sha)) if sha else ""})
+            # тестовые попытки — в закрытой части, путь к ним не показываем (TD-FN-174)
+            voice = (
+                store.path_for(sha) if sha and store.part_on_disk(sha) is not Part.TEST else None
+            )
+            writer.writerow({**row, "audio_path": str(voice) if voice else ""})

@@ -40,6 +40,7 @@ from muallim.domain.annotation import (
 )
 from muallim.domain.annotation import AnnotationStatus as AttemptStatus
 from muallim.domain.policy import Verdict, is_mastered_verdict
+from muallim.domain.split import Part
 from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.repositories.annotation import bot_errors, queue_query
 from muallim.infrastructure.db.tables import annotations, attempts, learners
@@ -96,7 +97,10 @@ async def export_package(
     found = await bot_errors(session, [r.id for r in rows])
     errors = {a: _errors_text(e) for a, e in found.items()}
     store = FileAudioStore(audio_root)
-    missing = [r.audio_sha256 for r in rows if not store.path_for(r.audio_sha256).is_file()]
+    parts = {r.audio_sha256: store.part_on_disk(r.audio_sha256) for r in rows}
+    missing = [sha for sha, part in parts.items() if part is None]
+    # тестовые попытки размечают в боте, в пакет (его открывает и агент) они не идут (TD-FN-174)
+    rows = [r for r in rows if parts[r.audio_sha256] is Part.TRAIN]
     if missing:
         raise AnnotationError(
             f"Нет файлов записей: {len(missing)} (первый {missing[0]}). "

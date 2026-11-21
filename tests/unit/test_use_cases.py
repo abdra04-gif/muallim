@@ -988,3 +988,39 @@ async def test_progress_counts_lines_for_review_today(w: World) -> None:
     w.clock.current += timedelta(days=1)
     progress = await w.progress().execute(learner)
     assert progress.review_due == len(await _review(w).execute(learner)) == 1
+
+
+# ---------- деление на учёбу и тест (TD-FN-174, предрегистрация 0.7) ----------
+class _Salt:
+    def get(self) -> bytes:
+        return b"s" * 32
+
+    def fingerprint(self) -> str:
+        return "x"
+
+
+async def test_voice_goes_to_the_part_given_by_the_split_rule(w: World) -> None:
+    from dataclasses import replace as dc_replace  # noqa: PLC0415
+
+    from muallim.domain.split import part_of  # noqa: PLC0415
+
+    learner = await w.learner()
+    learner.research_consent = True
+    uc = dc_replace(w.assess(), split_salt=_Salt())
+    for k in range(40):  # разные записи — разные хеши файлов
+        await uc.execute(learner, f"ogg-{k}".encode())
+    seen = set()
+    for attempt, _ in w.attempts.items:
+        assert attempt.audio_sha256 is not None
+        expected = part_of(attempt.id, _Salt().get()).value
+        assert w.audio.parts[attempt.audio_sha256] == expected, attempt.id
+        seen.add(expected)
+    assert seen == {"train", "test"}, "за 40 попыток встречаются обе части"
+
+
+async def test_without_salt_every_voice_stays_in_training(w: World) -> None:
+    learner = await w.learner()
+    learner.research_consent = True
+    for k in range(10):
+        await w.assess().execute(learner, f"ogg-{k}".encode())
+    assert set(w.audio.parts.values()) == {"train"}

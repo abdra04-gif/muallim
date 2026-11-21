@@ -3,15 +3,29 @@
 from dataclasses import dataclass
 from typing import Protocol
 
+from muallim.domain.split import Part
+
 
 class AudioStore(Protocol):
-    async def save(self, audio: bytes) -> str:
-        """Сохраняет запись и возвращает её SHA-256 (адресация по содержимому)."""
+    async def save(self, audio: bytes, part: Part = Part.TRAIN) -> str:
+        """Сохраняет запись и возвращает её SHA-256 (адресация по содержимому).
 
-    async def delete(self, sha256: str) -> None: ...
+        ``part`` — учёба или тест (TD-FN-174): тестовые записи лежат в закрытой части."""
+
+    async def delete(self, sha256: str) -> None:
+        """Удаляет запись из любой части (удаление данных ученика)."""
 
     async def read(self, sha256: str) -> bytes | None:
-        """Запись по SHA-256 (для разметчика); None — файла нет."""
+        """Запись по SHA-256 из любой части (для разметчика); None — файла нет."""
+
+
+class SplitSalt(Protocol):
+    """Соль деления на учёбу и тест (TD-FN-174): создаётся один раз, лежит в закрытой части."""
+
+    def get(self) -> bytes: ...
+
+    def fingerprint(self) -> str:
+        """SHA-256 соли — в журнал исследования до первого обучения (предрегистрация 0.7)."""
 
 
 class ReferenceAudioLibrary(Protocol):

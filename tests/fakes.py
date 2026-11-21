@@ -213,11 +213,14 @@ class InMemoryAudio:
     files: dict[str, bytes] = field(default_factory=dict)
     journal: list[str] = field(default_factory=list)  # общий с SpyUoW: порядок commit/удаления
 
-    async def save(self, audio: bytes) -> str:
+    parts: dict[str, str] = field(default_factory=dict)  # sha → "train" / "test" (TD-FN-174)
+
+    async def save(self, audio: bytes, part: Any = None) -> str:
         import hashlib  # noqa: PLC0415
 
         sha = hashlib.sha256(audio).hexdigest()
         self.files[sha] = audio
+        self.parts[sha] = getattr(part, "value", "train")
         return sha
 
     async def delete(self, sha256: str) -> None:

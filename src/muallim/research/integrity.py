@@ -50,9 +50,15 @@ MIN_ORPHAN_AGE_S = 600  # бот пишет файл до commit попытки:
 
 
 def _stored(audio_root: Path) -> dict[str, Path]:
-    if not audio_root.is_dir():
-        return {}
-    return {p.stem: p for p in audio_root.glob("*/*.ogg") if _SHA.fullmatch(p.stem)}
+    """Файлы записей в обеих частях: учёба и закрытая тестовая (TD-FN-174)."""
+    roots = (audio_root, FileAudioStore(audio_root).holdout_root)
+    return {
+        p.stem: p
+        for root in roots
+        if root.is_dir()
+        for p in root.glob("*/*.ogg")
+        if _SHA.fullmatch(p.stem)
+    }
 
 
 def _sha256(path: Path) -> str:
@@ -173,10 +179,10 @@ async def delete_orphans(
     Свежие файлы не трогаем, и перед каждым удалением ещё раз спрашиваем БД: бот мог как раз
     сохранить попытку с этой записью.
     """
-    store, now, deleted = FileAudioStore(audio_root), time.time(), 0
+    files, now, deleted = _stored(audio_root), time.time(), 0
     for sha in report.orphans:
-        path = store.path_for(sha)
-        if not path.exists() or now - path.stat().st_mtime < min_age_s:
+        path = files.get(sha)
+        if path is None or not path.exists() or now - path.stat().st_mtime < min_age_s:
             continue
         if not await _in_use(session, sha):
             path.unlink(missing_ok=True)

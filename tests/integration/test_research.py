@@ -139,6 +139,26 @@ async def test_package_has_table_and_recordings_for_annotator(
     assert second["bot_errors"] == "" and second["bot_verdict"] == "засчитано"
 
 
+async def test_package_skips_test_part_voices_instead_of_failing(
+    session: AsyncSession, tmp_path: Path
+) -> None:
+    """TD-FN-174: голос тестовой попытки в закрытой части — пакет без неё, а не падение."""
+    from muallim.domain.split import Part  # noqa: PLC0415
+
+    await _seed(session)
+    root = _audio(tmp_path / "audio")
+    store = FileAudioStore(root)
+    for ch in "abc":  # все голоса — в тест: учебных нет
+        sha = ch * 64
+        test_path = store.path_for(sha, Part.TEST)
+        test_path.parent.mkdir(parents=True, exist_ok=True)
+        store.path_for(sha).replace(test_path)
+    out = tmp_path / "pkg"
+    count = await annotation.export_package(session, root, out, "A1", 10)
+    assert count == 0
+    assert not list((out / "audio").glob("*.ogg")) if (out / "audio").exists() else True
+
+
 async def test_import_from_excel_and_queue_is_per_annotator(
     session: AsyncSession, tmp_path: Path
 ) -> None:

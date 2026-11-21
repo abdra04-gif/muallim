@@ -14,7 +14,7 @@ from muallim.application.ports.recognition import (
     RecognitionError,
 )
 from muallim.application.ports.repositories import AttemptRepository, UnitOfWork
-from muallim.application.ports.storage import AudioStore
+from muallim.application.ports.storage import AudioStore, SplitSalt
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.application.transcription import Reading, as_text, legend, reading
 from muallim.application.use_cases.cards import OpenItem
@@ -30,6 +30,7 @@ from muallim.domain.card_check import (
 from muallim.domain.curriculum import Curriculum, Lesson, LessonItem, Lexicon, lesson_letter
 from muallim.domain.learner import Learner
 from muallim.domain.policy import CardPolicy, GradingPolicy, Verdict
+from muallim.domain.split import Part, part_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,6 +93,8 @@ class AssessRecitation:
     # «Варианты карточки» на MostafaMaroof (FR-70, ADR-0088); None — прежняя проверка Muaalem
     listener: CardListener | None = None
     card_policy: CardPolicy = field(default_factory=CardPolicy)
+    # деление на учёбу и тест (TD-FN-174, предрегистрация 0.7); None — всё в учёбу
+    split_salt: SplitSalt | None = None
 
     async def execute(
         self, learner: Learner, audio: bytes, item_id: str | None = None
@@ -121,13 +124,16 @@ class AssessRecitation:
         best = result.best
         processing_ms = round((time.perf_counter() - started) * 1000)
 
+        # Номер попытки — до сохранения: по нему часть (учёба / тест), тестовый голос — в закрытую.
+        attempt_id = self.ids.new_id()
+        part = part_of(attempt_id, self.split_salt.get()) if self.split_salt else Part.TRAIN
         # Запись храним только с согласия ученика (FR-09, docs/security/privacy.md).
-        audio_sha = await self.audio.save(audio) if learner.research_consent else None
+        audio_sha = await self.audio.save(audio, part) if learner.research_consent else None
 
         language = self.catalog.resolve(learner)
         renderer = self.catalog.renderer(language)
         attempt = Attempt(
-            id=self.ids.new_id(),
+            id=attempt_id,
             learner_id=learner.id,
             item_id=item.id,
             curriculum_version=self.curriculum.version,

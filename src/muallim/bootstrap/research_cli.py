@@ -19,7 +19,6 @@
 
 import argparse
 import asyncio
-import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -90,20 +89,18 @@ async def _run(args: argparse.Namespace) -> str:
             if args.command == "dataset-export":
                 rows = await dataset.dataset_rows(session)
                 store = FileAudioStore(settings.audio_dir)
-                missing = [r for r in rows if not store.path_for(r["audio_sha256"]).is_file()]
-                if missing:  # до создания папки: недоделанная выгрузка хуже, чем никакой
-                    raise annotation.AnnotationError(
-                        f"Нет файлов записей: {len(missing)}. Сначала: muallim-research verify"
-                    )
                 out_dir = PROJECT_ROOT / "data" / "exports" / stamp
                 (out_dir / "audio").mkdir(parents=True)
-                for row in rows:
-                    shutil.copy2(store.path_for(row["audio_sha256"]), out_dir / row["audio"])
+                # только учебная часть; тестовые попытки — в закрытой части (TD-FN-174)
+                rows, test_skipped = dataset.copy_training_audio(rows, store, out_dir)
                 dataset.write_jsonl(rows, out_dir / "manifest.jsonl")
                 dataset.write_iqraeval(rows, out_dir)
                 dataset.write_phonemes(rows, out_dir / "phonemes.csv")
                 agreed = sum(r["consensus_phonemes"] is not None for r in rows)
-                return f"Датасет: {len(rows)} записей, согласованная разметка: {agreed} → {out_dir}"
+                return (
+                    f"Датасет: {len(rows)} записей, согласованная разметка: {agreed} → {out_dir}"
+                    f"\nТестовых попыток не выгружено (закрытая часть): {test_skipped}"
+                )
     finally:
         await engine.dispose()
     raise SystemExit(f"Неизвестная команда {args.command}")

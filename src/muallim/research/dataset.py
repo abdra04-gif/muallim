@@ -15,6 +15,7 @@ Telegram ID и имя не выгружаются никогда — тольк�
 
 import csv
 import json
+import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from muallim.domain.split import Part
+from muallim.infrastructure.audio.file_store import FileAudioStore
 from muallim.infrastructure.db.tables import (
     annotation_marks,
     annotations,
@@ -30,7 +33,7 @@ from muallim.infrastructure.db.tables import (
     learner_profiles,
     learners,
 )
-from muallim.research.annotation import USABLE, AttemptStatus
+from muallim.research.annotation import USABLE, AnnotationError, AttemptStatus
 from muallim.research.metrics import COMPARISON_VERSION, phoneme_outcomes
 
 _STATUSES = [str(s) for s in AttemptStatus]  # метки руководства 2.0; старые (без фонем) — нет
@@ -147,6 +150,23 @@ def _consensus(marks: list[dict[str, Any]]) -> str | None:
     complete = all(m["actual_phonemes"] is not None for m in marks)
     usable = len(marks) >= 2 and complete and all(m["status"] in USABLE for m in marks)
     return actual.pop() if usable and len(actual) == 1 else None
+
+
+def copy_training_audio(
+    rows: list[dict[str, Any]], store: FileAudioStore, out_dir: Path
+) -> tuple[list[dict[str, Any]], int]:
+    """Голоса для выгрузки обучения (TD-FN-174): только учебная часть. Тестовые попытки не
+    копируются, а считаются; записи, которых нет нигде, — ошибка, и до копирования."""
+    parts = {r["audio_sha256"]: store.part_on_disk(r["audio_sha256"]) for r in rows}
+    missing = [sha for sha, part in parts.items() if part is None]
+    if missing:  # до копирования: недоделанная выгрузка хуже, чем никакой
+        raise AnnotationError(
+            f"Нет файлов записей: {len(missing)}. Сначала: muallim-research verify"
+        )
+    kept = [r for r in rows if parts[r["audio_sha256"]] is Part.TRAIN]
+    for row in kept:
+        shutil.copy2(store.path_for(row["audio_sha256"]), out_dir / row["audio"])
+    return kept, len(rows) - len(kept)
 
 
 def write_jsonl(rows: list[dict[str, Any]], path: Path) -> None:
