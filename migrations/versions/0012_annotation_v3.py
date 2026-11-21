@@ -67,6 +67,6 @@ def downgrade() -> None:
     )
     _swap_kind_check(OLD_KINDS)
     if op.get_bind().dialect.name != "sqlite":
-        op.drop_constraint(SOURCE_CHECK, "annotations", type_="check")
+        op.drop_constraint(op.f(SOURCE_CHECK), "annotations", type_="check")  # имя уже полное
     # SQLite ≥ 3.35 удаляет столбец сам; CHECK столбца уходит вместе с ним.
     op.execute("ALTER TABLE annotations DROP COLUMN phonemes_source")

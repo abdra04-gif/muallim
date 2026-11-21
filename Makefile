@@ -92,6 +92,17 @@ model-check: ## Не обновилась ли модель Muaalem на Hugging
 report: ## Отчёт по данным исследования
 	uv run muallim-research report
 
+# Вход ИИ-агента в БД — только учебная часть (ADR-0090, TD-FN-174): роль muallim_agent, адрес — из
+# data/agent/database.url (создаёт make db-roles). Агенту другие входы закрыты хуком guard.py.
+AGENT_DB = $$(cat data/agent/database.url)
+agent-research: ## Агент: muallim-research входом muallim_agent, make agent-research a="report"
+	@test -f data/agent/database.url || (echo "нет data/agent/database.url — make db-roles" && exit 1)
+	DATABASE_URL="$(AGENT_DB)" uv run muallim-research $(a)
+
+agent-psql: ## Агент: psql входом muallim_agent (только чтение, только учебная часть)
+	@test -f data/agent/database.url || (echo "нет data/agent/database.url — make db-roles" && exit 1)
+	psql "$$(sed 's/+asyncpg//' data/agent/database.url)"
+
 thesis: ## Диссертация LaTeX, английская версия → thesis/build/main.pdf
 	cd thesis && latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=build main.tex
 

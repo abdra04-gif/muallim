@@ -56,7 +56,22 @@ def upgrade() -> None:
         op.execute(sql)
 
 
+# Таблицы с фильтром строк для входа агента (scripts/db/roles.sql): его политики зависят от split.
+RLS_TABLES = (
+    "attempts", "sura_readings", "detected_errors", "annotations", "learner_reports",
+    "quiz_answers", "annotation_marks", "sura_reading_ayahs", "sura_reading_chunks",
+    "sura_reading_events",
+)  # fmt: skip
+
+
 def downgrade() -> None:
+    if op.get_bind().dialect.name == "postgresql":
+        # без split фильтр «только учёба» невозможен: политики и сам фильтр снимаем (после
+        # повторного upgrade их вернёт make db-roles)
+        for table in RLS_TABLES:
+            op.execute(f'DROP POLICY IF EXISTS agent_train ON "{table}"')
+            op.execute(f'DROP POLICY IF EXISTS everyone ON "{table}"')
+            op.execute(f'ALTER TABLE "{table}" DISABLE ROW LEVEL SECURITY')
     saved = _views_off()
     for table in TABLES:
         with op.batch_alter_table(table) as batch:

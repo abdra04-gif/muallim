@@ -81,7 +81,7 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_annotation_marks_annotation_id"), table_name="annotation_marks")
     op.drop_table("annotation_marks")
     if op.get_bind().dialect.name != "sqlite":
-        op.drop_constraint("ck_annotations_entry_values", "annotations", type_="check")
+        op.drop_constraint(op.f("ck_annotations_entry_values"), "annotations", type_="check")
     # SQLite ≥ 3.35 удаляет столбец сам; CHECK столбца уходит вместе с ним (без пересоздания
     # таблицы — представления не трогаются).
     op.execute("ALTER TABLE annotations DROP COLUMN entry")

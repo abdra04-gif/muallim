@@ -35,7 +35,9 @@ pytestmark = [
     pytest.mark.postgres,
     pytest.mark.skipif(not URL, reason="TEST_POSTGRES_URL не задан"),
 ]
-PASSWORDS = {"owner": "owner-pass", "app": "app-pass", "reader": "reader-pass"}
+PASSWORDS = {
+    "owner": "owner-pass", "app": "app-pass", "reader": "reader-pass", "agent": "agent-pass"
+}  # fmt: skip
 DENIED = (asyncpg.InsufficientPrivilegeError, asyncpg.ReadOnlySQLTransactionError)
 
 
@@ -81,7 +83,8 @@ def roles() -> Iterator[None]:
             "DROP OWNED BY muallim_owner CASCADE;"
             "DROP OWNED BY muallim_app CASCADE;"
             "DROP OWNED BY muallim_reader CASCADE;"
-            "DROP ROLE muallim_owner, muallim_app, muallim_reader;"
+            "DROP OWNED BY muallim_agent CASCADE;"
+            "DROP ROLE muallim_owner, muallim_app, muallim_reader, muallim_agent;"
         )
     )
 
@@ -184,7 +187,75 @@ def test_roles_are_not_superusers_and_script_is_repeatable(roles: None) -> None:
             await con.close()
 
     assert asyncio.run(flags()) == [
+        ("muallim_agent", False, False),  # вход ИИ-агента (TD-FN-174)
         ("muallim_app", False, False),
         ("muallim_owner", False, False),
         ("muallim_reader", False, False),
     ]
+
+
+# ---------- вход агента: только учебная часть (TD-FN-174, ADR-0090, шаг 2б) ----------
+_SEED = """
+INSERT INTO learners (id, telegram_user_id, pseudonym, language, created_at, research_consent,
+    blocked_bot)
+VALUES ('00000000-0000-0000-0000-000000000001', 7, 'L-1', 'ru', now(), true, false);
+INSERT INTO attempts (id, learner_id, item_id, curriculum_version, model_version,
+    reference_phonemes, heard_phonemes, score, verdict, processing_ms, created_at, split)
+VALUES
+ ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-000000000001', 'L03-04', 'v',
+  'm', 'a', 'a', 100, 'excellent', 1, now(), 'train'),
+ ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-000000000001', 'L03-04', 'v',
+  'm', 'a', 'b', 0, 'failed', 1, now(), 'test');
+INSERT INTO detected_errors (attempt_id, ordinal, kind, position, expected, heard, message)
+VALUES ('00000000-0000-0000-0000-00000000000a', 0, 'substitution', 0, 'a', 'a', ''),
+       ('00000000-0000-0000-0000-00000000000b', 0, 'substitution', 0, 'a', 'b', '');
+"""
+
+
+def test_agent_sees_only_the_training_part(roles: None) -> None:
+    """Фильтр строк PostgreSQL: агент пишет обычные запросы, тестовых строк ему не отдают —
+    ни в таблицах, ни через представления, ни в связанных таблицах (ошибки, разметка)."""
+    asyncio.run(_run(_SEED))
+
+    async def scenario() -> dict[str, list[str]]:
+        con = await asyncpg.connect(_url("agent", driver="postgresql"))
+        try:
+            return {
+                "attempts": [r[0] for r in await con.fetch("SELECT split FROM attempts")],
+                "errors": [r[0] for r in await con.fetch("SELECT heard FROM detected_errors")],
+                "view": [r[0] for r in await con.fetch("SELECT heard_phonemes FROM v_attempts")],
+            }
+        finally:
+            await con.close()
+
+    assert asyncio.run(scenario()) == {"attempts": ["train"], "errors": ["a"], "view": ["a"]}
+
+
+def test_bot_and_reader_still_see_both_parts(roles: None) -> None:
+    asyncio.run(_run(_SEED))
+
+    async def count(role: str) -> int:
+        con = await asyncpg.connect(_url(role, driver="postgresql"))
+        try:
+            return int(await con.fetchval("SELECT count(*) FROM attempts"))
+        finally:
+            await con.close()
+
+    assert asyncio.run(count("app")) == 2 and asyncio.run(count("reader")) == 2
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "INSERT INTO annotators (code, created_at) VALUES ('X', now())",
+        "UPDATE attempts SET split = 'train'",
+        "DELETE FROM attempts",
+        "SELECT telegram_user_id FROM learners",
+        "SELECT * FROM learner_names",
+        # в журнале действий — оценки и итоги разметки и тестовых попыток
+        "SELECT * FROM interaction_events",
+    ],
+)
+def test_agent_reads_only_and_without_personal_ids(roles: None, statement: str) -> None:
+    with pytest.raises(DENIED):
+        asyncio.run(_run(statement, "agent"))

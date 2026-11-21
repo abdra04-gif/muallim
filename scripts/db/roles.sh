@@ -1,5 +1,6 @@
 #!/bin/sh
-# Три входа в БД (ADR-0054): muallim_owner (миграции), muallim_app (бот), muallim_reader (DBeaver).
+# Входы в БД (ADR-0054): muallim_owner (миграции), muallim_app (бот), muallim_reader (DBeaver),
+# muallim_agent (ИИ-агент: только чтение и только учебная часть — ADR-0090, TD-FN-174).
 # Новые случайные пароли → роли и права в базе (scripts/db/roles.sql) → строки в .env.
 # Запускает человек (CLAUDE.md: всё про персональные данные). Пароли на экран не выводятся.
 # Повторный запуск = смена паролей и повторная раздача прав (например, после новой миграции).
@@ -14,6 +15,7 @@ db=$(sed -n 's/^POSTGRES_DB=//p' .env)
 owner=$(openssl rand -hex 24)  # только 0-9a-f: не нужно экранировать в URL и SQL
 app=$(openssl rand -hex 24)
 reader=$(openssl rand -hex 24)
+agent=$(openssl rand -hex 24)
 
 # Docker Compose проверяет APP_DB_PASSWORD сервиса bot даже для команды к postgres, а пароль
 # появляется только после этого скрипта — до первого запуска подставляем заглушку (бот её не видит).
@@ -21,11 +23,12 @@ reader=$(openssl rand -hex 24)
 {
   printf '\\set owner_password %s\n\\set app_password %s\n\\set reader_password %s\n' \
     "'$owner'" "'$app'" "'$reader'"
+  printf '\\set agent_password %s\n' "'$agent'"
   cat scripts/db/roles.sql
 } | APP_DB_PASSWORD="${APP_DB_PASSWORD:-roles-not-created-yet}" \
   docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -q -U "$admin" -d "$db" -f -
 
-DB="$db" OWNER="$owner" APP="$app" READER="$reader" python3 - <<'PY'
+DB="$db" OWNER="$owner" APP="$app" READER="$reader" AGENT="$agent" python3 - <<'PY'
 import os, re
 from pathlib import Path
 
@@ -47,6 +50,13 @@ for key, value in values.items():
     text = pattern.sub(line, text) if pattern.search(text) else text.rstrip("\n") + f"\n{line}\n"
 env.write_text(text)
 env.chmod(0o600)
+# Вход агента — отдельный файл: его читают make agent-research и make agent-psql (TD-FN-174).
+agent = Path("data/agent")
+agent.mkdir(parents=True, exist_ok=True)
+agent.chmod(0o700)
+url = agent / "database.url"
+url.write_text(f"postgresql+asyncpg://muallim_agent:{os.environ['AGENT']}@localhost:5432/{db}\n")
+url.chmod(0o600)
 PY
 
 echo "Готово: три входа созданы, пароли записаны в .env (DBeaver — пользователь muallim_reader,"

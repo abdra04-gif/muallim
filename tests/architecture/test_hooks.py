@@ -45,6 +45,10 @@ def guard(project: Path, tool: str, **tool_input: str) -> int:
         ("Write", "file_path", "data/audio/ab/x.ogg"),
         ("Edit", "file_path", "data/annotation/labels.json"),
         ("Write", "file_path", "data/dev.sqlite3"),
+        # с базой агент работает только входом muallim_agent (TD-FN-174, шаг 2б)
+        ("Bash", "command", "uv run muallim-research report"),
+        ("Bash", "command", "uv run muallim-research errors --letter ص"),
+        ("Bash", "command", "psql -h localhost -U muallim_app muallim"),
         # и через shell (ревью 2026-11-21, автор: 3А)
         ("Bash", "command", "mv /tmp/x.ogg data/audio/ab/x.ogg"),
         ("Bash", "command", "cp new.ogg data/recitations/r.ogg"),
@@ -79,6 +83,9 @@ def test_guard_blocks(project: Path, tool: str, arg: str, value: str) -> None:
         ("Read", "file_path", "data/dev.sqlite3"),
         ("Grep", "path", "data/exports"),
         ("Bash", "command", "sqlite3 data/dev.sqlite3 'select count(*) from attempts'"),
+        # вход агента в БД — только учебная часть (TD-FN-174, шаг 2б)
+        ("Bash", "command", "make agent-research a='report'"),
+        ("Bash", "command", "make agent-psql"),
         ("Edit", "file_path", "tests/unit/test_policy.py"),
         ("Bash", "command", "uv run pytest -q"),
         ("Bash", "command", "scripts/phase impl"),

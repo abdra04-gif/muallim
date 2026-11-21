@@ -56,6 +56,13 @@ SHELL_WRITES_ORIGINALS = re.compile(
     r"\b(mv|cp|tee|dd|rsync|ln)\b[^|;&]*\bdata/(audio|recitations|backups|erasures|annotation)/"
     r"|>>?\s*\S*data/(audio|recitations|backups|erasures|annotation)/"
 )
+# С базой агент работает только входом muallim_agent (только учебная часть, TD-FN-174): прямой
+# muallim-research, psql и make report/errors ходят полным входом и видят тест.
+DB_FULL_ACCESS = re.compile(
+    # verify — сверка файлов (только счёт и хеши), агенту можно
+    r"\bmuallim-research\b(?!\s+verify\b)|(^|[\s;&|(])psql\b|\bmake\s+(report|errors)\b"
+)
+AGENT_DB = re.compile(r"^\s*make\s+agent-(research|psql)\b")
 SQL_CLIENT = re.compile(r"\b(psql|db-shell|sqlite3)\b")
 SQL_DESTROY = re.compile(
     r"\b(drop\s+(table|database|schema|view|role|owned)|truncate|delete\s+from|alter\s+table"
@@ -96,6 +103,11 @@ def check_shell(command: str) -> None:
         block("Запрещено: опасная команда (--no-verify, force push, reset --hard, rm -rf...).")
     if SHELL_WRITES_ORIGINALS.search(command):
         block("Запрещено: команда меняет оригиналы данных учеников; читать можно (ADR-0090).")
+    if DB_FULL_ACCESS.search(command) and not AGENT_DB.search(command):
+        block(
+            "Запрещено: полный вход в БД видит тестовую часть. Агенту — make agent-research "
+            'a="…" или make agent-psql (только учебная часть, TD-FN-174).'
+        )
     if DB_DESTROY.search(command) or (SQL_CLIENT.search(command) and SQL_DESTROY.search(command)):
         block(
             "Запрещено: команда может уничтожить данные пилота (том БД, откат миграций, "
