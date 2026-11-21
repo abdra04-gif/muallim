@@ -217,3 +217,30 @@ async def test_reading_keeps_the_grading_policy(curriculum: Curriculum) -> None:
     w = World(curriculum)
     result = await w.uc.execute(w.learner, b"ogg", DUHA, SuraMode.TEXT)
     assert result.reading.policy == GradingPolicy()
+
+
+async def test_sura_voice_goes_to_the_part_given_by_the_split_rule(curriculum: Curriculum) -> None:
+    """Суры делятся так же, как карточки (автор 2026-11-21, вариант «а»; TD-FN-174)."""
+    from dataclasses import replace as dc_replace  # noqa: PLC0415
+
+    from muallim.domain.split import part_of  # noqa: PLC0415
+
+    class Salt:
+        def get(self) -> bytes:
+            return b"s" * 32
+
+        def fingerprint(self) -> str:
+            return "x"
+
+    w = World(curriculum)
+    uc = dc_replace(w.uc, split_salt=Salt())
+    seen = set()
+    for k in range(30):
+        result = await uc.execute(w.learner, f"ogg-{k}".encode(), DUHA, SuraMode.TEXT)
+        reading = result.reading
+        expected = part_of(reading.id, Salt().get())
+        assert reading.part is expected
+        assert reading.audio_sha256 is not None
+        assert w.audio.parts[reading.audio_sha256] == expected.value
+        seen.add(expected)
+    assert len(seen) == 2, "за 30 чтений встречаются обе части"

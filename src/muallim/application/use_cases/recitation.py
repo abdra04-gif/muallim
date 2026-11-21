@@ -150,6 +150,7 @@ class AssessRecitation:
             policy=self.policy,
             app_version=self.build.version,
             feedback_language=language,
+            part=part,
         )
         errors = best.assessment.errors
         reference = best.assessment.reference

@@ -12,6 +12,7 @@ from uuid import UUID
 
 from muallim.domain.assessment import Assessment, Candidate
 from muallim.domain.policy import GradingPolicy, Verdict
+from muallim.domain.split import Part
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,3 +34,4 @@ class Attempt:
     policy: GradingPolicy = field(default_factory=GradingPolicy)  # пороги на момент решения
     app_version: str = ""  # версия кода (git)
     feedback_language: str = "ru"
+    part: Part = Part.TRAIN  # учёба / тест (TD-FN-174, предрегистрация 0.7)

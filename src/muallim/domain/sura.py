@@ -18,6 +18,7 @@ from muallim.domain.assessment import ErrorKind, assess
 from muallim.domain.curriculum import Curriculum, Lesson, LessonItem
 from muallim.domain.phonetics import CONSONANTS
 from muallim.domain.policy import GradingPolicy
+from muallim.domain.split import Part
 
 SURA_SECTION = "sura"
 BASMALA = "1:1"
@@ -532,6 +533,7 @@ class SuraReading:
     processing_ms: int
     created_at: datetime
     policy: GradingPolicy | None = None  # порог, по которому оценено (ADR-0019, TD-FN-116)
+    part: Part = Part.TRAIN  # учёба / тест (TD-FN-174; суры делятся так же — автор 2026-11-21)
 
     @property
     def passed(self) -> bool:

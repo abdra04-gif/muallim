@@ -42,6 +42,7 @@ class SqlAttemptRepository(AttemptRepository):
                 score=a.score,
                 verdict=attempt.verdict,
                 audio_sha256=attempt.audio_sha256,
+                split=attempt.part.value,
                 audio_duration_ms=attempt.audio_duration_ms,
                 processing_ms=attempt.processing_ms,
                 created_at=attempt.created_at,

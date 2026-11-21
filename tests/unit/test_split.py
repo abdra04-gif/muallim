@@ -198,3 +198,15 @@ async def test_dataset_audio_copy_still_fails_on_truly_missing_files(tmp_path: P
     rows = [{"audio_sha256": "f" * 64, "audio": "audio/x.ogg"}]
     with pytest.raises(AnnotationError):
         copy_training_audio(rows, store, tmp_path)
+
+
+# ---------- шаг 2а: часть у попытки и чтения суры; суры делятся так же (автор: «а») ----------
+def test_attempt_and_sura_reading_are_training_by_default() -> None:
+    from dataclasses import fields  # noqa: PLC0415
+
+    from muallim.domain.attempt import Attempt  # noqa: PLC0415
+    from muallim.domain.sura import SuraReading  # noqa: PLC0415
+
+    for model in (Attempt, SuraReading):
+        default = {f.name: f.default for f in fields(model)}.get("part")
+        assert default is Part.TRAIN, model

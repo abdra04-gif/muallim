@@ -40,6 +40,7 @@ class SqlSuraReadingRepository(SuraReadingRepository):
                 reference_phonemes=a.reference,
                 heard_phonemes=a.heard,
                 audio_sha256=reading.audio_sha256,
+                split=reading.part.value,
                 audio_duration_ms=reading.audio_duration_ms,
                 processing_ms=reading.processing_ms,
                 model_version=reading.model_version,

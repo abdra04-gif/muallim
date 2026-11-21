@@ -1014,6 +1014,7 @@ async def test_voice_goes_to_the_part_given_by_the_split_rule(w: World) -> None:
         assert attempt.audio_sha256 is not None
         expected = part_of(attempt.id, _Salt().get()).value
         assert w.audio.parts[attempt.audio_sha256] == expected, attempt.id
+        assert attempt.part.value == expected, "часть попытки уходит и в БД (шаг 2а)"
         seen.add(expected)
     assert seen == {"train", "test"}, "за 40 попыток встречаются обе части"
 

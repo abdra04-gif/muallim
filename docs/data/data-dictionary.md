@@ -101,6 +101,7 @@
 | `policy` | JSON, null | пороги на момент решения: `{"pass_threshold", "excellent_threshold"}` |
 | `app_version` | varchar(64), null | версия кода: `0.2.0+a1b2c3d[-dirty]` |
 | `feedback_language` | varchar(8), null | на каком языке показано объяснение |
+| `split` | varchar(8), по умолч. `train` | учёба или тест: `train` / `test`, по хешу номера попытки с солью (≈ 30 % — тест; TD-FN-174, ADR-0090, предрегистрация 0.7, миграция 0017). Голос тестовой попытки — в закрытой части, агенту не виден. Старые строки — `train`, пока их не разложит команда шага 3 |
 
 Поля следа решения пусты у попыток до миграции 0002.
 
@@ -274,6 +275,7 @@
 | `model_version`, `curriculum_version`, `app_version` | varchar | версии, принявшие решение (ADR-0019) |
 | `policy` | JSON, NULL | порог `GradingPolicy` (`pass_threshold`, `excellent_threshold`), по которому оценено (ADR-0019; порог под вопросом — TD-FN-116) |
 | `created_at` | timestamptz | |
+| `split` | varchar(8), по умолч. `train` | учёба или тест, как у попыток (по хешу номера чтения с солью; суры делятся так же — автор 2026-11-21; TD-FN-174, миграция 0017) |
 
 ## `sura_reading_ayahs` — аяты в чтении суры (FR-60)
 | Поле | Тип | Описание |

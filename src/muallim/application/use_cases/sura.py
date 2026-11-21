@@ -21,13 +21,14 @@ from muallim.application.ports.repositories import (
     SuraReadingRepository,
     UnitOfWork,
 )
-from muallim.application.ports.storage import AudioStore
+from muallim.application.ports.storage import AudioStore, SplitSalt
 from muallim.application.ports.system import BuildInfo, Clock, EventLog, IdGenerator
 from muallim.domain.assessment import Assessment, assess
 from muallim.domain.card_check import CardDecision, accepted_references, decide, full_reading
 from muallim.domain.curriculum import Curriculum
 from muallim.domain.learner import Learner
 from muallim.domain.policy import CardPolicy, GradingPolicy
+from muallim.domain.split import Part, part_of
 from muallim.domain.sura import (
     AyahOutcome,
     AyahResult,
@@ -64,6 +65,8 @@ class ReadSura:
     # «Варианты карточки» на MostafaMaroof (FR-70 ч. 7, ADR-0088); None — прежняя проверка Muaalem
     listener: SuraListener | None = None
     card_policy: CardPolicy = field(default_factory=CardPolicy)
+    # деление на учёбу и тест, как у карточек (TD-FN-174); None — всё в учёбу
+    split_salt: SplitSalt | None = None
 
     async def memorized(self, learner: Learner) -> frozenset[int]:
         """Суры, прочитанные наизусть без ошибок (отметка в списке)."""
@@ -133,13 +136,16 @@ class ReadSura:
         count = await self.readings.count(learner.id, number, mode)
         last = await self.readings.last_read(learner.id, number)
         now = self.clock.now()
+        # Номер чтения — до сохранения: по нему часть (учёба / тест, TD-FN-174), как у карточек.
+        reading_id = self.ids.new_id()
+        part = part_of(reading_id, self.split_salt.get()) if self.split_salt else Part.TRAIN
         # Запись храним только с согласия ученика (FR-09, docs/security/privacy.md).
-        audio_sha = await self.audio.save(audio) if learner.research_consent else None
+        audio_sha = await self.audio.save(audio, part) if learner.research_consent else None
         credited = (
             tuple(i.id for i in items) if mode is SuraMode.TEXT and assessment.complete else ()
         )
         reading = SuraReading(
-            id=self.ids.new_id(),
+            id=reading_id,
             learner_id=learner.id,
             sura=number,
             mode=mode,
@@ -157,6 +163,7 @@ class ReadSura:
             processing_ms=processing_ms,
             created_at=now,
             policy=self.policy,
+            part=part,
         )
         await self.readings.add(reading)
         if credited:

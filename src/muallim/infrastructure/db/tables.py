@@ -55,6 +55,7 @@ from muallim.domain.settings import (
     MINUTES_PER_DAY,
     HowToRead,
 )
+from muallim.domain.split import Part
 from muallim.domain.sura import AyahOutcome, EventKind, SuraMode
 
 # Метки руководства 1.0 (ADR-0040): больше не ставятся, но могли остаться в БД — CHECK их пускает.
@@ -187,8 +188,11 @@ attempts = Table(
     Column("policy", JSON),
     Column("app_version", String(64)),
     Column("feedback_language", String(8)),
+    # учёба / тест (TD-FN-174, миграция 0017); старые строки — train до разметки по соли
+    Column("split", String(8), nullable=False, server_default=Part.TRAIN.value),
     CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
     CheckConstraint(_one_of("verdict", Verdict), name="verdict_values"),
+    CheckConstraint(_one_of("split", Part), name="split_values"),
 )
 
 curriculum_items = Table(
@@ -451,9 +455,12 @@ sura_readings = Table(
     Column("app_version", String(64), nullable=False),
     Column("policy", JSON),  # порог GradingPolicy, по которому оценено (ADR-0019)
     Column("created_at", UtcDateTime(), nullable=False, index=True),
+    # учёба / тест (TD-FN-174, миграция 0017); старые строки — train до разметки по соли
+    Column("split", String(8), nullable=False, server_default=Part.TRAIN.value),
     CheckConstraint(_one_of("mode", SuraMode), name="mode_values"),
     CheckConstraint("score BETWEEN 0 AND 100", name="score_range"),
     CheckConstraint("attempt_number >= 1", name="attempt_number_positive"),
+    CheckConstraint(_one_of("split", Part), name="split_values"),
 )
 
 sura_reading_ayahs = Table(
